@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence, useScroll, useTransform, useSpring } from 'motion/react';
 import { Menu, X, Instagram, Facebook, ArrowRight, ChevronLeft, ChevronRight, Share2, Mail, MessageCircle, Sparkles, Layers, Ban, AlertCircle, Feather, Palette, Heart } from 'lucide-react';
-// @ts-ignore
-import heroBg from './assets/images/mbravo_hero_bg_1780505167063.png';
+
+const heroBg = '/Original.png';
 
 // --- Constants & Types ---
 const NAV_LINKS = [
