@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence, useScroll, useTransform, useSpring } from 'motion/react';
 import { Menu, X, Instagram, Facebook, ArrowRight, ChevronLeft, ChevronRight, Share2, Mail, MessageCircle, Sparkles, Layers, Ban, AlertCircle, Feather, Palette, Heart } from 'lucide-react';
 
-const heroBg = "https://raw.githubusercontent.com/DesignerJota/mbravo-site/main/Original.png";
+const heroBg = '/fundo.png';
 // --- Constants & Types ---
 const NAV_LINKS = [
   { name: 'História', href: '#sobre' },
