@@ -2,8 +2,14 @@ import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence, useScroll, useTransform, useSpring } from 'motion/react';
 import { Menu, X, Instagram, Facebook, ArrowRight, ChevronLeft, ChevronRight, Share2, Mail, MessageCircle, Sparkles, Layers, Ban, AlertCircle, Feather, Palette, Heart } from 'lucide-react';
 
-// @ts-ignore
-import heroBg from '../fundo.png';
+// Hero background images for automatic rotation
+const HERO_BACKGROUNDS = [
+  "https://i.ibb.co/KppF2KLq/Background.png",
+  "https://i.ibb.co/Z6z6D2W9/Background04.png",
+  "https://i.ibb.co/JjKC14LX/Backgrounde03.png",
+  "https://i.ibb.co/nK7Y2Rc/Background06.png"
+];
+
 // --- Constants & Types ---
 const NAV_LINKS = [
   { name: 'História', href: '#sobre' },
@@ -718,6 +724,16 @@ const Hero = () => {
     const contentY = useTransform(scrollY, [0, 500], [0, 60]);
     const scrollYTransform = useTransform(scrollY, [0, 400], [0, -50]);
 
+    // Automatic rotating background slideshow
+    const [bgIndex, setBgIndex] = useState(0);
+
+    useEffect(() => {
+        const timer = setInterval(() => {
+            setBgIndex((prev) => (prev + 1) % HERO_BACKGROUNDS.length);
+        }, 8000); // Cycle backgrounds every 8 seconds
+        return () => clearInterval(timer);
+    }, []);
+
     // Words for the cinematic stagger fade-in
     const titleWords = ["Cada", "ponto", "guarda", "uma", "memória."];
 
@@ -725,14 +741,18 @@ const Hero = () => {
         <section data-background="dark" className="relative z-20 h-screen flex flex-col items-center justify-center bg-forest overflow-hidden text-cream">
             {/* Ambient Overlay Image with Parallax & Slow Animation - Revealing more texture and matter */}
             <div className="absolute inset-0 z-0 select-none pointer-events-none">
-                <motion.div 
-                    style={{ y: bgY, scale: bgScale, backgroundImage: `url(${heroBg})` }}
-                    animate={{ 
-                        opacity: [0.90, 0.96, 0.90],
-                    }}
-                    transition={{ duration: 28, repeat: Infinity, ease: "easeInOut" }}
-                    className="absolute inset-0 bg-cover bg-center brightness-[0.46] contrast-[1.40] saturate-[1.05]"
-                />
+                {HERO_BACKGROUNDS.map((bgUrl, index) => (
+                    <motion.div 
+                        key={bgUrl}
+                        style={{ y: bgY, scale: bgScale, backgroundImage: `url(${bgUrl})` }}
+                        initial={{ opacity: 0 }}
+                        animate={{ 
+                            opacity: bgIndex === index ? 0.93 : 0,
+                        }}
+                        transition={{ duration: 2.2, ease: "easeInOut" }}
+                        className="absolute inset-0 bg-cover bg-center brightness-[0.46] contrast-[1.40] saturate-[1.05]"
+                    />
+                ))}
                 
                 {/* Golden ambient studio lighting leak/flare overlay, adding richness and luxury with organic movement */}
                 <motion.div 
