@@ -118,7 +118,7 @@ const parseMaterials = (text: string): MaterialOption[] => {
 const SHOP_CATEGORIES = [
   {
     id: 'home',
-    name: 'Home',
+    name: 'Casa',
     items: 'Coasters, Placemats, Bookmarks',
     img: 'https://i.ibb.co/j9LHyxq6/Firefly-Gemini-Flash-Imagem-com-ambiente-cosy-tema-handmade-crochet-usar-o-logo-em-label-de-cartao.png',
     products: [
@@ -224,7 +224,7 @@ const SHOP_CATEGORIES = [
   },
   {
     id: 'bags',
-    name: 'Bags',
+    name: 'Malas',
     items: 'African Flower Pouch, Booksleeves, Granny Square',
     img: 'https://i.ibb.co/L78HHMd/bags-pouches-1.png',
     products: [
@@ -361,7 +361,7 @@ const SHOP_CATEGORIES = [
   },
   {
     id: 'premium',
-    name: 'Premium',
+    name: 'Atelier',
     items: 'Cardigan, Top, Clutch, Peças Únicas',
     img: 'https://i.ibb.co/hxvcw25g/Cardigan-CAPA.png',
     products: [
@@ -738,9 +738,9 @@ const Hero = () => {
     const titleWords = ["Cada", "ponto", "guarda", "uma", "memória."];
 
     return (
-        <section data-background="dark" className="relative z-20 h-screen flex flex-col items-center justify-center bg-forest overflow-hidden text-cream">
-            {/* Ambient Overlay Image with Parallax & Slow Animation - Revealing more texture and matter */}
-            <div className="absolute inset-0 z-0 select-none pointer-events-none">
+        <section data-background="dark" className="relative z-20 h-screen flex flex-col items-center justify-center overflow-hidden text-cream" style={{ background: 'linear-gradient(to bottom, #243119 0%, #243119 85%, #29361e 100%)' }}>
+            {/* Ambient Overlay Image with Parallax & Slow Animation - Revealing more texture and matter with a bottom dissolution fade matching our background gradient transition */}
+            <div className="absolute inset-0 z-0 select-none pointer-events-none [mask-image:linear-gradient(to_bottom,black_78%,transparent_98%)]">
                 {HERO_BACKGROUNDS.map((bgUrl, index) => (
                     <motion.div 
                         key={bgUrl}
@@ -795,7 +795,7 @@ const Hero = () => {
                 <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[850px] h-[850px] bg-[radial-gradient(circle_at_center,rgba(197,160,89,0.22)_0%,rgba(197,160,89,0.05)_45%,transparent_70%)] z-10 pointer-events-none mix-blend-screen" />
  
                 {/* Radial gradient vignette and linear gradients for ultimate depth and blend - bottom is completely transparent to flow into page below */}
-                <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_30%,#243119_90%)] z-10 pointer-events-none opacity-50 [mask-image:linear-gradient(to_bottom,black_60%,transparent_100%)]" />
+                <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_30%,#243119_90%)] z-10 pointer-events-none opacity-50 [mask-image:linear-gradient(to_bottom,black_75%,transparent_100%)]" />
                 <div className="absolute inset-0 bg-gradient-to-b from-[#243119]/40 via-transparent to-transparent z-10 pointer-events-none" />
             </div>
  
@@ -822,7 +822,7 @@ const Hero = () => {
                         style={{ 
                             filter: "drop-shadow(0 24px 54px rgba(18,26,13,0.95)) drop-shadow(0 4px 20px rgba(197,160,89,0.18))"
                         }}
-                        className="h-[8.5rem] sm:h-[11rem] md:h-[13.5rem] lg:h-[16.5rem] xl:h-[20rem] mb-1 sm:mb-1.5 md:mb-2 lg:mb-2.5 -mt-3 md:-mt-5 origin-center select-none"
+                        className="h-[7.4rem] sm:h-[9.5rem] md:h-[11.8rem] lg:h-[14.4rem] xl:h-[17.5rem] mb-[5px] sm:mb-[7px] md:mb-[9.5px] lg:mb-[11.5px] -mt-3 md:-mt-5 origin-center select-none"
                     >
                         <Logo light className="h-full" />
                     </motion.div>
@@ -870,7 +870,7 @@ const Hero = () => {
                 </motion.div>
 
                 {/* Zero-height anchor for the thread container so it stays exactly below the subtitle on all screens with perfect vertical composition */}
-                <div className="relative w-full h-0 mt-6 md:mt-8 flex justify-center overflow-visible">
+                <div className="relative w-full h-0 mt-7 md:mt-9 flex justify-center overflow-visible">
                     <motion.div 
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
@@ -878,7 +878,7 @@ const Hero = () => {
                             duration: 1.5,
                             delay: 2.6
                         }}
-                        className="absolute top-0 left-1/2 -translate-x-1/2 w-80 h-[450px] flex flex-col items-center justify-start pointer-events-none select-none z-30 overflow-visible"
+                        className="absolute top-[50px] left-1/2 -translate-x-1/2 w-80 h-[450px] flex flex-col items-center justify-start pointer-events-none select-none z-30 overflow-visible"
                     >
                         <div className="relative w-full h-[450px] flex items-start justify-center overflow-visible">
                             <svg 
@@ -1113,7 +1113,7 @@ const StorySection = () => {
     }, []);
 
     return (
-        <section ref={containerRef} id="sobre" data-background="light" className="py-44 md:py-64 lg:py-72 px-6 sm:px-12 md:px-20 lg:px-24 bg-cream relative z-10 overflow-hidden select-none">
+        <section ref={containerRef} id="sobre" data-background="light" className="py-44 md:py-64 lg:py-72 px-6 sm:px-12 md:px-20 lg:px-24 relative z-10 overflow-hidden select-none" style={{ background: 'linear-gradient(to bottom, #29361e 0%, #354326 8%, #475538 18%, #5f6c4f 30%, #828f70 45%, #adb69a 62%, #dadfcb 80%, #eeebe0 92%, #F5F2ED 97%, #F5F2ED 100%)' }}>
             {/* Elegant Large Watermark Signature in Background */}
             <motion.div 
                 style={{ x: xTrack, y: yTrack, opacity: opacityTrack, fontFamily: "'Great Vibes', cursive" }}
@@ -1211,7 +1211,7 @@ const StorySection = () => {
                 >
                     <div className="space-y-6">
                         <span className="text-[10px] uppercase tracking-[0.45em] font-bold text-forest/35 block font-sans">
-                            01 / MEMÓRIA E AFETO
+                            MEMÓRIA E AFETO
                         </span>
                         <h2 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-serif text-forest tracking-tight leading-[1.05] font-light">
                             Tudo começou com <br />
@@ -1285,14 +1285,14 @@ const MadeWithTimeSection = () => {
                 {/* Header: Large Typography */}
                 <div className="max-w-3xl mb-24 md:mb-32">
                     <span className="text-[10px] uppercase tracking-[0.45em] font-semibold text-forest/35 block mb-4 font-sans">
-                        02 / THE CHRONICLES OF SLOW DESIGN
+                        THE CHRONICLES OF SLOW DESIGN
                     </span>
                     <h2 className="text-4xl sm:text-5xl md:text-7xl font-serif text-forest tracking-tight leading-[1.1] font-light">
                         Feito com Tempo. <br />
                         <span className="italic font-normal text-[#C5A059]">O ritmo calmo de tudo o que merece permanecer.</span>
                     </h2>
                     <p className="mt-6 text-forest/75 text-base md:text-xl font-light leading-relaxed max-w-2xl font-serif italic">
-                        "To slow down is to notice the universe in a single thread."
+                        "Há histórias que só as mãos sabem contar."
                     </p>
                 </div>
 
@@ -1463,7 +1463,7 @@ const KnotSection = () => {
     const opacityTrack = useTransform(smoothProgress, [0, 0.2, 0.8, 1], [0, 0.04, 0.04, 0]);
 
     return (
-        <section ref={containerRef} id="feeling" data-background="dark" className="bg-forest py-52 md:py-80 lg:py-96 px-6 sm:px-12 md:px-20 lg:px-24 relative overflow-hidden">
+        <section ref={containerRef} id="feeling" data-background="dark" className="pt-24 pb-14 md:pt-36 md:pb-20 lg:pt-40 lg:pb-24 px-6 sm:px-12 md:px-20 lg:px-24 relative overflow-hidden" style={{ background: 'linear-gradient(to bottom, #243119 0%, #243119 75%, color-mix(in srgb, #243119 80%, #F5F2ED) 100%)' }}>
             <motion.div 
                 style={{ x: xTrack, y: yTrack, opacity: opacityTrack, fontFamily: "'Cormorant Garamond', serif" }}
                 className="absolute inset-0 pointer-events-none text-cream text-[35vw] leading-none italic font-light whitespace-nowrap text-center flex items-center justify-center select-none"
@@ -1472,12 +1472,12 @@ const KnotSection = () => {
             </motion.div>
 
             <div className="max-w-7xl mx-auto relative z-10">
-                <div className="max-w-3xl mb-36 md:mb-44 lg:mb-48">
+                <div className="max-w-3xl mb-16 md:mb-20 lg:mb-24">
                     <motion.span 
                         initial={{ opacity: 0, y: 10 }}
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true }}
-                        className="text-[10px] uppercase tracking-[0.4em] font-bold text-cream/30 mb-8 block"
+                        className="text-[10px] uppercase tracking-[0.4em] font-bold text-cream/30 mb-4 block"
                     >
                         Filosofia de Criação
                     </motion.span>
@@ -1486,7 +1486,7 @@ const KnotSection = () => {
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true }}
                         transition={{ duration: 1 }}
-                        className="text-6xl md:text-8xl font-serif text-cream leading-tight mb-14 md:mb-16"
+                        className="text-6xl md:text-8xl font-serif text-cream leading-tight mb-8 md:mb-10"
                     >
                         O Ritmo do Coração <br />
                         <span className="italic font-normal text-brand-green-light">em Cada Ponto.</span>
@@ -1496,61 +1496,53 @@ const KnotSection = () => {
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true }}
                         transition={{ duration: 1, delay: 0.2 }}
-                        className="text-cream/80 text-xl md:text-2xl font-light leading-relaxed"
+                        className="text-cream/80 text-xl md:text-2xl font-light leading-relaxed animate-fadeIn"
                     >
-                        Há algo especial em criar com as próprias mãos.
-                        <br /><br />
-                        Cada ponto nasce de um gesto simples, repetido com calma, até ganhar forma, textura e significado.
+                        Há algo especial em criar com as próprias mãos. Cada ponto nasce de um gesto simples, repetido com calma, até ganhar forma, textura e significado.
                         <br /><br />
                         Enquanto as peças crescem, também crescem as memórias, os pensamentos e as histórias que as acompanham.
                         <br /><br />
-                        Talvez seja por isso que o handmade nos toca de forma diferente.
-                        <br /><br />
-                        Porque não transporta apenas matéria.
-                        <br /><br />
-                        Transporta tempo.
-                        <br /><br />
-                        E tudo aquilo que sentimos enquanto criamos.
+                        Talvez seja por isso que o handmade nos toca de forma diferente. Porque não transporta apenas matéria. Transporta tempo – e tudo aquilo que sentimos enquanto criamos.
                     </motion.p>
                 </div>
 
                 {/* Minimalist Details Gallery */}
-                <div className="grid grid-cols-12 gap-12 md:gap-20 lg:gap-24">
+                <div className="grid grid-cols-12 gap-8 md:gap-20 lg:gap-24">
                     {/* Main Focus Detail */}
                     <motion.div 
                         initial={{ opacity: 0, scale: 0.98 }}
                         whileInView={{ opacity: 1, scale: 1 }}
                         viewport={{ once: true }}
                         transition={{ duration: 1.5 }}
-                        className="col-span-12 md:col-span-7 aspect-[4/5] rounded-[3rem] overflow-hidden relative group shadow-2xl"
+                        className="col-span-12 md:col-span-7 aspect-[4/5] rounded-3xl md:rounded-[3rem] overflow-hidden relative group shadow-2xl"
                     >
                         <img 
                             src="https://i.ibb.co/F4Z4Fp4Z/LOGOTIPOo.jpg" 
                             alt="Textura de malha" 
-                            className="w-full h-full object-cover grayscale brightness-[0.4] group-hover:grayscale-0 group-hover:brightness-90 transition-all duration-[2s] ease-out scale-110 group-hover:scale-100"
+                            className="w-full h-full object-cover brightness-[0.75] md:grayscale md:brightness-[0.45] md:group-hover:grayscale-0 md:group-hover:brightness-90 transition-all duration-[1.5s] ease-out scale-105 md:scale-110 md:group-hover:scale-100"
                         />
-                        <div className="absolute inset-x-0 bottom-0 p-12 bg-gradient-to-t from-forest/80 to-transparent">
-                            <span className="text-[10px] uppercase tracking-[0.4em] text-cream/40 mb-2 block">Premium / Bags</span>
+                        <div className="absolute inset-x-0 bottom-0 p-8 md:p-12 bg-gradient-to-t from-forest/90 via-forest/40 to-transparent">
+                            <span className="text-[10px] uppercase tracking-[0.4em] text-cream/50 mb-1 md:mb-2 block">Premium / Bags</span>
                             <p className="text-cream text-lg md:text-2xl font-serif italic">A trama que define o DNA Bravo.</p>
                         </div>
                     </motion.div>
 
                     {/* Secondary Details */}
-                    <div className="col-span-12 md:col-span-5 flex flex-col gap-12 md:gap-20 lg:gap-24 justify-center">
+                    <div className="col-span-12 md:col-span-5 flex flex-col gap-6 md:gap-14 lg:gap-16 justify-center">
                         <motion.div 
                             initial={{ opacity: 0, x: 30 }}
                             whileInView={{ opacity: 1, x: 0 }}
                             viewport={{ once: true }}
                             transition={{ duration: 1.2, delay: 0.3 }}
-                            className="aspect-square rounded-[3rem] overflow-hidden grayscale brightness-[0.4] hover:grayscale-0 hover:brightness-100 transition-all duration-1000 shadow-xl relative group"
+                            className="aspect-square rounded-3xl md:rounded-[3rem] overflow-hidden transition-all duration-1000 shadow-xl relative group"
                         >
                             <img 
                                 src="https://i.ibb.co/d0Rn6jC7/MOOD-01.png" 
                                 alt="Mãos da artesã" 
-                                className="w-full h-full object-cover hover:scale-110 transition-transform duration-[2s]"
+                                className="w-full h-full object-cover brightness-[0.75] md:grayscale md:brightness-[0.45] md:hover:grayscale-0 md:hover:brightness-100 scale-102 md:hover:scale-110 transition-all duration-[1.5s]"
                             />
-                            <div className="absolute top-6 left-6 opacity-0 group-hover:opacity-100 transition-opacity">
-                                <span className="bg-cream/10 backdrop-blur-md px-4 py-1 rounded-full text-[8px] uppercase tracking-widest text-cream">Home Essentials</span>
+                            <div className="absolute top-4 left-4 md:top-6 md:left-6 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-300">
+                                <span className="bg-cream/15 backdrop-blur-md px-4 py-1.5 rounded-full text-[8.5px] uppercase tracking-widest text-cream">Home Essentials</span>
                             </div>
                         </motion.div>
                         <motion.div 
@@ -1558,15 +1550,15 @@ const KnotSection = () => {
                             whileInView={{ opacity: 1, x: 0 }}
                             viewport={{ once: true }}
                             transition={{ duration: 1.2, delay: 0.5 }}
-                            className="aspect-video rounded-[3rem] overflow-hidden grayscale brightness-[0.4] hover:grayscale-0 hover:brightness-100 transition-all duration-1000 shadow-xl relative group"
+                            className="aspect-video rounded-3xl md:rounded-[3rem] overflow-hidden transition-all duration-1000 shadow-xl relative group"
                         >
                             <img 
                                 src="https://i.ibb.co/0pfJPj9V/emotional-thank-you-card-1.png" 
                                 alt="Detalhe de material" 
-                                className="w-full h-full object-cover hover:scale-110 transition-transform duration-[2s]"
+                                className="w-full h-full object-cover brightness-[0.75] md:grayscale md:brightness-[0.45] md:hover:grayscale-0 md:hover:brightness-100 scale-102 md:hover:scale-110 transition-all duration-[1.5s]"
                             />
-                            <div className="absolute top-6 left-6 opacity-0 group-hover:opacity-100 transition-opacity">
-                                <span className="bg-cream/10 backdrop-blur-md px-4 py-1 rounded-full text-[8px] uppercase tracking-widest text-cream">Bikinis & Beach</span>
+                            <div className="absolute top-4 left-4 md:top-6 md:left-6 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-300">
+                                <span className="bg-cream/15 backdrop-blur-md px-4 py-1.5 rounded-full text-[8.5px] uppercase tracking-widest text-cream">Bikinis & Beach</span>
                             </div>
                         </motion.div>
                     </div>
@@ -1762,13 +1754,13 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, i, isFocused, isSubd
     const currentImg = productImages[activeImgIndex];
 
     return (
-        <div className="w-full h-full md:max-w-6xl md:h-[88vh] bg-[#FCFBF9] rounded-none md:rounded-[2.5rem] flex flex-col md:flex-row shadow-2xl relative overflow-y-auto md:overflow-hidden text-forest select-none">
+        <div className="w-full h-full md:max-w-3xl md:h-[90vh] lg:max-w-6xl lg:h-[88vh] bg-[#FCFBF9] rounded-none md:rounded-[2rem] lg:rounded-[2.5rem] flex flex-col lg:flex-row shadow-2xl relative overflow-y-auto lg:overflow-hidden text-forest select-none">
             {/* a) Área de Visualização */}
             <div 
-                className={`transition-all duration-500 ease-in-out relative flex flex-col items-center justify-center p-6 md:p-12 overflow-hidden bg-[#141A11] ${
+                className={`transition-all duration-500 ease-in-out relative flex flex-col items-center justify-center p-6 lg:p-12 overflow-hidden bg-[#141A11] ${
                     isZoomed 
-                        ? 'fixed inset-0 z-[140] w-screen h-screen bg-black/98 p-4 md:p-8 border-none' 
-                        : 'w-full md:w-[62%] h-[46vh] md:h-full shrink-0 border-b md:border-b-0 md:border-r border-white/5'
+                        ? 'fixed inset-0 z-[140] w-screen h-screen bg-black/98 p-4 lg:p-8 border-none' 
+                        : 'w-full lg:w-[62%] h-[46vh] md:h-[50vh] lg:h-full shrink-0 border-b lg:border-b-0 lg:border-r border-white/5'
                 }`}
                 style={{ touchAction: 'none' }}
             >
@@ -1787,7 +1779,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, i, isFocused, isSubd
                 )}
 
                 {!isZoomed && (
-                    <div className="absolute top-6 left-6 z-20 pointer-events-none hidden md:block">
+                    <div className="absolute top-6 left-6 z-20 pointer-events-none hidden lg:block">
                         <span className="bg-white/15 backdrop-blur-md text-white/70 text-[8px] uppercase tracking-[0.25em] px-3.5 py-1.5 rounded-full border border-white/5">
                             Clique para aproximar a foto
                         </span>
@@ -1828,7 +1820,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, i, isFocused, isSubd
                                 }
                             }}
                             className={`max-w-full max-h-full object-contain cursor-grab active:cursor-grabbing select-none rounded-[1.5rem] transition-transform duration-300 ${
-                                isZoomed ? 'md:max-h-[85vh] scale-[1.03]' : 'md:max-h-[75vh] hover:scale-[1.01]'
+                                isZoomed ? 'lg:max-h-[85vh] scale-[1.03]' : 'lg:max-h-[75vh] hover:scale-[1.01]'
                             }`}
                             onClick={() => {
                                 if (!isZoomed) setIsZoomed(true);
@@ -1884,7 +1876,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, i, isFocused, isSubd
                         
                         {/* Interactive Luxury Thumbnails Strip in Viewer */}
                         {!isZoomed && (
-                            <div className="absolute bottom-16 left-1/2 -translate-x-1/2 z-35 hidden md:flex gap-2 p-1.5 bg-black/30 backdrop-blur-xl rounded-xl border border-white/10 max-w-[85%] overflow-x-auto no-scrollbar">
+                            <div className="absolute bottom-16 left-1/2 -translate-x-1/2 z-35 hidden lg:flex gap-2 p-1.5 bg-black/30 backdrop-blur-xl rounded-xl border border-white/10 max-w-[85%] overflow-x-auto no-scrollbar">
                                 {productImages.map((imgUrl, idx) => (
                                     <button
                                         key={idx}
@@ -1911,15 +1903,15 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, i, isFocused, isSubd
             </div>
 
             {/* b) Área de Informação (Details / Sidebar and custom features) */}
-            <div className="w-full md:w-[38%] h-auto md:h-full bg-[#FCFBF9] flex flex-col pl-5 pr-5 py-6 md:py-8 text-forest relative box-border">
+            <div className="w-full lg:w-[38%] h-auto lg:h-full bg-[#FCFBF9] flex flex-col pl-5 pr-5 py-6 lg:py-8 text-forest relative box-border">
                 {/* Upper Scrollable Info Panel with compact spacing */}
-                <div className="flex-1 overflow-y-visible md:overflow-y-auto space-y-5 pr-1 select-text scrollbar-thin scrollbar-thumb-forest/10 scrollbar-track-transparent">
+                <div className="flex-1 overflow-y-visible lg:overflow-y-auto space-y-5 pr-1 select-text scrollbar-thin scrollbar-thumb-forest/10 scrollbar-track-transparent">
                     
                     {/* Title & Navigation/Close Controls */}
                     <div className="flex justify-between items-start gap-4">
                         <div>
                             <span className="text-[9px] uppercase tracking-[0.4em] text-[#C5A059] block mb-1 font-sans font-semibold">EXCLUSIVO M★BRAVO</span>
-                            <h3 className="text-3xl md:text-3.5xl font-serif font-light text-forest leading-tight tracking-[0.05em] mb-1">{product.name}</h3>
+                            <h3 className="text-3xl lg:text-3.5xl font-serif font-light text-forest leading-tight tracking-[0.05em] mb-1">{product.name}</h3>
                         </div>
                         <div className="flex items-center gap-2 flex-shrink-0 z-30">
                             {onPrevProduct && onNextProduct && (
@@ -1959,7 +1951,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, i, isFocused, isSubd
 
                     {/* Descrição em Layout Editorial Expandido e Fluido */}
                     {product.description && (
-                        <p className="text-[13px] text-forest/75 leading-relaxed tracking-wide font-light font-sans whitespace-pre-line max-w-prose md:max-w-[90%] w-full mb-6">
+                        <p className="text-[13px] text-forest/75 leading-relaxed tracking-wide font-light font-sans whitespace-pre-line max-w-prose lg:max-w-[90%] w-full mb-6">
                             {product.description}
                         </p>
                     )}
@@ -2142,7 +2134,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, i, isFocused, isSubd
                     </div>
 
                         {/* B & C) TABLET & MOBILE CHECKOUT BOX: Rendered statically in the scroll flow, liberating vertical space */}
-                        <div className="md:hidden block">
+                        <div className="lg:hidden block">
                             <div id="checkout-box-mobile" className="bg-[#343E2C] rounded-2xl p-5 border border-white/10 shadow-lg relative overflow-hidden text-[#FCFBF9] animate-fadeIn">
                                 <div className="flex justify-between items-center mb-3 pb-2.5 border-b border-white/10">
                                     <h4 className="text-[11px] uppercase tracking-[0.25em] font-semibold bg-gradient-to-b from-[#F5E0B5] to-[#D4AF37] bg-clip-text text-transparent">ENCOMENDA</h4>
@@ -2189,7 +2181,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, i, isFocused, isSubd
                 </div>
 
                 {/* A) DESKTOP FIXED FOOTER CHECKOUT BOX: Always anchored at the base of the sidebar, content scrolls beautifully behind it */}
-                <div className="hidden md:block shrink-0 mt-2">
+                <div className="hidden lg:block shrink-0 mt-2">
                     <div id="checkout-box-desktop" className="bg-[#343E2C] rounded-2xl p-5 border border-white/10 shadow-lg relative overflow-hidden text-[#FCFBF9] animate-fadeIn">
                         <div className="flex justify-between items-center mb-3 pb-2.5 border-b border-white/10">
                             <h4 className="text-[11px] uppercase tracking-[0.25em] font-semibold bg-gradient-to-b from-[#F5E0B5] to-[#D4AF37] bg-clip-text text-transparent">ENCOMENDA</h4>
@@ -2306,7 +2298,8 @@ const CollectionSection = () => {
     }, [focusedProductId]);
 
     return (
-        <section ref={containerRef} id="collection" data-background="light" className="py-44 md:py-64 lg:py-72 bg-cream min-h-screen relative overflow-hidden">
+        <section ref={containerRef} id="collection" data-background="light" className="pt-28 pb-44 md:pt-40 md:pb-64 lg:pt-44 lg:pb-72 bg-cream min-h-screen relative overflow-hidden" style={{ background: 'linear-gradient(to bottom, color-mix(in srgb, #243119 80%, #F5F2ED) 0%, color-mix(in srgb, #243119 40%, #F5F2ED) 40%, #F5F2ED 85%, #F5F2ED 100%)' }}>
+
             <motion.div 
                 style={{ x: xTrack, y: yTrack, opacity: opacityTrack, fontFamily: "'Cormorant Garamond', serif" }}
                 className="absolute inset-0 pointer-events-none text-forest text-[35vw] leading-none italic font-light whitespace-nowrap text-center flex items-center justify-center select-none"
@@ -2314,21 +2307,62 @@ const CollectionSection = () => {
                 M★Bravo
             </motion.div>
 
-            <div className="max-w-7xl mx-auto px-6 mb-44 md:mb-52 text-center relative z-10">
+            <div className="max-w-7xl mx-auto px-6 mb-28 md:mb-32 text-center relative z-10">
+                 {/* Halo radial suave atrás do título */}
+                 <div 
+                     className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none -z-10 rounded-full"
+                     style={{
+                         width: '700px',
+                         height: '300px',
+                         background: 'radial-gradient(circle, rgba(255,248,220,0.18) 0%, rgba(255,248,220,0.08) 35%, transparent 70%)'
+                     }}
+                 />
                  <motion.span 
                     initial={{ opacity: 0 }}
                     whileInView={{ opacity: 1 }}
                     className="text-[10px] uppercase tracking-[0.4em] font-bold text-forest/30 mb-4 block"
                  >
-                    {selectedCategory ? activeCategory?.name : 'Categorias'}
+                    {selectedCategory ? activeCategory?.name : 'Coleção'}
                  </motion.span>
                  <motion.h2 
                     initial={{ opacity: 0, y: 20 }}
                     whileInView={{ opacity: 1, y: 0 }}
-                    className="text-6xl md:text-8xl font-serif text-forest leading-tight"
+                    style={{ 
+                        color: '#1F2A18',
+                        textShadow: '0 1px 0 rgba(255,255,255,0.18), 0 2px 6px rgba(0,0,0,0.05)'
+                    } as React.CSSProperties}
+                    className="text-[4.125rem] md:text-[6.6rem] font-serif font-medium tracking-tight leading-tight"
                  >
-                    {selectedCategory ? activeCategory?.name : <>Catálogo</>}
+                    {selectedCategory ? activeCategory?.name : (
+                        <>
+                            Coleção M
+                            <span 
+                                className="inline-block select-none"
+                                style={{
+                                    background: 'radial-gradient(circle at 35% 30%, rgba(255,255,255,0.75) 0%, rgba(255,255,255,0.15) 35%, transparent 70%), linear-gradient(to bottom, #F7E7A8 0%, #D9B45B 50%, #B8862F 100%)',
+                                    WebkitBackgroundClip: 'text',
+                                    WebkitTextFillColor: 'transparent',
+                                    WebkitTextStroke: '0.2px rgba(255, 255, 255, 0.45)',
+                                    filter: 'drop-shadow(0 2px 6px rgba(184, 134, 47, 0.20))',
+                                } as React.CSSProperties}
+                            >
+                                ★
+                            </span>
+                            Bravo
+                        </>
+                    )}
                  </motion.h2>
+                 
+                 {!selectedCategory && (
+                     <motion.p
+                         initial={{ opacity: 0, y: 10 }}
+                         whileInView={{ opacity: 1, y: 0 }}
+                         transition={{ duration: 1, delay: 0.2 }}
+                         className="text-forest/60 text-lg md:text-xl font-light italic mt-6"
+                     >
+                         O que começou como gesto torna-se matéria.
+                     </motion.p>
+                 )}
 
                  {selectedCategory && (
                     <motion.button 
@@ -2338,7 +2372,7 @@ const CollectionSection = () => {
                         className="mt-12 group flex items-center gap-4 mx-auto text-[10px] uppercase tracking-[0.4em] font-bold text-forest/40 hover:text-forest transition-colors"
                     >
                         <ChevronLeft size={16} className="group-hover:-translate-x-2 transition-transform" />
-                        Voltar às Categorias
+                        Voltar à Coleção
                     </motion.button>
                  )}
             </div>
@@ -2371,7 +2405,6 @@ const CollectionSection = () => {
                                         className="w-full h-full object-cover grayscale brightness-75 group-hover:grayscale-0 group-hover:brightness-100 group-hover:scale-110 transition-all duration-[2s] ease-out"
                                     />
                                     <div className="absolute inset-0 bg-gradient-to-t from-forest/90 via-forest/20 to-transparent flex flex-col justify-end p-12 translate-y-6 group-hover:translate-y-0 transition-transform duration-700">
-                                        <span className="text-brand-green-light text-[10px] uppercase tracking-[0.5em] font-bold mb-4">Categoria</span>
                                         <h3 className="text-4xl md:text-6xl font-serif text-cream mb-4">{cat.name}</h3>
                                         <p className="text-cream/60 text-sm font-light mb-10 max-w-sm opacity-0 group-hover:opacity-100 transition-opacity duration-700">{cat.items}</p>
                                     </div>
@@ -2516,9 +2549,9 @@ const ContactSection = () => {
                     <div className="flex flex-col items-center gap-10 md:gap-12">
                         <a 
                             href={MAILTO_LINK}
-                            className="group flex items-center gap-4 text-2xl md:text-4xl font-serif text-cream hover:text-brand-green-light transition-all border-b border-cream/20 pb-4"
+                            className="group flex items-center gap-3 md:gap-4 text-[17px] xs:text-xl sm:text-2xl md:text-4xl font-serif text-cream hover:text-brand-green-light transition-all border-b border-cream/20 pb-3 md:pb-4 whitespace-nowrap"
                         >
-                            <Mail size={24} className="md:w-8 md:h-8 opacity-40 group-hover:opacity-100 transition-opacity" />
+                            <Mail size={20} className="sm:w-6 sm:h-6 md:w-8 md:h-8 opacity-40 group-hover:opacity-100 transition-opacity flex-shrink-0" />
                             {CONTACT_EMAIL}
                         </a>
 
@@ -2526,15 +2559,15 @@ const ContactSection = () => {
                             href={`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent("Olá! Vi o site da M★BRAVO e gostaria de saber mais sobre as suas peças.")}`}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="group flex items-center gap-4 text-2xl md:text-4xl font-serif text-cream hover:text-brand-green-light transition-all border-b border-cream/20 pb-4"
+                            className="group flex items-center gap-3 md:gap-4 text-[17px] xs:text-xl sm:text-2xl md:text-4xl font-serif text-cream hover:text-brand-green-light transition-all border-b border-cream/20 pb-3 md:pb-4 whitespace-nowrap"
                         >
-                            <MessageCircle size={24} className="md:w-8 md:h-8 opacity-40 group-hover:opacity-100 transition-opacity" />
+                            <MessageCircle size={20} className="sm:w-6 sm:h-6 md:w-8 md:h-8 opacity-40 group-hover:opacity-100 transition-opacity flex-shrink-0" />
                             Conversar via WhatsApp
                         </a>
                     </div>
                 </motion.div>
 
-                <div className="mt-40 md:mt-48 flex flex-wrap justify-center gap-14 md:gap-16 lg:gap-20">
+                <div className="mt-40 md:mt-48 flex flex-wrap justify-center gap-6 sm:gap-14 md:gap-16 lg:gap-20">
                     <a href="https://www.instagram.com/mbravo.handmade/" target="_blank" rel="noopener noreferrer" className="text-[10px] uppercase tracking-[0.4em] text-cream/40 hover:text-cream transition-colors">
                         Instagram
                     </a>
@@ -2586,7 +2619,7 @@ const MemoryContinuesSection = () => {
                     {/* Section label */}
                     <div className="space-y-6">
                         <span className="text-[10px] uppercase tracking-[0.45em] font-semibold text-forest/35 block font-sans">
-                            03 / A MEMÓRIA CONTINUA
+                            A MEMÓRIA CONTINUA
                         </span>
                         <div className="h-[1px] w-12 bg-forest/10 mx-auto" />
                     </div>
