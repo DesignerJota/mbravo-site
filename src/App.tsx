@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { motion, AnimatePresence, useScroll, useTransform, useSpring } from 'motion/react';
+import { motion, AnimatePresence, useScroll, useTransform, useSpring, useVelocity } from 'motion/react';
 import { Menu, X, Instagram, Facebook, ArrowRight, ChevronLeft, ChevronRight, Share2, Mail, MessageCircle, Sparkles, Layers, Ban, AlertCircle, Feather, Palette, Heart } from 'lucide-react';
 
 // Hero background images for automatic rotation
@@ -714,6 +714,214 @@ const Navbar = () => {
   );
 };
 
+const FioCondutor = () => {
+    const { scrollY } = useScroll();
+
+    // Responsive State: check if screen is mobile (width < 768px)
+    const [isMobile, setIsMobile] = useState(false);
+    useEffect(() => {
+        const checkMobile = () => {
+            setIsMobile(window.innerWidth < 768);
+        };
+        checkMobile();
+        window.addEventListener('resize', checkMobile);
+        return () => window.removeEventListener('resize', checkMobile);
+    }, []);
+
+    // 1. Dynamic Thread Opacity based on scroll progress & page density
+    // Drops to 0.1/0.08 near dense elements (images, details, grids) and stays visible (0.4/0.45) in negative spaces
+    const rawThreadOpacity = useTransform(
+        scrollY,
+        [0, 200, 450, 750, 1100, 1450, 1850, 2200, 2550, 2900, 3200],
+        [0, 0.35, 0.45, 0.12, 0.08, 0.15, 0.42, 0.35, 0.12, 0.08, 0]
+    );
+    const threadOpacity = useSpring(rawThreadOpacity, { stiffness: 60, damping: 22, mass: 0.8 });
+
+    // Map scrollY [0, 3200] to vertical position of the star [40, 2900]
+    const rawStarY = useTransform(scrollY, [0, 3200], [40, 2900], { clamp: true });
+    
+    // Smooth the star's movement with a spring to simulate realistic gravity and inertia
+    const starY = useSpring(rawStarY, { stiffness: 85, damping: 24, mass: 0.4 });
+    
+    // 2. Mobile wiggles vs Desktop wiggles:
+    // Centered around 160. Desktop goes up to 240, down to 80. Mobile stays within 145-175 for non-intrusive flow.
+    const desktopPath = "M 160 40 C 160 180, 240 280, 220 380 C 200 480, 80 580, 100 700 C 120 820, 240 920, 210 1040 C 180 1160, 80 1260, 110 1380 C 140 1500, 240 1620, 220 1740 C 200 1860, 80 1960, 100 2080 C 120 2200, 240 2320, 210 2440 C 180 2560, 80 2680, 120 2800 C 140 2880, 170 2940, 160 3000";
+    const mobilePath  = "M 160 40 C 160 180, 175 280, 170 380 C 165 480, 145 580, 150 700 C 155 820, 175 920, 170 1040 C 165 1160, 145 1260, 150 1380 C 155 1500, 175 1620, 170 1740 C 165 1860, 145 1960, 150 2080 C 155 2200, 175 2320, 170 2440 C 165 2560, 145 2680, 152 2800 C 156 2880, 162 2940, 160 3000";
+
+    const pathD = isMobile ? mobilePath : desktopPath;
+
+    // Track horizontal alignment perfectly
+    const desktopStarXRange = [160, 185, 220, 150, 100, 165, 210, 145, 110, 170, 220, 150, 100, 165, 210, 145, 120, 160];
+    const mobileStarXRange  = [160, 168, 175, 162, 145, 152, 170, 158, 148, 164, 175, 162, 145, 152, 170, 158, 150, 160];
+    const starXRange = isMobile ? mobileStarXRange : desktopStarXRange;
+
+    // Map horizontal coordinate based on path curves
+    const starX = useTransform(
+        starY,
+        [40,  200, 380, 540, 700, 870, 1040, 1210, 1380, 1560, 1740, 1910, 2080, 2260, 2440, 2620, 2800, 3000],
+        starXRange
+    );
+
+    // 3. The Breathing Star based on scroll speed / velocity
+    const scrollVelocity = useVelocity(scrollY);
+    
+    // Transform raw velocity frequency to normalized active scale [0, 1]
+    const rawActiveScroll = useTransform(scrollVelocity, (val) => {
+        const absoluteSpeed = Math.abs(val);
+        // Fully awake/active scroll is around absolute velocity 300
+        return Math.min(absoluteSpeed / 300, 1);
+    });
+
+    // Highly responsive breathing spring for the star activity state (keeps glow alive short time after stopping)
+    const starActivity = useSpring(rawActiveScroll, { stiffness: 45, damping: 18 });
+
+    // Map activity state into opacity: when stopped, it fades to a faint gold glow (0.2), when scrolling, fully visible (1)
+    const starOpacity = useTransform(starActivity, [0, 1], [0.22, 1.0]);
+    const starGlowScale = useTransform(starActivity, [0, 1], [0.85, 1.35]);
+
+    // Apply half-thickness stroke measurements for Mobile
+    const shadowStrokeWidth = isMobile ? 0.6 : 1.2;
+    const coreStrokeWidth   = isMobile ? 0.25 : 0.5;
+    const glowStrokeWidth   = isMobile ? 0.4 : 0.8;
+    const specularStrokeWidth = isMobile ? 0.12 : 0.25;
+
+    return (
+        <div className="absolute top-[75vh] left-1/2 -translate-x-1/2 w-80 h-[3000px] pointer-events-none select-none z-30 overflow-visible">
+            <motion.div 
+                style={{ opacity: threadOpacity }}
+                transition={{ duration: 0.5 }}
+                className="relative w-full h-full flex flex-col items-center justify-start overflow-visible"
+            >
+                <svg 
+                    viewBox="0 0 320 3000" 
+                    fill="none" 
+                    className="select-none pointer-events-none overflow-visible w-full h-full"
+                >
+                    <defs>
+                        {/* High-quality warm golden daylight gradient with sunset vibe fading entirely at bottom */}
+                        <linearGradient id="warmSunlight" x1="0%" y1="0%" x2="0%" y2="100%">
+                            <stop offset="0%" stopColor="#FFF4D6" stopOpacity="0.95" />
+                            <stop offset="25%" stopColor="#C5A059" stopOpacity="0.9" />
+                            <stop offset="50%" stopColor="#D4B26F" stopOpacity="0.85" />
+                            <stop offset="85%" stopColor="#C5A059" stopOpacity="0.7" />
+                            <stop offset="100%" stopColor="#C5A059" stopOpacity="0" />
+                        </linearGradient>
+
+                        {/* Fading transparent gradient for the underlying thread shadow to integrate flawlessly on the cream block */}
+                        <linearGradient id="shadowGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                            <stop offset="0%" stopColor="#182414" stopOpacity="0.32" />
+                            <stop offset="85%" stopColor="#182414" stopOpacity="0.12" />
+                            <stop offset="100%" stopColor="#182414" stopOpacity="0" />
+                        </linearGradient>
+
+                        {/* Transparent fading gradient for the core metallic thread */}
+                        <linearGradient id="solidThreadGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                            <stop offset="0%" stopColor="#C5A059" stopOpacity="0.85" />
+                            <stop offset="85%" stopColor="#C5A059" stopOpacity="0.65" />
+                            <stop offset="100%" stopColor="#C5A059" stopOpacity="0" />
+                        </linearGradient>
+
+                        {/* Transparent fading gradient for the shiny specular highlight */}
+                        <linearGradient id="specularGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                            <stop offset="0%" stopColor="#FFFFFF" stopOpacity="0.95" />
+                            <stop offset="85%" stopColor="#FFFFFF" stopOpacity="0.55" />
+                            <stop offset="100%" stopColor="#FFFFFF" stopOpacity="0" />
+                        </linearGradient>
+
+                        {/* Warm, soft focus sunbeam blur/glow for active light particles */}
+                        <filter id="subtleThreadGlow" x="-50%" y="-50%" width="200%" height="200%">
+                            <feGaussianBlur stdDeviation="1.1" result="blur" />
+                            <feMerge>
+                                <feMergeNode in="blur" />
+                                <feMergeNode in="SourceGraphic" />
+                            </feMerge>
+                        </filter>
+                    </defs>
+
+                    {/* 1. Underlying shadow/glow depth to give dimensional physical presence to the fine thread */}
+                    <motion.path 
+                        d={pathD}
+                        stroke="url(#shadowGradient)" 
+                        strokeWidth={shadowStrokeWidth} 
+                        strokeLinecap="round"
+                        className="blur-[0.7px]"
+                    />
+
+                    {/* 2. Core extremely thin handcrafted thread */}
+                    <motion.path 
+                        d={pathD}
+                        stroke="url(#solidThreadGradient)" 
+                        strokeWidth={coreStrokeWidth} 
+                        strokeLinecap="round"
+                    />
+
+                    {/* 3. Soft warm sunlight catching the thread, breathing gently */}
+                    <motion.path 
+                        d={pathD}
+                        stroke="url(#warmSunlight)" 
+                        strokeWidth={glowStrokeWidth} 
+                        strokeLinecap="round"
+                        filter="url(#subtleThreadGlow)"
+                    />
+
+                    {/* 4. Ultra-thin glowing specular highlight catching natural afternoon glare */}
+                    <motion.path 
+                        d={pathD}
+                        stroke="url(#specularGradient)" 
+                        strokeWidth={specularStrokeWidth} 
+                        strokeLinecap="round"
+                    />
+
+                    {/* Star Group centered exactly around its bottom indent (0, 0), and positioned dynamically with spring-driven scroll tracking */}
+                    <motion.g 
+                        style={{ 
+                            x: starX, 
+                            y: starY,
+                            opacity: starOpacity
+                        }}
+                    >
+                        {/* Elegant background halo glow that increases size and visible light during scroll activity */}
+                        <motion.circle
+                            r="16"
+                            fill="rgba(197, 160, 89, 0.28)"
+                            filter="url(#subtleThreadGlow)"
+                            style={{
+                                scale: starGlowScale,
+                                opacity: starActivity
+                            }}
+                        />
+
+                        {/* Official M★Bravo Star shape, solid gold - centered such that its bottom indent is at (0, 0) */}
+                        <motion.path 
+                            d="M0 -23 L4.3 -13.3 L14.7 -12.3 L7.3 -5.3 L9 4.7 L0 0 L-9 4.7 L-7.3 -5.3 L-14.7 -12.3 L-4.3 -13.3 Z" 
+                            fill="#C5A059"
+                            animate={{
+                                scale: [1, 1.05, 1],
+                            }}
+                            transition={{
+                                duration: 4,
+                                repeat: Infinity,
+                                ease: "easeInOut"
+                            }}
+                        />
+
+                        {/* Elegant Serif "M" inside the star to correspond 100% to the official brand star */}
+                        <text 
+                            x="0" 
+                            y="-6.5" 
+                            textAnchor="middle" 
+                            fill="#243119" 
+                            style={{ fontSize: '7px', fontFamily: "'Cormorant Garamond', serif", fontWeight: 'bold' }}
+                        >
+                            M
+                        </text>
+                    </motion.g>
+                </svg>
+            </motion.div>
+        </div>
+    );
+};
+
 const Hero = () => {
     const { scrollY } = useScroll();
     // Parallax background movement: background slowly slides up or down on scroll
@@ -726,348 +934,185 @@ const Hero = () => {
 
     // Automatic rotating background slideshow
     const [bgIndex, setBgIndex] = useState(0);
+    const [isFirstImageLoaded, setIsFirstImageLoaded] = useState(false);
 
     useEffect(() => {
+        // Preload the first background image to ensure zero-lag flicker-free loading
+        const img = new Image();
+        img.src = HERO_BACKGROUNDS[0];
+        img.onload = () => {
+            setIsFirstImageLoaded(true);
+        };
+
         const timer = setInterval(() => {
             setBgIndex((prev) => (prev + 1) % HERO_BACKGROUNDS.length);
         }, 8000); // Cycle backgrounds every 8 seconds
-        return () => clearInterval(timer);
+        return () => {
+            clearInterval(timer);
+        };
     }, []);
 
     // Words for the cinematic stagger fade-in
     const titleWords = ["Cada", "ponto", "guarda", "uma", "memória."];
 
     return (
-        <section data-background="dark" className="relative z-20 h-screen flex flex-col items-center justify-center overflow-hidden text-cream" style={{ background: 'linear-gradient(to bottom, #243119 0%, #243119 85%, #29361e 100%)' }}>
-            {/* Ambient Overlay Image with Parallax & Slow Animation - Revealing more texture and matter with a bottom dissolution fade matching our background gradient transition */}
-            <div className="absolute inset-0 z-0 select-none pointer-events-none [mask-image:linear-gradient(to_bottom,black_78%,transparent_98%)]">
-                {HERO_BACKGROUNDS.map((bgUrl, index) => (
-                    <motion.div 
-                        key={bgUrl}
-                        style={{ y: bgY, scale: bgScale, backgroundImage: `url(${bgUrl})` }}
-                        initial={{ opacity: 0 }}
-                        animate={{ 
-                            opacity: bgIndex === index ? 0.93 : 0,
-                        }}
-                        transition={{ duration: 2.2, ease: "easeInOut" }}
-                        className="absolute inset-0 bg-cover bg-center brightness-[0.46] contrast-[1.40] saturate-[1.05]"
-                    />
-                ))}
-                
-                {/* Golden ambient studio lighting leak/flare overlay, adding richness and luxury with organic movement */}
-                <motion.div 
-                    animate={{ 
-                        opacity: [0.75, 0.95, 0.75],
-                        scale: [1, 1.04, 1],
-                    }}
-                    transition={{ duration: 20, repeat: Infinity, ease: "easeInOut" }}
-                    className="absolute inset-0 bg-[radial-gradient(circle_at_75%_35%,rgba(197,160,89,0.24)_0%,transparent_60%)] z-10 pointer-events-none mix-blend-color-dodge origin-top-right"
+        <>
+            {/* Estado 0: Empty dark container with solid brand tone #1F2A18 if background image is not loaded yet */}
+            {!isFirstImageLoaded ? (
+                <section 
+                    data-background="dark" 
+                    className="relative z-20 h-screen w-full flex flex-col items-center justify-center overflow-hidden bg-[#1F2A18]" 
+                    style={{ background: '#1F2A18' }} 
+                    id="hero-loader-placeholder"
                 />
-                <motion.div 
-                    animate={{ 
-                        opacity: [0.50, 0.72, 0.50],
-                        x: [-20, 20, -20],
-                        y: [-10, 10, -10]
-                    }}
-                    transition={{ duration: 24, repeat: Infinity, ease: "easeInOut" }}
-                    className="absolute inset-0 bg-[radial-gradient(circle_at_25%_65%,rgba(197,160,89,0.15)_0%,transparent_50%)] z-10 pointer-events-none mix-blend-overlay"
-                />
- 
-                {/* Subtle volumetric ray of light sweeping slowly like workshop window sun shafts */}
-                <motion.div 
-                    animate={{ 
-                        opacity: [0.38, 0.58, 0.38],
-                        rotate: [-1, 1, -1]
-                    }}
-                    transition={{ duration: 32, repeat: Infinity, ease: "easeInOut" }}
-                    className="absolute inset-0 bg-[radial-gradient(ellipse_at_35%_0%,rgba(255,251,240,0.15)_0%,transparent_45%)] z-10 pointer-events-none mix-blend-screen origin-top"
-                />
- 
-                {/* Handmade texture layer: Premium subtle cellulose/organic film grain */}
-                <div 
-                    className="absolute inset-0 pointer-events-none z-10 opacity-[0.075] mix-blend-overlay"
-                    style={{
-                        backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 250 250' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.68' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`
-                    }}
-                />
-                
-                {/* Soft bloom backglow centered right behind the signature to separate and spotlight the brand from the background */}
-                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[850px] h-[850px] bg-[radial-gradient(circle_at_center,rgba(197,160,89,0.22)_0%,rgba(197,160,89,0.05)_45%,transparent_70%)] z-10 pointer-events-none mix-blend-screen" />
- 
-                {/* Radial gradient vignette and linear gradients for ultimate depth and blend - bottom is completely transparent to flow into page below */}
-                <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_30%,#243119_90%)] z-10 pointer-events-none opacity-50 [mask-image:linear-gradient(to_bottom,black_75%,transparent_100%)]" />
-                <div className="absolute inset-0 bg-gradient-to-b from-[#243119]/40 via-transparent to-transparent z-10 pointer-events-none" />
-            </div>
- 
-            {/* Cinematic Centered Editorial Content */}
-            <motion.div 
-                style={{ scale: logoScale, y: contentY }}
-                className="relative z-20 flex flex-col items-center px-6 text-center select-none"
-            >
-                {/* Scroll-fading content wrapper to keep the primary brand elements clean while scroll progresses */}
-                <motion.div
-                    style={{ opacity: logoOpacity }}
-                    className="flex flex-col items-center"
-                >
-                    {/* Official Logo M★Bravo - An elegant editorial brand signature, emerging naturally with majestic scale and supreme presence */}
-                    <motion.div
-                        initial={{ scale: 0.95, opacity: 0, filter: "blur(12px)", y: -15 }}
-                        animate={{ scale: 1.0, opacity: 1.0, filter: "blur(0px)", y: 0 }}
-                        transition={{ 
-                            duration: 2.2,
-                            delay: 0.5,
-                            ease: [0.16, 1, 0.3, 1] 
-                        }}
-                        whileHover={{ opacity: 1, scale: 1.008, transition: { duration: 1.0 } }}
-                        style={{ 
-                            filter: "drop-shadow(0 24px 54px rgba(18,26,13,0.95)) drop-shadow(0 4px 20px rgba(197,160,89,0.18))"
-                        }}
-                        className="h-[7.4rem] sm:h-[9.5rem] md:h-[11.8rem] lg:h-[14.4rem] xl:h-[17.5rem] mb-[5px] sm:mb-[7px] md:mb-[9.5px] lg:mb-[11.5px] -mt-3 md:-mt-5 origin-center select-none"
-                    >
-                        <Logo light className="h-full" />
-                    </motion.div>
- 
-                    {/* Headline: "Cada ponto guarda uma memória." - Refined to a luxury editorial masterwork with staggered word reveal following the logo introduction */}
-                    <h1
-                        style={{ 
-                            fontFamily: "'Cormorant Garamond', serif",
-                            textShadow: "0 15px 40px rgba(18, 26, 13, 0.95), 0 4px 12px rgba(18, 26, 13, 0.7)",
-                            letterSpacing: "-0.015em"
-                        }}
-                        className="italic text-2xl sm:text-3xl md:text-[2.5rem] lg:text-[2.85rem] leading-[1.15] md:leading-[1.18] font-normal text-[#FFFDF9] mb-0 antialiased selection:bg-[#C5A059]/30 flex flex-wrap justify-center gap-x-[0.25em] md:gap-x-[0.28em] max-w-2xl"
-                    >
-                        {titleWords.map((word, i) => (
-                            <motion.span
-                                key={i}
-                                initial={{ opacity: 0, y: 18, filter: "blur(8px)" }}
-                                animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-                                transition={{
-                                    delay: 1.2 + i * 0.15,
-                                    duration: 2.2,
-                                    ease: [0.16, 1, 0.3, 1]
-                                }}
-                                className="inline-block text-[#FFFDF9]"
-                            >
-                                {word}
-                            </motion.span>
-                        ))}
-                    </h1>
- 
-                    {/* Subheadline: "Criado à mão, com tempo, amor e memórias." - Soft, quiet luxury whispering text layout */}
-                    <motion.p
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 0.58, y: 0 }}
-                        transition={{ delay: 2.4, duration: 2.0, ease: [0.16, 1, 0.3, 1] }}
-                        style={{
-                            fontFamily: "'Cormorant Garamond', serif",
-                            textShadow: "0 4px 12px rgba(18, 26, 13, 0.25)",
-                            letterSpacing: "0.024em"
-                        }}
-                        className="italic text-xs sm:text-sm md:text-base font-light text-[#D4C3A3] max-w-[260px] sm:max-w-xs md:max-w-sm mx-auto leading-relaxed mb-0 antialiased"
-                    >
-                        Criado à mão, com tempo, amor e memórias.
-                    </motion.p>
-                </motion.div>
-
-                {/* Zero-height anchor for the thread container so it stays exactly below the subtitle on all screens with perfect vertical composition */}
-                <div className="relative w-full h-0 mt-7 md:mt-9 flex justify-center overflow-visible">
-                    <motion.div 
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        transition={{ 
-                            duration: 1.5,
-                            delay: 2.6
-                        }}
-                        className="absolute top-[50px] left-1/2 -translate-x-1/2 w-80 h-[450px] flex flex-col items-center justify-start pointer-events-none select-none z-30 overflow-visible"
-                    >
-                        <div className="relative w-full h-[450px] flex items-start justify-center overflow-visible">
-                            <svg 
-                                width="320" 
-                                height="450" 
-                                viewBox="0 0 320 450" 
-                                fill="none" 
-                                className="select-none pointer-events-none overflow-visible"
-                            >
-                                <defs>
-                                    {/* High-quality warm golden daylight gradient with sunset vibe fading entirely at bottom */}
-                                    <linearGradient id="warmSunlight" x1="0%" y1="0%" x2="0%" y2="100%">
-                                        <stop offset="0%" stopColor="#FFF4D6" stopOpacity="0.95" />
-                                        <stop offset="40%" stopColor="#C5A059" stopOpacity="0.9" />
-                                        <stop offset="85%" stopColor="#D4B26F" stopOpacity="0.85" />
-                                        <stop offset="100%" stopColor="#C5A059" stopOpacity="0" />
-                                    </linearGradient>
- 
-                                    {/* Fading transparent gradient for the underlying thread shadow to integrate flawlessly on the cream block */}
-                                    <linearGradient id="shadowGradient" x1="0%" y1="0%" x2="0%" y2="100%">
-                                        <stop offset="0%" stopColor="#182414" stopOpacity="0.32" />
-                                        <stop offset="85%" stopColor="#182414" stopOpacity="0.22" />
-                                        <stop offset="100%" stopColor="#182414" stopOpacity="0" />
-                                    </linearGradient>
- 
-                                    {/* Transparent fading gradient for the core metallic thread */}
-                                    <linearGradient id="solidThreadGradient" x1="0%" y1="0%" x2="0%" y2="100%">
-                                        <stop offset="0%" stopColor="#C5A059" stopOpacity="0.85" />
-                                        <stop offset="85%" stopColor="#C5A059" stopOpacity="0.75" />
-                                        <stop offset="100%" stopColor="#C5A059" stopOpacity="0" />
-                                    </linearGradient>
- 
-                                    {/* Transparent fading gradient for the shiny specular highlight */}
-                                    <linearGradient id="specularGradient" x1="0%" y1="0%" x2="0%" y2="100%">
-                                        <stop offset="0%" stopColor="#FFFFFF" stopOpacity="0.95" />
-                                        <stop offset="85%" stopColor="#FFFFFF" stopOpacity="0.75" />
-                                        <stop offset="100%" stopColor="#FFFFFF" stopOpacity="0" />
-                                    </linearGradient>
- 
-                                    {/* Warm, soft focus sunbeam blur/glow for active light particles */}
-                                    <filter id="subtleThreadGlow" x="-50%" y="-50%" width="200%" height="200%">
-                                        <feGaussianBlur stdDeviation="1.1" result="blur" />
-                                        <feMerge>
-                                            <feMergeNode in="blur" />
-                                            <feMergeNode in="SourceGraphic" />
-                                        </feMerge>
-                                    </filter>
-                                </defs>
-
-                                {/* 1. Underlying shadow/glow depth to give dimensional physical presence to the fine thread */}
-                                <motion.path 
+            ) : (
+                <section data-background="dark" className="relative z-20 h-screen flex flex-col items-center justify-center overflow-hidden text-cream bg-[#1F2A18]" style={{ background: 'linear-gradient(to bottom, #1F2A18 0%, #1F2A18 85%, #24301d 100%)' }}>
+                    {/* Ambient Overlay Image with Parallax & Slow Animation - Revealing more texture and matter with a bottom dissolution fade matching our background gradient transition */}
+                    <div className="absolute inset-0 z-0 select-none pointer-events-none [mask-image:linear-gradient(to_bottom,black_78%,transparent_98%)] bg-[#1F2A18]">
+                        {/* Estado 1: Pulsing, dreaming fade-in of the background images with breathing texture depth, merging organically with our deep brand green */}
+                        <motion.div
+                            initial={{ opacity: 0 }}
+                            animate={{
+                                opacity: [0.82, 0.90, 0.82],
+                            }}
+                            transition={{
+                                duration: 8,
+                                repeat: Infinity,
+                                ease: "easeInOut"
+                            }}
+                            className="absolute inset-0"
+                        >
+                            {HERO_BACKGROUNDS.map((bgUrl, index) => (
+                                <motion.div 
+                                    key={bgUrl}
+                                    style={{ y: bgY, scale: bgScale, backgroundImage: `url(${bgUrl})` }}
                                     initial={{ opacity: 0 }}
-                                    animate={{
-                                        opacity: [0, 0.22, 0.16, 0.22],
-                                        d: [
-                                            "M 160 40 C 160 70, 185 90, 180 120 C 175 150, 135 165, 145 200 C 155 235, 180 260, 165 300 C 150 335, 160 345, 160 383 C 155 415, 175 430, 160 450",
-                                            "M 160 40 C 158 68, 181 87, 176 117 C 171 147, 139 167, 149 197 C 159 232, 176 257, 161 296 C 146 335, 159 345, 159 383 C 154 412, 171 427, 160 450",
-                                            "M 160 40 C 162 72, 189 93, 184 123 C 179 153, 131 163, 141 203 C 151 238, 184 263, 169 304 C 154 335, 161 345, 161 383 C 151 418, 179 433, 160 450",
-                                            "M 160 40 C 160 70, 185 90, 180 120 C 175 150, 135 165, 145 200 C 155 235, 180 260, 165 300 C 150 335, 160 345, 160 383 C 155 415, 175 430, 160 450"
-                                        ]
-                                    }}
-                                    transition={{
-                                        opacity: { delay: 3.4, times: [0, 0.2, 0.7, 1], duration: 18, repeat: Infinity, repeatType: "reverse" },
-                                        d: { duration: 18, repeat: Infinity, ease: "easeInOut" }
-                                    }}
-                                    stroke="url(#shadowGradient)" 
-                                    strokeWidth="1.2" 
-                                    strokeLinecap="round"
-                                    className="blur-[0.7px]"
-                                />
-
-                                {/* 2. Core extremely thin handcrafted thread */}
-                                <motion.path 
-                                    initial={{ opacity: 0 }}
-                                    animate={{
-                                        opacity: 0.40,
-                                        d: [
-                                            "M 160 40 C 160 70, 185 90, 180 120 C 175 150, 135 165, 145 200 C 155 235, 180 260, 165 300 C 150 335, 160 345, 160 383 C 155 415, 175 430, 160 450",
-                                            "M 160 40 C 158 68, 181 87, 176 117 C 171 147, 139 167, 149 197 C 159 232, 176 257, 161 296 C 146 335, 159 345, 159 383 C 154 412, 171 427, 160 450",
-                                            "M 160 40 C 162 72, 189 93, 184 123 C 179 153, 131 163, 141 203 C 151 238, 184 263, 169 304 C 154 335, 161 345, 161 383 C 151 418, 179 433, 160 450",
-                                            "M 160 40 C 160 70, 185 90, 180 120 C 175 150, 135 165, 145 200 C 155 235, 180 260, 165 300 C 150 335, 160 345, 160 383 C 155 415, 175 430, 160 450"
-                                        ]
-                                    }}
-                                    transition={{
-                                        opacity: { delay: 3.4, duration: 2.5 },
-                                        d: { duration: 18, repeat: Infinity, ease: "easeInOut" }
-                                    }}
-                                    stroke="url(#solidThreadGradient)" 
-                                    strokeWidth="0.5" 
-                                    strokeLinecap="round"
-                                />
-
-                                {/* 3. Soft warm sunlight catching the thread, breathing gently */}
-                                <motion.path 
-                                    initial={{ opacity: 0 }}
-                                    animate={{
-                                        opacity: [0, 0.70, 0.45, 0.70],
-                                        d: [
-                                            "M 160 40 C 160 70, 185 90, 180 120 C 175 150, 135 165, 145 200 C 155 235, 180 260, 165 300 C 150 335, 160 345, 160 383 C 155 415, 175 430, 160 450",
-                                            "M 160 40 C 158 68, 181 87, 176 117 C 171 147, 139 167, 149 197 C 159 232, 176 257, 161 296 C 146 335, 159 345, 159 383 C 154 412, 171 427, 160 450",
-                                            "M 160 40 C 162 72, 189 93, 184 123 C 179 153, 131 163, 141 203 C 151 238, 184 263, 169 304 C 154 335, 161 345, 161 383 C 151 418, 179 433, 160 450",
-                                            "M 160 40 C 160 70, 185 90, 180 120 C 175 150, 135 165, 145 200 C 155 235, 180 260, 165 300 C 150 335, 160 345, 160 383 C 155 415, 175 430, 160 450"
-                                        ]
-                                    }}
-                                    transition={{
-                                        opacity: { delay: 3.6, times: [0, 0.35, 0.75, 1], duration: 14, repeat: Infinity, repeatType: "reverse" },
-                                        d: { duration: 18, repeat: Infinity, ease: "easeInOut" }
-                                    }}
-                                    stroke="url(#warmSunlight)" 
-                                    strokeWidth="0.8" 
-                                    strokeLinecap="round"
-                                    filter="url(#subtleThreadGlow)"
-                                />
-
-                                {/* 4. Ultra-thin glowing specular highlight catching natural afternoon glare */}
-                                <motion.path 
-                                    initial={{ opacity: 0 }}
-                                    animate={{
-                                        opacity: [0, 0.85, 0.50, 0.85],
-                                        d: [
-                                            "M 160 40 C 160 70, 185 90, 180 120 C 175 150, 135 165, 145 200 C 155 235, 180 260, 165 300 C 150 335, 160 345, 160 383 C 155 415, 175 430, 160 450",
-                                            "M 160 40 C 158 68, 181 87, 176 117 C 171 147, 139 167, 149 197 C 159 232, 176 257, 161 296 C 146 335, 159 345, 159 383 C 154 412, 171 427, 160 450",
-                                            "M 160 40 C 162 72, 189 93, 184 123 C 179 153, 131 163, 141 203 C 151 238, 184 263, 169 304 C 154 335, 161 345, 161 383 C 151 418, 179 433, 160 450",
-                                            "M 160 40 C 160 70, 185 90, 180 120 C 175 150, 135 165, 145 200 C 155 235, 180 260, 165 300 C 150 335, 160 345, 160 383 C 155 415, 175 430, 160 450"
-                                        ]
-                                    }}
-                                    transition={{
-                                        opacity: { delay: 3.6, times: [0, 0.35, 0.75, 1], duration: 11, repeat: Infinity, repeatType: "reverse" },
-                                        d: { duration: 18, repeat: Infinity, ease: "easeInOut" }
-                                    }}
-                                    stroke="url(#specularGradient)" 
-                                    strokeWidth="0.25" 
-                                    strokeLinecap="round"
-                                />
-
-                                {/* Star Group centered exactly around its bottom indent (0, 0), and positioned perfectly at the start of the thread (160, 40) with zero visual gaps */}
-                                <motion.g 
-                                    initial={{ opacity: 0, scale: 0.73, y: 55, x: 160 }}
                                     animate={{ 
-                                        opacity: [0, 0.95, 0.92, 0.95],
-                                        scale: [0.73, 0.79, 0.77, 0.79],
-                                        y: 40,
-                                        x: 160
+                                        opacity: bgIndex === index ? 0.93 : 0,
                                     }}
-                                    transition={{
-                                        opacity: {
-                                            times: [0, 0.15, 0.65, 1],
-                                            delay: 2.9,
-                                            duration: 16,
-                                            repeat: Infinity,
-                                            repeatType: "reverse"
-                                        },
-                                        scale: {
-                                            times: [0, 0.15, 0.65, 1],
-                                            delay: 2.9,
-                                            duration: 16,
-                                            repeat: Infinity,
-                                            repeatType: "reverse"
-                                        },
-                                        y: {
-                                            delay: 2.9,
-                                            duration: 2.5,
-                                            ease: [0.16, 1, 0.3, 1]
-                                        }
-                                    }}
-                                >
-                                    {/* Official M★Bravo Star shape, solid gold - centered such that its bottom indent is at (0, 0) */}
-                                    <path 
-                                        d="M0 -23 L4.3 -13.3 L14.7 -12.3 L7.3 -5.3 L9 4.7 L0 0 L-9 4.7 L-7.3 -5.3 L-14.7 -12.3 L-4.3 -13.3 Z" 
-                                        fill="#C5A059"
-                                    />
- 
-                                    {/* Elegant Serif "M" inside the star to correspond 100% to the official brand star */}
-                                    <text 
-                                        x="0" 
-                                        y="-6.5" 
-                                        textAnchor="middle" 
-                                        fill="#243119" 
-                                        style={{ fontSize: '7px', fontFamily: "'Cormorant Garamond', serif", fontWeight: 'bold' }}
+                                    transition={{ duration: 2.2, ease: "easeInOut" }}
+                                    className="absolute inset-0 bg-cover bg-center brightness-[0.46] contrast-[1.40] saturate-[1.05]"
+                                />
+                            ))}
+                        </motion.div>
+
+                        {/* Golden ambient studio lighting leak/flare overlay, adding richness and luxury with organic movement */}
+                        <motion.div 
+                            animate={{ 
+                                opacity: [0.75, 0.95, 0.75],
+                                scale: [1, 1.04, 1],
+                            }}
+                            transition={{ duration: 20, repeat: Infinity, ease: "easeInOut" }}
+                            className="absolute inset-0 bg-[radial-gradient(circle_at_75%_35%,rgba(197,160,89,0.24)_0%,transparent_60%)] z-10 pointer-events-none mix-blend-color-dodge origin-top-right"
+                        />
+                        <motion.div 
+                            animate={{ 
+                                opacity: [0.50, 0.72, 0.50],
+                                x: [-20, 20, -20],
+                                y: [-10, 10, -10]
+                            }}
+                            transition={{ duration: 24, repeat: Infinity, ease: "easeInOut" }}
+                            className="absolute inset-0 bg-[radial-gradient(circle_at_25%_65%,rgba(197,160,89,0.15)_0%,transparent_50%)] z-10 pointer-events-none mix-blend-overlay"
+                        />
+         
+                        {/* Subtle volumetric ray of light sweeping slowly like workshop window sun shafts */}
+                        <motion.div 
+                            animate={{ 
+                                opacity: [0.38, 0.58, 0.38],
+                                rotate: [-1, 1, -1]
+                            }}
+                            transition={{ duration: 32, repeat: Infinity, ease: "easeInOut" }}
+                            className="absolute inset-0 bg-[radial-gradient(ellipse_at_35%_0%,rgba(255,251,240,0.15)_0%,transparent_45%)] z-10 pointer-events-none mix-blend-screen origin-top"
+                        />
+         
+                        {/* Handmade texture layer: Premium subtle cellulose/organic film grain */}
+                        <div 
+                            className="absolute inset-0 pointer-events-none z-10 opacity-[0.075] mix-blend-overlay"
+                            style={{
+                                backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 250 250' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.68' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`
+                            }}
+                        />
+                        
+                        {/* Soft bloom backglow centered right behind the signature to separate and spotlight the brand from the background */}
+                        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[850px] h-[850px] bg-[radial-gradient(circle_at_center,rgba(197,160,89,0.22)_0%,rgba(197,160,89,0.05)_45%,transparent_70%)] z-10 pointer-events-none mix-blend-screen" />
+         
+                        {/* Radial gradient vignette and linear gradients for ultimate depth and blend - bottom is completely transparent to flow into page below */}
+                        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_30%,#243119_90%)] z-10 pointer-events-none opacity-50 [mask-image:linear-gradient(to_bottom,black_75%,transparent_100%)]" />
+                        <div className="absolute inset-0 bg-gradient-to-b from-[#243119]/40 via-transparent to-transparent z-10 pointer-events-none" />
+                    </div>
+         
+                    {/* Cinematic Centered Editorial Content */}
+                    <motion.div 
+                        style={{ scale: logoScale, y: contentY }}
+                        className="relative z-20 flex flex-col items-center px-6 text-center select-none"
+                    >
+                        {/* Scroll-fading content wrapper to keep the primary brand elements clean while scroll progresses */}
+                        <motion.div
+                            style={{ opacity: logoOpacity }}
+                            className="flex flex-col items-center"
+                        >
+                            {/* Estado 1: Official Logo M★Bravo - An elegant editorial brand signature, emerging naturally over 1.5s immediately when image is ready */}
+                            <motion.div
+                                initial={{ scale: 0.98, opacity: 0, filter: "blur(4px)", y: -8 }}
+                                animate={{ scale: 1.0, opacity: 1.0, filter: "blur(0px)", y: 0 }}
+                                transition={{ 
+                                    duration: 1.5,
+                                    delay: 0,
+                                    ease: [0.25, 1, 0.5, 1] 
+                                }}
+                                whileHover={{ opacity: 1, scale: 1.008, transition: { duration: 1.0 } }}
+                                style={{ 
+                                    filter: "drop-shadow(0 24px 54px rgba(18,26,13,0.95)) drop-shadow(0 4px 20px rgba(197,160,89,0.18))"
+                                }}
+                                className="h-[7.4rem] sm:h-[9.5rem] md:h-[11.8rem] lg:h-[14.4rem] xl:h-[17.5rem] mb-[5px] sm:mb-[7px] md:mb-[9.5px] lg:mb-[11.5px] -mt-3 md:-mt-5 origin-center select-none"
+                            >
+                                <Logo light className="h-full" />
+                            </motion.div>
+         
+                            {/* Estado 2: Headline: "Cada ponto guarda uma memória." - Refined to a luxury editorial masterwork with staggered word reveal starting exactly at t = 1.5s */}
+                            <h1
+                                style={{ 
+                                    fontFamily: "'Cormorant Garamond', serif",
+                                    textShadow: "0 15px 40px rgba(18, 26, 13, 0.95), 0 4px 12px rgba(18, 26, 13, 0.7)",
+                                    letterSpacing: "-0.015em"
+                                }}
+                                className="italic text-2xl sm:text-3xl md:text-[2.5rem] lg:text-[2.85rem] leading-[1.15] md:leading-[1.18] font-normal text-[#FFFDF9] mb-4 md:mb-5 antialiased selection:bg-[#C5A059]/30 flex flex-wrap justify-center gap-x-[0.25em] md:gap-x-[0.28em] max-w-2xl"
+                            >
+                                {titleWords.map((word, i) => (
+                                    <motion.span
+                                        key={i}
+                                        initial={{ opacity: 0, y: 12, filter: "blur(4px)" }}
+                                        animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+                                        transition={{
+                                            delay: 1.5 + i * 0.25,
+                                            duration: 1.5,
+                                            ease: [0.25, 1, 0.5, 1]
+                                        }}
+                                        className="inline-block text-[#FFFDF9]"
                                     >
-                                        M
-                                    </text>
-                                </motion.g>
-                            </svg>
-                        </div>
+                                        {word}
+                                    </motion.span>
+                                ))}
+                            </h1>
+         
+                            {/* Estado 3: Subheadline: "Criado à mão, com tempo, amor e memórias." - Soft, quiet luxury whispering text layout starting at t = 4.0s */}
+                            <motion.p
+                                initial={{ opacity: 0, y: 8 }}
+                                animate={{ opacity: 0.58, y: 0 }}
+                                transition={{ delay: 4.0, duration: 2.0, ease: [0.16, 1, 0.3, 1] }}
+                                style={{
+                                    fontFamily: "'Cormorant Garamond', serif",
+                                    textShadow: "0 4px 12px rgba(18, 26, 13, 0.25)",
+                                    letterSpacing: "0.024em"
+                                }}
+                                className="italic text-xs sm:text-sm md:text-base font-light text-[#D4C3A3] max-w-[260px] sm:max-w-xs md:max-w-sm mx-auto leading-relaxed mb-0 antialiased"
+                            >
+                                Criado à mão, com tempo, amor e memórias.
+                            </motion.p>
+                        </motion.div>
+
+
                     </motion.div>
-                </div>
- 
-            </motion.div>
  
             {/* Corner Labels (Editorial feel) */}
             <div className="absolute bottom-12 left-12 hidden lg:block z-20 pointer-events-none select-none">
@@ -1076,7 +1121,9 @@ const Hero = () => {
             <div className="absolute bottom-12 right-12 hidden lg:block z-20 pointer-events-none select-none">
                 <span className="text-[9px] uppercase tracking-[0.4em] text-cream/20 [writing-mode:vertical-rl]">BRAVO ARTESANATO</span>
             </div>
-        </section>
+                </section>
+            )}
+        </>
     );
 };
 
@@ -1113,11 +1160,46 @@ const StorySection = () => {
     }, []);
 
     return (
-        <section ref={containerRef} id="sobre" data-background="light" className="py-44 md:py-64 lg:py-72 px-6 sm:px-12 md:px-20 lg:px-24 relative z-10 overflow-hidden select-none" style={{ background: 'linear-gradient(to bottom, #29361e 0%, #354326 8%, #475538 18%, #5f6c4f 30%, #828f70 45%, #adb69a 62%, #dadfcb 80%, #eeebe0 92%, #F5F2ED 97%, #F5F2ED 100%)' }}>
+        <section ref={containerRef} id="sobre" data-background="light" className="py-24 sm:py-32 md:py-48 lg:py-64 px-6 sm:px-12 md:px-20 lg:px-24 relative z-10 overflow-hidden select-none" style={{ backgroundColor: '#F5F2ED' }}>
+            {/* Glow Sfumato: Dynamic dissolution cromática background transition from dark forest green (#1F2A18) directly into solid cream (#F5F2ED) */}
+            <div className="absolute top-0 inset-x-0 h-[650px] pointer-events-none z-0 overflow-hidden">
+                {/* Seamless deep forest-green fade to prevent visual hard borders */}
+                <div className="absolute inset-x-0 top-0 h-full bg-gradient-to-b from-[#1F2A18] via-[#1F2A18]/60 to-transparent" />
+                
+                {/* Warm golden light-leak/flare sfumato radial element for luxury feel */}
+                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[450px] bg-[radial-gradient(circle_at_center,rgba(197,160,89,0.18)_0%,transparent_75%)] mix-blend-screen" />
+            </div>
+
+            {/* Elements of Fundo Subtis: Handcrafted loose cotton fibers / wavy spinning threads running deep inside the cream canvas, completely backgrounded */}
+            <div className="absolute inset-x-0 bottom-0 top-[650px] pointer-events-none z-0 overflow-hidden">
+                {/* Subtle organic textile noise */}
+                <div 
+                    className="absolute inset-0 opacity-[0.035] mix-blend-overlay"
+                    style={{
+                        backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 250 250' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseTrans'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.80' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseTrans)'/%3E%3C/svg%3E")`
+                    }}
+                />
+                
+                {/* Abstract spinning textile thread born gracefully inside the cream space (opacity 0.04) */}
+                <svg className="w-full h-full min-w-[900px] absolute left-1/2 -translate-x-1/2 top-40 opacity-[0.04]" viewBox="0 0 1000 600" fill="none">
+                    <defs>
+                        <filter id="subtleFiberBlur">
+                            <feGaussianBlur stdDeviation="4.0" />
+                        </filter>
+                    </defs>
+                    <path 
+                        d="M -50 200 C 180 250, 320 80, 520 180 C 720 280, 800 50, 1050 120" 
+                        stroke="#C5A059" 
+                        strokeWidth="2.5" 
+                        strokeLinecap="round" 
+                        filter="url(#subtleFiberBlur)"
+                    />
+                </svg>
+            </div>
             {/* Elegant Large Watermark Signature in Background */}
             <motion.div 
                 style={{ x: xTrack, y: yTrack, opacity: opacityTrack, fontFamily: "'Great Vibes', cursive" }}
-                className="absolute inset-0 pointer-events-none text-forest text-[32vw] leading-none whitespace-nowrap text-center flex items-center justify-center select-none"
+                className="absolute inset-0 pointer-events-none text-forest text-[26vw] md:text-[32vw] leading-none whitespace-nowrap text-center flex items-center justify-center select-none"
             >
                 Carolina
             </motion.div>
@@ -1129,7 +1211,7 @@ const StorySection = () => {
                     whileInView={{ opacity: 1, scale: 1, y: 0 }}
                     viewport={{ once: true, margin: "-100px" }}
                     transition={{ duration: 1.4, ease: [0.16, 1, 0.3, 1] }}
-                    className="relative lg:col-span-5"
+                    className="relative lg:col-span-5 max-w-md mx-auto lg:max-w-none w-full"
                 >
                     <div className="aspect-[4/5] overflow-hidden rounded-[2rem] md:rounded-[2.5rem] shadow-2xl relative bg-forest/5">
                         <AnimatePresence mode="wait">
@@ -1137,14 +1219,22 @@ const StorySection = () => {
                                 key={currentImg}
                                 src={storyImages[currentImg]} 
                                 alt="Crochet craft hands and label process by M★Bravo" 
-                                initial={{ opacity: 0, scale: 1.08 }}
-                                animate={{ opacity: 1, scale: 1 }}
-                                exit={{ opacity: 0, scale: 0.96 }}
+                                initial={{ opacity: 0, scale: 1.05, filter: "contrast(0.92) brightness(1.04)" }}
+                                animate={{ opacity: 0.95, scale: 1, filter: "contrast(1.02) brightness(1.0)" }}
+                                exit={{ opacity: 0, scale: 0.97 }}
                                 transition={{ duration: 1.8, ease: "easeInOut" }}
-                                className="w-full h-full object-cover grayscale-[0.2] hover:grayscale-0 transition-all duration-[1200ms] ease-out"
+                                className="w-full h-full object-cover select-none"
                             />
                         </AnimatePresence>
-                        <div className="absolute inset-0 ring-1 ring-inset ring-forest/10 rounded-[2rem] md:rounded-[2.5rem]" />
+                        
+                        {/* Organic cotton/linen thread tactile overlay on top of images for workshop feel */}
+                        <div 
+                            className="absolute inset-0 pointer-events-none z-10 opacity-[0.14] mix-blend-multiply rounded-[2rem] md:rounded-[2.5rem]"
+                            style={{
+                                backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='paperNoise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.05' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='0.8 0 0 0 0 0 0.8 0 0 0 0 0 0.8 0 0 0 0 0 0.5 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23paperNoise)'/%3E%3C/svg%3E")`
+                            }}
+                        />
+                        <div className="absolute inset-0 ring-1 ring-inset ring-forest/10 rounded-[2rem] md:rounded-[2.5rem] z-20" />
                         
                         {/* Slide Indicators */}
                         <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-2 z-20 bg-black/10 backdrop-blur-sm px-3 py-1.5 rounded-full">
@@ -1213,7 +1303,7 @@ const StorySection = () => {
                         <span className="text-[10px] uppercase tracking-[0.45em] font-bold text-forest/35 block font-sans">
                             MEMÓRIA E AFETO
                         </span>
-                        <h2 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-serif text-forest tracking-tight leading-[1.05] font-light">
+                        <h2 className="text-3xl xs:text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-serif text-forest tracking-tight leading-[1.05] font-light">
                             Tudo começou com <br />
                             <span className="italic font-normal text-[#C5A059]">uma memória.</span>
                         </h2>
@@ -1280,7 +1370,7 @@ const StorySection = () => {
 
 const MadeWithTimeSection = () => {
     return (
-        <section id="manifesto" data-background="light" className="py-44 md:py-60 lg:py-68 bg-[#FCFBF9] px-6 sm:px-12 md:px-20 lg:px-24 relative overflow-hidden select-none border-t border-forest/5">
+        <section id="manifesto" data-background="light" className="py-20 sm:py-32 md:py-48 lg:py-64 bg-[#FCFBF9] px-6 sm:px-12 md:px-20 lg:px-24 relative overflow-hidden select-none border-t border-forest/5">
             <div className="max-w-7xl mx-auto">
                 {/* Header: Large Typography */}
                 <div className="max-w-3xl mb-24 md:mb-32">
@@ -1300,7 +1390,7 @@ const MadeWithTimeSection = () => {
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-20 lg:gap-32 items-start">
                     
                     {/* Left side: Warm Natural Imagery with luxurious framing */}
-                    <div className="lg:col-span-5 space-y-6">
+                    <div className="lg:col-span-5 space-y-6 max-w-md mx-auto lg:max-w-none w-full">
                         <motion.div 
                             initial={{ opacity: 0, y: 30 }}
                             whileInView={{ opacity: 1, y: 0 }}
@@ -1311,7 +1401,15 @@ const MadeWithTimeSection = () => {
                             <img 
                                 src="https://i.ibb.co/j9LHyxq6/Firefly-Gemini-Flash-Imagem-com-ambiente-cosy-tema-handmade-crochet-usar-o-logo-em-label-de-cartao.png" 
                                 alt="Warm cozy ambient handcrafted yarn detail by M★Bravo" 
-                                className="w-full h-full object-cover grayscale-[0.1] contrast-[1.05] group-hover:scale-105 transition-transform duration-[2.5s] ease-out brightness-95"
+                                className="w-full h-full object-cover select-none brightness-95"
+                            />
+                            
+                            {/* Organic cotton/linen thread tactile overlay on top of images for workshop feel */}
+                            <div 
+                                className="absolute inset-0 pointer-events-none z-10 opacity-[0.14] mix-blend-multiply rounded-[2rem]"
+                                style={{
+                                    backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='paperNoise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.05' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='0.8 0 0 0 0 0 0.8 0 0 0 0 0 0.8 0 0 0 0 0 0.5 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23paperNoise)'/%3E%3C/svg%3E")`
+                                }}
                             />
                             {/* Floating Quote Card */}
                             <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent flex flex-col justify-end p-8 md:p-10">
@@ -1330,8 +1428,8 @@ const MadeWithTimeSection = () => {
                     </div>
 
                     {/* Right side: The Four Pillars */}
-                    <div className="lg:col-span-7 space-y-16 lg:space-y-24">
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-16 lg:gap-x-24 gap-y-20 md:gap-y-28">
+                    <div className="lg:col-span-7 space-y-12 lg:space-y-24">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-16 lg:gap-x-24 gap-y-12 sm:gap-y-16 md:gap-y-24">
                             
                             {/* Pillar 1: Handmade Craftsmanship */}
                             <motion.div 
@@ -1466,7 +1564,7 @@ const KnotSection = () => {
         <section ref={containerRef} id="feeling" data-background="dark" className="pt-24 pb-14 md:pt-36 md:pb-20 lg:pt-40 lg:pb-24 px-6 sm:px-12 md:px-20 lg:px-24 relative overflow-hidden" style={{ background: 'linear-gradient(to bottom, #243119 0%, #243119 75%, color-mix(in srgb, #243119 80%, #F5F2ED) 100%)' }}>
             <motion.div 
                 style={{ x: xTrack, y: yTrack, opacity: opacityTrack, fontFamily: "'Cormorant Garamond', serif" }}
-                className="absolute inset-0 pointer-events-none text-cream text-[35vw] leading-none italic font-light whitespace-nowrap text-center flex items-center justify-center select-none"
+                className="absolute inset-0 pointer-events-none text-cream text-[26vw] md:text-[35vw] leading-none italic font-light whitespace-nowrap text-center flex items-center justify-center select-none"
             >
                 Handmade
             </motion.div>
@@ -1486,7 +1584,7 @@ const KnotSection = () => {
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true }}
                         transition={{ duration: 1 }}
-                        className="text-6xl md:text-8xl font-serif text-cream leading-tight mb-8 md:mb-10"
+                        className="text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-serif text-cream leading-tight mb-8 md:mb-10"
                     >
                         O Ritmo do Coração <br />
                         <span className="italic font-normal text-brand-green-light">em Cada Ponto.</span>
@@ -1496,7 +1594,7 @@ const KnotSection = () => {
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true }}
                         transition={{ duration: 1, delay: 0.2 }}
-                        className="text-cream/80 text-xl md:text-2xl font-light leading-relaxed animate-fadeIn"
+                        className="text-cream/80 text-base sm:text-lg md:text-xl lg:text-2xl font-light leading-relaxed animate-fadeIn"
                     >
                         Há algo especial em criar com as próprias mãos. Cada ponto nasce de um gesto simples, repetido com calma, até ganhar forma, textura e significado.
                         <br /><br />
@@ -1514,7 +1612,7 @@ const KnotSection = () => {
                         whileInView={{ opacity: 1, scale: 1 }}
                         viewport={{ once: true }}
                         transition={{ duration: 1.5 }}
-                        className="col-span-12 md:col-span-7 aspect-[4/5] rounded-3xl md:rounded-[3rem] overflow-hidden relative group shadow-2xl"
+                        className="col-span-12 md:col-span-7 aspect-[4/5] rounded-3xl md:rounded-[3rem] overflow-hidden relative group shadow-2xl max-w-2xl mx-auto md:max-w-none w-full"
                     >
                         <img 
                             src="https://i.ibb.co/F4Z4Fp4Z/LOGOTIPOo.jpg" 
@@ -1528,7 +1626,7 @@ const KnotSection = () => {
                     </motion.div>
 
                     {/* Secondary Details */}
-                    <div className="col-span-12 md:col-span-5 flex flex-col gap-6 md:gap-14 lg:gap-16 justify-center">
+                    <div className="col-span-12 md:col-span-5 flex flex-col gap-6 md:gap-14 lg:gap-16 justify-center max-w-2xl mx-auto md:max-w-none w-full">
                         <motion.div 
                             initial={{ opacity: 0, x: 30 }}
                             whileInView={{ opacity: 1, x: 0 }}
@@ -1779,11 +1877,21 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, i, isFocused, isSubd
                 )}
 
                 {!isZoomed && (
-                    <div className="absolute top-6 left-6 z-20 pointer-events-none hidden lg:block">
-                        <span className="bg-white/15 backdrop-blur-md text-white/70 text-[8px] uppercase tracking-[0.25em] px-3.5 py-1.5 rounded-full border border-white/5">
-                            Clique para aproximar a foto
-                        </span>
-                    </div>
+                    <>
+                        <div className="absolute top-6 left-6 z-20 pointer-events-none hidden lg:block">
+                            <span className="bg-white/15 backdrop-blur-md text-white/70 text-[8px] uppercase tracking-[0.25em] px-3.5 py-1.5 rounded-full border border-white/5">
+                                Clique para aproximar a foto
+                            </span>
+                        </div>
+                        {/* High-End Floating Close Button for Mobile/Tablet */}
+                        <button 
+                            onClick={handleToggle}
+                            className="absolute top-4 right-4 z-40 lg:hidden p-3 rounded-full bg-black/40 hover:bg-black/60 text-white backdrop-blur-md transition-all border border-white/10 cursor-pointer flex items-center justify-center shadow-lg"
+                            title="Fechar Detalhes"
+                        >
+                            <X size={18} />
+                        </button>
+                    </>
                 )}
 
                 {/* Main Proportional Visual Frame with layoutId */}
@@ -2016,7 +2124,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, i, isFocused, isSubd
                                     <h5 className="text-[9px] uppercase tracking-[0.25em] font-bold text-forest/45 flex items-center gap-1.5">
                                         <span className="text-[#C5A059] text-xs">●</span> QUANTIDADE DO CONJUNTO
                                     </h5>
-                                    <div className="flex gap-1.5">
+                                    <div className="flex flex-wrap gap-1.5">
                                         {quantities.map(opt => (
                                             <button 
                                                 key={opt}
@@ -2067,7 +2175,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, i, isFocused, isSubd
                             <h5 className="text-[9px] uppercase tracking-[0.25em] font-bold text-forest/45 flex items-center gap-1.5">
                                 <span className="text-[#C5A059] text-xs">●</span> MANUTENÇÃO & CUIDADOS
                             </h5>
-                            <div className="grid grid-cols-4 gap-2 pt-1 select-none">
+                            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-2 pt-1 select-none">
                                 <div className="flex flex-col items-center text-center">
                                     <div className="w-10 h-10 rounded-full bg-forest/5 flex items-center justify-center text-forest/70 border border-forest/5 hover:bg-forest/10 transition-colors">
                                         <svg viewBox="0 0 24 24" className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
@@ -2079,7 +2187,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, i, isFocused, isSubd
                                             <path d="M12 3v7M9.5 4.5v5.5M14.5 3.5v6.5M7 6v4c0 1 1 2 2 2h4.5" />
                                         </svg>
                                     </div>
-                                    <span className="text-[9px] tracking-tight leading-tight mt-1 text-forest/70 font-light font-sans max-w-[65px]">
+                                    <span className="text-[9px] tracking-tight leading-tight mt-1 text-forest/70 font-light font-sans max-w-[100px] sm:max-w-[65px]">
                                         LAVAGEM À MÃO
                                     </span>
                                 </div>
@@ -2092,7 +2200,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, i, isFocused, isSubd
                                             <line x1="8" y1="12" x2="16" y2="12" />
                                         </svg>
                                     </div>
-                                    <span className="text-[9px] tracking-tight leading-tight mt-1 text-forest/70 font-light font-sans max-w-[65px]">
+                                    <span className="text-[9px] tracking-tight leading-tight mt-1 text-forest/70 font-light font-sans max-w-[100px] sm:max-w-[65px]">
                                         SECAR HORIZONTAL
                                     </span>
                                 </div>
@@ -2108,7 +2216,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, i, isFocused, isSubd
                                             <line x1="18" y1="6" x2="6" y2="18" />
                                         </svg>
                                     </div>
-                                    <span className="text-[9px] tracking-tight leading-tight mt-1 text-forest/70 font-light font-sans max-w-[65px]">
+                                    <span className="text-[9px] tracking-tight leading-tight mt-1 text-forest/70 font-light font-sans max-w-[100px] sm:max-w-[65px]">
                                         SEM SECADORA
                                     </span>
                                 </div>
@@ -2122,7 +2230,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, i, isFocused, isSubd
                                             <line x1="18" y1="6" x2="6" y2="18" />
                                         </svg>
                                     </div>
-                                    <span className="text-[9px] tracking-tight leading-tight mt-1 text-forest/70 font-light font-sans max-w-[65px]">
+                                    <span className="text-[9px] tracking-tight leading-tight mt-1 text-forest/70 font-light font-sans max-w-[100px] sm:max-w-[65px]">
                                         EVITAR TORCER
                                     </span>
                                 </div>
@@ -2133,48 +2241,38 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, i, isFocused, isSubd
                         <p className="text-[10px] text-[#A68244]/80 italic font-medium">{finalNote}</p>
                     </div>
 
-                        {/* B & C) TABLET & MOBILE CHECKOUT BOX: Rendered statically in the scroll flow, liberating vertical space */}
-                        <div className="lg:hidden block">
-                            <div id="checkout-box-mobile" className="bg-[#343E2C] rounded-2xl p-5 border border-white/10 shadow-lg relative overflow-hidden text-[#FCFBF9] animate-fadeIn">
-                                <div className="flex justify-between items-center mb-3 pb-2.5 border-b border-white/10">
-                                    <h4 className="text-[11px] uppercase tracking-[0.25em] font-semibold bg-gradient-to-b from-[#F5E0B5] to-[#D4AF37] bg-clip-text text-transparent">ENCOMENDA</h4>
-                                    <span className="text-2xl md:text-3xl font-serif text-[#FCFBF9] font-semibold tracking-tight">{currentPrice}</span>
+                        {/* B & C) TABLET & MOBILE RECAP BOX: Rendered statically in the scroll flow to present configuration status */}
+                        <div className="lg:hidden block pb-4">
+                            <div id="checkout-box-mobile" className="bg-forest/5 rounded-2xl p-5 border border-forest/10 shadow-sm relative overflow-hidden text-forest animate-fadeIn">
+                                <div className="flex justify-between items-center mb-3 pb-2.5 border-b border-forest/10">
+                                    <h4 className="text-[10px] uppercase tracking-[0.25em] font-extrabold text-[#A68244]">CONFIGURAÇÃO SELECIONADA</h4>
+                                    <span className="text-lg font-serif text-forest font-semibold tracking-tight">{currentPrice}</span>
                                 </div>
 
-                                <div className="space-y-1.5 mb-3.5 text-[11px] uppercase tracking-wider text-white/90 font-normal">
-                                    <div className="flex justify-between items-center border-b border-white/5 pb-1">
-                                        <span className="text-white/40 text-[9px] tracking-[0.2em]">COR</span>
-                                        <span className="text-[#FCFBF9] font-semibold">{selections.cor || 'Verde Musgo'}</span>
+                                <div className="space-y-1.5 text-[11px] uppercase tracking-wider text-forest/80 font-normal">
+                                    <div className="flex justify-between items-center border-b border-forest/5 pb-1">
+                                        <span className="text-forest/40 text-[9px] tracking-[0.2em]">COR</span>
+                                        <span className="text-forest font-semibold">{selections.cor || 'Verde Musgo'}</span>
                                     </div>
                                     {hasSize && (
-                                        <div className="flex justify-between items-center border-b border-white/5 pb-1">
-                                            <span className="text-white/40 text-[9px] tracking-[0.2em]">TAMANHO</span>
-                                            <span className="text-[#FCFBF9] font-semibold">{selections.tamanho}</span>
+                                        <div className="flex justify-between items-center border-b border-forest/5 pb-1">
+                                            <span className="text-forest/40 text-[9px] tracking-[0.2em]">TAMANHO</span>
+                                            <span className="text-forest font-semibold">{selections.tamanho}</span>
                                         </div>
                                     )}
                                     {hasQuantity && (
-                                        <div className="flex justify-between items-center border-b border-white/5 pb-1">
-                                            <span className="text-white/40 text-[9px] tracking-[0.2em]">QUANTIDADE</span>
-                                            <span className="text-[#FCFBF9] font-semibold">{selections.quantidade}</span>
+                                        <div className="flex justify-between items-center border-b border-forest/5 pb-1">
+                                            <span className="text-forest/40 text-[9px] tracking-[0.2em]">QUANTIDADE</span>
+                                            <span className="text-forest font-semibold">{selections.quantidade}</span>
                                         </div>
                                     )}
                                     {product.dimensions && (
-                                        <div className="flex justify-between items-center border-b border-white/5 pb-1">
-                                            <span className="text-white/40 text-[9px] tracking-[0.2em]">DIMENSÕES</span>
-                                            <span className="text-[#FCFBF9] font-semibold">{product.dimensions}</span>
+                                        <div className="flex justify-between items-center border-b border-forest/5 pb-1">
+                                            <span className="text-forest/40 text-[9px] tracking-[0.2em]">DIMENSÕES</span>
+                                            <span className="text-forest font-semibold">{product.dimensions}</span>
                                         </div>
                                     )}
                                 </div>
-                                
-                                <motion.a 
-                                    href={whatsappUrl}
-                                    target="_blank"
-                                    whileHover={{ scale: 1.01 }}
-                                    whileTap={{ scale: 0.99 }}
-                                    className="w-full rounded-full py-3.5 text-center font-bold bg-[#C5A059] text-[#343E2C] hover:bg-[#d5b069] active:scale-95 text-[11px] uppercase tracking-widest cursor-pointer shadow-[0_4px_15px_rgba(197,160,89,0.3)] border border-[#C5A059]/10 block transition-all duration-300"
-                                >
-                                    ENVIAR ENCOMENDA
-                                </motion.a>
                             </div>
                         </div>
                     </div>
@@ -2225,13 +2323,34 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, i, isFocused, isSubd
                     </div>
                 </div>
             </div>
+
+            {/* Sticky Mobile/Tablet Checkout Footer Bar */}
+            <div 
+                className="lg:hidden sticky bottom-0 left-0 right-0 z-[60] bg-[#FCFBF9]/95 backdrop-blur-md border-t border-forest/10 px-6 py-4 flex items-center justify-between gap-4 shadow-[0_-12px_45px_rgba(31,42,24,0.08)] w-full shrink-0"
+                style={{ paddingBottom: 'max(1rem, env(safe-area-inset-bottom))' }}
+            >
+                <div className="flex flex-col text-left">
+                    <span className="text-[8px] uppercase tracking-[0.2em] text-[#A68244] font-bold font-sans">IMPORTE TOTAL</span>
+                    <span className="text-xl sm:text-2xl font-serif text-forest font-semibold tracking-tight">{currentPrice}</span>
+                </div>
+                <motion.a 
+                    href={whatsappUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    whileHover={{ scale: 1.01 }}
+                    whileTap={{ scale: 0.99 }}
+                    className="flex-1 max-w-[190px] xs:max-w-[210px] sm:max-w-[240px] rounded-full py-3.5 text-center font-bold bg-[#C5A059] text-[#343E2C] hover:bg-[#d5b069] text-[10px] sm:text-[11px] uppercase tracking-widest cursor-pointer shadow-[0_4px_15px_rgba(197,160,89,0.35)] border border-[#C5A059]/10 block font-sans"
+                >
+                    ENVIAR ENCOMENDA
+                </motion.a>
+            </div>
         </div>
     );
 };
 
 const CarouselItem: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     return (
-        <div className="flex-none w-full md:w-[calc(100%/3)] px-4 snap-center md:snap-start">
+        <div className="flex-none w-full md:w-1/2 lg:w-[calc(100%/3)] px-4 snap-center md:snap-start">
             <div className="w-full h-full">
                 {children}
             </div>
@@ -2298,16 +2417,16 @@ const CollectionSection = () => {
     }, [focusedProductId]);
 
     return (
-        <section ref={containerRef} id="collection" data-background="light" className="pt-28 pb-44 md:pt-40 md:pb-64 lg:pt-44 lg:pb-72 bg-cream min-h-screen relative overflow-hidden" style={{ background: 'linear-gradient(to bottom, color-mix(in srgb, #243119 80%, #F5F2ED) 0%, color-mix(in srgb, #243119 40%, #F5F2ED) 40%, #F5F2ED 85%, #F5F2ED 100%)' }}>
+        <section ref={containerRef} id="collection" data-background="light" className="pt-16 pb-24 sm:pt-24 sm:pb-36 md:pt-32 md:pb-48 lg:pt-40 lg:pb-64 bg-cream min-h-screen relative overflow-hidden" style={{ background: 'linear-gradient(to bottom, color-mix(in srgb, #243119 80%, #F5F2ED) 0%, color-mix(in srgb, #243119 40%, #F5F2ED) 40%, #F5F2ED 85%, #F5F2ED 100%)' }}>
 
             <motion.div 
                 style={{ x: xTrack, y: yTrack, opacity: opacityTrack, fontFamily: "'Cormorant Garamond', serif" }}
-                className="absolute inset-0 pointer-events-none text-forest text-[35vw] leading-none italic font-light whitespace-nowrap text-center flex items-center justify-center select-none"
+                className="absolute inset-0 pointer-events-none text-forest text-[26vw] md:text-[35vw] leading-none italic font-light whitespace-nowrap text-center flex items-center justify-center select-none"
             >
                 M★Bravo
             </motion.div>
 
-            <div className="max-w-7xl mx-auto px-6 mb-28 md:mb-32 text-center relative z-10">
+            <div className="max-w-7xl mx-auto px-6 mb-16 sm:mb-24 md:mb-32 text-center relative z-10">
                  {/* Halo radial suave atrás do título */}
                  <div 
                      className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none -z-10 rounded-full"
@@ -2331,7 +2450,7 @@ const CollectionSection = () => {
                         color: '#1F2A18',
                         textShadow: '0 1px 0 rgba(255,255,255,0.18), 0 2px 6px rgba(0,0,0,0.05)'
                     } as React.CSSProperties}
-                    className="text-[4.125rem] md:text-[6.6rem] font-serif font-medium tracking-tight leading-tight"
+                    className="text-3.5xl xs:text-5xl sm:text-6xl md:text-[6.6rem] font-serif font-medium tracking-tight leading-tight max-[350px]:text-2xl"
                  >
                     {selectedCategory ? activeCategory?.name : (
                         <>
@@ -2395,7 +2514,7 @@ const CollectionSection = () => {
                                     whileInView={{ opacity: 1, y: 0 }}
                                     viewport={{ once: true }}
                                     transition={{ delay: i * 0.1 }}
-                                    className="group relative aspect-[4/3] rounded-[3rem] overflow-hidden bg-forest/5 cursor-pointer"
+                                    className="group relative aspect-[4/3] rounded-[3rem] overflow-hidden bg-forest/5 cursor-pointer max-w-2xl mx-auto w-full"
                                     style={{ willChange: 'transform' }}
                                     onClick={() => setSelectedCategory(cat.id)}
                                 >
@@ -2546,10 +2665,10 @@ const ContactSection = () => {
                         Deseja uma peça personalizada ou simplesmente quer saber mais sobre o nosso processo? Estamos a um ponto de distância.
                     </p>
                     
-                    <div className="flex flex-col items-center gap-10 md:gap-12">
+                    <div className="flex flex-col items-center gap-6 sm:gap-10 md:gap-12">
                         <a 
                             href={MAILTO_LINK}
-                            className="group flex items-center gap-3 md:gap-4 text-[17px] xs:text-xl sm:text-2xl md:text-4xl font-serif text-cream hover:text-brand-green-light transition-all border-b border-cream/20 pb-3 md:pb-4 whitespace-nowrap"
+                            className="group flex items-center gap-3 md:gap-4 text-[15px] max-[350px]:text-[13px] xs:text-xl sm:text-2xl md:text-4xl font-serif text-cream hover:text-brand-green-light transition-all border-b border-cream/20 pb-3 md:pb-4 break-all sm:break-normal"
                         >
                             <Mail size={20} className="sm:w-6 sm:h-6 md:w-8 md:h-8 opacity-40 group-hover:opacity-100 transition-opacity flex-shrink-0" />
                             {CONTACT_EMAIL}
@@ -2559,7 +2678,7 @@ const ContactSection = () => {
                             href={`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent("Olá! Vi o site da M★BRAVO e gostaria de saber mais sobre as suas peças.")}`}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="group flex items-center gap-3 md:gap-4 text-[17px] xs:text-xl sm:text-2xl md:text-4xl font-serif text-cream hover:text-brand-green-light transition-all border-b border-cream/20 pb-3 md:pb-4 whitespace-nowrap"
+                            className="group flex items-center gap-3 md:gap-4 text-[15px] max-[350px]:text-[11px] xs:text-xl sm:text-2xl md:text-4xl font-serif text-cream hover:text-brand-green-light transition-all border-b border-cream/20 pb-3 md:pb-4 break-all sm:break-normal"
                         >
                             <MessageCircle size={20} className="sm:w-6 sm:h-6 md:w-8 md:h-8 opacity-40 group-hover:opacity-100 transition-opacity flex-shrink-0" />
                             Conversar via WhatsApp
@@ -2567,7 +2686,7 @@ const ContactSection = () => {
                     </div>
                 </motion.div>
 
-                <div className="mt-40 md:mt-48 flex flex-wrap justify-center gap-6 sm:gap-14 md:gap-16 lg:gap-20">
+                <div className="mt-20 sm:mt-32 md:mt-48 flex flex-wrap justify-center gap-6 sm:gap-14 md:gap-16 lg:gap-20">
                     <a href="https://www.instagram.com/mbravo.handmade/" target="_blank" rel="noopener noreferrer" className="text-[10px] uppercase tracking-[0.4em] text-cream/40 hover:text-cream transition-colors">
                         Instagram
                     </a>
@@ -2607,14 +2726,14 @@ const Footer = () => {
 
 const MemoryContinuesSection = () => {
     return (
-        <section id="memoria" data-background="light" className="py-40 md:py-60 lg:py-64 bg-[#FCFBF9] px-6 sm:px-12 md:px-20 lg:px-24 relative overflow-hidden select-none border-b border-forest/5">
+        <section id="memoria" data-background="light" className="py-20 sm:py-32 md:py-48 lg:py-60 bg-[#FCFBF9] px-6 sm:px-12 md:px-20 lg:px-24 relative overflow-hidden select-none border-b border-forest/5">
             <div className="max-w-4xl mx-auto text-center relative z-10">
                 <motion.div
                     initial={{ opacity: 0, y: 30 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true, margin: "-100px" }}
                     transition={{ duration: 1.5, ease: [0.16, 1, 0.3, 1] }}
-                    className="space-y-16 md:space-y-24"
+                    className="space-y-10 sm:space-y-16 md:space-y-24"
                 >
                     {/* Section label */}
                     <div className="space-y-6">
@@ -2667,7 +2786,7 @@ export default function App() {
   }, []);
 
   return (
-    <div className="relative min-h-screen bg-cream text-forest select-none">
+    <div className="relative min-h-screen bg-cream text-forest select-none overflow-x-hidden">
       <NoiseOverlay />
       
       <AnimatePresence mode="wait">
@@ -2686,6 +2805,10 @@ export default function App() {
             {/* Smooth Parallax Scroll Content */}
             <div className="relative">
                 <Hero />
+                
+                {/* Scroll-linked Organic Fio Condutor (Golden Embroidery thread crossing sections) */}
+                <FioCondutor />
+
                 <div className="relative overflow-hidden">
                     <StorySection />
                     <MadeWithTimeSection />
