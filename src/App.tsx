@@ -29,6 +29,7 @@ const BASE_PRICES: { [key: string]: number | string } = {
     'm★bravo cardigan': 95,
     'geometric poncho': 75,
     'cozy mesh poncho': 75,
+    'signature granny poncho': 75,
     'mini alma cardigan': 55,
     'granny square bag': 55,
     'marea bikini set': 45,
@@ -38,8 +39,8 @@ const BASE_PRICES: { [key: string]: number | string } = {
     'african flower pouch': 25,
     'booksleeve': 25,
     'stella cushion': 20,
-    'dragonfly bandana': 15,
-    'bandana': 15,
+    'dragonfly bandana': 22,
+    'bandana': 20,
     'dragonfly headband': 12,
     'placemats': 12,
     'bookmarks': 8,
@@ -261,54 +262,102 @@ const SHOP_CATEGORIES = [
   {
     id: 'vestuario',
     name: 'Vestuário',
-    items: 'Marea Bikini Set, Poncho, Bandanas, Dragonfly Headband',
-    img: 'https://i.ibb.co/844dLBLB/mockup-cardigan.png',
+    items: 'Cardigans, Bikini Set, Triangle Top, Ponchos',
+    img: 'https://i.ibb.co/s9GKBBpQ/IMG-2699-02.jpg',
     products: [
+      { 
+        id: 'b1b', 
+        name: 'Alma Cardigan', 
+        price: calculateProductRange('Alma Cardigan'), 
+        img: 'https://i.ibb.co/4qjnQph/Cardigan-CAPA.png',
+        description: "Cardigan em crochet feito à mão com granny squares clássicos e um design cozy e intemporal. Uma peça confortável e delicada, perfeita para dias frescos de verão, outono ou para criar um look mais acolhedor e effortless. Disponível em várias combinações de cores e materiais.",
+        material: "- Opção 1: 100% algodão (Leve, respirável e ideal para dias mais amenos ou meia-estação)\n- Opção 2: 50% algodão / 50% lã (Mais quente, macio e aconchegante, ideal para dias mais frios)",
+        care: "- Lavagem delicada à mão\n- Secar ao ar em superfície plana\n- Evitar torcer a peça",
+        details: "- Modelo de manga comprida\n- Fecho em laço frontal"
+      },
+      { 
+        id: 'b1c', 
+        name: 'Mini Alma Cardigan', 
+        price: calculateProductRange('Mini Alma Cardigan'), 
+        img: 'https://i.ibb.co/8nQtzsbY/Mini-Alma-Cardigan-1.jpg',
+        images: [
+          'https://i.ibb.co/8nQtzsbY/Mini-Alma-Cardigan-1.jpg',
+          'https://i.ibb.co/PzzS4Vm2/Mini-Alma-Cardigan-4.jpg',
+          'https://i.ibb.co/4nXVDvLh/Mini-Alma-Cardigan-3.jpg'
+        ],
+        sizes: ['2 anos', '4 anos', '6 anos'],
+        description: "Versão mini do Alma Cardigan, feita à mão em crochet com granny squares clássicos e um design cozy e intemporal. Pensado para os mais pequenos, combina conforto, delicadeza e um toque handmade especial. Disponível em várias combinações de cores and materiais.",
+        material: "- Opção Leve: 100% algodão\n- Opção Cozy: 50% algodão, 50% lã",
+        care: "- Lavagem delicada à mão\n- Secar ao ar em superfície plana\n- Evitar máquina de secar",
+        details: "- Modelo de manga comprida\n- Fecho em laço frontal"
+      },
+      { 
+        id: 'p1', name: 'M★BRAVO Cardigan', price: calculateProductRange('M★BRAVO Cardigan'), img: 'https://i.ibb.co/mrJQy5Dk/IMG-20260508-WA0003.jpg',
+        material: "Este M★BRAVO Cardigan é produzido em 100% Algodão Egípcio Safran. A suavidade deste fio nobre respeita a sensibilidade da pele.",
+        care: "Lavar à mão com sabão neutro. Secar à sombra."
+      },
       { 
         id: 'v1', 
         name: 'Marea Bikini Set', 
         price: calculateProductRange('Marea Bikini Set'), 
-        img: 'https://i.ibb.co/2QHMzGT/Bikini-CAPA.png',
+        img: 'https://i.ibb.co/pBtF8x7L/Marea-Bikini-Set.png',
         images: [
-          'https://i.ibb.co/2QHMzGT/Bikini-CAPA.png',
-          'https://i.ibb.co/hFchC6S9/BIKINI-FRENTE.png',
-          'https://i.ibb.co/bgqhJ6tt/BIKINI-COSTAS.png'
+          'https://i.ibb.co/pBtF8x7L/Marea-Bikini-Set.png',
+          'https://i.ibb.co/yS5kGZ5w/Marea-Bikini-Set-2.png',
+          'https://i.ibb.co/Z6P2ZzY8/Marea-Bikini-Set-3.png',
+          'https://i.ibb.co/pBtF8x7L/Marea-Bikini-Set-4.png'
         ],
-        description: "Biquíni em crochet feito à mão, pensado para os dias de verão e momentos à beira-mar. O Marea Bikini combina um design de riscas delicadas com um ajuste confortável, criando um look handmade, minimalista e cozy. Disponível em várias combinações de cores.",
+        description: "Bikini set em crochet feito à mão, com um toque artesanal único e elegante. Perfeito para os dias de sol e mar, oferecendo conforto e um estilo exclusivo para a praia ou piscina. Disponível em várias cores vibrantes e neutras.",
         material: "- Material: 100% algodão",
-        care: "- Lavagem delicada à mão\n- Secar ao ar",
-        details: "- Disponível em XS, S, M e L (Caso tenha dúvidas sobre o tamanho ideal, pode entrar em contacto)"
+        care: "- Lavar à mão\n- Secar à sombra"
       },
       { 
-        id: 'v1_dup', 
+        id: 'v1b', 
         name: 'Marea Triangle Top', 
         price: calculateProductRange('Marea Triangle Top'), 
-        img: 'https://i.ibb.co/B2d99LhQ/BIKINI.png',
+        img: 'https://i.ibb.co/yS5kGZ5w/Marea-Bikini-Set-2.png',
         images: [
-          'https://i.ibb.co/B2d99LhQ/BIKINI.png',
-          'https://i.ibb.co/TqF1FrCS/Bikini-top.png'
+          'https://i.ibb.co/yS5kGZ5w/Marea-Bikini-Set-2.png',
+          'https://i.ibb.co/Z6P2ZzY8/Marea-Bikini-Set-3.png',
+          'https://i.ibb.co/pBtF8x7L/Marea-Bikini-Set.png',
+          'https://i.ibb.co/pBtF8x7L/Marea-Bikini-Set-4.png'
         ],
-        sizes: ['XS', 'S', 'M', 'L'],
-        description: "Top de biquíni em crochet feito à mão, com design triangular clássico e fitas ajustáveis para maior conforto. O Marea Triangle Top foi pensado para combinar conforto e um look delicado de verão.",
+        description: "Top de biquíni em formato triângulo feito à mão em crochet, com um toque artesanal único e elegante. Perfeito para os dias de sol e mar, proporcionando conforto, versatilidade e um design intemporal.",
         material: "- Material: 100% algodão",
-        care: "- Lavagem delicada à mão\n- Secar ao ar",
-        details: "- Disponível em XS, S, M e L (Caso tenha dúvidas sobre o tamanho ideal, pode entrar em contacto)"
+        care: "- Lavar à mão\n- Secar à sombra"
       },
       { 
-        id: 'v2', name: 'Geometric Poncho', price: calculateProductRange('Geometric Poncho'), img: 'https://i.ibb.co/Zpd35Tt7/colecao-Cardigra-1.png',
-        material: "Este Geometric Poncho é produzido em 100% Algodão Egípcio Safran. A suavidade deste fio nobre respeita a sensibilidade da pele.",
-        care: "Lavar à mão com sabão neutro. Secar à sombra."
-      },
-      { 
-        id: 'v2b', name: 'Cozy Mesh Poncho', price: calculateProductRange('Cozy Mesh Poncho'), img: 'https://i.ibb.co/0p2g0BJt/Poncho.png',
+        id: 'v2b', name: 'Mesh Poncho', price: calculateProductRange('Mesh Poncho'), img: 'https://i.ibb.co/0p2g0BJt/Poncho.png',
         images: [
           'https://i.ibb.co/0p2g0BJt/Poncho.png',
           'https://i.ibb.co/844dLBLB/mockup-cardigan.png'
         ],
-        description: "Poncho em crochet leve e delicado, feito à mão com um design de malha aberta para um look effortless e cozy. Perfeito para sobrepor a tops, vestidos ou biquínis, criando um toque elegante e descontraído ao outfit. Disponível em várias cores.",
+        description: "Poncho em crochet leve e delicado, feito à mão com um design de malha aberta para um look effortless and cozy. Perfeito para sobrepor a tops, vestidos ou biquínis, criando um toque elegante e descontraído ao outfit. Disponível em várias cores.",
         material: "- Material: 100% algodão",
         care: "- Lavagem delicada à mão\n- Secar ao ar\n- Evitar máquina de secar"
       },
+      { 
+        id: 'v2c', 
+        name: 'Signature Granny Poncho', 
+        price: calculateProductRange('Signature Granny Poncho'), 
+        img: 'https://i.ibb.co/s9GKBBpQ/IMG-2699-02.jpg',
+        images: [
+          'https://i.ibb.co/s9GKBBpQ/IMG-2699-02.jpg',
+          'https://i.ibb.co/0p2g0BJt/Poncho.png'
+        ],
+        description: "Poncho em crochet feito à mão, criado com um clássico padrão granny stitch e combinação de duas cores para um look cozy e intemporal. Com um ajuste confortável e textura aconchegante, é perfeito para sobrepor a diferentes looks e acrescentar um toque handmade e effortless ao visual.",
+        details: "• Ideal para layering em diferentes looks\n• Disponível em várias combinações de cores",
+        material: "- Composição: 100% algodão egípcio de alta qualidade ou mistura de algodão e lã macia (Consulte para opções)",
+        care: "- Lavagem delicada à mão com sabão neutro\n- Secar ao ar em superfície plana\n- Evitar máquina de secar"
+      }
+    ]
+  },
+  {
+    id: 'premium',
+    name: 'Acessórios',
+    items: 'Bandanas, Headbands',
+    img: 'https://i.ibb.co/NdQjvs6c/IMG-2782.jpg',
+    products: [
       { 
         id: 'v3', 
         name: 'Dragonfly Bandana', 
@@ -356,60 +405,6 @@ const SHOP_CATEGORIES = [
         description: "Headband em crochet com delicado padrão de libelinhas, feita à mão para um toque leve e especial no dia a dia. Confortável, versátil e perfeita para complementar qualquer look com um detalhe handmade e cozy. Disponível em várias cores.",
         material: "- Material: 100% algodão",
         care: "- Lavagem delicada à mão\n- Secar ao ar\n- Evitar máquina de secar"
-      }
-    ]
-  },
-  {
-    id: 'premium',
-    name: 'Atelier',
-    items: 'Cardigan, Top, Clutch, Peças Únicas',
-    img: 'https://i.ibb.co/hxvcw25g/Cardigan-CAPA.png',
-    products: [
-      { 
-        id: 'b1b', 
-        name: 'Alma Cardigan', 
-        price: calculateProductRange('Alma Cardigan'), 
-        img: 'https://i.ibb.co/4qjnQph/Cardigan-CAPA.png',
-        description: "Cardigan em crochet feito à mão com granny squares clássicos e um design cozy e intemporal. Uma peça confortável e delicada, perfeita para dias frescos de verão, outono ou para criar um look mais acolhedor e effortless. Disponível em várias combinações de cores e materiais.",
-        material: "- Opção 1: 100% algodão (Leve, respirável e ideal para dias mais amenos ou meia-estação)\n- Opção 2: 50% algodão / 50% lã (Mais quente, macio e aconchegante, ideal para dias mais frios)",
-        care: "- Lavagem delicada à mão\n- Secar ao ar em superfície plana\n- Evitar torcer a peça",
-        details: "- Modelo de manga comprida\n- Fecho em laço frontal"
-      },
-      { 
-        id: 'b1c', 
-        name: 'Mini Alma Cardigan', 
-        price: calculateProductRange('Mini Alma Cardigan'), 
-        img: 'https://i.ibb.co/8nQtzsbY/Mini-Alma-Cardigan-1.jpg',
-        images: [
-          'https://i.ibb.co/8nQtzsbY/Mini-Alma-Cardigan-1.jpg',
-          'https://i.ibb.co/PzzS4Vm2/Mini-Alma-Cardigan-4.jpg',
-          'https://i.ibb.co/4nXVDvLh/Mini-Alma-Cardigan-3.jpg'
-        ],
-        sizes: ['2 anos', '4 anos', '6 anos'],
-        description: "Versão mini do Alma Cardigan, feita à mão em crochet com granny squares clássicos e um design cozy e intemporal. Pensado para os mais pequenos, combina conforto, delicadeza e um toque handmade especial. Disponível em várias combinações de cores e materiais.",
-        material: "- Opção Leve: 100% algodão\n- Opção Cozy: 50% algodão, 50% lã",
-        care: "- Lavagem delicada à mão\n- Secar ao ar em superfície plana\n- Evitar máquina de secar",
-        details: "- Modelo de manga comprida\n- Fecho em laço frontal"
-      },
-      { 
-        id: 'p1', name: 'M★BRAVO Cardigan', price: calculateProductRange('M★BRAVO Cardigan'), img: 'https://i.ibb.co/mrJQy5Dk/IMG-20260508-WA0003.jpg',
-        material: "Este M★BRAVO Cardigan é produzido em 100% Algodão Egípcio Safran. A suavidade deste fio nobre respeita a sensibilidade da pele.",
-        care: "Lavar à mão com sabão neutro. Secar à sombra."
-      },
-      { 
-        id: 'p2', name: 'Top', price: calculateProductRange('Crystalline Top'), img: 'https://i.ibb.co/8nc4jXr3/colecao-Top-1.png',
-        material: "Este Crystalline Top é produzido em 100% Algodão Egípcio Safran. A suavidade deste fio nobre respeita a sensibilidade da pele.",
-        care: "Lavar à mão com sabão neutro. Secar à sombra."
-      },
-      { 
-        id: 'p3', name: 'Luxury Clutch', price: calculateProductRange('Luxury Clutch'), img: 'https://i.ibb.co/BVjGyZK1/colecao-Clutch-1.png',
-        material: "Esta Luxury Clutch é produzida em 100% Algodão. Um fio de fibra grossa que garante a estabilidade necessária.",
-        care: "Lavável à máquina (40ºC). Secar na horizontal."
-      },
-      { 
-        id: 'p4', name: 'Peça Única', price: calculateProductRange('Peça Única'), img: 'https://i.ibb.co/ZRwv4qPt/colecao-bolsa-1.png',
-        material: "Esta Obra Única #01 é produzida em 100% Algodão Egípcio Safran. A suavidade deste fio nobre respeita a sensibilidade da pele.",
-        care: "Lavar à mão com sabão neutro. Secar à sombra."
       }
     ]
   }
@@ -786,7 +781,7 @@ const FioCondutor = () => {
     const specularStrokeWidth = isMobile ? 0.12 : 0.25;
 
     return (
-        <div className="absolute top-[75vh] left-1/2 -translate-x-1/2 w-80 h-[3000px] pointer-events-none select-none z-30 overflow-visible">
+        <div className="absolute top-[75vh] left-1/2 -translate-x-1/2 w-80 h-[3000px] pointer-events-none select-none z-[5] overflow-visible">
             <motion.div 
                 style={{ opacity: threadOpacity }}
                 transition={{ duration: 0.5 }}
@@ -961,14 +956,20 @@ const Hero = () => {
             {!isFirstImageLoaded ? (
                 <section 
                     data-background="dark" 
-                    className="relative z-20 h-screen w-full flex flex-col items-center justify-center overflow-hidden bg-[#1F2A18]" 
+                    className="relative z-20 min-h-[100dvh] lg:h-screen w-full pt-28 pb-20 md:pt-24 lg:py-0 flex flex-col items-center justify-center overflow-hidden bg-[#1F2A18]" 
                     style={{ background: '#1F2A18' }} 
                     id="hero-loader-placeholder"
                 />
             ) : (
-                <section data-background="dark" className="relative z-20 h-screen flex flex-col items-center justify-center overflow-hidden text-cream bg-[#1F2A18]" style={{ background: 'linear-gradient(to bottom, #1F2A18 0%, #1F2A18 85%, #24301d 100%)' }}>
+                <section data-background="dark" className="relative z-20 min-h-[100dvh] lg:h-screen pt-28 pb-20 md:pt-24 lg:py-0 flex flex-col items-center justify-center overflow-hidden text-cream bg-[#1F2A18]" style={{ background: 'linear-gradient(to bottom, #1F2A18 0%, #1F2A18 85%, #24301d 100%)' }}>
                     {/* Ambient Overlay Image with Parallax & Slow Animation - Revealing more texture and matter with a bottom dissolution fade matching our background gradient transition */}
-                    <div className="absolute inset-0 z-0 select-none pointer-events-none [mask-image:linear-gradient(to_bottom,black_78%,transparent_98%)] bg-[#1F2A18]">
+                    <div 
+                        className="absolute inset-0 z-0 select-none pointer-events-none bg-[#1F2A18]"
+                        style={{
+                            WebkitMaskImage: 'linear-gradient(to bottom, black 0%, black calc(100% - 100px), transparent 100%)',
+                            maskImage: 'linear-gradient(to bottom, black 0%, black calc(100% - 100px), transparent 100%)'
+                        }}
+                    >
                         {/* Estado 1: Pulsing, dreaming fade-in of the background images with breathing texture depth, merging organically with our deep brand green */}
                         <motion.div
                             initial={{ opacity: 0 }}
@@ -1024,7 +1025,7 @@ const Hero = () => {
                             transition={{ duration: 32, repeat: Infinity, ease: "easeInOut" }}
                             className="absolute inset-0 bg-[radial-gradient(ellipse_at_35%_0%,rgba(255,251,240,0.15)_0%,transparent_45%)] z-10 pointer-events-none mix-blend-screen origin-top"
                         />
-         
+          
                         {/* Handmade texture layer: Premium subtle cellulose/organic film grain */}
                         <div 
                             className="absolute inset-0 pointer-events-none z-10 opacity-[0.075] mix-blend-overlay"
@@ -1043,7 +1044,10 @@ const Hero = () => {
          
                     {/* Cinematic Centered Editorial Content */}
                     <motion.div 
-                        style={{ scale: logoScale, y: contentY }}
+                        style={{ 
+                            scale: logoScale, 
+                            y: contentY
+                        }}
                         className="relative z-20 flex flex-col items-center px-6 text-center select-none"
                     >
                         {/* Scroll-fading content wrapper to keep the primary brand elements clean while scroll progresses */}
@@ -1076,7 +1080,7 @@ const Hero = () => {
                                     textShadow: "0 15px 40px rgba(18, 26, 13, 0.95), 0 4px 12px rgba(18, 26, 13, 0.7)",
                                     letterSpacing: "-0.015em"
                                 }}
-                                className="italic text-2xl sm:text-3xl md:text-[2.5rem] lg:text-[2.85rem] leading-[1.15] md:leading-[1.18] font-normal text-[#FFFDF9] mb-4 md:mb-5 antialiased selection:bg-[#C5A059]/30 flex flex-wrap justify-center gap-x-[0.25em] md:gap-x-[0.28em] max-w-2xl"
+                                className="italic text-2xl sm:text-3xl md:text-4xl lg:text-[2.85rem] leading-tight font-normal text-[#FFFDF9] mb-4 md:mb-5 antialiased selection:bg-[#C5A059]/30 flex flex-wrap justify-center gap-x-[0.25em] md:gap-x-[0.28em] max-w-2xl"
                             >
                                 {titleWords.map((word, i) => (
                                     <motion.span
@@ -1160,18 +1164,23 @@ const StorySection = () => {
     }, []);
 
     return (
-        <section ref={containerRef} id="sobre" data-background="light" className="py-24 sm:py-32 md:py-48 lg:py-64 px-6 sm:px-12 md:px-20 lg:px-24 relative z-10 overflow-hidden select-none" style={{ backgroundColor: '#F5F2ED' }}>
+        <section ref={containerRef} id="sobre" data-background="light" className="py-12 px-4 landscape:py-8 md:portrait:py-16 lg:py-20 xl:py-28 relative z-10 overflow-hidden select-none" style={{ backgroundColor: '#F5F2ED' }}>
             {/* Glow Sfumato: Dynamic dissolution cromática background transition from dark forest green (#1F2A18) directly into solid cream (#F5F2ED) */}
-            <div className="absolute top-0 inset-x-0 h-[650px] pointer-events-none z-0 overflow-hidden">
-                {/* Seamless deep forest-green fade to prevent visual hard borders */}
-                <div className="absolute inset-x-0 top-0 h-full bg-gradient-to-b from-[#1F2A18] via-[#1F2A18]/60 to-transparent" />
+            <div className="absolute top-0 inset-x-0 h-[850px] pointer-events-none z-0 overflow-hidden">
+                {/* Seamless deep forest-green fade using an organic, multi-stop light decay channel */}
+                <div 
+                    className="absolute inset-x-0 top-0 h-full" 
+                    style={{
+                        background: 'linear-gradient(to bottom, #1F2A18 0%, #1F2A18 10%, rgba(31, 42, 24, 0.93) 22%, rgba(31, 42, 24, 0.78) 36%, rgba(31, 42, 24, 0.58) 52%, rgba(31, 42, 24, 0.38) 68%, rgba(31, 42, 24, 0.18) 82%, rgba(31, 42, 24, 0.05) 93%, transparent 100%)'
+                    }}
+                />
                 
                 {/* Warm golden light-leak/flare sfumato radial element for luxury feel */}
                 <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[450px] bg-[radial-gradient(circle_at_center,rgba(197,160,89,0.18)_0%,transparent_75%)] mix-blend-screen" />
             </div>
 
             {/* Elements of Fundo Subtis: Handcrafted loose cotton fibers / wavy spinning threads running deep inside the cream canvas, completely backgrounded */}
-            <div className="absolute inset-x-0 bottom-0 top-[650px] pointer-events-none z-0 overflow-hidden">
+            <div className="absolute inset-x-0 bottom-0 top-[850px] pointer-events-none z-0 overflow-hidden">
                 {/* Subtle organic textile noise */}
                 <div 
                     className="absolute inset-0 opacity-[0.035] mix-blend-overlay"
@@ -1181,7 +1190,7 @@ const StorySection = () => {
                 />
                 
                 {/* Abstract spinning textile thread born gracefully inside the cream space (opacity 0.04) */}
-                <svg className="w-full h-full min-w-[900px] absolute left-1/2 -translate-x-1/2 top-40 opacity-[0.04]" viewBox="0 0 1000 600" fill="none">
+                <svg className="w-full h-full min-w-[900px] absolute left-1/2 -translate-x-1/2 top-40 opacity-[0.04] z-0" viewBox="0 0 1000 600" fill="none">
                     <defs>
                         <filter id="subtleFiberBlur">
                             <feGaussianBlur stdDeviation="4.0" />
@@ -1199,21 +1208,21 @@ const StorySection = () => {
             {/* Elegant Large Watermark Signature in Background */}
             <motion.div 
                 style={{ x: xTrack, y: yTrack, opacity: opacityTrack, fontFamily: "'Great Vibes', cursive" }}
-                className="absolute inset-0 pointer-events-none text-forest text-[26vw] md:text-[32vw] leading-none whitespace-nowrap text-center flex items-center justify-center select-none"
+                className="absolute inset-0 pointer-events-none text-forest text-[26vw] md:text-[32vw] leading-none whitespace-nowrap text-center flex items-center justify-center select-none z-0"
             >
                 Carolina
             </motion.div>
 
-            <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-20 lg:gap-32 items-center relative z-10">
+            <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-6 lg:gap-12 items-center relative z-10">
                 {/* Left Side: Elegant Portrait / Working Hands Presentation */}
                 <motion.div 
                     initial={{ opacity: 0, scale: 0.96, y: 30 }}
                     whileInView={{ opacity: 1, scale: 1, y: 0 }}
                     viewport={{ once: true, margin: "-100px" }}
                     transition={{ duration: 1.4, ease: [0.16, 1, 0.3, 1] }}
-                    className="relative lg:col-span-5 max-w-md mx-auto lg:max-w-none w-full"
+                    className="relative md:col-span-1 lg:col-span-5 max-w-md mx-auto lg:max-w-none w-full"
                 >
-                    <div className="aspect-[4/5] overflow-hidden rounded-[2rem] md:rounded-[2.5rem] shadow-2xl relative bg-forest/5">
+                    <div className="w-full aspect-[4/5] max-h-[50vh] sm:max-h-[60vh] lg:max-h-none overflow-hidden rounded-[2rem] md:rounded-[2.5rem] shadow-2xl relative bg-forest/5">
                         <AnimatePresence mode="wait">
                             <motion.img 
                                 key={currentImg}
@@ -1264,9 +1273,9 @@ const StorySection = () => {
                                     d="M 50, 50 m -36, 0 a 36,36 0 1, 1 72,0 a 36,36 0 1, 1 -72,0"
                                     fill="none"
                                 />
-                                <text className="text-[10px] font-bold uppercase tracking-[0.14em] fill-cream">
-                                    <textPath href="#circlePathBadge" startOffset="0%">
-                                        M★BRAVO ★ HANDMADE ★ EST. 2025 ★ 
+                                <text style={{ fontSize: '9px', lineHeight: '13.5px' }} className="font-bold uppercase tracking-[0.14em] fill-cream">
+                                    <textPath href="#circlePathBadge" startOffset="0%" style={{ fontSize: '9px', lineHeight: '13.5px' }}>
+                                        M★BRAVO ★ HANDMADE ★ EST. 2025 ★
                                     </textPath>
                                 </text>
                             </svg>
@@ -1297,13 +1306,13 @@ const StorySection = () => {
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true, margin: "-100px" }}
                     transition={{ duration: 1.4, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
-                    className="flex flex-col gap-12 md:gap-14 lg:col-span-7 lg:pl-12 text-left"
+                    className="flex flex-col gap-12 md:gap-14 md:col-span-1 lg:col-span-7 lg:pl-12 text-left"
                 >
                     <div className="space-y-6">
                         <span className="text-[10px] uppercase tracking-[0.45em] font-bold text-forest/35 block font-sans">
-                            MEMÓRIA E AFETO
+                            MEMÓRIA CRUA
                         </span>
-                        <h2 className="text-3xl xs:text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-serif text-forest tracking-tight leading-[1.05] font-light">
+                        <h2 className="text-3xl xs:text-4xl sm:text-5xl md:text-5xl lg:text-7xl font-serif text-forest tracking-tight leading-tight md:leading-[1.05] font-light">
                             Tudo começou com <br />
                             <span className="italic font-normal text-[#C5A059]">uma memória.</span>
                         </h2>
@@ -1311,9 +1320,9 @@ const StorySection = () => {
                     
                     <div className="space-y-8">
                         <p className="text-forest font-serif italic text-xl md:text-2xl leading-relaxed font-light text-forest/90">
-                            Antes de existir uma marca, existia uma história. <br />
+                            Antes de existir uma marca, existia uma historia. <br />
                             <span className="text-base sm:text-lg font-sans not-italic text-forest/70 block mt-3 font-light leading-relaxed">
-                                Uma história feita de afeto, de tempo e de momentos que permanecem mesmo quando os dias passam.
+                                Uma historia feita de afeto, de tempo e de momentos que permanecem mesmo quando os dias passam.
                             </span>
                         </p>
                         
@@ -1322,15 +1331,15 @@ const StorySection = () => {
                         </p>
                         
                         <p className="text-forest/70 text-[15px] md:text-lg leading-relaxed font-sans font-light max-w-2xl">
-                            Cada peça é criada à mão, com calma e intenção, respeitando o tempo que as coisas verdadeiramente importantes merecem.
+                            Cada peça é criada à mão, com calma e pureza, respeitando o tempo que as coisas realmente importantes merecem.
                         </p>
                     </div>
 
                     {/* Staggered Mantras (M★Bravo Pillars) with elegant lines */}
                     <div className="space-y-6 pt-10 border-t border-forest/10 max-w-xl">
                         {[
-                            "Porque algumas histórias não foram feitas para ficar guardadas.",
-                            "Foram feitas para ser sentidas."
+                            "porque algumas historias não foram feitas para ficarem guardadas.",
+                            "Foram feitos para serem sentidos."
                         ].map((mantra, idx) => (
                             <motion.div 
                                 key={idx}
@@ -1355,7 +1364,7 @@ const StorySection = () => {
                             className="group relative inline-flex items-center gap-6 px-10 py-5 bg-forest text-cream rounded-full overflow-hidden transition-all duration-500 hover:pr-14"
                         >
                             <span className="relative z-10 text-[10px] uppercase tracking-[0.3em] font-semibold">
-                                Descobrir a Coleção
+                                Contemplar a Matéria
                             </span>
                             <div className="absolute right-4 w-10 h-10 bg-[#C5A059] text-forest rounded-full flex items-center justify-center transition-all duration-500 group-hover:right-6">
                                 <ArrowRight size={16} />
@@ -1370,174 +1379,180 @@ const StorySection = () => {
 
 const MadeWithTimeSection = () => {
     return (
-        <section id="manifesto" data-background="light" className="py-20 sm:py-32 md:py-48 lg:py-64 bg-[#FCFBF9] px-6 sm:px-12 md:px-20 lg:px-24 relative overflow-hidden select-none border-t border-forest/5">
-            <div className="max-w-7xl mx-auto">
-                {/* Header: Large Typography */}
-                <div className="max-w-3xl mb-24 md:mb-32">
-                    <span className="text-[10px] uppercase tracking-[0.45em] font-semibold text-forest/35 block mb-4 font-sans">
-                        THE CHRONICLES OF SLOW DESIGN
-                    </span>
-                    <h2 className="text-4xl sm:text-5xl md:text-7xl font-serif text-forest tracking-tight leading-[1.1] font-light">
-                        Feito com Tempo. <br />
-                        <span className="italic font-normal text-[#C5A059]">O ritmo calmo de tudo o que merece permanecer.</span>
-                    </h2>
-                    <p className="mt-6 text-forest/75 text-base md:text-xl font-light leading-relaxed max-w-2xl font-serif italic">
-                        "Há histórias que só as mãos sabem contar."
-                    </p>
+        <section id="manifesto" data-background="light" className="py-12 px-4 landscape:py-8 md:portrait:py-16 lg:py-20 xl:py-28 bg-[#FCFBF9] relative overflow-hidden select-none border-t border-forest/5">
+            <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                {/* Header: Large Asymmetrical Editorial Typography */}
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-16 items-baseline mb-24 md:mb-32 border-b border-forest/10 pb-16">
+                    <div className="lg:col-span-7">
+                        <span className="text-[10px] uppercase tracking-[0.45em] font-semibold text-forest/35 block mb-4 font-sans">
+                            A ESCOLHA
+                        </span>
+                        <h2 className="text-3xl sm:text-5xl md:text-5xl lg:text-6xl font-serif text-forest tracking-tight leading-tight lg:leading-[1.1] font-light">
+                            Feito com Tempo. <br />
+                            <span className="italic font-normal text-[#C5A059]">O ritmo calmo de tudo o que merece permanência.</span>
+                        </h2>
+                    </div>
+                    <div className="lg:col-span-5 lg:pl-12">
+                        <p className="text-forest/70 text-lg md:text-xl font-light leading-relaxed font-serif italic border-l border-[#C5A059]/40 pl-6 py-2">
+                            "Há histórias que só as mãos sabem contar."
+                        </p>
+                    </div>
                 </div>
 
-                {/* Grid layout */}
-                <div className="grid grid-cols-1 lg:grid-cols-12 gap-20 lg:gap-32 items-start">
+                {/* Main Content Grid: Balanced 12-column layout */}
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-12 items-start">
                     
-                    {/* Left side: Warm Natural Imagery with luxurious framing */}
-                    <div className="lg:col-span-5 space-y-6 max-w-md mx-auto lg:max-w-none w-full">
+                    {/* Left Column: The 4 editorial pillars (spans 7 columns) */}
+                    <div className="lg:col-span-7">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 lg:gap-x-12 lg:gap-y-16">
+                            
+                            {/* Pillar 1 - O Ritmo */}
+                            <motion.div 
+                                initial={{ opacity: 0, y: 30 }}
+                                whileInView={{ opacity: 1, y: 0 }}
+                                viewport={{ once: true }}
+                                transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1] }}
+                                className="space-y-4 text-left group"
+                            >
+                                <div className="flex items-center justify-between border-b border-forest/10 pb-3">
+                                    <div className="flex items-center gap-2">
+                                        <Feather size={14} className="text-[#C5A059] opacity-80" />
+                                        <span className="font-mono text-[9px] uppercase tracking-[0.25em] text-forest/40">01 / ARTESÃO</span>
+                                    </div>
+                                    <span className="font-serif italic text-lg text-[#C5A059]/50 group-hover:text-[#C5A059] transition-colors duration-500 font-light select-none">I</span>
+                                </div>
+                                <h3 className="text-xl font-serif text-forest tracking-wide group-hover:text-[#C5A059] transition-colors duration-300 font-light leading-snug">
+                                    Algumas coisas precisam de tempo para nascer.
+                                </h3>
+                                <div className="space-y-4 font-sans text-forest/65 text-sm font-light leading-relaxed">
+                                    <p>Não acredito em apressar aquilo que realmente importa.</p>
+                                    <p>Cada peça começa em silêncio, crescendo ponto a ponto, respeitando seu próprio ritmo.</p>
+                                    <p>Porque as coisas mais importantes da vida não são criadas à pressa.</p>
+                                </div>
+                            </motion.div>
+
+                            {/* Pillar 2 - A Presença */}
+                            <motion.div 
+                                initial={{ opacity: 0, y: 30 }}
+                                whileInView={{ opacity: 1, y: 0 }}
+                                viewport={{ once: true }}
+                                transition={{ duration: 1.2, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
+                                className="space-y-4 text-left group lg:translate-y-12"
+                            >
+                                <div className="flex items-center justify-between border-b border-forest/10 pb-3">
+                                    <div className="flex items-center gap-2">
+                                        <Sparkles size={14} className="text-[#C5A059] opacity-80" />
+                                        <span className="font-mono text-[9px] uppercase tracking-[0.25em] text-forest/40">02 / EXCLUSIVO</span>
+                                    </div>
+                                    <span className="font-serif italic text-lg text-[#C5A059]/50 group-hover:text-[#C5A059] transition-colors duration-500 font-light select-none">II</span>
+                                </div>
+                                <h3 className="text-xl font-serif text-forest tracking-wide group-hover:text-[#C5A059] transition-colors duration-300 font-light leading-snug">
+                                    Nenhuma memória nasce duas vezes.
+                                </h3>
+                                <div className="space-y-4 font-sans text-forest/65 text-sm font-light leading-relaxed">
+                                    <p>Raramente procuro recriar uma peça exatamente da mesma forma.</p>
+                                    <p>Tal como as memórias, cada criação carrega o seu próprio caráter, as suas imperfeições e a sua história.</p>
+                                    <p>É aí que vive a sua beleza.</p>
+                                </div>
+                            </motion.div>
+
+                            {/* Pillar 3 - A Matéria */}
+                            <motion.div 
+                                initial={{ opacity: 0, y: 30 }}
+                                whileInView={{ opacity: 1, y: 0 }}
+                                viewport={{ once: true }}
+                                transition={{ duration: 1.2, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
+                                className="space-y-4 text-left group lg:-mt-12"
+                            >
+                                <div className="flex items-center justify-between border-b border-forest/10 pb-3">
+                                    <div className="flex items-center gap-2">
+                                        <Palette size={14} className="text-[#C5A059] opacity-80" />
+                                        <span className="font-mono text-[9px] uppercase tracking-[0.25em] text-forest/40">03 / CONSCIENTE</span>
+                                    </div>
+                                    <span className="font-serif italic text-lg text-[#C5A059]/50 group-hover:text-[#C5A059] transition-colors duration-500 font-light select-none">III</span>
+                                </div>
+                                <h3 className="text-xl font-serif text-forest tracking-wide group-hover:text-[#C5A059] transition-colors duration-300 font-light leading-snug">
+                                    A criação acontece no silêncio.
+                                </h3>
+                                <div className="space-y-4 font-sans text-forest/65 text-sm font-light leading-relaxed">
+                                    <p>Muitas ideias nascem entre fios, pensamentos e momentos de quietude.</p>
+                                    <p>O processo nunca é acelerado.</p>
+                                    <p>É neste ritmo mais lento que os detalhes se revelam e a inspiração encontra o seu lugar.</p>
+                                </div>
+                            </motion.div>
+
+                            {/* Pillar 4 - O Afeto */}
+                            <motion.div 
+                                initial={{ opacity: 0, y: 30 }}
+                                whileInView={{ opacity: 1, y: 0 }}
+                                viewport={{ once: true }}
+                                transition={{ duration: 1.2, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
+                                className="space-y-4 text-left group lg:translate-y-12"
+                            >
+                                <div className="flex items-center justify-between border-b border-forest/10 pb-3">
+                                    <div className="flex items-center gap-2">
+                                        <Heart size={14} className="text-[#C5A059] opacity-80" />
+                                        <span className="font-mono text-[9px] uppercase tracking-[0.25em] text-forest/40">04 / EMOCIONAL</span>
+                                    </div>
+                                    <span className="font-serif italic text-lg text-[#C5A059]/50 group-hover:text-[#C5A059] transition-colors duration-500 font-light select-none">IV</span>
+                                </div>
+                                <h3 className="text-xl font-serif text-forest tracking-wide group-hover:text-[#C5A059] transition-colors duration-300 font-light leading-snug">
+                                    O verdadeiro valor é aquilo que permanece.
+                                </h3>
+                                <div className="space-y-4 font-sans text-forest/65 text-sm font-light leading-relaxed">
+                                    <p>O valor de uma peça artesanal não vive apenas nos materiais.</p>
+                                    <p>Vive no cuidado, na intenção e na emoção transportada em cada ponto.</p>
+                                    <p>Muito depois de o fio ser tecido, o sentimento permanece.</p>
+                                </div>
+                            </motion.div>
+
+                        </div>
+                    </div>
+
+                    {/* Right Column: The Refined Image (spans 5 columns) - Elegantly proportioned to balance the text column */}
+                    <div className="lg:col-span-5 space-y-8 lg:sticky lg:top-36">
                         <motion.div 
-                            initial={{ opacity: 0, y: 30 }}
-                            whileInView={{ opacity: 1, y: 0 }}
+                            initial={{ opacity: 0, scale: 0.98, y: 20 }}
+                            whileInView={{ opacity: 1, scale: 1, y: 0 }}
                             viewport={{ once: true, margin: "-100px" }}
-                            transition={{ duration: 1.5, ease: [0.16, 1, 0.3, 1] }}
-                            className="aspect-[3/4] relative rounded-[2rem] overflow-hidden shadow-2xl group"
+                            transition={{ duration: 1.6, ease: [0.16, 1, 0.3, 1] }}
+                            className="w-full aspect-[4/5] max-h-[50vh] sm:max-h-[60vh] lg:max-h-none relative rounded-[2rem] overflow-hidden shadow-[0_24px_50px_rgba(31,42,24,0.06)] group border border-forest/5"
                         >
                             <img 
                                 src="https://i.ibb.co/j9LHyxq6/Firefly-Gemini-Flash-Imagem-com-ambiente-cosy-tema-handmade-crochet-usar-o-logo-em-label-de-cartao.png" 
-                                alt="Warm cozy ambient handcrafted yarn detail by M★Bravo" 
-                                className="w-full h-full object-cover select-none brightness-95"
+                                alt="Destaque de textura de lã e rótulo M★Bravo" 
+                                className="w-full h-full object-cover select-none brightness-[0.98] transition-transform duration-[3000ms] ease-out group-hover:scale-[1.03]"
                             />
                             
-                            {/* Organic cotton/linen thread tactile overlay on top of images for workshop feel */}
+                            {/* Subtle natural woven paper overtexture */}
                             <div 
-                                className="absolute inset-0 pointer-events-none z-10 opacity-[0.14] mix-blend-multiply rounded-[2rem]"
+                                className="absolute inset-0 pointer-events-none z-10 opacity-[0.04] mix-blend-overlay"
                                 style={{
-                                    backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='paperNoise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.05' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='0.8 0 0 0 0 0 0.8 0 0 0 0 0 0.8 0 0 0 0 0 0.5 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23paperNoise)'/%3E%3C/svg%3E")`
+                                    backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='paperNoise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.05' numOctaves='4' stitchTiles='stitch'/%3E%3Crect width='100%25' height='100%25' filter='url(%23paperNoise)'/%3E%3C/svg%3E")`
                                 }}
                             />
-                            {/* Floating Quote Card */}
-                            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent flex flex-col justify-end p-8 md:p-10">
-                                <span className="text-[9px] uppercase tracking-[0.3em] text-[#C5A059] font-medium mb-2 block font-sans">AUTHENTIC PROCESS</span>
-                                <p className="text-cream font-serif italic text-lg md:text-xl font-light leading-relaxed">
-                                    "Memory is woven into every single knot we craft."
+                            
+                            {/* Overlay Vignette */}
+                            <div className="absolute inset-0 bg-gradient-to-t from-forest/30 via-transparent to-transparent opacity-80" />
+
+                            {/* Intimate overlay tag */}
+                            <div className="absolute bottom-6 left-6 right-6 flex justify-between items-end">
+                                <p className="text-cream font-serif italic text-base font-light leading-snug drop-shadow-sm max-w-[200px]">
+                                    "A paciência é a alma do atelier."
                                 </p>
+                                <span className="font-mono text-[8px] tracking-[0.3em] text-cream/70 uppercase">M★B</span>
                             </div>
                         </motion.div>
                         
-                        {/* Under-image metadata */}
-                        <div className="flex justify-between items-center px-2 mt-4 select-none pointer-events-none">
-                            <span className="text-[9px] uppercase tracking-[0.25em] text-forest/40 font-mono">EST. 2025 PORTUGAL</span>
-                            <span className="text-[9px] uppercase tracking-[0.25em] text-forest/45 font-mono">100% EXCLUSIVE PIECES</span>
+                        {/* Under-image captioning */}
+                        <div className="flex justify-between items-center px-4 py-2 border-t border-forest/10 font-sans text-forest/40 select-none">
+                            <span className="text-[9px] uppercase tracking-[0.2em] font-mono">ESTÚDIO DE CRIAÇÃO / REGISTO N° 0124</span>
+                            <span className="text-[9px] uppercase tracking-[0.2em] font-mono">PORTUGAL</span>
                         </div>
                     </div>
 
-                    {/* Right side: The Four Pillars */}
-                    <div className="lg:col-span-7 space-y-12 lg:space-y-24">
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-16 lg:gap-x-24 gap-y-12 sm:gap-y-16 md:gap-y-24">
-                            
-                            {/* Pillar 1: Handmade Craftsmanship */}
-                            <motion.div 
-                                initial={{ opacity: 0, y: 20 }}
-                                whileInView={{ opacity: 1, y: 0 }}
-                                viewport={{ once: true }}
-                                transition={{ duration: 1, delay: 0.1 }}
-                                className="space-y-4 text-left group"
-                            >
-                                <div className="flex items-center gap-3">
-                                    <div className="w-10 h-10 rounded-full bg-forest/5 flex items-center justify-center text-[#C5A059] group-hover:bg-[#C5A059]/10 group-hover:text-forest transition-all duration-500">
-                                        <Feather size={18} />
-                                    </div>
-                                    <span className="font-mono text-xs text-forest/40">01 / ARTISAN</span>
-                                </div>
-                                <h3 className="text-xl font-serif text-forest tracking-wide group-hover:text-[#C5A059] transition-colors duration-300">
-                                    Algumas coisas precisam de tempo para nascer.
-                                </h3>
-                                <p className="text-forest/65 text-sm leading-relaxed font-sans font-light">
-                                    Não acredito em apressar aquilo que realmente importa.
-                                    <br /><br />
-                                    Cada peça começa em silêncio, crescendo ponto a ponto, respeitando o seu próprio ritmo.
-                                    <br /><br />
-                                    Porque as coisas mais significativas da vida raramente são criadas à pressa.
-                                </p>
-                            </motion.div>
-
-                            {/* Pillar 2: Unique Pieces */}
-                            <motion.div 
-                                initial={{ opacity: 0, y: 20 }}
-                                whileInView={{ opacity: 1, y: 0 }}
-                                viewport={{ once: true }}
-                                transition={{ duration: 1, delay: 0.2 }}
-                                className="space-y-4 text-left group"
-                            >
-                                <div className="flex items-center gap-3">
-                                    <div className="w-10 h-10 rounded-full bg-forest/5 flex items-center justify-center text-[#C5A059] group-hover:bg-[#C5A059]/10 group-hover:text-forest transition-all duration-500">
-                                        <Sparkles size={18} />
-                                    </div>
-                                    <span className="font-mono text-xs text-forest/40">02 / EXCLUSIVE</span>
-                                </div>
-                                <h3 className="text-xl font-serif text-forest tracking-wide group-hover:text-[#C5A059] transition-colors duration-300">
-                                    Nenhuma memória nasce duas vezes.
-                                </h3>
-                                <p className="text-forest/65 text-sm leading-relaxed font-sans font-light">
-                                    Raramente procuro recriar uma peça exatamente da mesma forma.
-                                    <br /><br />
-                                    Tal como as memórias, cada criação carrega o seu próprio carácter, as suas imperfeições e a sua história.
-                                    <br /><br />
-                                    É aí que vive a sua beleza.
-                                </p>
-                            </motion.div>
-
-                            {/* Pillar 3: Thoughtful Design */}
-                            <motion.div 
-                                initial={{ opacity: 0, y: 20 }}
-                                whileInView={{ opacity: 1, y: 0 }}
-                                viewport={{ once: true }}
-                                transition={{ duration: 1, delay: 0.3 }}
-                                className="space-y-4 text-left group"
-                            >
-                                <div className="flex items-center gap-3">
-                                    <div className="w-10 h-10 rounded-full bg-forest/5 flex items-center justify-center text-[#C5A059] group-hover:bg-[#C5A059]/10 group-hover:text-forest transition-all duration-500">
-                                        <Palette size={18} />
-                                    </div>
-                                    <span className="font-mono text-xs text-forest/40">03 / CONSCIOUS</span>
-                                </div>
-                                <h3 className="text-xl font-serif text-forest tracking-wide group-hover:text-[#C5A059] transition-colors duration-300">
-                                    A criação acontece no silêncio.
-                                </h3>
-                                <p className="text-forest/65 text-sm leading-relaxed font-sans font-light">
-                                    Muitas ideias nascem entre fios, pensamentos e momentos de quietude.
-                                    <br /><br />
-                                    O processo nunca é acelerado.
-                                    <br /><br />
-                                    É neste ritmo mais lento que os detalhes se revelam e a inspiração encontra o seu lugar.
-                                </p>
-                            </motion.div>
-
-                            {/* Pillar 4: Emotional Value */}
-                            <motion.div 
-                                initial={{ opacity: 0, y: 20 }}
-                                whileInView={{ opacity: 1, y: 0 }}
-                                viewport={{ once: true }}
-                                transition={{ duration: 1, delay: 0.4 }}
-                                className="space-y-4 text-left group"
-                            >
-                                <div className="flex items-center gap-3">
-                                    <div className="w-10 h-10 rounded-full bg-forest/5 flex items-center justify-center text-[#C5A059] group-hover:bg-[#C5A059]/10 group-hover:text-forest transition-all duration-500">
-                                        <Heart size={18} />
-                                    </div>
-                                    <span className="font-mono text-xs text-forest/40">04 / EMOTIONAL</span>
-                                </div>
-                                <h3 className="text-xl font-serif text-forest tracking-wide group-hover:text-[#C5A059] transition-colors duration-300">
-                                    O verdadeiro valor é aquilo que permanece.
-                                </h3>
-                                <p className="text-forest/65 text-sm leading-relaxed font-sans font-light">
-                                    O valor de uma peça artesanal não vive apenas nos materiais.
-                                    <br /><br />
-                                    Vive no cuidado, na intenção e na emoção transportada em cada ponto.
-                                    <br /><br />
-                                    Muito depois de o fio ser tecido, o sentimento permanece.
-                                </p>
-                            </motion.div>
-
-                        </div>
-                    </div>
                 </div>
+
             </div>
         </section>
     );
@@ -1561,15 +1576,15 @@ const KnotSection = () => {
     const opacityTrack = useTransform(smoothProgress, [0, 0.2, 0.8, 1], [0, 0.04, 0.04, 0]);
 
     return (
-        <section ref={containerRef} id="feeling" data-background="dark" className="pt-24 pb-14 md:pt-36 md:pb-20 lg:pt-40 lg:pb-24 px-6 sm:px-12 md:px-20 lg:px-24 relative overflow-hidden" style={{ background: 'linear-gradient(to bottom, #243119 0%, #243119 75%, color-mix(in srgb, #243119 80%, #F5F2ED) 100%)' }}>
+        <section ref={containerRef} id="feeling" data-background="dark" className="py-12 px-4 landscape:py-8 md:portrait:py-16 lg:py-20 xl:py-28 relative overflow-hidden" style={{ background: 'linear-gradient(to bottom, #243119 0%, #243119 75%, color-mix(in srgb, #243119 80%, #F5F2ED) 100%)' }}>
             <motion.div 
                 style={{ x: xTrack, y: yTrack, opacity: opacityTrack, fontFamily: "'Cormorant Garamond', serif" }}
-                className="absolute inset-0 pointer-events-none text-cream text-[26vw] md:text-[35vw] leading-none italic font-light whitespace-nowrap text-center flex items-center justify-center select-none"
+                className="absolute inset-0 pointer-events-none text-cream text-[26vw] md:text-[35vw] leading-none italic font-light whitespace-nowrap text-center flex items-center justify-center select-none z-0"
             >
                 Handmade
             </motion.div>
 
-            <div className="max-w-7xl mx-auto relative z-10">
+            <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
                 <div className="max-w-3xl mb-16 md:mb-20 lg:mb-24">
                     <motion.span 
                         initial={{ opacity: 0, y: 10 }}
@@ -1584,7 +1599,7 @@ const KnotSection = () => {
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true }}
                         transition={{ duration: 1 }}
-                        className="text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-serif text-cream leading-tight mb-8 md:mb-10"
+                        className="text-3xl sm:text-5xl md:text-6xl lg:text-8xl font-serif text-cream leading-tight mb-8 md:mb-10"
                     >
                         O Ritmo do Coração <br />
                         <span className="italic font-normal text-brand-green-light">em Cada Ponto.</span>
@@ -1605,14 +1620,14 @@ const KnotSection = () => {
                 </div>
 
                 {/* Minimalist Details Gallery */}
-                <div className="grid grid-cols-12 gap-8 md:gap-20 lg:gap-24">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-6 lg:gap-12">
                     {/* Main Focus Detail */}
                     <motion.div 
                         initial={{ opacity: 0, scale: 0.98 }}
                         whileInView={{ opacity: 1, scale: 1 }}
                         viewport={{ once: true }}
                         transition={{ duration: 1.5 }}
-                        className="col-span-12 md:col-span-7 aspect-[4/5] rounded-3xl md:rounded-[3rem] overflow-hidden relative group shadow-2xl max-w-2xl mx-auto md:max-w-none w-full"
+                        className="col-span-1 md:col-span-1 lg:col-span-7 w-full aspect-[4/5] max-h-[50vh] sm:max-h-[60vh] lg:max-h-none overflow-hidden rounded-3xl md:rounded-[3rem] relative group shadow-2xl max-w-2xl mx-auto md:max-w-none"
                     >
                         <img 
                             src="https://i.ibb.co/F4Z4Fp4Z/LOGOTIPOo.jpg" 
@@ -1626,13 +1641,13 @@ const KnotSection = () => {
                     </motion.div>
 
                     {/* Secondary Details */}
-                    <div className="col-span-12 md:col-span-5 flex flex-col gap-6 md:gap-14 lg:gap-16 justify-center max-w-2xl mx-auto md:max-w-none w-full">
+                    <div className="col-span-1 md:col-span-1 lg:col-span-5 flex flex-col gap-6 md:gap-14 lg:gap-16 justify-center max-w-2xl mx-auto md:max-w-none w-full">
                         <motion.div 
                             initial={{ opacity: 0, x: 30 }}
                             whileInView={{ opacity: 1, x: 0 }}
                             viewport={{ once: true }}
                             transition={{ duration: 1.2, delay: 0.3 }}
-                            className="aspect-square rounded-3xl md:rounded-[3rem] overflow-hidden transition-all duration-1000 shadow-xl relative group"
+                            className="w-full aspect-[4/5] max-h-[50vh] sm:max-h-[60vh] lg:max-h-none overflow-hidden rounded-3xl md:rounded-[3rem] transition-all duration-1000 shadow-xl relative group"
                         >
                             <img 
                                 src="https://i.ibb.co/d0Rn6jC7/MOOD-01.png" 
@@ -1648,7 +1663,7 @@ const KnotSection = () => {
                             whileInView={{ opacity: 1, x: 0 }}
                             viewport={{ once: true }}
                             transition={{ duration: 1.2, delay: 0.5 }}
-                            className="aspect-video rounded-3xl md:rounded-[3rem] overflow-hidden transition-all duration-1000 shadow-xl relative group"
+                            className="w-full aspect-[4/5] max-h-[50vh] sm:max-h-[60vh] lg:max-h-none overflow-hidden rounded-3xl md:rounded-[3rem] transition-all duration-1000 shadow-xl relative group"
                         >
                             <img 
                                 src="https://i.ibb.co/0pfJPj9V/emotional-thank-you-card-1.png" 
@@ -1852,7 +1867,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, i, isFocused, isSubd
     const currentImg = productImages[activeImgIndex];
 
     return (
-        <div className="w-full h-full md:max-w-3xl md:h-[90vh] lg:max-w-6xl lg:h-[88vh] bg-[#FCFBF9] rounded-none md:rounded-[2rem] lg:rounded-[2.5rem] flex flex-col lg:flex-row shadow-2xl relative overflow-y-auto lg:overflow-hidden text-forest select-none">
+        <div className="w-full h-[100dvh] md:max-w-3xl md:h-[90vh] lg:max-w-6xl lg:h-[88vh] bg-[#FCFBF9] rounded-none md:rounded-[2rem] lg:rounded-[2.5rem] flex flex-col lg:flex-row shadow-2xl relative overflow-y-auto lg:overflow-hidden text-forest select-none">
             {/* a) Área de Visualização */}
             <div 
                 className={`transition-all duration-500 ease-in-out relative flex flex-col items-center justify-center p-6 lg:p-12 overflow-hidden bg-[#141A11] ${
@@ -1886,7 +1901,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, i, isFocused, isSubd
                         {/* High-End Floating Close Button for Mobile/Tablet */}
                         <button 
                             onClick={handleToggle}
-                            className="absolute top-4 right-4 z-40 lg:hidden p-3 rounded-full bg-black/40 hover:bg-black/60 text-white backdrop-blur-md transition-all border border-white/10 cursor-pointer flex items-center justify-center shadow-lg"
+                            className="fixed top-4 right-4 z-[150] lg:hidden p-3 rounded-full bg-black/60 hover:bg-black/80 text-white backdrop-blur-md transition-all border border-white/10 cursor-pointer flex items-center justify-center shadow-lg"
                             title="Fechar Detalhes"
                         >
                             <X size={18} />
@@ -2013,7 +2028,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, i, isFocused, isSubd
             {/* b) Área de Informação (Details / Sidebar and custom features) */}
             <div className="w-full lg:w-[38%] h-auto lg:h-full bg-[#FCFBF9] flex flex-col pl-5 pr-5 py-6 lg:py-8 text-forest relative box-border">
                 {/* Upper Scrollable Info Panel with compact spacing */}
-                <div className="flex-1 overflow-y-visible lg:overflow-y-auto space-y-5 pr-1 select-text scrollbar-thin scrollbar-thumb-forest/10 scrollbar-track-transparent">
+                <div className="flex-1 overflow-y-visible lg:overflow-y-auto space-y-5 pr-1 select-text pb-32 lg:pb-4 scrollbar-thin scrollbar-thumb-forest/10 scrollbar-track-transparent">
                     
                     {/* Title & Navigation/Close Controls */}
                     <div className="flex justify-between items-start gap-4">
@@ -2062,6 +2077,26 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, i, isFocused, isSubd
                         <p className="text-[13px] text-forest/75 leading-relaxed tracking-wide font-light font-sans whitespace-pre-line max-w-prose lg:max-w-[90%] w-full mb-6">
                             {product.description}
                         </p>
+                    )}
+
+                    {/* Detalhes do Produto */}
+                    {product.details && (
+                        <div className="mb-6 text-left max-w-prose lg:max-w-[90%] w-full">
+                            <h5 className="text-[9px] uppercase tracking-[0.25em] font-bold text-forest/45 flex items-center gap-1.5 mb-3">
+                                <span className="text-[#C5A059] text-xs">●</span> DETALHES DO PRODUTO
+                            </h5>
+                            <ul className="space-y-2 pl-0.5">
+                                {product.details.split('\n').map((line: string, index: number) => {
+                                    const cleaned = line.replace(/^[•\-\s]+/, '').trim();
+                                    return (
+                                        <li key={index} className="flex items-start gap-2 text-[12px] text-forest/75 leading-relaxed font-light font-sans">
+                                            <span className="text-[#C5A059] mt-0.5 shrink-0 select-none">•</span>
+                                            <span>{cleaned}</span>
+                                        </li>
+                                    );
+                                })}
+                            </ul>
+                        </div>
                     )}
 
                     {/* Customization Selection Panels */}
@@ -2417,16 +2452,16 @@ const CollectionSection = () => {
     }, [focusedProductId]);
 
     return (
-        <section ref={containerRef} id="collection" data-background="light" className="pt-16 pb-24 sm:pt-24 sm:pb-36 md:pt-32 md:pb-48 lg:pt-40 lg:pb-64 bg-cream min-h-screen relative overflow-hidden" style={{ background: 'linear-gradient(to bottom, color-mix(in srgb, #243119 80%, #F5F2ED) 0%, color-mix(in srgb, #243119 40%, #F5F2ED) 40%, #F5F2ED 85%, #F5F2ED 100%)' }}>
+        <section ref={containerRef} id="collection" data-background="light" className="py-12 px-4 landscape:py-8 md:portrait:py-16 lg:py-20 xl:py-28 bg-cream min-h-screen relative overflow-hidden" style={{ background: 'linear-gradient(to bottom, color-mix(in srgb, #243119 80%, #F5F2ED) 0%, color-mix(in srgb, #243119 40%, #F5F2ED) 40%, #F5F2ED 85%, #F5F2ED 100%)' }}>
 
             <motion.div 
                 style={{ x: xTrack, y: yTrack, opacity: opacityTrack, fontFamily: "'Cormorant Garamond', serif" }}
-                className="absolute inset-0 pointer-events-none text-forest text-[26vw] md:text-[35vw] leading-none italic font-light whitespace-nowrap text-center flex items-center justify-center select-none"
+                className="absolute inset-0 pointer-events-none text-forest text-[26vw] md:text-[35vw] leading-none italic font-light whitespace-nowrap text-center flex items-center justify-center select-none z-0"
             >
                 M★Bravo
             </motion.div>
 
-            <div className="max-w-7xl mx-auto px-6 mb-16 sm:mb-24 md:mb-32 text-center relative z-10">
+            <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-16 sm:mb-24 md:mb-32 text-center relative z-10">
                  {/* Halo radial suave atrás do título */}
                  <div 
                      className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none -z-10 rounded-full"
@@ -2450,7 +2485,7 @@ const CollectionSection = () => {
                         color: '#1F2A18',
                         textShadow: '0 1px 0 rgba(255,255,255,0.18), 0 2px 6px rgba(0,0,0,0.05)'
                     } as React.CSSProperties}
-                    className="text-3.5xl xs:text-5xl sm:text-6xl md:text-[6.6rem] font-serif font-medium tracking-tight leading-tight max-[350px]:text-2xl"
+                    className="text-3xl xs:text-4xl sm:text-5xl md:text-6xl lg:text-[6.6rem] font-serif font-medium tracking-tight leading-tight max-[350px]:text-2xl"
                  >
                     {selectedCategory ? activeCategory?.name : (
                         <>
@@ -2496,7 +2531,7 @@ const CollectionSection = () => {
                  )}
             </div>
 
-            <div className="max-w-7xl mx-auto px-6">
+            <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <AnimatePresence mode="wait">
                     {!selectedCategory ? (
                         <motion.div 
@@ -2597,15 +2632,15 @@ const CollectionSection = () => {
                                         animate={{ opacity: 1 }}
                                         exit={{ opacity: 0 }}
                                         transition={{ duration: 0.3 }}
-                                        className="fixed inset-0 z-[120] flex items-center justify-center p-0 md:p-6 lg:p-12 bg-forest/60 backdrop-blur-lg overflow-hidden"
+                                        className="fixed inset-0 z-[120] flex items-center justify-center p-0 md:p-6 lg:p-12 bg-forest/60 backdrop-blur-lg overflow-hidden h-[100dvh]"
                                     >
                                         {/* Clickable Backdrop inside */}
                                         <div 
-                                            className="fixed inset-0 -z-10 cursor-pointer" 
+                                            className="fixed inset-0 -z-10 cursor-pointer h-[100dvh]" 
                                             onClick={() => setFocusedProductId(null)} 
                                         />
                                         
-                                        <div className="relative w-full h-full md:h-auto max-w-6xl z-10 flex items-center justify-center">
+                                        <div className="relative w-full h-[100dvh] md:h-auto max-w-6xl z-10 flex items-center justify-center">
                                             <ProductCard 
                                                 product={activeCategory?.products.find(p => p.id === focusedProductId)} 
                                                 i={0} 
@@ -2645,22 +2680,22 @@ const ContactSection = () => {
     const opacityTrack = useTransform(smoothProgress, [0, 0.2, 0.8, 1], [0, 0.02, 0.02, 0]);
 
     return (
-        <section ref={containerRef} id="contacto" data-background="dark" className="py-44 md:py-64 lg:py-72 bg-forest px-6 sm:px-12 md:px-20 lg:px-24 relative overflow-hidden">
+        <section ref={containerRef} id="contacto" data-background="dark" className="py-12 px-4 landscape:py-8 md:portrait:py-16 lg:py-20 xl:py-28 bg-forest relative overflow-hidden">
              {/* Large Script Background */}
              <motion.div 
                 style={{ x: xTrack, y: yTrack, opacity: opacityTrack, fontFamily: "'Cormorant Garamond', serif" }}
-                className="absolute inset-0 pointer-events-none text-cream text-[35vw] leading-none italic font-light whitespace-nowrap text-center flex items-center justify-center select-none"
+                className="absolute inset-0 pointer-events-none text-cream text-[35vw] leading-none italic font-light whitespace-nowrap text-center flex items-center justify-center select-none z-0"
              >
                  M★Bravo
              </motion.div>
 
-             <div className="max-w-4xl mx-auto px-6 text-center relative z-10">
+             <div className="w-full max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
                 <motion.div
                     initial={{ opacity: 0, y: 30 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
                 >
-                    <h2 className="text-5xl md:text-8xl font-serif text-cream mb-14 md:mb-16">Entre no nosso <br /><span className="italic">Universo.</span></h2>
+                    <h2 className="text-4xl sm:text-5xl md:text-6xl lg:text-8xl font-serif text-cream mb-14 md:mb-16 leading-tight">Entre no nosso <br /><span className="italic">Universo.</span></h2>
                     <p className="text-cream/50 text-xl font-light mb-20 md:mb-24 leading-relaxed">
                         Deseja uma peça personalizada ou simplesmente quer saber mais sobre o nosso processo? Estamos a um ponto de distância.
                     </p>
@@ -2704,8 +2739,8 @@ const ContactSection = () => {
 
 const Footer = () => {
     return (
-        <footer className="bg-forest text-cream py-20 px-6 border-t border-cream/5">
-            <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-16">
+        <footer className="bg-forest text-cream py-12 px-4 border-t border-cream/5">
+            <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row justify-between items-center gap-16">
                 <Logo light className="opacity-50 h-28 md:h-48" />
                 
                 <div className="flex gap-12 text-[10px] uppercase tracking-[0.2em] font-medium text-cream/30">
@@ -2726,8 +2761,8 @@ const Footer = () => {
 
 const MemoryContinuesSection = () => {
     return (
-        <section id="memoria" data-background="light" className="py-20 sm:py-32 md:py-48 lg:py-60 bg-[#FCFBF9] px-6 sm:px-12 md:px-20 lg:px-24 relative overflow-hidden select-none border-b border-forest/5">
-            <div className="max-w-4xl mx-auto text-center relative z-10">
+        <section id="memoria" data-background="light" className="py-12 px-4 landscape:py-8 md:portrait:py-16 lg:py-20 xl:py-28 bg-[#FCFBF9] relative overflow-hidden select-none border-b border-forest/5">
+            <div className="w-full max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
                 <motion.div
                     initial={{ opacity: 0, y: 30 }}
                     whileInView={{ opacity: 1, y: 0 }}
@@ -2745,7 +2780,7 @@ const MemoryContinuesSection = () => {
 
                     {/* Main text and body with elegant layout */}
                     <div className="space-y-10 lg:space-y-14">
-                        <h2 className="text-3xl sm:text-4xl md:text-6xl font-serif text-forest tracking-tight leading-tight font-light col-span-2">
+                        <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-serif text-forest tracking-tight leading-tight font-light col-span-2">
                             Há histórias que <br className="inline sm:hidden" /> não desaparecem.
                         </h2>
                         
@@ -2831,7 +2866,7 @@ export default function App() {
                         />
                     </motion.div>
                     <div className="relative z-10 text-center px-6 max-w-4xl mx-auto flex flex-col items-center gap-6 md:gap-8">
-                        <h2 className="text-cream font-serif italic text-4xl md:text-7xl leading-tight">
+                        <h2 className="text-cream font-serif italic text-3xl sm:text-5xl md:text-6xl lg:text-7xl leading-tight">
                             "A beleza está na alma <br className="hidden md:inline" /> que colocamos em cada gesto."
                         </h2>
                         <span className="text-[#C5A059]/80 font-serif italic text-lg md:text-2xl tracking-wide font-light select-none block max-w-xl mx-auto">
