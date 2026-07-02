@@ -2,6 +2,10 @@ import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence, useScroll, useTransform, useSpring, useVelocity } from 'motion/react';
 import { Menu, X, Instagram, Facebook, ArrowRight, ChevronLeft, ChevronRight, Share2, Mail, MessageCircle, Sparkles, Layers, Ban, AlertCircle, Feather, Palette, Heart } from 'lucide-react';
 
+// Imported local high-quality assets for Blue and Pink Coasters cards
+import blueCoastersImg from './assets/images/regenerated_image_1778776322373.png';
+import pinkCoastersImg from './assets/images/regenerated_image_1778776432487.png';
+
 // Hero background images for automatic rotation
 const HERO_BACKGROUNDS = [
   "https://i.ibb.co/KppF2KLq/Background.png",
@@ -170,9 +174,9 @@ const SHOP_CATEGORIES = [
         id: 'h1d', 
         name: 'Blue Coasters', 
         price: calculateProductRange('Blue Coasters'), 
-        img: 'https://i.ibb.co/Rd5hYDv/Blue-coasters.png',
+        img: blueCoastersImg,
         images: [
-          'https://i.ibb.co/Rd5hYDv/Blue-coasters.png',
+          blueCoastersImg,
           'https://i.ibb.co/HL6sMgBq/Blue-coasters-3.jpg',
           'https://i.ibb.co/d437sBsp/Blue-coasters-4.jpg',
           'https://i.ibb.co/fd0RgYCH/Blue-coasters-2.png'
@@ -185,9 +189,9 @@ const SHOP_CATEGORIES = [
         id: 'h1e', 
         name: 'Pink Coasters', 
         price: calculateProductRange('Pink Coasters'), 
-        img: 'https://i.ibb.co/pD6r9Tp/Pink-coasters.png',
+        img: pinkCoastersImg,
         images: [
-          'https://i.ibb.co/pD6r9Tp/Pink-coasters.png',
+          pinkCoastersImg,
           'https://i.ibb.co/gL02D64Q/Pink-coasters-2.jpg',
           'https://i.ibb.co/PvqVqpty/Pink-coasters-3.jpg',
           'https://i.ibb.co/kVSX4zy1/Pink-coasters-1.jpg'
@@ -300,12 +304,11 @@ const SHOP_CATEGORIES = [
         id: 'v1', 
         name: 'Marea Bikini Set', 
         price: calculateProductRange('Marea Bikini Set'), 
-        img: 'https://i.ibb.co/pBtF8x7L/Marea-Bikini-Set.png',
+        img: 'https://i.ibb.co/whQzXMvv/Bikini-CAPA.png',
         images: [
-          'https://i.ibb.co/pBtF8x7L/Marea-Bikini-Set.png',
-          'https://i.ibb.co/yS5kGZ5w/Marea-Bikini-Set-2.png',
-          'https://i.ibb.co/Z6P2ZzY8/Marea-Bikini-Set-3.png',
-          'https://i.ibb.co/pBtF8x7L/Marea-Bikini-Set-4.png'
+          'https://i.ibb.co/whQzXMvv/Bikini-CAPA.png',
+          'https://i.ibb.co/Dfzz9dm2/BIKINI-FRENTE.png',
+          'https://i.ibb.co/4njR38T9/BIKINI-COSTAS.png'
         ],
         description: "Bikini set em crochet feito à mão, com um toque artesanal único e elegante. Perfeito para os dias de sol e mar, oferecendo conforto e um estilo exclusivo para a praia ou piscina. Disponível em várias cores vibrantes e neutras.",
         material: "- Material: 100% algodão",
@@ -315,12 +318,9 @@ const SHOP_CATEGORIES = [
         id: 'v1b', 
         name: 'Marea Triangle Top', 
         price: calculateProductRange('Marea Triangle Top'), 
-        img: 'https://i.ibb.co/yS5kGZ5w/Marea-Bikini-Set-2.png',
+        img: 'https://i.ibb.co/B5Fz2sDh/Bikini-top.png',
         images: [
-          'https://i.ibb.co/yS5kGZ5w/Marea-Bikini-Set-2.png',
-          'https://i.ibb.co/Z6P2ZzY8/Marea-Bikini-Set-3.png',
-          'https://i.ibb.co/pBtF8x7L/Marea-Bikini-Set.png',
-          'https://i.ibb.co/pBtF8x7L/Marea-Bikini-Set-4.png'
+          'https://i.ibb.co/B5Fz2sDh/Bikini-top.png'
         ],
         description: "Top de biquíni em formato triângulo feito à mão em crochet, com um toque artesanal único e elegante. Perfeito para os dias de sol e mar, proporcionando conforto, versatilidade e um design intemporal.",
         material: "- Material: 100% algodão",
@@ -343,7 +343,10 @@ const SHOP_CATEGORIES = [
         img: 'https://i.ibb.co/s9GKBBpQ/IMG-2699-02.jpg',
         images: [
           'https://i.ibb.co/s9GKBBpQ/IMG-2699-02.jpg',
-          'https://i.ibb.co/0p2g0BJt/Poncho.png'
+          'https://i.ibb.co/LXsR4Vqy/Granny-Poncho.png',
+          'https://i.ibb.co/svZH4nTR/Granny-Poncho04.png',
+          'https://i.ibb.co/93bBkp8R/Granny-Poncho03.png',
+          'https://i.ibb.co/F4f3yCK6/Granny-Poncho02.png'
         ],
         description: "Poncho em crochet feito à mão, criado com um clássico padrão granny stitch e combinação de duas cores para um look cozy e intemporal. Com um ajuste confortável e textura aconchegante, é perfeito para sobrepor a diferentes looks e acrescentar um toque handmade e effortless ao visual.",
         details: "• Ideal para layering em diferentes looks\n• Disponível em várias combinações de cores",
@@ -607,12 +610,12 @@ const Navbar = () => {
         };
     }, []);
 
-    // Totally transparent as requested
+    // Totally transparent with contrast-based dynamic text color as requested
     const navBg = 'bg-transparent';
     const textColor = isDarkBg ? 'text-cream' : 'text-forest';
 
   return (
-    <nav className={`fixed top-0 left-0 w-full z-50 transition-all duration-1000 ${isScrolled ? 'py-4' : 'py-8'} ${navBg}`}>
+    <nav className={`fixed top-0 left-0 w-full z-[100] transition-all duration-1000 ${isScrolled ? 'py-4' : 'py-8'} ${navBg}`}>
       <div className="max-w-7xl mx-auto px-6 flex justify-between items-center">
         {/* Logo with entry animation and Smart Invert */}
         <motion.a 
@@ -1164,23 +1167,9 @@ const StorySection = () => {
     }, []);
 
     return (
-        <section ref={containerRef} id="sobre" data-background="light" className="py-12 px-4 landscape:py-8 md:portrait:py-16 lg:py-20 xl:py-28 relative z-10 overflow-hidden select-none" style={{ backgroundColor: '#F5F2ED' }}>
-            {/* Glow Sfumato: Dynamic dissolution cromática background transition from dark forest green (#1F2A18) directly into solid cream (#F5F2ED) */}
-            <div className="absolute top-0 inset-x-0 h-[850px] pointer-events-none z-0 overflow-hidden">
-                {/* Seamless deep forest-green fade using an organic, multi-stop light decay channel */}
-                <div 
-                    className="absolute inset-x-0 top-0 h-full" 
-                    style={{
-                        background: 'linear-gradient(to bottom, #1F2A18 0%, #1F2A18 10%, rgba(31, 42, 24, 0.93) 22%, rgba(31, 42, 24, 0.78) 36%, rgba(31, 42, 24, 0.58) 52%, rgba(31, 42, 24, 0.38) 68%, rgba(31, 42, 24, 0.18) 82%, rgba(31, 42, 24, 0.05) 93%, transparent 100%)'
-                    }}
-                />
-                
-                {/* Warm golden light-leak/flare sfumato radial element for luxury feel */}
-                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[450px] bg-[radial-gradient(circle_at_center,rgba(197,160,89,0.18)_0%,transparent_75%)] mix-blend-screen" />
-            </div>
-
+        <section ref={containerRef} id="sobre" data-background="light" className="pt-24 pb-24 px-6 landscape:pt-24 landscape:pb-20 md:pt-24 md:portrait:px-12 lg:pt-32 lg:pb-32 xl:pt-36 xl:pb-36 relative z-10 overflow-hidden select-none" style={{ backgroundColor: '#FCFBF9' }}>
             {/* Elements of Fundo Subtis: Handcrafted loose cotton fibers / wavy spinning threads running deep inside the cream canvas, completely backgrounded */}
-            <div className="absolute inset-x-0 bottom-0 top-[850px] pointer-events-none z-0 overflow-hidden">
+            <div className="absolute inset-x-0 bottom-0 top-[150px] pointer-events-none z-0 overflow-hidden">
                 {/* Subtle organic textile noise */}
                 <div 
                     className="absolute inset-0 opacity-[0.035] mix-blend-overlay"
@@ -1213,14 +1202,14 @@ const StorySection = () => {
                 Carolina
             </motion.div>
 
-            <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-6 lg:gap-12 items-center relative z-10">
+            <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:grid md:grid-cols-2 md:portrait:flex md:portrait:flex-col lg:grid-cols-12 gap-12 lg:gap-12 items-center relative z-10">
                 {/* Left Side: Elegant Portrait / Working Hands Presentation */}
                 <motion.div 
                     initial={{ opacity: 0, scale: 0.96, y: 30 }}
                     whileInView={{ opacity: 1, scale: 1, y: 0 }}
                     viewport={{ once: true, margin: "-100px" }}
                     transition={{ duration: 1.4, ease: [0.16, 1, 0.3, 1] }}
-                    className="relative md:col-span-1 lg:col-span-5 max-w-md mx-auto lg:max-w-none w-full"
+                    className="relative w-full max-w-md mx-auto lg:max-w-none md:w-full lg:w-auto lg:col-span-5"
                 >
                     <div className="w-full aspect-[4/5] max-h-[50vh] sm:max-h-[60vh] lg:max-h-none overflow-hidden rounded-[2rem] md:rounded-[2.5rem] shadow-2xl relative bg-forest/5">
                         <AnimatePresence mode="wait">
@@ -1261,7 +1250,7 @@ const StorySection = () => {
                     </div>
 
                     {/* Luxurious Rotating Brand Badge */}
-                    <div className="absolute -bottom-10 -right-4 md:-bottom-12 md:-right-12 w-36 h-36 md:w-44 md:h-44 lg:w-48 lg:h-48 hidden sm:flex items-center justify-center bg-forest rounded-full p-1 border-4 border-cream shadow-[0_25px_60px_rgba(36,49,25,0.25)] z-20 overflow-hidden group">
+                    <div className="absolute -bottom-10 -right-4 md:-bottom-12 md:-right-12 w-36 h-36 md:w-44 md:h-44 lg:w-48 lg:h-48 hidden sm:flex md:portrait:hidden lg:flex items-center justify-center bg-forest rounded-full p-1 border-4 border-cream shadow-[0_25px_60px_rgba(36,49,25,0.25)] z-20 overflow-hidden group">
                         <motion.div 
                             animate={{ rotate: 360 }}
                             transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
@@ -1306,13 +1295,13 @@ const StorySection = () => {
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true, margin: "-100px" }}
                     transition={{ duration: 1.4, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
-                    className="flex flex-col gap-12 md:gap-14 md:col-span-1 lg:col-span-7 lg:pl-12 text-left"
+                    className="flex flex-col gap-12 md:gap-14 md:portrait:gap-8 pb-12 md:portrait:pb-12 lg:pb-0 md:col-span-1 lg:col-span-7 lg:pl-12 text-left w-full md:w-full lg:w-auto"
                 >
                     <div className="space-y-6">
                         <span className="text-[10px] uppercase tracking-[0.45em] font-bold text-forest/35 block font-sans">
                             MEMÓRIA CRUA
                         </span>
-                        <h2 className="text-3xl xs:text-4xl sm:text-5xl md:text-5xl lg:text-7xl font-serif text-forest tracking-tight leading-tight md:leading-[1.05] font-light">
+                        <h2 className="text-3xl xs:text-4xl sm:text-5xl md:text-5xl lg:text-forest lg:text-7xl font-serif text-forest tracking-tight leading-tight md:leading-[1.05] font-light">
                             Tudo começou com <br />
                             <span className="italic font-normal text-[#C5A059]">uma memória.</span>
                         </h2>
@@ -1350,7 +1339,7 @@ const StorySection = () => {
                                 className="flex items-center gap-4 group"
                             >
                                 <span className="text-[#C5A059] text-xs font-serif select-none transition-transform duration-500 group-hover:scale-125">★</span>
-                                <span className="text-forest font-serif text-[16px] md:text-xl font-light tracking-wide">
+                                <span className="text-forest lg:text-forest font-serif text-[16px] md:text-xl font-light tracking-wide">
                                     {mantra}
                                 </span>
                             </motion.div>
@@ -1358,10 +1347,10 @@ const StorySection = () => {
                     </div>
 
                     {/* Elegant, Non-Commercial CTA */}
-                    <div className="pt-8 md:pt-10">
+                    <div className="pt-8 md:pt-10 flex flex-col sm:flex-row md:portrait:flex-col lg:flex-row items-center sm:items-center md:portrait:items-center lg:items-start gap-8 md:portrait:gap-8 md:portrait:w-full md:portrait:justify-center">
                         <a 
                             href="#collection" 
-                            className="group relative inline-flex items-center gap-6 px-10 py-5 bg-forest text-cream rounded-full overflow-hidden transition-all duration-500 hover:pr-14"
+                            className="group relative inline-flex items-center gap-6 px-10 py-5 bg-forest text-cream rounded-full overflow-hidden transition-all duration-500 hover:pr-14 shrink-0"
                         >
                             <span className="relative z-10 text-[10px] uppercase tracking-[0.3em] font-semibold">
                                 Contemplar a Matéria
@@ -1370,6 +1359,45 @@ const StorySection = () => {
                                 <ArrowRight size={16} />
                             </div>
                         </a>
+
+                        {/* Fluid Brand Badge shown only in md:portrait and xs/sm mobile views, below the text flow smoothly */}
+                        <div className="flex sm:hidden md:portrait:flex lg:hidden items-center justify-center relative w-36 h-36 md:w-40 md:h-40 bg-forest rounded-full p-1 border-4 border-cream shadow-[0_25px_60px_rgba(36,49,25,0.25)] overflow-hidden group shrink-0">
+                            <motion.div 
+                                animate={{ rotate: 360 }}
+                                transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+                                className="w-full h-full relative flex items-center justify-center"
+                            >
+                                <svg viewBox="0 0 100 100" className="w-full h-full">
+                                    <path
+                                        id="circlePathBadgeFluid"
+                                        d="M 50, 50 m -36, 0 a 36,36 0 1, 1 72,0 a 36,36 0 1, 1 -72,0"
+                                        fill="none"
+                                    />
+                                    <text style={{ fontSize: '9px', lineHeight: '13.5px' }} className="font-bold uppercase tracking-[0.14em] fill-cream">
+                                        <textPath href="#circlePathBadgeFluid" startOffset="0%" style={{ fontSize: '9px', lineHeight: '13.5px' }}>
+                                            M★BRAVO ★ HANDMADE ★ EST. 2025 ★
+                                        </textPath>
+                                    </text>
+                                </svg>
+                            </motion.div>
+                            <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                                <svg viewBox="0 0 120 120" className="w-14 h-14 md:w-16 md:h-16">
+                                    <path 
+                                        d="M60 0 L78 38 L118 42 L90 71 L96 111 L60 93 L24 111 L30 71 L2 42 L42 38 Z" 
+                                        fill="#C5A059" 
+                                    />
+                                    <text 
+                                        x="60" 
+                                        y="72" 
+                                        textAnchor="middle" 
+                                        fill="#243119" 
+                                        style={{ fontSize: '32px', fontFamily: 'Playfair Display, serif', fontWeight: 'bold' }}
+                                    >
+                                        M
+                                    </text>
+                                </svg>
+                            </div>
+                        </div>
                     </div>
                 </motion.div>
             </div>
@@ -1379,7 +1407,7 @@ const StorySection = () => {
 
 const MadeWithTimeSection = () => {
     return (
-        <section id="manifesto" data-background="light" className="py-12 px-4 landscape:py-8 md:portrait:py-16 lg:py-20 xl:py-28 bg-[#FCFBF9] relative overflow-hidden select-none border-t border-forest/5">
+        <section id="manifesto" data-background="light" className="pt-24 pb-20 px-4 landscape:py-16 md:portrait:py-24 lg:py-32 xl:py-36 bg-[#FCFBF9] relative overflow-hidden select-none border-t border-forest/5">
             <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 {/* Header: Large Asymmetrical Editorial Typography */}
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-16 items-baseline mb-24 md:mb-32 border-b border-forest/10 pb-16">
@@ -1576,7 +1604,15 @@ const KnotSection = () => {
     const opacityTrack = useTransform(smoothProgress, [0, 0.2, 0.8, 1], [0, 0.04, 0.04, 0]);
 
     return (
-        <section ref={containerRef} id="feeling" data-background="dark" className="py-12 px-4 landscape:py-8 md:portrait:py-16 lg:py-20 xl:py-28 relative overflow-hidden" style={{ background: 'linear-gradient(to bottom, #243119 0%, #243119 75%, color-mix(in srgb, #243119 80%, #F5F2ED) 100%)' }}>
+        <section 
+            ref={containerRef} 
+            id="feeling" 
+            data-background="dark" 
+            className="pt-24 pb-20 px-4 landscape:py-16 md:portrait:py-24 lg:py-32 xl:py-36 relative overflow-hidden" 
+            style={{ 
+                backgroundColor: '#243119'
+            }}
+        >
             <motion.div 
                 style={{ x: xTrack, y: yTrack, opacity: opacityTrack, fontFamily: "'Cormorant Garamond', serif" }}
                 className="absolute inset-0 pointer-events-none text-cream text-[26vw] md:text-[35vw] leading-none italic font-light whitespace-nowrap text-center flex items-center justify-center select-none z-0"
@@ -2452,7 +2488,7 @@ const CollectionSection = () => {
     }, [focusedProductId]);
 
     return (
-        <section ref={containerRef} id="collection" data-background="light" className="py-12 px-4 landscape:py-8 md:portrait:py-16 lg:py-20 xl:py-28 bg-cream min-h-screen relative overflow-hidden" style={{ background: 'linear-gradient(to bottom, color-mix(in srgb, #243119 80%, #F5F2ED) 0%, color-mix(in srgb, #243119 40%, #F5F2ED) 40%, #F5F2ED 85%, #F5F2ED 100%)' }}>
+        <section ref={containerRef} id="collection" data-background="light" className="pt-24 pb-20 px-4 landscape:py-16 md:portrait:py-24 lg:py-32 xl:py-36 bg-[#FCFBF9] min-h-screen relative overflow-hidden">
 
             <motion.div 
                 style={{ x: xTrack, y: yTrack, opacity: opacityTrack, fontFamily: "'Cormorant Garamond', serif" }}
@@ -2476,34 +2512,29 @@ const CollectionSection = () => {
                     whileInView={{ opacity: 1 }}
                     className="text-[10px] uppercase tracking-[0.4em] font-bold text-forest/30 mb-4 block"
                  >
-                    {selectedCategory ? activeCategory?.name : 'Coleção'}
+                    {selectedCategory ? activeCategory?.name : 'Produtos'}
                  </motion.span>
                  <motion.h2 
                     initial={{ opacity: 0, y: 20 }}
                     whileInView={{ opacity: 1, y: 0 }}
-                    style={{ 
-                        color: '#1F2A18',
-                        textShadow: '0 1px 0 rgba(255,255,255,0.18), 0 2px 6px rgba(0,0,0,0.05)'
-                    } as React.CSSProperties}
-                    className="text-3xl xs:text-4xl sm:text-5xl md:text-6xl lg:text-[6.6rem] font-serif font-medium tracking-tight leading-tight max-[350px]:text-2xl"
+                    className="text-3xl xs:text-4xl sm:text-5xl md:text-6xl font-light tracking-[0.2em] text-forest uppercase leading-tight text-center"
+                    style={{ fontFamily: "'Cormorant Garamond', serif" }}
                  >
                     {selectedCategory ? activeCategory?.name : (
-                        <>
-                            Coleção M
+                        <span className="inline-flex items-center gap-1 justify-center">
+                            M
                             <span 
                                 className="inline-block select-none"
                                 style={{
                                     background: 'radial-gradient(circle at 35% 30%, rgba(255,255,255,0.75) 0%, rgba(255,255,255,0.15) 35%, transparent 70%), linear-gradient(to bottom, #F7E7A8 0%, #D9B45B 50%, #B8862F 100%)',
                                     WebkitBackgroundClip: 'text',
                                     WebkitTextFillColor: 'transparent',
-                                    WebkitTextStroke: '0.2px rgba(255, 255, 255, 0.45)',
-                                    filter: 'drop-shadow(0 2px 6px rgba(184, 134, 47, 0.20))',
                                 } as React.CSSProperties}
-                            >
+                             >
                                 ★
                             </span>
-                            Bravo
-                        </>
+                            BRAVO
+                        </span>
                     )}
                  </motion.h2>
                  
@@ -2680,7 +2711,7 @@ const ContactSection = () => {
     const opacityTrack = useTransform(smoothProgress, [0, 0.2, 0.8, 1], [0, 0.02, 0.02, 0]);
 
     return (
-        <section ref={containerRef} id="contacto" data-background="dark" className="py-12 px-4 landscape:py-8 md:portrait:py-16 lg:py-20 xl:py-28 bg-forest relative overflow-hidden">
+        <section ref={containerRef} id="contacto" data-background="dark" className="pt-24 pb-20 px-4 landscape:py-16 md:portrait:py-24 lg:py-32 xl:py-36 bg-forest relative overflow-hidden">
              {/* Large Script Background */}
              <motion.div 
                 style={{ x: xTrack, y: yTrack, opacity: opacityTrack, fontFamily: "'Cormorant Garamond', serif" }}
@@ -2761,7 +2792,7 @@ const Footer = () => {
 
 const MemoryContinuesSection = () => {
     return (
-        <section id="memoria" data-background="light" className="py-12 px-4 landscape:py-8 md:portrait:py-16 lg:py-20 xl:py-28 bg-[#FCFBF9] relative overflow-hidden select-none border-b border-forest/5">
+        <section id="memoria" data-background="light" className="pt-24 pb-20 px-4 landscape:py-16 md:portrait:py-24 lg:py-32 xl:py-36 bg-[#FCFBF9] relative overflow-hidden select-none border-b border-forest/5">
             <div className="w-full max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
                 <motion.div
                     initial={{ opacity: 0, y: 30 }}
