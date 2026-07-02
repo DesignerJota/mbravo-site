@@ -266,9 +266,69 @@ const SHOP_CATEGORIES = [
   {
     id: 'vestuario',
     name: 'Vestuário',
-    items: 'Cardigans, Bikini Set, Triangle Top, Ponchos',
+    items: 'Bikini Set, Triangle Top, Ponchos, Cardigans',
     img: 'https://i.ibb.co/s9GKBBpQ/IMG-2699-02.jpg',
     products: [
+      { 
+        id: 'v1', 
+        name: 'Marea Bikini Set', 
+        price: calculateProductRange('Marea Bikini Set'), 
+        img: 'https://i.ibb.co/whQzXMvv/Bikini-CAPA.png',
+        images: [
+          'https://i.ibb.co/whQzXMvv/Bikini-CAPA.png',
+          'https://i.ibb.co/Dfzz9dm2/BIKINI-FRENTE.png',
+          'https://i.ibb.co/NnHNVj8R/Marea-Bikini-Set05.png',
+          'https://i.ibb.co/zVN7TS5v/Marea-Bikini-Set03.png',
+          'https://i.ibb.co/Rk6MD3b6/Marea-Bikini-Set04.png',
+          'https://i.ibb.co/GQ7B8VGt/Marea-Bikini-Set.png',
+        ],
+        description: "Bikini set em crochet feito à mão, com um toque artesanal único e elegante. Perfeito para os dias de sol e mar, oferecendo conforto e um estilo exclusivo para a praia ou piscina. Disponível em várias cores vibrantes e neutras.",
+        material: "- Material: 100% algodão",
+        care: "- Lavar à mão\n- Secar à sombra"
+      },
+      { 
+        id: 'v1b', 
+        name: 'Marea Triangle Top', 
+        price: calculateProductRange('Marea Triangle Top'), 
+        img: 'https://i.ibb.co/8gjmkHJL/Marea-Triangle-Top05.png',
+        images: [
+          'https://i.ibb.co/8gjmkHJL/Marea-Triangle-Top05.png',
+          'https://i.ibb.co/BKVnWHNx/Marea-Triangle-Top06.png',
+          'https://i.ibb.co/PLsP727/Marea-Triangle-Top02.png',
+          'https://i.ibb.co/8q58Xzd/Marea-Triangle-Top04.png',
+          'https://i.ibb.co/PzCPh6Tn/Marea-Triangle-Top03.png'
+        ],
+        description: "Top de biquíni em formato triângulo feito à mão em crochet, com um toque artesanal único e elegante. Perfeito para os dias de sol e mar, proporcionando conforto, versatilidade e um design intemporal.",
+        material: "- Material: 100% algodão",
+        care: "- Lavar à mão\n- Secar à sombra"
+      },
+      { 
+        id: 'v2b', name: 'Mesh Poncho', price: calculateProductRange('Mesh Poncho'), img: 'https://i.ibb.co/0p2g0BJt/Poncho.png',
+        images: [
+          'https://i.ibb.co/0p2g0BJt/Poncho.png',
+          'https://i.ibb.co/844dLBLB/mockup-cardigan.png'
+        ],
+        description: "Poncho em crochet leve e delicado, feito à mão com um design de malha aberta para um look effortless and cozy. Perfeito para sobrepor a tops, vestidos ou biquínis, criando um toque elegante e descontraído ao outfit. Disponível em várias cores.",
+        material: "- Material: 100% algodão",
+        care: "- Lavagem delicada à mão\n- Secar ao ar\n- Evitar máquina de secar"
+      },
+      { 
+        id: 'v2c', 
+        name: 'Signature Granny Poncho', 
+        price: calculateProductRange('Signature Granny Poncho'), 
+        img: 'https://i.ibb.co/s9GKBBpQ/IMG-2699-02.jpg',
+        images: [
+          'https://i.ibb.co/s9GKBBpQ/IMG-2699-02.jpg',
+          'https://i.ibb.co/8Ln2L6cY/Granny-Poncho.png',
+          'https://i.ibb.co/ymrRt0V4/Granny-Poncho04.png',
+          'https://i.ibb.co/s9FkHJPg/Granny-Poncho03.png',
+          'https://i.ibb.co/wrFHzgxD/Granny-Poncho02.png'
+        ],
+        description: "Poncho em crochet feito à mão, criado com um clássico padrão granny stitch e combinação de duas cores para um look cozy e intemporal. Com um ajuste confortável e textura aconchegante, é perfeito para sobrepor a diferentes looks e acrescentar um toque handmade e effortless ao visual.",
+        details: "• Ideal para layering em diferentes looks\n• Disponível em várias combinações de cores",
+        material: "- Composição: 100% algodão egípcio de alta qualidade ou mistura de algodão and lã macia (Consulte para opções)",
+        care: "- Lavagem delicada à mão com sabão neutro\n- Secar ao ar em superfície plana\n- Evitar máquina de secar"
+      },
       { 
         id: 'b1b', 
         name: 'Alma Cardigan', 
@@ -294,64 +354,6 @@ const SHOP_CATEGORIES = [
         material: "- Opção Leve: 100% algodão\n- Opção Cozy: 50% algodão, 50% lã",
         care: "- Lavagem delicada à mão\n- Secar ao ar em superfície plana\n- Evitar máquina de secar",
         details: "- Modelo de manga comprida\n- Fecho em laço frontal"
-      },
-      { 
-        id: 'p1', name: 'M★BRAVO Cardigan', price: calculateProductRange('M★BRAVO Cardigan'), img: 'https://i.ibb.co/mrJQy5Dk/IMG-20260508-WA0003.jpg',
-        material: "Este M★BRAVO Cardigan é produzido em 100% Algodão Egípcio Safran. A suavidade deste fio nobre respeita a sensibilidade da pele.",
-        care: "Lavar à mão com sabão neutro. Secar à sombra."
-      },
-      { 
-        id: 'v1', 
-        name: 'Marea Bikini Set', 
-        price: calculateProductRange('Marea Bikini Set'), 
-        img: 'https://i.ibb.co/whQzXMvv/Bikini-CAPA.png',
-        images: [
-          'https://i.ibb.co/whQzXMvv/Bikini-CAPA.png',
-          'https://i.ibb.co/Dfzz9dm2/BIKINI-FRENTE.png',
-          'https://i.ibb.co/4njR38T9/BIKINI-COSTAS.png'
-        ],
-        description: "Bikini set em crochet feito à mão, com um toque artesanal único e elegante. Perfeito para os dias de sol e mar, oferecendo conforto e um estilo exclusivo para a praia ou piscina. Disponível em várias cores vibrantes e neutras.",
-        material: "- Material: 100% algodão",
-        care: "- Lavar à mão\n- Secar à sombra"
-      },
-      { 
-        id: 'v1b', 
-        name: 'Marea Triangle Top', 
-        price: calculateProductRange('Marea Triangle Top'), 
-        img: 'https://i.ibb.co/B5Fz2sDh/Bikini-top.png',
-        images: [
-          'https://i.ibb.co/B5Fz2sDh/Bikini-top.png'
-        ],
-        description: "Top de biquíni em formato triângulo feito à mão em crochet, com um toque artesanal único e elegante. Perfeito para os dias de sol e mar, proporcionando conforto, versatilidade e um design intemporal.",
-        material: "- Material: 100% algodão",
-        care: "- Lavar à mão\n- Secar à sombra"
-      },
-      { 
-        id: 'v2b', name: 'Mesh Poncho', price: calculateProductRange('Mesh Poncho'), img: 'https://i.ibb.co/0p2g0BJt/Poncho.png',
-        images: [
-          'https://i.ibb.co/0p2g0BJt/Poncho.png',
-          'https://i.ibb.co/844dLBLB/mockup-cardigan.png'
-        ],
-        description: "Poncho em crochet leve e delicado, feito à mão com um design de malha aberta para um look effortless and cozy. Perfeito para sobrepor a tops, vestidos ou biquínis, criando um toque elegante e descontraído ao outfit. Disponível em várias cores.",
-        material: "- Material: 100% algodão",
-        care: "- Lavagem delicada à mão\n- Secar ao ar\n- Evitar máquina de secar"
-      },
-      { 
-        id: 'v2c', 
-        name: 'Signature Granny Poncho', 
-        price: calculateProductRange('Signature Granny Poncho'), 
-        img: 'https://i.ibb.co/s9GKBBpQ/IMG-2699-02.jpg',
-        images: [
-          'https://i.ibb.co/s9GKBBpQ/IMG-2699-02.jpg',
-          'https://i.ibb.co/LXsR4Vqy/Granny-Poncho.png',
-          'https://i.ibb.co/svZH4nTR/Granny-Poncho04.png',
-          'https://i.ibb.co/93bBkp8R/Granny-Poncho03.png',
-          'https://i.ibb.co/F4f3yCK6/Granny-Poncho02.png'
-        ],
-        description: "Poncho em crochet feito à mão, criado com um clássico padrão granny stitch e combinação de duas cores para um look cozy e intemporal. Com um ajuste confortável e textura aconchegante, é perfeito para sobrepor a diferentes looks e acrescentar um toque handmade e effortless ao visual.",
-        details: "• Ideal para layering em diferentes looks\n• Disponível em várias combinações de cores",
-        material: "- Composição: 100% algodão egípcio de alta qualidade ou mistura de algodão e lã macia (Consulte para opções)",
-        care: "- Lavagem delicada à mão com sabão neutro\n- Secar ao ar em superfície plana\n- Evitar máquina de secar"
       }
     ]
   },
