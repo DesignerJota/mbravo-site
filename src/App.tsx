@@ -174,12 +174,11 @@ const SHOP_CATEGORIES = [
         id: 'h1d', 
         name: 'Blue Coasters', 
         price: calculateProductRange('Blue Coasters'), 
-        img: blueCoastersImg,
+        img: 'https://i.ibb.co/kV9xpfNL/Blue-coasters-2.png',
         images: [
-          blueCoastersImg,
+          'https://i.ibb.co/kV9xpfNL/Blue-coasters-2.png',
           'https://i.ibb.co/HL6sMgBq/Blue-coasters-3.jpg',
-          'https://i.ibb.co/d437sBsp/Blue-coasters-4.jpg',
-          'https://i.ibb.co/fd0RgYCH/Blue-coasters-2.png'
+          'https://i.ibb.co/d437sBsp/Blue-coasters-4.jpg'
         ],
         description: "Bases em crochet com um design floral delicado, pensadas para trazer um toque cozy e elegante ao teu espaço. Disponíveis em várias cores, mantendo sempre as pétalas brancas para um acabamento suave e delicado.",
         material: "- Material: 100% algodão",
@@ -189,9 +188,9 @@ const SHOP_CATEGORIES = [
         id: 'h1e', 
         name: 'Pink Coasters', 
         price: calculateProductRange('Pink Coasters'), 
-        img: pinkCoastersImg,
+        img: 'https://i.ibb.co/wZvSQ5zv/Pink-coasters.png',
         images: [
-          pinkCoastersImg,
+          'https://i.ibb.co/wZvSQ5zv/Pink-coasters.png',
           'https://i.ibb.co/gL02D64Q/Pink-coasters-2.jpg',
           'https://i.ibb.co/PvqVqpty/Pink-coasters-3.jpg',
           'https://i.ibb.co/kVSX4zy1/Pink-coasters-1.jpg'
