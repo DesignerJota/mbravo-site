@@ -41,6 +41,8 @@ const BASE_PRICES: { [key: string]: number | string } = {
     'marea triangle top': 25,
     'crystalline top': 25,
     'african flower pouch': 25,
+    'mini pouches': 15,
+    'airpods case': 12,
     'booksleeve': 25,
     'stella cushion': 20,
     'dragonfly bandana': 22,
@@ -124,7 +126,7 @@ const SHOP_CATEGORIES = [
   {
     id: 'home',
     name: 'Casa',
-    items: 'Coasters, Placemats, Bookmarks',
+    items: 'Coasters, Stella Cushion',
     img: 'https://i.ibb.co/j9LHyxq6/Firefly-Gemini-Flash-Imagem-com-ambiente-cosy-tema-handmade-crochet-usar-o-logo-em-label-de-cartao.png',
     products: [
       { 
@@ -200,12 +202,6 @@ const SHOP_CATEGORIES = [
         care: "- Lavagem delicada\n- Secar ao ar"
       },
       { 
-        id: 'h2', name: 'Placemats', price: calculateProductRange('Placemats'), img: 'https://i.ibb.co/HThTzmLQ/home-placemats-1.png',
-        description: "Placemats em crochet feitos à mão, criados para dar um toque cozy e especial à tua mesa. Perfeitos para decorar, proteger superfícies e tornar qualquer refeição ainda mais acolhedora. Disponíveis em diferentes formatos, designs e combinações de cores.",
-        material: "- Material: 100% algodão",
-        care: "- Lavagem delicada à mão\n- Secar ao ar"
-      },
-      { 
         id: 'h2b', 
         name: 'Stella Cushion', 
         price: calculateProductRange('Stella Cushion'), 
@@ -217,20 +213,14 @@ const SHOP_CATEGORIES = [
         description: "Almofada decorativa em forma de estrela, feita à mão em crochet para dar um toque delicado e cozy a qualquer espaço. Perfeita para decorar camas, sofás, cadeiras, quartos infantis ou qualquer cantinho especial. Disponível em várias cores para combinar com diferentes estilos de decoração.",
         material: "- Material: 100% poliéster (Fio macio e estruturado, ideal para peças decorativas)",
         care: "- Limpeza delicada à mão\n- Secar ao ar em superfície plana\n- Evitar torcer a peça"
-      },
-      { 
-        id: 'h4', name: 'Bookmarks', price: calculateProductRange('Bookmarks'), img: 'https://i.ibb.co/yFK9DMX3/home-bookmarks-1.png',
-        description: "Bookmark em crochet feito à mão, criado para dar um toque delicado e especial às tuas leituras. Perfeito para marcar páginas de forma bonita e única, sendo também uma opção querida para oferecer a qualquer book lover. Disponível em diferentes designs e combinações de cores.",
-        material: "- Material: 100% algodão",
-        care: "- Lavagem delicada à mão\n- Secar ao ar"
       }
     ]
   },
   {
     id: 'bags',
     name: 'Malas',
-    items: 'African Flower Pouch, Booksleeves, Granny Square',
-    img: 'https://i.ibb.co/L78HHMd/bags-pouches-1.png',
+    items: 'African Flower Pouch, Mini Pouches, AirPods Case',
+    img: 'https://i.ibb.co/nM8RVGGt/Capa-Malas.png',
     products: [
       { 
         id: 'b1', 
@@ -239,9 +229,12 @@ const SHOP_CATEGORIES = [
         img: 'https://i.ibb.co/PvjVXHPV/pouch-luxury-1.png',
         images: [
           'https://i.ibb.co/PvjVXHPV/pouch-luxury-1.png',
-          'https://i.ibb.co/VW1mwZSt/Pouch-1.png',
-          'https://i.ibb.co/rfKT2cfR/Pouch-3.png',
-          'https://i.ibb.co/gLj3Zw8F/Pouch-4.png'
+          'https://i.ibb.co/bhybFwG/Pouch-1.png',
+          'https://i.ibb.co/dws6Z36H/Pouch-2.png',
+          'https://i.ibb.co/7JGsMDKN/Pouch-4.png',
+          'https://i.ibb.co/NnCJyRTF/African-Flower-Pouch-10-1.png',
+          'https://i.ibb.co/TDL7gj28/African-Flower-Pouch-112-1.png',
+          'https://i.ibb.co/jk86rkbh/Firefly-7.jpg'
         ],
         description: "Pouch em crochet com padrão African Flower, cuidadosamente feito à mão e forrado no interior para maior estrutura e proteção. Finalizado com fecho, é perfeito para guardar os teus essenciais do dia a dia com um toque cozy e handmade.",
         material: "- Material: 100% algodão\n- Detalhe: Forro interior em tecido",
@@ -249,14 +242,38 @@ const SHOP_CATEGORIES = [
         dimensions: "25 cm (largura) × 14 cm (altura)"
       },
       { 
-        id: 'b2', name: 'Booksleeve', price: calculateProductRange('Booksleeve'), img: 'https://i.ibb.co/Jj1WHWs0/bags-booksleeve-1.png',
-        description: "Book sleeve em crochet feito à mão, criado para proteger os teus livros com um toque cozy e especial. Ideal para levar na mala e proteger os livros de riscos e desgaste diário. Disponível em diferentes combinações de cores e opção de forro interior.",
+        id: 'b1b', 
+        name: 'Mini Pouches', 
+        price: calculateProductRange('Mini Pouches'), 
+        img: 'https://i.ibb.co/4RdPTkr4/Mini-pouches-CAPA.png',
+        images: [
+          'https://i.ibb.co/4RdPTkr4/Mini-pouches-CAPA.png',
+          'https://i.ibb.co/rCrBDcM/Mini-pouches-LOGO.png',
+          'https://i.ibb.co/GfxGK5d3/Mini-pouches-9.jpg',
+          'https://i.ibb.co/1fcmcPSM/Mini-pouches-7.jpg',
+          'https://i.ibb.co/356r9hSN/Mini-pouches-12.jpg',
+          'https://i.ibb.co/JWV9Xp16/Mini-pouches-15.png',
+          'https://i.ibb.co/VYShK64h/Mini-pouches-14.png',
+          'https://i.ibb.co/MDtDfPtp/Mini-pouches-17.png',
+          'https://i.ibb.co/kgc9PkSp/Mini-pouches-16.png'
+        ],
+        description: "Mini pouches em crochet feitas à mão, perfeitas para organizar os teus pequenos essenciais com charme, elegância e um toque de carinho. Práticas e delicadas, ideais para o dia a dia.",
         material: "- Material: 100% algodão",
-        care: "- Lavagem delicada à mão\n- Secar ao ar"
+        care: "- Lavagem delicada à mão\n- Secar ao ar em superfície plana"
       },
       { 
-        id: 'b3', name: 'Granny Square Bag', price: calculateProductRange('Granny Square Bag'), img: 'https://i.ibb.co/FvZydN0/colecao-Granny-Square-BAGS-1.png',
-        description: "Granny square bag em crochet feita à mão, perfeita para dar um toque handmade e especial aos teus looks do dia a dia. Ideal para transportar os teus essenciais, combinando conforto, estilo e um detalhe cozy único. Disponível em diferentes combinações de cores, designs e acabamentos.",
+        id: 'b1_airpods', 
+        name: 'AirPods Case', 
+        price: calculateProductRange('AirPods Case'), 
+        img: 'https://i.ibb.co/cKQz9Q2L/Air-Pods-case-9.jpg',
+        images: [
+          'https://i.ibb.co/cKQz9Q2L/Air-Pods-case-9.jpg',
+          'https://i.ibb.co/YBmMhjqX/Firefly-8.jpg',
+          'https://i.ibb.co/S4zY5CbT/Air-Pods-case-1.jpg',
+          'https://i.ibb.co/qMdr29kJ/Air-Pods-case-10-1.jpg',
+          'https://i.ibb.co/qX9C1Qd/Air-Pods-case-11-2.jpg'
+        ],
+        description: "Capa para AirPods em crochet feita à mão, criada para proteger os teus auriculares com charme, estilo e um toque cozy especial. Prática, delicada e perfeita para o dia a dia.",
         material: "- Material: 100% algodão",
         care: "- Lavagem delicada à mão\n- Secar ao ar em superfície plana"
       }
