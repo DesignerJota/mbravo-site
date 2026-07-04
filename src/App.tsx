@@ -36,17 +36,20 @@ const BASE_PRICES: { [key: string]: number | string } = {
     'signature granny poncho': 75,
     'mini alma cardigan': 55,
     'granny square bag': 55,
+    'granny square sling bag': 55,
     'marea bikini set': 45,
     'luxury clutch': 35,
     'marea triangle top': 25,
     'crystalline top': 25,
     'african flower pouch': 25,
     'mini pouches': 15,
+    'mini shell pouch': 18,
     'airpods case': 12,
     'booksleeve': 25,
     'stella cushion': 20,
     'dragonfly bandana': 22,
     'bandana': 20,
+    'scarf hip bandana': 22,
     'dragonfly headband': 12,
     'placemats': 12,
     'bookmarks': 8,
@@ -219,7 +222,7 @@ const SHOP_CATEGORIES = [
   {
     id: 'bags',
     name: 'Malas',
-    items: 'African Flower Pouch, Mini Pouches, AirPods Case',
+    items: 'African Flower Pouch, Mini Pouches, AirPods Case, Granny Square Sling Bag, Mini shell Pouch',
     img: 'https://i.ibb.co/nM8RVGGt/Capa-Malas.png',
     products: [
       { 
@@ -276,6 +279,47 @@ const SHOP_CATEGORIES = [
         description: "Capa para AirPods em crochet feita à mão, criada para proteger os teus auriculares com charme, estilo e um toque cozy especial. Prática, delicada e perfeita para o dia a dia.",
         material: "- Material: 100% algodão",
         care: "- Lavagem delicada à mão\n- Secar ao ar em superfície plana"
+      },
+      { 
+        id: 'b2_sling', 
+        name: 'Granny Square Sling Bag', 
+        price: calculateProductRange('Granny Square Sling Bag'), 
+        img: 'https://i.ibb.co/wNdC8NNG/Granny-square-sling-bag-20.png',
+        images: [
+          'https://i.ibb.co/wNdC8NNG/Granny-square-sling-bag-20.png',
+          'https://i.ibb.co/1t3HW02t/Granny-square-sling-bag-12.png',
+          'https://i.ibb.co/JjC82Njj/Granny-square-sling-bag-13.png',
+          'https://i.ibb.co/Df0JxNDd/Granny-square-sling-bag-14.png',
+          'https://i.ibb.co/TDJv9VjK/Granny-square-sling-bag-16.png',
+          'https://i.ibb.co/wZ3G1WDH/Granny-square-sling-bag-17.png',
+          'https://i.ibb.co/1Yw7mWzG/Granny-square-sling-bag-18.png',
+          'https://i.ibb.co/6cs3nMkY/Granny-square-sling-bag-19.png'
+        ],
+        description: "Mala de ombro de estilo 'sling bag' em crochet, com padrão clássico granny square. Feita inteiramente à mão no nosso atelier com fios selecionados de alta qualidade. Combina um design retro nostálgico com a praticidade moderna, ideal para transportar os seus essenciais diários com máxima elegância e originalidade.",
+        material: "- Material: 100% algodão de alta qualidade\n- Detalhe: Forro interno macio para maior segurança e estrutura",
+        care: "- Lavagem delicada à mão\n- Secar ao ar horizontalmente\n- Não utilizar máquina de secar"
+      },
+      { 
+        id: 'b2_shell', 
+        name: 'Mini shell Pouch', 
+        price: calculateProductRange('Mini shell Pouch'), 
+        img: 'https://i.ibb.co/xqMXmg3T/Mini-shell-Pouch-18.png',
+        images: [
+          'https://i.ibb.co/xqMXmg3T/Mini-shell-Pouch-18.png',
+          'https://i.ibb.co/xKMWpG5g/Mini-shell-Pouch-8.png',
+          'https://i.ibb.co/Wvy7HswX/Mini-shell-Pouch-9.png',
+          'https://i.ibb.co/FLvMYjWs/Mini-shell-Pouch-10.png',
+          'https://i.ibb.co/Q3d5Qrsq/Mini-shell-Pouch-11.png',
+          'https://i.ibb.co/d0sYHCht/Mini-shell-Pouch-12.png',
+          'https://i.ibb.co/dwwKCMS8/Mini-shell-Pouch-13.png',
+          'https://i.ibb.co/50JHRC0/Mini-shell-Pouch-14.png',
+          'https://i.ibb.co/7xDSCbWt/Mini-shell-Pouch-15.png',
+          'https://i.ibb.co/jvwp8PYN/Mini-shell-Pouch-16.png',
+          'https://i.ibb.co/Y7R6Hx30/Mini-shell-Pouch-17.png'
+        ],
+        description: "Elegante mini bolsa em crochet com padrão de conchas texturizado em relevo ('shell stitch'). Tecida meticulosamente à mão com fios de algodão premium, é o acessório perfeito para organizar pequenos cosméticos, cartões ou joias, aliando delicadeza artesanal e sofisticação intemporal.",
+        material: "- Material: 100% algodão mercerizado de alta qualidade\n- Detalhe: Fecho metálico delicado e acabamento interior premium",
+        care: "- Lavagem manual com água fria e sabão neutro\n- Secar horizontalmente à sombra\n- Não torcer nem centrifugar"
       }
     ]
   },
@@ -306,13 +350,18 @@ const SHOP_CATEGORIES = [
         id: 'v1b', 
         name: 'Marea Triangle Top', 
         price: calculateProductRange('Marea Triangle Top'), 
-        img: 'https://i.ibb.co/8gjmkHJL/Marea-Triangle-Top05.png',
+        img: 'https://i.ibb.co/j9LYMvVw/Marea-Triangle-Top10-2.jpg',
         images: [
-          'https://i.ibb.co/8gjmkHJL/Marea-Triangle-Top05.png',
-          'https://i.ibb.co/BKVnWHNx/Marea-Triangle-Top06.png',
+          'https://i.ibb.co/j9LYMvVw/Marea-Triangle-Top10-2.jpg',
+          'https://i.ibb.co/FM5Q1ct/Marea-Triangle-Top09.jpg',
           'https://i.ibb.co/PLsP727/Marea-Triangle-Top02.png',
           'https://i.ibb.co/8q58Xzd/Marea-Triangle-Top04.png',
-          'https://i.ibb.co/PzCPh6Tn/Marea-Triangle-Top03.png'
+          'https://i.ibb.co/PzCPh6Tn/Marea-Triangle-Top03.png',
+          'https://i.ibb.co/8gjmkHJL/Marea-Triangle-Top05.png',
+          'https://i.ibb.co/Gvh7mHth/Marea-Triangle-Top08.png',
+          'https://i.ibb.co/R4bW2xMP/Marea-Triangle-Top11-1.jpg',
+          'https://i.ibb.co/cKcyDcN8/Marea-Triangle-Top11-1.png',
+          'https://i.ibb.co/YBnsJYzY/Marea-Triangle-Top11-2.jpg'
         ],
         description: "Top de biquíni em formato triângulo feito à mão em crochet, com um toque artesanal único e elegante. Perfeito para os dias de sol e mar, proporcionando conforto, versatilidade e um design intemporal.",
         material: "- Material: 100% algodão",
@@ -332,13 +381,13 @@ const SHOP_CATEGORIES = [
         id: 'v2c', 
         name: 'Signature Granny Poncho', 
         price: calculateProductRange('Signature Granny Poncho'), 
-        img: 'https://i.ibb.co/s9GKBBpQ/IMG-2699-02.jpg',
+        img: 'https://i.ibb.co/9H1wYzSv/IMG-2738.jpg',
         images: [
-          'https://i.ibb.co/s9GKBBpQ/IMG-2699-02.jpg',
-          'https://i.ibb.co/8Ln2L6cY/Granny-Poncho.png',
-          'https://i.ibb.co/ymrRt0V4/Granny-Poncho04.png',
-          'https://i.ibb.co/s9FkHJPg/Granny-Poncho03.png',
-          'https://i.ibb.co/wrFHzgxD/Granny-Poncho02.png'
+          'https://i.ibb.co/9H1wYzSv/IMG-2738.jpg',
+          'https://i.ibb.co/Xk33krB5/IMG-2674-2.jpg',
+          'https://i.ibb.co/gL0QR9Ms/IMG-2713.jpg',
+          'https://i.ibb.co/KzGNwQgY/IMG-2820-2.jpg',
+          'https://i.ibb.co/21K1FLRn/IMG-2807-2.jpg'
         ],
         description: "Poncho em crochet feito à mão, criado com um clássico padrão granny stitch e combinação de duas cores para um look cozy e intemporal. Com um ajuste confortável e textura aconchegante, é perfeito para sobrepor a diferentes looks e acrescentar um toque handmade e effortless ao visual.",
         details: "• Ideal para layering em diferentes looks\n• Disponível em várias combinações de cores",
@@ -376,15 +425,19 @@ const SHOP_CATEGORIES = [
   {
     id: 'premium',
     name: 'Acessórios',
-    items: 'Bandanas, Headbands',
+    items: 'Bandanas, Headbands, Scarf Hip Bandana',
     img: 'https://i.ibb.co/NdQjvs6c/IMG-2782.jpg',
     products: [
       { 
         id: 'v3', 
         name: 'Dragonfly Bandana', 
         price: calculateProductRange('Dragonfly Bandana'), 
-        img: 'https://i.ibb.co/nNbwppxF/Bandana-LIBELINHA-capa.png',
+        img: 'https://i.ibb.co/35v25TQS/Bandana-LIBELINHA-1.jpg',
         images: [
+          'https://i.ibb.co/35v25TQS/Bandana-LIBELINHA-1.jpg',
+          'https://i.ibb.co/QjmnZpkw/Bandana-LIBELINHA-2.jpg',
+          'https://i.ibb.co/V00ntjtS/Bandana-LIBELINHA-3.jpg',
+          'https://i.ibb.co/CpfWF52W/Bandana-LIBELINHA-4.jpg',
           'https://i.ibb.co/nNbwppxF/Bandana-LIBELINHA-capa.png',
           'https://i.ibb.co/ycdCNGhn/Bandanas-5.png',
           'https://i.ibb.co/ycdJCtrC/Bandanas-4.png',
@@ -426,6 +479,26 @@ const SHOP_CATEGORIES = [
         description: "Headband em crochet com delicado padrão de libelinhas, feita à mão para um toque leve e especial no dia a dia. Confortável, versátil e perfeita para complementar qualquer look com um detalhe handmade e cozy. Disponível em várias cores.",
         material: "- Material: 100% algodão",
         care: "- Lavagem delicada à mão\n- Secar ao ar\n- Evitar máquina de secar"
+      },
+      { 
+        id: 'v3c', 
+        name: 'Scarf Hip Bandana', 
+        price: calculateProductRange('Scarf Hip Bandana'), 
+        img: 'https://i.ibb.co/nM17XqPf/Scarf-Hip-Bandana-3.png',
+        images: [
+          'https://i.ibb.co/nM17XqPf/Scarf-Hip-Bandana-3.png',
+          'https://i.ibb.co/bRQPfFX1/Scarf-Hip-Bandana-4.png',
+          'https://i.ibb.co/FqKX8F3t/Scarf-Hip-Bandana-12.png',
+          'https://i.ibb.co/8njFLFCK/Scarf-Hip-Bandana-9.png',
+          'https://i.ibb.co/TBp4xHWs/Scarf-Hip-Bandana-10.png',
+          'https://i.ibb.co/dsXdhvSg/Scarf-Hip-Bandana-13.png',
+          'https://i.ibb.co/0pn5hCsJ/Scarf-Hip-Bandana-14.png',
+          'https://i.ibb.co/yB5QZ0rP/Scarf-Hip-Bandana-20.png',
+          'https://i.ibb.co/dJ6hjPdC/Scarf-Hip-Bandana-16.png'
+        ],
+        description: "Versátil e charmosa bandana/lenço de quadril ('scarf hip bandana') tecida inteiramente à mão em crochet. Com um padrão delicado e franjas elegantes, é o acessório ideal para dar um toque boémio, descontraído e cheio de personalidade ao seu look de praia, festival ou dia a dia.",
+        material: "- Material: 100% algodão premium leve e fresco\n- Acabamento: Detalhe de franjas artesanais na extremidade",
+        care: "- Lavagem delicada à mão com sabão neutro\n- Secar horizontalmente à sombra para preservar as franjas\n- Não utilizar máquina de secar"
       }
     ]
   }
@@ -1774,6 +1847,29 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, i, isFocused, isSubd
     const [activeImgIndex, setActiveImgIndex] = useState(0);
     const [direction, setDirection] = useState(0);
 
+    // New Direct Checkout Gateway States
+    const [isCheckingOut, setIsCheckingOut] = useState(false);
+    const [paymentMethod, setPaymentMethod] = useState<'mbway' | 'multibanco' | 'card'>('mbway');
+    const [checkoutForm, setCheckoutForm] = useState({
+        nome: '',
+        email: '',
+        telefone: '',
+        morada: '',
+        codigoPostal: '',
+        cidade: '',
+        mbwayPhone: '',
+        cardNumber: '',
+        cardName: '',
+        cardExpiry: '',
+        cardCvv: ''
+    });
+    const [isPaying, setIsPaying] = useState(false);
+    const [paymentCompleted, setPaymentCompleted] = useState(false);
+    const [multibancoRef, setMultibancoRef] = useState<{ entidade: string, referencia: string } | null>(null);
+    const [orderId, setOrderId] = useState('');
+    const [checkoutError, setCheckoutError] = useState<string | null>(null);
+    const [sandboxEmails, setSandboxEmails] = useState<{ customerEmailUrl: string, adminEmailUrl: string } | null>(null);
+
     const productImages = product.images || [product.img];
 
     useEffect(() => {
@@ -1837,6 +1933,24 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, i, isFocused, isSubd
                 fecho: '', 
                 forro: '', 
                 detalhe: '' 
+            });
+            setIsCheckingOut(false);
+            setPaymentCompleted(false);
+            setMultibancoRef(null);
+            setCheckoutError(null);
+            setSandboxEmails(null);
+            setCheckoutForm({
+                nome: '',
+                email: '',
+                telefone: '',
+                morada: '',
+                codigoPostal: '',
+                cidade: '',
+                mbwayPhone: '',
+                cardNumber: '',
+                cardName: '',
+                cardExpiry: '',
+                cardCvv: ''
             });
         }
     }, [isFocused, product.name, product.sizes]);
@@ -2081,358 +2195,887 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, i, isFocused, isSubd
 
             {/* b) Área de Informação (Details / Sidebar and custom features) */}
             <div className="w-full lg:w-[38%] h-auto lg:h-full bg-[#FCFBF9] flex flex-col pl-5 pr-5 py-6 lg:py-8 text-forest relative box-border">
-                {/* Upper Scrollable Info Panel with compact spacing */}
-                <div className="flex-1 overflow-y-visible lg:overflow-y-auto space-y-5 pr-1 select-text pb-32 lg:pb-4 scrollbar-thin scrollbar-thumb-forest/10 scrollbar-track-transparent">
-                    
-                    {/* Title & Navigation/Close Controls */}
-                    <div className="flex justify-between items-start gap-4">
-                        <div>
-                            <span className="text-[9px] uppercase tracking-[0.4em] text-[#C5A059] block mb-1 font-sans font-semibold">EXCLUSIVO M★BRAVO</span>
-                            <h3 className="text-3xl lg:text-3.5xl font-serif font-light text-forest leading-tight tracking-[0.05em] mb-1">{product.name}</h3>
-                        </div>
-                        <div className="flex items-center gap-2 flex-shrink-0 z-30">
-                            {onPrevProduct && onNextProduct && (
-                                <div className="flex items-center bg-forest/5 rounded-full p-1 border border-forest/10 shadow-sm backdrop-blur-sm">
-                                    <button
-                                        onClick={(e) => {
-                                            e.stopPropagation();
-                                            onPrevProduct();
-                                        }}
-                                        className="p-1.5 rounded-full hover:bg-forest hover:text-cream transition-all bg-transparent text-forest cursor-pointer"
-                                        title="Produto Anterior"
-                                    >
-                                        <ChevronLeft size={14} />
-                                    </button>
-                                    <span className="text-[8px] uppercase tracking-widest font-black text-forest/45 px-1.5 pointer-events-none select-none">PEÇA</span>
-                                    <button
-                                        onClick={(e) => {
-                                            e.stopPropagation();
-                                            onNextProduct();
-                                        }}
-                                        className="p-1.5 rounded-full hover:bg-forest hover:text-cream transition-all bg-transparent text-forest cursor-pointer"
-                                        title="Próximo Produto"
-                                    >
-                                        <ChevronRight size={14} />
-                                    </button>
-                                </div>
-                            )}
+                {isCheckingOut ? (
+                    <div className="flex-1 flex flex-col h-full bg-[#FCFBF9] text-forest select-text p-1 animate-fadeIn overflow-y-auto max-h-full">
+                        {/* Header with Back button */}
+                        <div className="flex justify-between items-center border-b border-forest/10 pb-4 mb-4">
                             <button 
-                                onClick={handleToggle}
-                                className="p-2.5 rounded-full bg-forest/5 text-forest hover:bg-forest hover:text-cream transition-all border border-forest/10 shadow-sm cursor-pointer"
-                                title="Fechar"
+                                onClick={() => {
+                                    if (paymentCompleted) {
+                                        setIsCheckingOut(false);
+                                        setPaymentCompleted(false);
+                                        setMultibancoRef(null);
+                                    } else {
+                                        setIsCheckingOut(false);
+                                    }
+                                }}
+                                className="flex items-center gap-2 text-[10px] uppercase tracking-[0.3em] font-bold text-forest/50 hover:text-forest transition-colors cursor-pointer"
                             >
-                                <X size={18} />
+                                <ChevronLeft size={16} />
+                                {paymentCompleted ? 'Voltar ao Catálogo' : 'Voltar'}
                             </button>
+                            <span className="text-[9px] font-mono uppercase tracking-[0.2em] text-forest/30">
+                                {paymentCompleted ? 'Pedido Concluído' : 'Checkout Seguro'}
+                            </span>
                         </div>
-                    </div>
 
-                    {/* Descrição em Layout Editorial Expandido e Fluido */}
-                    {product.description && (
-                        <p className="text-[13px] text-forest/75 leading-relaxed tracking-wide font-light font-sans whitespace-pre-line max-w-prose lg:max-w-[90%] w-full mb-6">
-                            {product.description}
-                        </p>
-                    )}
-
-                    {/* Detalhes do Produto */}
-                    {product.details && (
-                        <div className="mb-6 text-left max-w-prose lg:max-w-[90%] w-full">
-                            <h5 className="text-[9px] uppercase tracking-[0.25em] font-bold text-forest/45 flex items-center gap-1.5 mb-3">
-                                <span className="text-[#C5A059] text-xs">●</span> DETALHES DO PRODUTO
-                            </h5>
-                            <ul className="space-y-2 pl-0.5">
-                                {product.details.split('\n').map((line: string, index: number) => {
-                                    const cleaned = line.replace(/^[•\-\s]+/, '').trim();
-                                    return (
-                                        <li key={index} className="flex items-start gap-2 text-[12px] text-forest/75 leading-relaxed font-light font-sans">
-                                            <span className="text-[#C5A059] mt-0.5 shrink-0 select-none">•</span>
-                                            <span>{cleaned}</span>
-                                        </li>
-                                    );
-                                })}
-                            </ul>
-                        </div>
-                    )}
-
-                    {/* Customization Selection Panels */}
-                    <div className="space-y-6">
-                        {/* Container Comum para Seletores (Cores, Tamanho, Quantidade) com recuo explícito */}
-                        <div id="selection-selectors-group" className="space-y-6 text-left w-full">
-                            {/* Cores */}
-                            <div className="space-y-2">
-                                <div className="flex justify-between items-center">
-                                    <h5 className="text-[9px] uppercase tracking-[0.25em] font-bold text-forest/45 flex items-center gap-1.5">
-                                        <span className="text-[#C5A059] text-xs">●</span> COR DA PEÇA
-                                    </h5>
-                                    <span className="text-[9px] font-extrabold text-[#A68244] bg-[#FDF9F3] px-3 py-0.5 rounded-full border border-[#C5A059]/10">
-                                        {selections.cor}
-                                    </span>
+                        {paymentCompleted ? (
+                            /* Success / Completed screen */
+                            <div className="flex flex-col items-center text-center py-8 space-y-6">
+                                <div className="w-16 h-16 rounded-full bg-forest/5 flex items-center justify-center border border-forest/15">
+                                    <LogoIcon className="h-10 w-10 text-forest" />
                                 </div>
-                                <div className="flex flex-wrap gap-2">
-                                    {colors.map(opt => (
-                                        <button 
-                                            key={opt.name}
-                                            onClick={() => setSelections(prev => ({ ...prev, cor: opt.name }))}
-                                            className={`w-8 h-8 rounded-full border-2 transition-all p-0.5 cursor-pointer ${
-                                                selections.cor === opt.name ? 'border-forest scale-110 shadow-md shadow-forest/10' : 'border-transparent hover:scale-110'
-                                            }`}
-                                            title={opt.name}
+                                
+                                <h4 className="font-serif italic text-2xl lg:text-3xl font-light text-forest">
+                                    Encomenda Confirmada!
+                                </h4>
+                                
+                                <p className="text-sm text-forest/70 font-sans font-light leading-relaxed max-w-sm">
+                                    Agradecemos a sua encomenda, <strong>{checkoutForm.nome || 'Cliente'}</strong>. Enviámos um e-mail de confirmação para <strong>{checkoutForm.email}</strong> com os detalhes do envio.
+                                </p>
+
+                                <div className="bg-forest/5 rounded-2xl p-5 border border-forest/10 w-full text-left space-y-3 font-sans text-xs">
+                                    <div className="flex justify-between border-b border-forest/5 pb-1.5">
+                                        <span className="text-forest/40 uppercase tracking-wider text-[9px]">ID Pedido</span>
+                                        <span className="font-semibold text-forest">{orderId}</span>
+                                    </div>
+                                    <div className="flex justify-between border-b border-forest/5 pb-1.5">
+                                        <span className="text-forest/40 uppercase tracking-wider text-[9px]">Artigo</span>
+                                        <span className="font-semibold text-forest">{product.name}</span>
+                                    </div>
+                                    <div className="flex justify-between border-b border-forest/5 pb-1.5">
+                                        <span className="text-forest/40 uppercase tracking-wider text-[9px]">Configuração</span>
+                                        <span className="font-semibold text-forest text-right">
+                                            {selections.cor} {hasSize && `| ${selections.tamanho}`} {hasQuantity && `| ${selections.quantidade}`}
+                                        </span>
+                                    </div>
+                                    <div className="flex justify-between border-b border-forest/5 pb-1.5">
+                                        <span className="text-forest/40 uppercase tracking-wider text-[9px]">Método Pagamento</span>
+                                        <span className="font-semibold text-forest uppercase">
+                                            {paymentMethod === 'mbway' ? 'MB WAY' : paymentMethod === 'multibanco' ? 'Referência Multibanco' : 'Cartão de Crédito'}
+                                        </span>
+                                    </div>
+                                    <div className="flex justify-between pt-1 font-bold">
+                                        <span className="text-[#A68244] uppercase tracking-wider text-[10px]">Total Pago</span>
+                                        <span className="text-base font-serif text-forest">{currentPrice}</span>
+                                    </div>
+                                </div>
+
+                                <div className="bg-amber-50/50 rounded-xl p-3.5 border border-[#C5A059]/20 text-left text-[11px] text-forest/80 leading-relaxed font-sans">
+                                    <p className="font-semibold text-[#A68244] mb-1">Nota de Produção:</p>
+                                    <p>Por ser uma peça produzida inteiramente à mão, estimamos o tempo de produção e envio em 7 a 14 dias úteis.</p>
+                                </div>
+
+                                {sandboxEmails && (
+                                    <div className="w-full bg-[#243119]/5 rounded-2xl p-4 border border-[#243119]/10 text-left space-y-3 font-sans">
+                                        <p className="text-[10px] uppercase tracking-wider text-[#A68244] font-bold">Simulações de E-mail (Sandbox)</p>
+                                        <p className="text-[11px] text-forest/70 leading-relaxed">Clique para abrir em nova aba os e-mails minimalistas de confirmação e alerta de atelier gerados em tempo real:</p>
+                                        <div className="grid grid-cols-2 gap-2 pt-1">
+                                            <a 
+                                                href={sandboxEmails.customerEmailUrl} 
+                                                target="_blank" 
+                                                rel="noreferrer"
+                                                className="block text-center rounded-lg py-2 bg-white border border-[#243119]/15 text-[10px] uppercase tracking-wider font-semibold text-forest hover:bg-[#243119] hover:text-white hover:border-transparent transition-all"
+                                            >
+                                                Ver E-mail Cliente
+                                            </a>
+                                            <a 
+                                                href={sandboxEmails.adminEmailUrl} 
+                                                target="_blank" 
+                                                rel="noreferrer"
+                                                className="block text-center rounded-lg py-2 bg-white border border-[#243119]/15 text-[10px] uppercase tracking-wider font-semibold text-forest hover:bg-[#243119] hover:text-white hover:border-transparent transition-all"
+                                            >
+                                                Ver Alerta Atelier
+                                            </a>
+                                        </div>
+                                    </div>
+                                )}
+
+                                <button
+                                    onClick={() => {
+                                        setIsCheckingOut(false);
+                                        setPaymentCompleted(false);
+                                        setMultibancoRef(null);
+                                        handleToggle(); // Close modal using existing trigger
+                                    }}
+                                    className="w-full rounded-full py-3 text-center font-bold bg-[#C5A059] text-[#343E2C] hover:bg-[#d5b069] text-[10px] uppercase tracking-widest cursor-pointer shadow-md transition-all font-sans"
+                                >
+                                    Fechar e Voltar ao Início
+                                </button>
+                            </div>
+                        ) : (
+                            /* Checkout Form and Gateway selection */
+                            <div className="space-y-6 pb-20 lg:pb-6 text-left flex-grow flex flex-col justify-between">
+                                <div className="space-y-6">
+                                    {/* Product Summary Mini Card */}
+                                    <div className="bg-forest/5 rounded-2xl p-4 border border-forest/5 flex justify-between items-center gap-4">
+                                        <div className="flex items-center gap-3">
+                                            <img src={productImages[0]} alt="" className="w-12 h-12 rounded-lg object-cover border border-forest/5" />
+                                            <div>
+                                                <span className="font-serif font-light text-sm text-forest block">{product.name}</span>
+                                                <span className="text-[10px] text-forest/50 uppercase tracking-wider">
+                                                    {selections.cor} {hasSize && `| ${selections.tamanho}`}
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <span className="font-serif text-base font-semibold text-forest">{currentPrice}</span>
+                                    </div>
+
+                                    {/* Shipping Details form */}
+                                    <div className="space-y-3">
+                                        <h5 className="text-[9px] uppercase tracking-[0.25em] font-bold text-forest/45">
+                                            1. DADOS DE ENVIO & CONTATO
+                                        </h5>
+                                        
+                                        <div className="space-y-2">
+                                            <input 
+                                                type="text" 
+                                                placeholder="Nome Completo" 
+                                                required
+                                                value={checkoutForm.nome}
+                                                onChange={(e) => setCheckoutForm(prev => ({ ...prev, nome: e.target.value }))}
+                                                className="w-full bg-white rounded-xl px-4 py-2.5 text-xs text-forest placeholder-forest/30 border border-forest/10 focus:border-[#C5A059] focus:outline-none transition-all font-sans"
+                                            />
+                                            <div className="grid grid-cols-2 gap-2">
+                                                <input 
+                                                    type="email" 
+                                                    placeholder="E-mail" 
+                                                    required
+                                                    value={checkoutForm.email}
+                                                    onChange={(e) => setCheckoutForm(prev => ({ ...prev, email: e.target.value }))}
+                                                    className="w-full bg-white rounded-xl px-4 py-2.5 text-xs text-forest placeholder-forest/30 border border-forest/10 focus:border-[#C5A059] focus:outline-none transition-all font-sans"
+                                                />
+                                                <input 
+                                                    type="tel" 
+                                                    placeholder="Telemóvel" 
+                                                    required
+                                                    value={checkoutForm.telefone}
+                                                    onChange={(e) => setCheckoutForm(prev => ({ ...prev, telefone: e.target.value }))}
+                                                    className="w-full bg-white rounded-xl px-4 py-2.5 text-xs text-forest placeholder-forest/30 border border-forest/10 focus:border-[#C5A059] focus:outline-none transition-all font-sans"
+                                                />
+                                            </div>
+                                            <input 
+                                                type="text" 
+                                                placeholder="Morada de Envio" 
+                                                required
+                                                value={checkoutForm.morada}
+                                                onChange={(e) => setCheckoutForm(prev => ({ ...prev, morada: e.target.value }))}
+                                                className="w-full bg-white rounded-xl px-4 py-2.5 text-xs text-forest placeholder-forest/30 border border-forest/10 focus:border-[#C5A059] focus:outline-none transition-all font-sans"
+                                            />
+                                            <div className="grid grid-cols-2 gap-2">
+                                                <input 
+                                                    type="text" 
+                                                    placeholder="Código Postal" 
+                                                    required
+                                                    value={checkoutForm.codigoPostal}
+                                                    onChange={(e) => setCheckoutForm(prev => ({ ...prev, codigoPostal: e.target.value }))}
+                                                    className="w-full bg-white rounded-xl px-4 py-2.5 text-xs text-forest placeholder-forest/30 border border-forest/10 focus:border-[#C5A059] focus:outline-none transition-all font-sans"
+                                                />
+                                                <input 
+                                                    type="text" 
+                                                    placeholder="Cidade" 
+                                                    required
+                                                    value={checkoutForm.cidade}
+                                                    onChange={(e) => setCheckoutForm(prev => ({ ...prev, cidade: e.target.value }))}
+                                                    className="w-full bg-white rounded-xl px-4 py-2.5 text-xs text-forest placeholder-forest/30 border border-forest/10 focus:border-[#C5A059] focus:outline-none transition-all font-sans"
+                                                />
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {/* Payment Gateway Selection */}
+                                    <div className="space-y-3">
+                                        <h5 className="text-[9px] uppercase tracking-[0.25em] font-bold text-forest/45">
+                                            2. MÉTODO DE PAGAMENTO
+                                        </h5>
+
+                                        <div className="grid grid-cols-3 gap-2">
+                                            {/* MBWAY */}
+                                            <button
+                                                type="button"
+                                                onClick={() => setPaymentMethod('mbway')}
+                                                className={`flex flex-col items-center justify-center py-2.5 rounded-xl border transition-all cursor-pointer ${
+                                                    paymentMethod === 'mbway' 
+                                                        ? 'bg-[#343E2C] text-[#C5A059] border-[#C5A059]' 
+                                                        : 'bg-white text-forest/65 border-forest/10 hover:bg-forest/5'
+                                                }`}
+                                            >
+                                                <span className="text-[10px] font-extrabold tracking-wider uppercase font-sans">MB WAY</span>
+                                            </button>
+                                            
+                                            {/* Multibanco */}
+                                            <button
+                                                type="button"
+                                                onClick={() => {
+                                                    setPaymentMethod('multibanco');
+                                                    if (!multibancoRef) {
+                                                        const entity = "12445";
+                                                        const refNum = `${Math.floor(100 + Math.random() * 900)} ${Math.floor(100 + Math.random() * 900)} ${Math.floor(100 + Math.random() * 900)}`;
+                                                        setMultibancoRef({ entidade: entity, referencia: refNum });
+                                                    }
+                                                }}
+                                                className={`flex flex-col items-center justify-center py-2.5 rounded-xl border transition-all cursor-pointer ${
+                                                    paymentMethod === 'multibanco' 
+                                                        ? 'bg-[#343E2C] text-[#C5A059] border-[#C5A059]' 
+                                                        : 'bg-white text-forest/65 border-forest/10 hover:bg-forest/5'
+                                                }`}
+                                            >
+                                                <span className="text-[10px] font-extrabold tracking-wider uppercase font-sans">MB</span>
+                                            </button>
+
+                                            {/* Cartão de Crédito */}
+                                            <button
+                                                type="button"
+                                                onClick={() => setPaymentMethod('card')}
+                                                className={`flex flex-col items-center justify-center py-2.5 rounded-xl border transition-all cursor-pointer ${
+                                                    paymentMethod === 'card' 
+                                                        ? 'bg-[#343E2C] text-[#C5A059] border-[#C5A059]' 
+                                                        : 'bg-white text-forest/65 border-forest/10 hover:bg-forest/5'
+                                                }`}
+                                            >
+                                                <span className="text-[10px] font-extrabold tracking-wider uppercase font-sans">CARTÃO</span>
+                                            </button>
+                                        </div>
+
+                                        {/* Conditional Payment Method Input Panels */}
+                                        <div className="mt-4 p-4 bg-white border border-forest/10 rounded-2xl min-h-[120px] flex flex-col justify-center">
+                                            {paymentMethod === 'mbway' && (
+                                                <div className="space-y-3 animate-fadeIn">
+                                                    <span className="text-[9px] uppercase tracking-wider text-forest/40 font-mono">Telemóvel Associado ao MB WAY</span>
+                                                    <input 
+                                                        type="tel" 
+                                                        placeholder="9xx xxx xxx" 
+                                                        required
+                                                        value={checkoutForm.mbwayPhone}
+                                                        onChange={(e) => setCheckoutForm(prev => ({ ...prev, mbwayPhone: e.target.value }))}
+                                                        className="w-full bg-[#FCFBF9] rounded-xl px-4 py-2.5 text-xs text-forest placeholder-forest/30 border border-forest/10 focus:border-[#C5A059] focus:outline-none transition-all font-sans"
+                                                    />
+                                                    <p className="text-[10px] text-forest/50 font-sans leading-relaxed">
+                                                        Irá receber uma notificação na aplicação MB WAY para autorizar o pagamento no valor de <strong>{currentPrice}</strong>.
+                                                    </p>
+                                                    <div className="p-2.5 bg-forest/5 rounded-xl border border-[#C5A059]/15 text-[10px] text-forest/70 font-sans leading-relaxed space-y-1">
+                                                        <span className="font-bold text-[#A68244] uppercase tracking-wider text-[8px] block">Consola de Teste Sandbox</span>
+                                                        <ul className="list-disc list-inside space-y-0.5 text-[9px] text-forest/60">
+                                                            <li>Escreve <strong className="font-mono text-forest">911 111 111</strong> para simular <strong>Aprovação Rápida</strong>.</li>
+                                                            <li>Escreve <strong className="font-mono text-forest">922 222 222</strong> para simular <strong>Rejeição de MB WAY</strong>.</li>
+                                                            <li>Escreve <strong className="font-mono text-forest">933 333 333</strong> para simular <strong>Expiração/Timeout</strong>.</li>
+                                                        </ul>
+                                                    </div>
+                                                </div>
+                                            )}
+
+                                            {paymentMethod === 'multibanco' && multibancoRef && (
+                                                <div className="space-y-3 animate-fadeIn">
+                                                    <span className="text-[9px] uppercase tracking-wider text-[#A68244] font-mono font-bold block mb-1">DADOS DE PAGAMENTO (ENTIDADE & REFERÊNCIA)</span>
+                                                    
+                                                    <div className="space-y-1.5 font-sans text-xs bg-forest/5 p-3 rounded-xl border border-forest/5">
+                                                        <div className="flex justify-between items-center border-b border-forest/5 pb-1">
+                                                            <span className="text-forest/40 text-[9px] uppercase tracking-wider">Entidade</span>
+                                                            <span className="font-mono font-bold text-forest">{multibancoRef.entidade}</span>
+                                                        </div>
+                                                        <div className="flex justify-between items-center border-b border-forest/5 pb-1">
+                                                            <span className="text-forest/40 text-[9px] uppercase tracking-wider">Referência</span>
+                                                            <span className="font-mono font-bold text-forest">{multibancoRef.referencia}</span>
+                                                        </div>
+                                                        <div className="flex justify-between items-center pb-1">
+                                                            <span className="text-forest/40 text-[9px] uppercase tracking-wider">Montante</span>
+                                                            <span className="font-mono font-bold text-forest">{currentPrice}</span>
+                                                        </div>
+                                                    </div>
+                                                    <p className="text-[10px] text-forest/50 font-sans leading-relaxed">
+                                                        Efetue o pagamento num terminal Multibanco ou através do seu Homebanking usando a opção <i>"Pagamento de Serviços"</i>.
+                                                    </p>
+                                                    <div className="p-2.5 bg-forest/5 rounded-xl border border-[#C5A059]/15 text-[10px] text-forest/70 font-sans leading-relaxed">
+                                                        <span className="font-bold text-[#A68244] uppercase tracking-wider text-[8px] block mb-0.5">Consola de Teste Sandbox</span>
+                                                        <p className="text-[9px] text-forest/60">Após efetuar a encomenda, o botão de pagamento abaixo simula o recebimento do webhook em tempo real.</p>
+                                                    </div>
+                                                </div>
+                                            )}
+
+                                            {paymentMethod === 'card' && (
+                                                <div className="space-y-3 animate-fadeIn">
+                                                    <span className="text-[9px] uppercase tracking-wider text-forest/40 font-mono">Detalhes do Cartão</span>
+                                                    <input 
+                                                        type="text" 
+                                                        placeholder="Nome no Cartão" 
+                                                        required
+                                                        value={checkoutForm.cardName}
+                                                        onChange={(e) => setCheckoutForm(prev => ({ ...prev, cardName: e.target.value }))}
+                                                        className="w-full bg-[#FCFBF9] rounded-xl px-4 py-2 text-xs text-forest placeholder-forest/30 border border-forest/10 focus:border-[#C5A059] focus:outline-none transition-all font-sans"
+                                                    />
+                                                    <input 
+                                                        type="text" 
+                                                        placeholder="Número do Cartão" 
+                                                        maxLength={19}
+                                                        required
+                                                        value={checkoutForm.cardNumber}
+                                                        onChange={(e) => setCheckoutForm(prev => {
+                                                            const clean = e.target.value.replace(/\D/g, '');
+                                                            const formatted = clean.match(/.{1,4}/g)?.join(' ') || clean;
+                                                            return { ...prev, cardNumber: formatted.substring(0, 19) };
+                                                        })}
+                                                        className="w-full bg-[#FCFBF9] rounded-xl px-4 py-2 text-xs text-forest placeholder-forest/30 border border-forest/10 focus:border-[#C5A059] focus:outline-none transition-all font-sans"
+                                                    />
+                                                    <div className="grid grid-cols-2 gap-2">
+                                                        <input 
+                                                            type="text" 
+                                                            placeholder="MM/AA" 
+                                                            maxLength={5}
+                                                            required
+                                                            value={checkoutForm.cardExpiry}
+                                                            onChange={(e) => setCheckoutForm(prev => {
+                                                                const clean = e.target.value.replace(/\D/g, '');
+                                                                let formatted = clean;
+                                                                if (clean.length > 2) {
+                                                                    formatted = `${clean.substring(0,2)}/${clean.substring(2,4)}`;
+                                                                }
+                                                                return { ...prev, cardExpiry: formatted };
+                                                            })}
+                                                            className="w-full bg-[#FCFBF9] rounded-xl px-4 py-2 text-xs text-forest placeholder-forest/30 border border-forest/10 focus:border-[#C5A059] focus:outline-none transition-all font-sans"
+                                                        />
+                                                        <input 
+                                                            type="text" 
+                                                            placeholder="CVV" 
+                                                            maxLength={3}
+                                                            required
+                                                            value={checkoutForm.cardCvv}
+                                                            onChange={(e) => setCheckoutForm(prev => ({ ...prev, cardCvv: e.target.value.replace(/\D/g, '') }))}
+                                                            className="w-full bg-[#FCFBF9] rounded-xl px-4 py-2 text-xs text-forest placeholder-forest/30 border border-forest/10 focus:border-[#C5A059] focus:outline-none transition-all font-sans"
+                                                        />
+                                                    </div>
+                                                    <div className="p-2.5 bg-forest/5 rounded-xl border border-[#C5A059]/15 text-[10px] text-forest/70 font-sans leading-relaxed space-y-1">
+                                                        <span className="font-bold text-[#A68244] uppercase tracking-wider text-[8px] block">Consola de Teste Sandbox</span>
+                                                        <ul className="list-disc list-inside space-y-0.5 text-[9px] text-forest/60">
+                                                            <li>Termina em <strong className="font-mono text-forest">5001</strong> para simular <strong>Saldo Insuficiente</strong>.</li>
+                                                            <li>Termina em <strong className="font-mono text-forest">5002</strong> para simular <strong>Tempo Limite de Gateway</strong>.</li>
+                                                            <li>Qualquer outra numeração simula aprovação de <strong>Sucesso</strong> imediato.</li>
+                                                        </ul>
+                                                    </div>
+                                                </div>
+                                            )}
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Complete Payment Button */}
+                                <div className="pt-4">
+                                    {checkoutError && (
+                                        <div className="p-3 bg-red-50 border border-red-200/50 rounded-xl text-left text-[11px] text-red-900 leading-relaxed font-sans mb-3 flex flex-col gap-1 animate-fadeIn">
+                                            <div className="flex justify-between items-center">
+                                                <span className="font-semibold uppercase tracking-wide text-[9px] text-red-700">Erro ou Falha de Pagamento</span>
+                                                <button onClick={() => setCheckoutError(null)} className="text-red-400 hover:text-red-700 font-bold px-1 text-xs">✕</button>
+                                            </div>
+                                            <p>{checkoutError}</p>
+                                        </div>
+                                    )}
+
+                                    <motion.button
+                                        disabled={isPaying || !checkoutForm.nome || !checkoutForm.email || !checkoutForm.morada || (paymentMethod === 'mbway' && !checkoutForm.mbwayPhone) || (paymentMethod === 'card' && (!checkoutForm.cardNumber || !checkoutForm.cardExpiry || !checkoutForm.cardCvv))}
+                                        onClick={async () => {
+                                            setIsPaying(true);
+                                            setCheckoutError(null);
+                                            setSandboxEmails(null);
+
+                                            // If Multibanco ref is already active, clicking simulates the manual user payment webhook confirmation
+                                            if (paymentMethod === 'multibanco' && multibancoRef) {
+                                                try {
+                                                    const res = await fetch('/api/payment/webhook', {
+                                                        method: 'POST',
+                                                        headers: { 'Content-Type': 'application/json' },
+                                                        body: JSON.stringify({
+                                                            orderId,
+                                                            event: 'payment_intent.succeeded'
+                                                        })
+                                                    });
+                                                    const statusData = await res.json();
+                                                    if (statusData.status === 'paid') {
+                                                        setIsPaying(false);
+                                                        setPaymentCompleted(true);
+                                                        if (statusData.emailLinks) {
+                                                            setSandboxEmails(statusData.emailLinks);
+                                                        }
+                                                    } else {
+                                                        throw new Error("Erro ao simular webhook de pagamento.");
+                                                    }
+                                                } catch (err: any) {
+                                                    setIsPaying(false);
+                                                    setCheckoutError(err.message || 'Erro ao simular o recebimento do webhook.');
+                                                }
+                                                return;
+                                            }
+
+                                            try {
+                                                const response = await fetch('/api/payment/create-intent', {
+                                                    method: 'POST',
+                                                    headers: { 'Content-Type': 'application/json' },
+                                                    body: JSON.stringify({
+                                                        product: {
+                                                            id: product.id,
+                                                            name: product.name,
+                                                            price: currentPrice
+                                                        },
+                                                        selections,
+                                                        checkoutForm,
+                                                        paymentMethod
+                                                    })
+                                                });
+
+                                                const data = await response.json();
+
+                                                if (!response.ok || data.error) {
+                                                    throw new Error(data.error || 'Erro ao conectar com a gateway de pagamentos.');
+                                                }
+
+                                                setOrderId(data.orderId);
+
+                                                if (data.status === 'paid') {
+                                                    setIsPaying(false);
+                                                    setPaymentCompleted(true);
+                                                    if (data.emailLinks) {
+                                                        setSandboxEmails(data.emailLinks);
+                                                    }
+                                                } else if (data.status === 'failed') {
+                                                    throw new Error(data.errorMessage || 'Transação recusada pela gateway.');
+                                                } else {
+                                                    // Pending payment
+                                                    if (paymentMethod === 'multibanco') {
+                                                        setMultibancoRef(data.multibancoRef);
+                                                        setIsPaying(false);
+                                                    } else if (paymentMethod === 'mbway') {
+                                                        // Poll status
+                                                        let attempts = 0;
+                                                        const intervalId = setInterval(async () => {
+                                                            attempts++;
+                                                            try {
+                                                                const statusRes = await fetch(`/api/payment/status/${data.orderId}`);
+                                                                if (!statusRes.ok) return;
+                                                                const statusData = await statusRes.json();
+
+                                                                if (statusData.status === 'paid') {
+                                                                    clearInterval(intervalId);
+                                                                    setIsPaying(false);
+                                                                    setPaymentCompleted(true);
+                                                                    if (statusData.emailLinks) {
+                                                                        setSandboxEmails(statusData.emailLinks);
+                                                                    }
+                                                                } else if (statusData.status === 'failed') {
+                                                                    clearInterval(intervalId);
+                                                                    setIsPaying(false);
+                                                                    setCheckoutError(statusData.errorMessage || 'Transação MB WAY recusada pelo utilizador.');
+                                                                }
+                                                            } catch (pollErr) {
+                                                                console.error("Erro ao consultar status:", pollErr);
+                                                            }
+
+                                                            if (attempts > 20) {
+                                                                clearInterval(intervalId);
+                                                                setIsPaying(false);
+                                                                setCheckoutError('O tempo limite de aprovação MB WAY expirou (Simulação de Exceção/Timeout).');
+                                                            }
+                                                        }, 3000);
+                                                    }
+                                                }
+                                            } catch (err: any) {
+                                                setIsPaying(false);
+                                                setCheckoutError(err.message || 'Ocorreu um erro ao processar o seu pagamento.');
+                                            }
+                                        }}
+                                        whileHover={{ scale: 1.01 }}
+                                        whileTap={{ scale: 0.99 }}
+                                        className="w-full rounded-full py-4 text-center font-bold bg-[#343E2C] text-[#C5A059] hover:bg-[#2c3525] active:scale-95 text-[11px] uppercase tracking-widest cursor-pointer shadow-lg disabled:opacity-40 disabled:cursor-not-allowed border border-[#C5A059]/10 flex items-center justify-center gap-2 transition-all duration-300 font-sans"
+                                    >
+                                        {isPaying ? (
+                                            <>
+                                                <span className="animate-spin rounded-full h-3.5 w-3.5 border border-[#C5A059] border-t-transparent" />
+                                                {paymentMethod === 'mbway' ? 'A AGUARDAR AUTORIZAÇÃO MB WAY...' : 'CONECTANDO GATEWAY...'}
+                                            </>
+                                        ) : paymentMethod === 'multibanco' ? (
+                                            multibancoRef ? 'SIMULAR PAGAMENTO WEBHOOK' : 'GERAR REFERÊNCIA MULTIBANCO'
+                                        ) : (
+                                            'EFETUAR ENCOMENDA'
+                                        )}
+                                    </motion.button>
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                ) : (
+                    <div className="flex-1 overflow-y-visible lg:overflow-y-auto space-y-5 pr-1 select-text pb-32 lg:pb-4 scrollbar-thin scrollbar-thumb-forest/10 scrollbar-track-transparent">
+                        
+                        {/* Title & Navigation/Close Controls */}
+                        <div className="flex justify-between items-start gap-4">
+                            <div>
+                                <span className="text-[9px] uppercase tracking-[0.4em] text-[#C5A059] block mb-1 font-sans font-semibold">EXCLUSIVO M★BRAVO</span>
+                                <h3 className="text-3xl lg:text-3.5xl font-serif font-light text-forest leading-tight tracking-[0.05em] mb-1">{product.name}</h3>
+                            </div>
+                            <div className="flex items-center gap-2 flex-shrink-0 z-30">
+                                {onPrevProduct && onNextProduct && (
+                                    <div className="flex items-center bg-forest/5 rounded-full p-1 border border-forest/10 shadow-sm backdrop-blur-sm">
+                                        <button
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                onPrevProduct();
+                                            }}
+                                            className="p-1.5 rounded-full hover:bg-forest hover:text-cream transition-all bg-transparent text-forest cursor-pointer"
+                                            title="Produto Anterior"
                                         >
-                                            <div className="w-full h-full rounded-full border border-forest/5" style={{ backgroundColor: opt.hex }} />
+                                            <ChevronLeft size={14} />
                                         </button>
+                                        <span className="text-[8px] uppercase tracking-widest font-black text-forest/45 px-1.5 pointer-events-none select-none">PEÇA</span>
+                                        <button
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                onNextProduct();
+                                            }}
+                                            className="p-1.5 rounded-full hover:bg-forest hover:text-cream transition-all bg-transparent text-forest cursor-pointer"
+                                            title="Próximo Produto"
+                                        >
+                                            <ChevronRight size={14} />
+                                        </button>
+                                    </div>
+                                )}
+                                <button 
+                                    onClick={handleToggle}
+                                    className="p-2.5 rounded-full bg-forest/5 text-forest hover:bg-forest hover:text-cream transition-all border border-forest/10 shadow-sm cursor-pointer"
+                                    title="Fechar"
+                                >
+                                    <X size={18} />
+                                </button>
+                            </div>
+                        </div>
+
+                        {/* Descrição em Layout Editorial Expandido e Fluido */}
+                        {product.description && (
+                            <p className="text-[13px] text-forest/75 leading-relaxed tracking-wide font-light font-sans whitespace-pre-line max-w-prose lg:max-w-[90%] w-full mb-6">
+                                {product.description}
+                            </p>
+                        )}
+
+                        {/* Detalhes do Produto */}
+                        {product.details && (
+                            <div className="mb-6 text-left max-w-prose lg:max-w-[90%] w-full">
+                                <h5 className="text-[9px] uppercase tracking-[0.25em] font-bold text-forest/45 flex items-center gap-1.5 mb-3">
+                                    <span className="text-[#C5A059] text-xs">●</span> DETALHES DO PRODUTO
+                                </h5>
+                                <ul className="space-y-2 pl-0.5">
+                                    {product.details.split('\n').map((line: string, index: number) => {
+                                        const cleaned = line.replace(/^[•\-\s]+/, '').trim();
+                                        return (
+                                            <li key={index} className="flex items-start gap-2 text-[12px] text-forest/75 leading-relaxed font-light font-sans">
+                                                <span className="text-[#C5A059] mt-0.5 shrink-0 select-none">•</span>
+                                                <span>{cleaned}</span>
+                                            </li>
+                                        );
+                                    })}
+                                </ul>
+                            </div>
+                        )}
+
+                        {/* Customization Selection Panels */}
+                        <div className="space-y-6">
+                            {/* Container Comum para Seletores (Cores, Tamanho, Quantidade) com recuo explícito */}
+                            <div id="selection-selectors-group" className="space-y-6 text-left w-full">
+                                {/* Cores */}
+                                <div className="space-y-2">
+                                    <div className="flex justify-between items-center">
+                                        <h5 className="text-[9px] uppercase tracking-[0.25em] font-bold text-forest/45 flex items-center gap-1.5">
+                                            <span className="text-[#C5A059] text-xs">●</span> COR DA PEÇA
+                                        </h5>
+                                        <span className="text-[9px] font-extrabold text-[#A68244] bg-[#FDF9F3] px-3 py-0.5 rounded-full border border-[#C5A059]/10">
+                                            {selections.cor}
+                                        </span>
+                                    </div>
+                                    <div className="flex flex-wrap gap-2">
+                                        {colors.map(opt => (
+                                            <button 
+                                                key={opt.name}
+                                                onClick={() => setSelections(prev => ({ ...prev, cor: opt.name }))}
+                                                className={`w-8 h-8 rounded-full border-2 transition-all p-0.5 cursor-pointer ${
+                                                    selections.cor === opt.name ? 'border-forest scale-110 shadow-md shadow-forest/10' : 'border-transparent hover:scale-110'
+                                                }`}
+                                                title={opt.name}
+                                            >
+                                                <div className="w-full h-full rounded-full border border-forest/5" style={{ backgroundColor: opt.hex }} />
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                {/* Tamanho */}
+                                {hasSize && (
+                                    <div className="space-y-2">
+                                        <h5 className="text-[9px] uppercase tracking-[0.25em] font-bold text-forest/45 flex items-center gap-1.5">
+                                            <span className="text-[#C5A059] text-xs">●</span> TAMANHO
+                                        </h5>
+                                        <div className="flex flex-wrap gap-1.5">
+                                            {sizes.map(opt => (
+                                                <button 
+                                                    key={opt}
+                                                    onClick={() => setSelections(prev => ({ ...prev, tamanho: opt }))}
+                                                    className={`rounded-full px-4 py-1.5 border border-forest/20 transition-all duration-300 text-xs font-bold cursor-pointer ${
+                                                        selections.tamanho === opt 
+                                                            ? 'bg-forest text-cream border-forest shadow-sm scale-105' 
+                                                            : 'bg-white text-forest hover:bg-forest/5'
+                                                    }`}
+                                                >
+                                                    {opt}
+                                                </button>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
+
+                                {/* Quantidade */}
+                                {hasQuantity && (
+                                    <div className="space-y-2">
+                                        <h5 className="text-[9px] uppercase tracking-[0.25em] font-bold text-forest/45 flex items-center gap-1.5">
+                                            <span className="text-[#C5A059] text-xs">●</span> QUANTIDADE DO CONJUNTO
+                                        </h5>
+                                        <div className="flex flex-wrap gap-1.5">
+                                            {quantities.map(opt => (
+                                                <button 
+                                                    key={opt}
+                                                    onClick={() => setSelections(prev => ({ ...prev, quantidade: opt }))}
+                                                    className={`rounded-full px-4 py-1.5 border border-forest/20 transition-all duration-300 text-xs font-bold cursor-pointer ${
+                                                        selections.quantidade === opt 
+                                                            ? 'bg-forest text-cream border-forest shadow-sm scale-105' 
+                                                            : 'bg-white text-forest hover:bg-forest/5'
+                                                    }`}
+                                                >
+                                                    {opt}
+                                                </button>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+
+                            {/* Secção de Material & Composição (Estrutura de Cartões Minimalistas) */}
+                            <div className="space-y-2 text-left">
+                                <h5 className="text-[9px] uppercase tracking-[0.25em] font-bold text-forest/45 flex items-center gap-1.5">
+                                    <span className="text-[#C5A059] text-xs">●</span> MATERIAL & COMPOSIÇÃO
+                                </h5>
+                                <div className="flex flex-col gap-2 w-full pt-1">
+                                    {parseMaterials(materialText).map((item, idx) => (
+                                        <div key={idx} className="bg-neutral-100/50 rounded-xl p-3 border border-forest/5 shadow-[0_2px_8px_rgba(0,0,0,0.02)] text-left select-text">
+                                            {item.title ? (
+                                                <div className="space-y-0.5">
+                                                    <span className="text-[10px] uppercase tracking-wider font-extrabold text-[#A68244] block">
+                                                        {item.title}
+                                                    </span>
+                                                    <p className="text-[12px] text-forest/80 leading-relaxed font-light font-sans">
+                                                        {item.description}
+                                                    </p>
+                                                </div>
+                                            ) : (
+                                                <p className="text-[12px] text-forest/80 leading-relaxed font-light font-sans">
+                                                    {item.description}
+                                                </p>
+                                            )}
+                                        </div>
                                     ))}
                                 </div>
                             </div>
 
-                            {/* Tamanho */}
-                            {hasSize && (
-                                <div className="space-y-2">
-                                    <h5 className="text-[9px] uppercase tracking-[0.25em] font-bold text-forest/45 flex items-center gap-1.5">
-                                        <span className="text-[#C5A059] text-xs">●</span> TAMANHO
-                                    </h5>
-                                    <div className="flex flex-wrap gap-1.5">
-                                        {sizes.map(opt => (
-                                            <button 
-                                                key={opt}
-                                                onClick={() => setSelections(prev => ({ ...prev, tamanho: opt }))}
-                                                className={`rounded-full px-4 py-1.5 border border-forest/20 transition-all duration-300 text-xs font-bold cursor-pointer ${
-                                                    selections.tamanho === opt 
-                                                        ? 'bg-forest text-cream border-forest shadow-sm scale-105' 
-                                                        : 'bg-white text-forest hover:bg-forest/5'
-                                                }`}
-                                            >
-                                                {opt}
-                                            </button>
-                                        ))}
+                            {/* Secção de Manutenção e Cuidados (Com Ícones e Legendas) */}
+                            <div className="space-y-3 text-left">
+                                <h5 className="text-[9px] uppercase tracking-[0.25em] font-bold text-forest/45 flex items-center gap-1.5">
+                                    <span className="text-[#C5A059] text-xs">●</span> MANUTENÇÃO & CUIDADOS
+                                </h5>
+                                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-2 pt-1 select-none">
+                                    <div className="flex flex-col items-center text-center">
+                                        <div className="w-10 h-10 rounded-full bg-forest/5 flex items-center justify-center text-forest/70 border border-forest/5 hover:bg-forest/10 transition-colors">
+                                            <svg viewBox="0 0 24 24" className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                                                <path d="M3 9h18c0 0-1.5 8-2 10s-1.5 2-3 2H8c-1.5 0-2.5-2-3-2S3 9 3 9z" />
+                                                <path d="M3 12c1.8-1.5 3.8 1.5 5.6 0s3.8-1.5 5.6 0 3.8 1.5 5.6 0" />
+                                                <path d="M12 3v7M9.5 4.5v5.5M14.5 3.5v6.5M7 6v4c0 1 1 2 2 2h4.5" />
+                                            </svg>
+                                        </div>
+                                        <span className="text-[9px] tracking-tight leading-tight mt-1 text-forest/70 font-light font-sans max-w-[100px] sm:max-w-[65px]">
+                                            LAVAGEM À MÃO
+                                        </span>
+                                    </div>
+                                    <div className="flex flex-col items-center text-center">
+                                        <div className="w-10 h-10 rounded-full bg-forest/5 flex items-center justify-center text-forest/70 border border-forest/5 hover:bg-forest/10 transition-colors">
+                                            <svg viewBox="0 0 24 24" className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                                                <rect x="4" y="4" width="16" height="16" rx="3" />
+                                                <line x1="8" y1="12" x2="16" y2="12" />
+                                            </svg>
+                                        </div>
+                                        <span className="text-[9px] tracking-tight leading-tight mt-1 text-forest/70 font-light font-sans max-w-[100px] sm:max-w-[65px]">
+                                            SECAR HORIZONTAL
+                                        </span>
+                                    </div>
+                                    <div className="flex flex-col items-center text-center">
+                                        <div className="w-10 h-10 rounded-full bg-forest/5 flex items-center justify-center text-forest/70 border border-forest/5 hover:bg-forest/10 transition-colors">
+                                            <svg viewBox="0 0 24 24" className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                                                <rect x="4" y="4" width="16" height="16" rx="3" />
+                                                <circle cx="12" cy="12" r="5" />
+                                                <line x1="6" y1="6" x2="18" y2="18" />
+                                                <line x1="18" y1="6" x2="6" y2="18" />
+                                            </svg>
+                                        </div>
+                                        <span className="text-[9px] tracking-tight leading-tight mt-1 text-forest/70 font-light font-sans max-w-[100px] sm:max-w-[65px]">
+                                            SEM SECADORA
+                                        </span>
+                                    </div>
+                                    <div className="flex flex-col items-center text-center">
+                                        <div className="w-10 h-10 rounded-full bg-forest/5 flex items-center justify-center text-forest/70 border border-forest/5 hover:bg-forest/10 transition-colors">
+                                            <svg viewBox="0 0 24 24" className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                                                <path d="M5 8c2 0 3 4 5 4s3-4 5-4 3 4 5 4M4 14c2 0 3-4 5-4s3 4 5 4 3-4 5-4" />
+                                                <line x1="6" y1="6" x2="18" y2="18" />
+                                                <line x1="18" y1="6" x2="6" y2="18" />
+                                            </svg>
+                                        </div>
+                                        <span className="text-[9px] tracking-tight leading-tight mt-1 text-forest/70 font-light font-sans max-w-[100px] sm:max-w-[65px]">
+                                            EVITAR TORCER
+                                        </span>
                                     </div>
                                 </div>
-                            )}
+                            </div>
 
-                            {/* Quantidade */}
-                            {hasQuantity && (
-                                <div className="space-y-2">
-                                    <h5 className="text-[9px] uppercase tracking-[0.25em] font-bold text-forest/45 flex items-center gap-1.5">
-                                        <span className="text-[#C5A059] text-xs">●</span> QUANTIDADE DO CONJUNTO
-                                    </h5>
-                                    <div className="flex flex-wrap gap-1.5">
-                                        {quantities.map(opt => (
-                                            <button 
-                                                key={opt}
-                                                onClick={() => setSelections(prev => ({ ...prev, quantidade: opt }))}
-                                                className={`rounded-full px-4 py-1.5 border border-forest/20 transition-all duration-300 text-xs font-bold cursor-pointer ${
-                                                    selections.quantidade === opt 
-                                                        ? 'bg-forest text-cream border-forest shadow-sm scale-105' 
-                                                        : 'bg-white text-forest hover:bg-forest/5'
-                                                }`}
-                                            >
-                                                {opt}
-                                            </button>
-                                        ))}
+                            <div className="text-center font-sans tracking-wide py-4">
+                                <p className="text-[10px] text-[#A68244]/80 italic font-medium">{finalNote}</p>
+                            </div>
+
+                            {/* B & C) TABLET & MOBILE RECAP BOX: Rendered statically in the scroll flow to present configuration status */}
+                            <div className="lg:hidden block pb-4">
+                                <div id="checkout-box-mobile" className="bg-forest/5 rounded-2xl p-5 border border-forest/10 shadow-sm relative overflow-hidden text-forest animate-fadeIn">
+                                    <div className="flex justify-between items-center mb-3 pb-2.5 border-b border-forest/10">
+                                        <h4 className="text-[10px] uppercase tracking-[0.25em] font-extrabold text-[#A68244]">CONFIGURAÇÃO SELECIONADA</h4>
+                                        <span className="text-lg font-serif text-forest font-semibold tracking-tight">{currentPrice}</span>
                                     </div>
-                                </div>
-                            )}
-                        </div>
 
-                        {/* Secção de Material & Composição (Estrutura de Cartões Minimalistas) */}
-                        <div className="space-y-2 text-left">
-                            <h5 className="text-[9px] uppercase tracking-[0.25em] font-bold text-forest/45 flex items-center gap-1.5">
-                                <span className="text-[#C5A059] text-xs">●</span> MATERIAL & COMPOSIÇÃO
-                            </h5>
-                            <div className="flex flex-col gap-2 w-full pt-1">
-                                {parseMaterials(materialText).map((item, idx) => (
-                                    <div key={idx} className="bg-neutral-100/50 rounded-xl p-3 border border-forest/5 shadow-[0_2px_8px_rgba(0,0,0,0.02)] text-left select-text">
-                                        {item.title ? (
-                                            <div className="space-y-0.5">
-                                                <span className="text-[10px] uppercase tracking-wider font-extrabold text-[#A68244] block">
-                                                    {item.title}
-                                                </span>
-                                                <p className="text-[12px] text-forest/80 leading-relaxed font-light font-sans">
-                                                    {item.description}
-                                                </p>
+                                    <div className="space-y-1.5 text-[11px] uppercase tracking-wider text-forest/80 font-normal">
+                                        <div className="flex justify-between items-center border-b border-forest/5 pb-1">
+                                            <span className="text-forest/40 text-[9px] tracking-[0.2em]">COR</span>
+                                            <span className="text-forest font-semibold">{selections.cor || 'Verde Musgo'}</span>
+                                        </div>
+                                        {hasSize && (
+                                            <div className="flex justify-between items-center border-b border-forest/5 pb-1">
+                                                <span className="text-forest/40 text-[9px] tracking-[0.2em]">TAMANHO</span>
+                                                <span className="text-forest font-semibold">{selections.tamanho}</span>
                                             </div>
-                                        ) : (
-                                            <p className="text-[12px] text-forest/80 leading-relaxed font-light font-sans">
-                                                {item.description}
-                                            </p>
+                                        )}
+                                        {hasQuantity && (
+                                            <div className="flex justify-between items-center border-b border-forest/5 pb-1">
+                                                <span className="text-forest/40 text-[9px] tracking-[0.2em]">QUANTIDADE</span>
+                                                <span className="text-forest font-semibold">{selections.quantidade}</span>
+                                            </div>
+                                        )}
+                                        {product.dimensions && (
+                                            <div className="flex justify-between items-center border-b border-forest/5 pb-1">
+                                                <span className="text-forest/40 text-[9px] tracking-[0.2em]">DIMENSÕES</span>
+                                                <span className="text-forest font-semibold">{product.dimensions}</span>
+                                            </div>
                                         )}
                                     </div>
-                                ))}
-                            </div>
-                        </div>
-
-                        {/* Secção de Manutenção e Cuidados (Com Ícones e Legendas) */}
-                        <div className="space-y-3 text-left">
-                            <h5 className="text-[9px] uppercase tracking-[0.25em] font-bold text-forest/45 flex items-center gap-1.5">
-                                <span className="text-[#C5A059] text-xs">●</span> MANUTENÇÃO & CUIDADOS
-                            </h5>
-                            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-2 pt-1 select-none">
-                                <div className="flex flex-col items-center text-center">
-                                    <div className="w-10 h-10 rounded-full bg-forest/5 flex items-center justify-center text-forest/70 border border-forest/5 hover:bg-forest/10 transition-colors">
-                                        <svg viewBox="0 0 24 24" className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                                            {/* Wash tub container */}
-                                            <path d="M3 9h18c0 0-1.5 8-2 10s-1.5 2-3 2H8c-1.5 0-2.5-2-3-2S3 9 3 9z" />
-                                            {/* Wavy water level */}
-                                            <path d="M3 12c1.8-1.5 3.8 1.5 5.6 0s3.8-1.5 5.6 0 3.8 1.5 5.6 0" />
-                                            {/* Hand reaching in */}
-                                            <path d="M12 3v7M9.5 4.5v5.5M14.5 3.5v6.5M7 6v4c0 1 1 2 2 2h4.5" />
-                                        </svg>
-                                    </div>
-                                    <span className="text-[9px] tracking-tight leading-tight mt-1 text-forest/70 font-light font-sans max-w-[100px] sm:max-w-[65px]">
-                                        LAVAGEM À MÃO
-                                    </span>
-                                </div>
-                                <div className="flex flex-col items-center text-center">
-                                    <div className="w-10 h-10 rounded-full bg-forest/5 flex items-center justify-center text-forest/70 border border-forest/5 hover:bg-forest/10 transition-colors">
-                                        <svg viewBox="0 0 24 24" className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                                            {/* Square container representing drying */}
-                                            <rect x="4" y="4" width="16" height="16" rx="3" />
-                                            {/* Horizontal line representing flat drying */}
-                                            <line x1="8" y1="12" x2="16" y2="12" />
-                                        </svg>
-                                    </div>
-                                    <span className="text-[9px] tracking-tight leading-tight mt-1 text-forest/70 font-light font-sans max-w-[100px] sm:max-w-[65px]">
-                                        SECAR HORIZONTAL
-                                    </span>
-                                </div>
-                                <div className="flex flex-col items-center text-center">
-                                    <div className="w-10 h-10 rounded-full bg-forest/5 flex items-center justify-center text-forest/70 border border-forest/5 hover:bg-forest/10 transition-colors">
-                                        <svg viewBox="0 0 24 24" className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                                            {/* Square for drying */}
-                                            <rect x="4" y="4" width="16" height="16" rx="3" />
-                                            {/* Circle inside for tumble */}
-                                            <circle cx="12" cy="12" r="5" />
-                                            {/* Cross slash (X) to prohibit */}
-                                            <line x1="6" y1="6" x2="18" y2="18" />
-                                            <line x1="18" y1="6" x2="6" y2="18" />
-                                        </svg>
-                                    </div>
-                                    <span className="text-[9px] tracking-tight leading-tight mt-1 text-forest/70 font-light font-sans max-w-[100px] sm:max-w-[65px]">
-                                        SEM SECADORA
-                                    </span>
-                                </div>
-                                <div className="flex flex-col items-center text-center">
-                                    <div className="w-10 h-10 rounded-full bg-forest/5 flex items-center justify-center text-forest/70 border border-forest/5 hover:bg-forest/10 transition-colors">
-                                        <svg viewBox="0 0 24 24" className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                                            {/* Twisted cloth shape representing wringing */}
-                                            <path d="M5 8c2 0 3 4 5 4s3-4 5-4 3 4 5 4M4 14c2 0 3-4 5-4s3 4 5 4 3-4 5-4" />
-                                            {/* Diagonal line of prohibition */}
-                                            <line x1="6" y1="6" x2="18" y2="18" />
-                                            <line x1="18" y1="6" x2="6" y2="18" />
-                                        </svg>
-                                    </div>
-                                    <span className="text-[9px] tracking-tight leading-tight mt-1 text-forest/70 font-light font-sans max-w-[100px] sm:max-w-[65px]">
-                                        EVITAR TORCER
-                                    </span>
-                                </div>
-                            </div>
-                        </div>
-
-                    <div className="text-center font-sans tracking-wide py-4">
-                        <p className="text-[10px] text-[#A68244]/80 italic font-medium">{finalNote}</p>
-                    </div>
-
-                        {/* B & C) TABLET & MOBILE RECAP BOX: Rendered statically in the scroll flow to present configuration status */}
-                        <div className="lg:hidden block pb-4">
-                            <div id="checkout-box-mobile" className="bg-forest/5 rounded-2xl p-5 border border-forest/10 shadow-sm relative overflow-hidden text-forest animate-fadeIn">
-                                <div className="flex justify-between items-center mb-3 pb-2.5 border-b border-forest/10">
-                                    <h4 className="text-[10px] uppercase tracking-[0.25em] font-extrabold text-[#A68244]">CONFIGURAÇÃO SELECIONADA</h4>
-                                    <span className="text-lg font-serif text-forest font-semibold tracking-tight">{currentPrice}</span>
-                                </div>
-
-                                <div className="space-y-1.5 text-[11px] uppercase tracking-wider text-forest/80 font-normal">
-                                    <div className="flex justify-between items-center border-b border-forest/5 pb-1">
-                                        <span className="text-forest/40 text-[9px] tracking-[0.2em]">COR</span>
-                                        <span className="text-forest font-semibold">{selections.cor || 'Verde Musgo'}</span>
-                                    </div>
-                                    {hasSize && (
-                                        <div className="flex justify-between items-center border-b border-forest/5 pb-1">
-                                            <span className="text-forest/40 text-[9px] tracking-[0.2em]">TAMANHO</span>
-                                            <span className="text-forest font-semibold">{selections.tamanho}</span>
-                                        </div>
-                                    )}
-                                    {hasQuantity && (
-                                        <div className="flex justify-between items-center border-b border-forest/5 pb-1">
-                                            <span className="text-forest/40 text-[9px] tracking-[0.2em]">QUANTIDADE</span>
-                                            <span className="text-forest font-semibold">{selections.quantidade}</span>
-                                        </div>
-                                    )}
-                                    {product.dimensions && (
-                                        <div className="flex justify-between items-center border-b border-forest/5 pb-1">
-                                            <span className="text-forest/40 text-[9px] tracking-[0.2em]">DIMENSÕES</span>
-                                            <span className="text-forest font-semibold">{product.dimensions}</span>
-                                        </div>
-                                    )}
                                 </div>
                             </div>
                         </div>
                     </div>
-                </div>
+                )}
 
                 {/* A) DESKTOP FIXED FOOTER CHECKOUT BOX: Always anchored at the base of the sidebar, content scrolls beautifully behind it */}
-                <div className="hidden lg:block shrink-0 mt-2">
-                    <div id="checkout-box-desktop" className="bg-[#343E2C] rounded-2xl p-5 border border-white/10 shadow-lg relative overflow-hidden text-[#FCFBF9] animate-fadeIn">
-                        <div className="flex justify-between items-center mb-3 pb-2.5 border-b border-white/10">
-                            <h4 className="text-[11px] uppercase tracking-[0.25em] font-semibold bg-gradient-to-b from-[#F5E0B5] to-[#D4AF37] bg-clip-text text-transparent">ENCOMENDA</h4>
-                            <span className="text-2xl md:text-3xl font-serif text-[#FCFBF9] font-semibold tracking-tight">{currentPrice}</span>
-                        </div>
-
-                        <div className="space-y-1.5 mb-3.5 text-[11px] uppercase tracking-wider text-white/90 font-normal">
-                            <div className="flex justify-between items-center border-b border-white/5 pb-1">
-                                <span className="text-white/40 text-[9px] tracking-[0.2em]">COR</span>
-                                <span className="text-[#FCFBF9] font-semibold">{selections.cor || 'Verde Musgo'}</span>
+                {!isCheckingOut && (
+                    <div className="hidden lg:block shrink-0 mt-2">
+                        <div id="checkout-box-desktop" className="bg-[#343E2C] rounded-2xl p-5 border border-white/10 shadow-lg relative overflow-hidden text-[#FCFBF9] animate-fadeIn">
+                            <div className="flex justify-between items-center mb-3 pb-2.5 border-b border-white/10">
+                                <h4 className="text-[11px] uppercase tracking-[0.25em] font-semibold bg-gradient-to-b from-[#F5E0B5] to-[#D4AF37] bg-clip-text text-transparent">COMPRA SEGURA</h4>
+                                <span className="text-2xl md:text-3xl font-serif text-[#FCFBF9] font-semibold tracking-tight">{currentPrice}</span>
                             </div>
-                            {hasSize && (
+
+                            <div className="space-y-1.5 mb-3.5 text-[11px] uppercase tracking-wider text-white/90 font-normal">
                                 <div className="flex justify-between items-center border-b border-white/5 pb-1">
-                                    <span className="text-white/40 text-[9px] tracking-[0.2em]">TAMANHO</span>
-                                    <span className="text-[#FCFBF9] font-semibold">{selections.tamanho}</span>
+                                    <span className="text-white/40 text-[9px] tracking-[0.2em]">COR</span>
+                                    <span className="text-[#FCFBF9] font-semibold">{selections.cor || 'Verde Musgo'}</span>
                                 </div>
-                            )}
-                            {hasQuantity && (
-                                <div className="flex justify-between items-center border-b border-white/5 pb-1">
-                                    <span className="text-white/40 text-[9px] tracking-[0.2em]">QUANTIDADE</span>
-                                    <span className="text-[#FCFBF9] font-semibold">{selections.quantidade}</span>
-                                </div>
-                            )}
-                            {product.dimensions && (
-                                <div className="flex justify-between items-center border-b border-white/5 pb-1">
-                                    <span className="text-white/40 text-[9px] tracking-[0.2em]">DIMENSÕES</span>
-                                    <span className="text-[#FCFBF9] font-semibold">{product.dimensions}</span>
-                                </div>
-                            )}
+                                {hasSize && (
+                                    <div className="flex justify-between items-center border-b border-white/5 pb-1">
+                                        <span className="text-white/40 text-[9px] tracking-[0.2em]">TAMANHO</span>
+                                        <span className="text-[#FCFBF9] font-semibold">{selections.tamanho}</span>
+                                    </div>
+                                )}
+                                {hasQuantity && (
+                                    <div className="flex justify-between items-center border-b border-white/5 pb-1">
+                                        <span className="text-white/40 text-[9px] tracking-[0.2em]">QUANTIDADE</span>
+                                        <span className="text-[#FCFBF9] font-semibold">{selections.quantidade}</span>
+                                    </div>
+                                )}
+                                {product.dimensions && (
+                                    <div className="flex justify-between items-center border-b border-white/5 pb-1">
+                                        <span className="text-white/40 text-[9px] tracking-[0.2em]">DIMENSÕES</span>
+                                        <span className="text-[#FCFBF9] font-semibold">{product.dimensions}</span>
+                                    </div>
+                                )}
+                            </div>
+                            
+                            <div className="space-y-2">
+                                <motion.button 
+                                    onClick={() => {
+                                        const rand = Math.floor(100000 + Math.random() * 900000);
+                                        setOrderId(`MB-${rand}`);
+                                        setIsCheckingOut(true);
+                                    }}
+                                    whileHover={{ scale: 1.01 }}
+                                    whileTap={{ scale: 0.99 }}
+                                    className="w-full rounded-full py-3.5 text-center font-bold bg-[#C5A059] text-[#343E2C] hover:bg-[#d5b069] active:scale-95 text-[11px] uppercase tracking-widest cursor-pointer shadow-[0_4px_15px_rgba(197,160,89,0.3)] border border-[#C5A059]/10 block transition-all duration-300"
+                                >
+                                    COMPRA IMEDIATA
+                                </motion.button>
+                                
+                                <motion.a 
+                                    href={whatsappUrl}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    whileHover={{ scale: 1.01 }}
+                                    whileTap={{ scale: 0.99 }}
+                                    className="w-full rounded-full py-3 text-center font-bold bg-transparent text-[#FCFBF9] hover:bg-white/5 active:scale-95 text-[10px] uppercase tracking-widest cursor-pointer border border-[#C5A059]/30 block transition-all duration-300"
+                                >
+                                    Personalizar o meu Design
+                                </motion.a>
+                            </div>
                         </div>
-                        
-                        <motion.a 
-                            href={whatsappUrl}
-                            target="_blank"
-                            whileHover={{ scale: 1.01 }}
-                            whileTap={{ scale: 0.99 }}
-                            className="w-full rounded-full py-3.5 text-center font-bold bg-[#C5A059] text-[#343E2C] hover:bg-[#d5b069] active:scale-95 text-[11px] uppercase tracking-widest cursor-pointer shadow-[0_4px_15px_rgba(197,160,89,0.3)] border border-[#C5A059]/10 block transition-all duration-300"
-                        >
-                            ENVIAR ENCOMENDA
-                        </motion.a>
                     </div>
-                </div>
+                )}
             </div>
 
             {/* Sticky Mobile/Tablet Checkout Footer Bar */}
-            <div 
-                className="lg:hidden sticky bottom-0 left-0 right-0 z-[60] bg-[#FCFBF9]/95 backdrop-blur-md border-t border-forest/10 px-6 py-4 flex items-center justify-between gap-4 shadow-[0_-12px_45px_rgba(31,42,24,0.08)] w-full shrink-0"
-                style={{ paddingBottom: 'max(1rem, env(safe-area-inset-bottom))' }}
-            >
-                <div className="flex flex-col text-left">
-                    <span className="text-[8px] uppercase tracking-[0.2em] text-[#A68244] font-bold font-sans">IMPORTE TOTAL</span>
-                    <span className="text-xl sm:text-2xl font-serif text-forest font-semibold tracking-tight">{currentPrice}</span>
-                </div>
-                <motion.a 
-                    href={whatsappUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    whileHover={{ scale: 1.01 }}
-                    whileTap={{ scale: 0.99 }}
-                    className="flex-1 max-w-[190px] xs:max-w-[210px] sm:max-w-[240px] rounded-full py-3.5 text-center font-bold bg-[#C5A059] text-[#343E2C] hover:bg-[#d5b069] text-[10px] sm:text-[11px] uppercase tracking-widest cursor-pointer shadow-[0_4px_15px_rgba(197,160,89,0.35)] border border-[#C5A059]/10 block font-sans"
+            {!isCheckingOut && (
+                <div 
+                    className="lg:hidden sticky bottom-0 left-0 right-0 z-[60] bg-[#FCFBF9]/95 backdrop-blur-md border-t border-forest/10 px-6 py-4 flex flex-col gap-3 shadow-[0_-12px_45px_rgba(31,42,24,0.08)] w-full shrink-0"
+                    style={{ paddingBottom: 'max(1rem, env(safe-area-inset-bottom))' }}
                 >
-                    ENVIAR ENCOMENDA
-                </motion.a>
-            </div>
+                    <div className="flex items-center justify-between w-full">
+                        <div className="flex flex-col text-left">
+                            <span className="text-[8px] uppercase tracking-[0.2em] text-[#A68244] font-bold font-sans">IMPORTE TOTAL</span>
+                            <span className="text-xl sm:text-2xl font-serif text-forest font-semibold tracking-tight">{currentPrice}</span>
+                        </div>
+                        <motion.button 
+                            onClick={() => {
+                                const rand = Math.floor(100000 + Math.random() * 900000);
+                                setOrderId(`MB-${rand}`);
+                                setIsCheckingOut(true);
+                            }}
+                            whileHover={{ scale: 1.01 }}
+                            whileTap={{ scale: 0.99 }}
+                            className="flex-1 max-w-[190px] xs:max-w-[210px] sm:max-w-[240px] rounded-full py-3.5 text-center font-bold bg-[#C5A059] text-[#343E2C] hover:bg-[#d5b069] text-[10px] sm:text-[11px] uppercase tracking-widest cursor-pointer shadow-[0_4px_15px_rgba(197,160,89,0.35)] border border-[#C5A059]/10 block font-sans"
+                        >
+                            COMPRA IMEDIATA
+                        </motion.button>
+                    </div>
+                    <motion.a 
+                        href={whatsappUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        whileHover={{ scale: 1.01 }}
+                        whileTap={{ scale: 0.99 }}
+                        className="w-full rounded-full py-2.5 text-center font-medium bg-transparent text-forest hover:bg-forest/5 text-[9px] uppercase tracking-widest cursor-pointer border border-[#C5A059]/30 block font-sans"
+                    >
+                        Personalizar o meu Design (WhatsApp)
+                    </motion.a>
+                </div>
+            )}
         </div>
     );
 };
@@ -2525,32 +3168,40 @@ const CollectionSection = () => {
                          background: 'radial-gradient(circle, rgba(255,248,220,0.18) 0%, rgba(255,248,220,0.08) 35%, transparent 70%)'
                      }}
                  />
-                 <motion.span 
+                  <motion.span 
                     initial={{ opacity: 0 }}
                     whileInView={{ opacity: 1 }}
-                    className="text-[10px] uppercase tracking-[0.4em] font-bold text-forest/30 mb-4 block"
+                    className="text-[10px] uppercase tracking-[0.45em] font-bold text-forest/35 mb-4 block font-sans"
                  >
-                    {selectedCategory ? activeCategory?.name : 'Produtos'}
+                    PRODUTOS
                  </motion.span>
                  <motion.h2 
                     initial={{ opacity: 0, y: 20 }}
                     whileInView={{ opacity: 1, y: 0 }}
-                    className="text-3xl xs:text-4xl sm:text-5xl md:text-6xl font-light tracking-[0.2em] text-forest uppercase leading-tight text-center"
+                    className="text-3xl xs:text-4xl sm:text-5xl md:text-6xl font-light tracking-[0.2em] uppercase leading-tight text-center"
                     style={{ fontFamily: "'Cormorant Garamond', serif" }}
                  >
                     {selectedCategory ? activeCategory?.name : (
-                        <span className="inline-flex items-center gap-1 justify-center">
+                        <span 
+                            className="inline-flex items-center gap-1 justify-center"
+                            style={{
+                                color: '#162C1E', // Very dark forest/almost black green for debossed look
+                                textShadow: '0.5px 0.5px 0px rgba(197, 160, 89, 0.4), -0.5px -0.5px 0px rgba(0, 0, 0, 0.2)', // debossed subtle depth and golden reflection
+                            }}
+                        >
                             M
                             <span 
-                                className="inline-block select-none"
+                                className="inline-block select-none mx-1"
                                 style={{
                                     background: 'radial-gradient(circle at 35% 30%, rgba(255,255,255,0.75) 0%, rgba(255,255,255,0.15) 35%, transparent 70%), linear-gradient(to bottom, #F7E7A8 0%, #D9B45B 50%, #B8862F 100%)',
                                     WebkitBackgroundClip: 'text',
                                     WebkitTextFillColor: 'transparent',
+                                    WebkitTextStroke: '0px transparent', // override gold stroke on the star
+                                    textShadow: 'none', // override shadow on the star
                                 } as React.CSSProperties}
                              >
                                 ★
-                            </span>
+                             </span>
                             BRAVO
                         </span>
                     )}
@@ -2561,7 +3212,7 @@ const CollectionSection = () => {
                          initial={{ opacity: 0, y: 10 }}
                          whileInView={{ opacity: 1, y: 0 }}
                          transition={{ duration: 1, delay: 0.2 }}
-                         className="text-forest/60 text-lg md:text-xl font-light italic mt-6"
+                         className="text-forest/60 text-lg md:text-xl font-serif font-light italic mt-6"
                      >
                          O que começou como gesto torna-se matéria.
                      </motion.p>
@@ -2607,9 +3258,9 @@ const CollectionSection = () => {
                                         alt={cat.name} 
                                         className="w-full h-full object-cover grayscale brightness-75 group-hover:grayscale-0 group-hover:brightness-100 group-hover:scale-110 transition-all duration-[2s] ease-out"
                                     />
-                                    <div className="absolute inset-0 bg-gradient-to-t from-forest/90 via-forest/20 to-transparent flex flex-col justify-end p-12 translate-y-6 group-hover:translate-y-0 transition-transform duration-700">
-                                        <h3 className="text-4xl md:text-6xl font-serif text-cream mb-4">{cat.name}</h3>
-                                        <p className="text-cream/60 text-sm font-light mb-10 max-w-sm opacity-0 group-hover:opacity-100 transition-opacity duration-700">{cat.items}</p>
+                                    <div className="absolute inset-0 bg-gradient-to-t from-forest/90 via-forest/20 to-transparent flex flex-col justify-end p-6 sm:p-8 md:p-12 translate-y-6 group-hover:translate-y-0 transition-transform duration-700">
+                                        <h3 className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-serif text-cream mb-2 sm:mb-4">{cat.name}</h3>
+                                        <p className="text-cream/60 text-xs sm:text-sm font-light mb-6 sm:mb-10 max-w-sm opacity-0 group-hover:opacity-100 transition-opacity duration-700">{cat.items}</p>
                                     </div>
                                 </motion.div>
                             ))}
@@ -2790,7 +3441,28 @@ const Footer = () => {
     return (
         <footer className="bg-forest text-cream py-12 px-4 border-t border-cream/5">
             <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row justify-between items-center gap-16">
-                <Logo light className="opacity-50 h-28 md:h-48" />
+                <div className="flex flex-col items-center md:items-start gap-4">
+                    <Logo light className="opacity-50 h-28 md:h-48" />
+                    {/* Minimalist Soft-Gold Payment Seals */}
+                    <div className="flex items-center gap-4 text-[#C5A059]/40 mt-1" title="Métodos de Pagamento Seguros">
+                        {/* MBWAY */}
+                        <svg width="42" height="26" viewBox="0 0 42 26" fill="none" xmlns="http://www.w3.org/2000/svg" className="h-5 w-auto transition-opacity hover:opacity-100" stroke="currentColor" strokeWidth="1.2">
+                            <rect x="1" y="1" width="40" height="24" rx="5" />
+                            <text x="50%" y="58%" textAnchor="middle" fontSize="7.5" fontWeight="900" fontFamily="sans-serif" fill="currentColor" letterSpacing="0.05em">MB WAY</text>
+                        </svg>
+                        {/* MULTIBANCO */}
+                        <svg width="42" height="26" viewBox="0 0 42 26" fill="none" xmlns="http://www.w3.org/2000/svg" className="h-5 w-auto transition-opacity hover:opacity-100" stroke="currentColor" strokeWidth="1.2">
+                            <rect x="1" y="1" width="40" height="24" rx="5" />
+                            <path d="M10 8H32M10 13H32M10 18H22" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round"/>
+                            <text x="27" y="20" fontSize="6.5" fontWeight="900" fontFamily="sans-serif" fill="currentColor">MB</text>
+                        </svg>
+                        {/* VISA */}
+                        <svg width="42" height="26" viewBox="0 0 42 26" fill="none" xmlns="http://www.w3.org/2000/svg" className="h-5 w-auto transition-opacity hover:opacity-100" stroke="currentColor" strokeWidth="1.2">
+                            <rect x="1" y="1" width="40" height="24" rx="5" />
+                            <text x="50%" y="60%" textAnchor="middle" fontSize="8" fontStyle="italic" fontWeight="900" fontFamily="sans-serif" fill="currentColor" letterSpacing="0.05em">VISA</text>
+                        </svg>
+                    </div>
+                </div>
                 
                 <div className="flex gap-12 text-[10px] uppercase tracking-[0.2em] font-medium text-cream/30">
                     <a href="#" className="hover:text-cream transition-colors">FAQ</a>
