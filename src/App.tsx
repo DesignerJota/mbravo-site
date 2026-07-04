@@ -327,7 +327,7 @@ const SHOP_CATEGORIES = [
     id: 'vestuario',
     name: 'Vestuário',
     items: 'Bikini Set, Triangle Top, Ponchos, Cardigans',
-    img: 'https://i.ibb.co/s9GKBBpQ/IMG-2699-02.jpg',
+    img: 'https://i.ibb.co/DDt8QMp1/Capa-Vestuario.png',
     products: [
       { 
         id: 'v1', 
@@ -426,7 +426,7 @@ const SHOP_CATEGORIES = [
     id: 'premium',
     name: 'Acessórios',
     items: 'Bandanas, Headbands, Scarf Hip Bandana',
-    img: 'https://i.ibb.co/NdQjvs6c/IMG-2782.jpg',
+    img: 'https://i.ibb.co/QvVDLDp3/Capa-Acessorios.png',
     products: [
       { 
         id: 'v3', 
