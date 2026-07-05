@@ -48,7 +48,7 @@ const BASE_PRICES: { [key: string]: number | string } = {
     'booksleeve': 25,
     'stella cushion': 20,
     'dragonfly bandana': 22,
-    'bandana': 20,
+    'classic bandana': 20,
     'scarf hip bandana': 22,
     'dragonfly headband': 12,
     'placemats': 12,
@@ -136,12 +136,12 @@ const SHOP_CATEGORIES = [
         id: 'h1', 
         name: 'Daisy Coasters', 
         price: calculateProductRange('Daisy Coasters'), 
-        img: 'https://i.ibb.co/KcDFpYzx/mockup-coosters-luxury-1.png',
+        img: 'https://i.ibb.co/mCmVm2rL/mockup-coosters-luxury-1.png',
         images: [
-          'https://i.ibb.co/KcDFpYzx/mockup-coosters-luxury-1.png',
-          'https://i.ibb.co/xKKjH57r/IMG-20260430-WA0002.jpg',
-          'https://i.ibb.co/ZRYgJ5m6/IMG-2121.jpg',
-          'https://i.ibb.co/Dg9QgZ0H/IMG-2126.jpg'
+          'https://i.ibb.co/mCmVm2rL/mockup-coosters-luxury-1.png',
+          'https://i.ibb.co/B2RnQ4cJ/mockup-coosters-luxury-4.png',
+          'https://i.ibb.co/tTzJFNwF/mockup-coosters-luxury-3.png',
+          'https://i.ibb.co/qL0PPg2G/mockup-coosters-luxury-2.png'
         ],
         description: "Bases em crochet inspiradas na delicadeza das margaridas e nos tons suaves da natureza. Um conjunto handmade pensado para trazer um toque cozy e acolhedor ao teu espaço.",
         material: "- Material: 100% algodão",
@@ -164,12 +164,11 @@ const SHOP_CATEGORIES = [
         id: 'h1c', 
         name: 'Sunflower Coasters', 
         price: calculateProductRange('Sunflower Coasters'), 
-        img: 'https://i.ibb.co/XfkbNYF8/Sunflower-coasters-1.png',
+        img: 'https://i.ibb.co/7mtncnc/Sunflower-coasters-2.png',
         images: [
-          'https://i.ibb.co/XfkbNYF8/Sunflower-coasters-1.png',
-          'https://i.ibb.co/gMD6gQR4/Sunflower-coasters-3.jpg',
-          'https://i.ibb.co/SX1R4pSF/Sunflower-coasters-2.jpg',
-          'https://i.ibb.co/QvHhvxvf/Sunflower-coasters.jpg'
+          'https://i.ibb.co/7mtncnc/Sunflower-coasters-2.png',
+          'https://i.ibb.co/JWxHQQwY/Sunflower-coasters-3.png',
+          'https://i.ibb.co/27J2MWwz/Sunflower-coasters-4-4.png'
         ],
         description: "Bases em crochet inspiradas na beleza dos girassóis e nos seus tons quentes e acolhedores. Um conjunto handmade pensado para trazer um toque cozy e luminoso ao teu espaço.",
         material: "- Material: 100% algodão",
@@ -195,7 +194,7 @@ const SHOP_CATEGORIES = [
         price: calculateProductRange('Pink Coasters'), 
         img: 'https://i.ibb.co/wZvSQ5zv/Pink-coasters.png',
         images: [
-          'https://i.ibb.co/wZvSQ5zv/Pink-coasters.png',
+          'https://i.ibb.co/ccTK53Lm/Pink-coasters2.png',
           'https://i.ibb.co/gL02D64Q/Pink-coasters-2.jpg',
           'https://i.ibb.co/PvqVqpty/Pink-coasters-3.jpg',
           'https://i.ibb.co/kVSX4zy1/Pink-coasters-1.jpg'
@@ -222,22 +221,19 @@ const SHOP_CATEGORIES = [
   {
     id: 'bags',
     name: 'Malas',
-    items: 'African Flower Pouch, Mini Pouches, AirPods Case, Granny Square Sling Bag, Mini shell Pouch',
+    items: ' Mini Pouches, AirPods Case',
     img: 'https://i.ibb.co/nM8RVGGt/Capa-Malas.png',
     products: [
       { 
         id: 'b1', 
         name: 'African Flower Pouch', 
         price: calculateProductRange('African Flower Pouch'), 
-        img: 'https://i.ibb.co/PvjVXHPV/pouch-luxury-1.png',
+        img: 'https://i.ibb.co/NnCJyRTF/African-Flower-Pouch-10-1.png',
         images: [
-          'https://i.ibb.co/PvjVXHPV/pouch-luxury-1.png',
-          'https://i.ibb.co/bhybFwG/Pouch-1.png',
-          'https://i.ibb.co/dws6Z36H/Pouch-2.png',
-          'https://i.ibb.co/7JGsMDKN/Pouch-4.png',
           'https://i.ibb.co/NnCJyRTF/African-Flower-Pouch-10-1.png',
           'https://i.ibb.co/TDL7gj28/African-Flower-Pouch-112-1.png',
-          'https://i.ibb.co/jk86rkbh/Firefly-7.jpg'
+          'https://i.ibb.co/jk86rkbh/Firefly-7.jpg',
+          'https://i.ibb.co/PvjVXHPV/pouch-luxury-1.png',
         ],
         description: "Pouch em crochet com padrão African Flower, cuidadosamente feito à mão e forrado no interior para maior estrutura e proteção. Finalizado com fecho, é perfeito para guardar os teus essenciais do dia a dia com um toque cozy e handmade.",
         material: "- Material: 100% algodão\n- Detalhe: Forro interior em tecido",
@@ -251,16 +247,11 @@ const SHOP_CATEGORIES = [
         img: 'https://i.ibb.co/4RdPTkr4/Mini-pouches-CAPA.png',
         images: [
           'https://i.ibb.co/4RdPTkr4/Mini-pouches-CAPA.png',
-          'https://i.ibb.co/rCrBDcM/Mini-pouches-LOGO.png',
           'https://i.ibb.co/GfxGK5d3/Mini-pouches-9.jpg',
           'https://i.ibb.co/1fcmcPSM/Mini-pouches-7.jpg',
-          'https://i.ibb.co/356r9hSN/Mini-pouches-12.jpg',
-          'https://i.ibb.co/JWV9Xp16/Mini-pouches-15.png',
-          'https://i.ibb.co/VYShK64h/Mini-pouches-14.png',
-          'https://i.ibb.co/MDtDfPtp/Mini-pouches-17.png',
-          'https://i.ibb.co/kgc9PkSp/Mini-pouches-16.png'
+          'https://i.ibb.co/356r9hSN/Mini-pouches-12.jpg'
         ],
-        description: "Mini pouches em crochet feitas à mão, perfeitas para organizar os teus pequenos essenciais com charme, elegância e um toque de carinho. Práticas e delicadas, ideais para o dia a dia.",
+        description: "Mini pouch em crochet com design inspirado em conchas, cuidadosamente feita à mão. Compacta e prática, fecha com um botão de madeira com estrela, um detalhe especial que reflete a identidade da marca, sendo perfeita para guardar os teus essenciais do dia a dia com um toque cozy e handmade.\nIdeal para moedas, auriculares/AirPods, anéis e pequenos tesouros do dia a dia.\nDimensões aproximadas: 8,5 cm (largura) × 7,5 cm (altura)",
         material: "- Material: 100% algodão",
         care: "- Lavagem delicada à mão\n- Secar ao ar em superfície plana"
       },
@@ -268,13 +259,11 @@ const SHOP_CATEGORIES = [
         id: 'b1_airpods', 
         name: 'AirPods Case', 
         price: calculateProductRange('AirPods Case'), 
-        img: 'https://i.ibb.co/cKQz9Q2L/Air-Pods-case-9.jpg',
+        img: 'https://i.ibb.co/b5QdC7vh/Air-Pods-case-9.jpg',
         images: [
-          'https://i.ibb.co/cKQz9Q2L/Air-Pods-case-9.jpg',
+          'https://i.ibb.co/b5QdC7vh/Air-Pods-case-9.jpg',
           'https://i.ibb.co/YBmMhjqX/Firefly-8.jpg',
-          'https://i.ibb.co/S4zY5CbT/Air-Pods-case-1.jpg',
-          'https://i.ibb.co/qMdr29kJ/Air-Pods-case-10-1.jpg',
-          'https://i.ibb.co/qX9C1Qd/Air-Pods-case-11-2.jpg'
+          'https://i.ibb.co/S4zY5CbT/Air-Pods-case-1.jpg'
         ],
         description: "Capa para AirPods em crochet feita à mão, criada para proteger os teus auriculares com charme, estilo e um toque cozy especial. Prática, delicada e perfeita para o dia a dia.",
         material: "- Material: 100% algodão",
@@ -289,13 +278,9 @@ const SHOP_CATEGORIES = [
           'https://i.ibb.co/wNdC8NNG/Granny-square-sling-bag-20.png',
           'https://i.ibb.co/1t3HW02t/Granny-square-sling-bag-12.png',
           'https://i.ibb.co/JjC82Njj/Granny-square-sling-bag-13.png',
-          'https://i.ibb.co/Df0JxNDd/Granny-square-sling-bag-14.png',
-          'https://i.ibb.co/TDJv9VjK/Granny-square-sling-bag-16.png',
-          'https://i.ibb.co/wZ3G1WDH/Granny-square-sling-bag-17.png',
-          'https://i.ibb.co/1Yw7mWzG/Granny-square-sling-bag-18.png',
-          'https://i.ibb.co/6cs3nMkY/Granny-square-sling-bag-19.png'
+          'https://i.ibb.co/Df0JxNDd/Granny-square-sling-bag-14.png'
         ],
-        description: "Mala de ombro de estilo 'sling bag' em crochet, com padrão clássico granny square. Feita inteiramente à mão no nosso atelier com fios selecionados de alta qualidade. Combina um design retro nostálgico com a praticidade moderna, ideal para transportar os seus essenciais diários com máxima elegância e originalidade.",
+        description: "Mala em crochet com padrão Granny Square floral, cuidadosamente feita à mão e forrada no interior para maior estrutura e durabilidade. Com alça ajustável e fecho de correr, pode ser usada à cintura, a tiracolo ou ao ombro, adaptando-se facilmente ao teu estilo e às tuas necessidades do dia a dia.\nDimensões aproximadas: 26 cm (largura) × 11 cm (altura)",
         material: "- Material: 100% algodão de alta qualidade\n- Detalhe: Forro interno macio para maior segurança e estrutura",
         care: "- Lavagem delicada à mão\n- Secar ao ar horizontalmente\n- Não utilizar máquina de secar"
       },
@@ -306,16 +291,7 @@ const SHOP_CATEGORIES = [
         img: 'https://i.ibb.co/xqMXmg3T/Mini-shell-Pouch-18.png',
         images: [
           'https://i.ibb.co/xqMXmg3T/Mini-shell-Pouch-18.png',
-          'https://i.ibb.co/xKMWpG5g/Mini-shell-Pouch-8.png',
-          'https://i.ibb.co/Wvy7HswX/Mini-shell-Pouch-9.png',
-          'https://i.ibb.co/FLvMYjWs/Mini-shell-Pouch-10.png',
-          'https://i.ibb.co/Q3d5Qrsq/Mini-shell-Pouch-11.png',
-          'https://i.ibb.co/d0sYHCht/Mini-shell-Pouch-12.png',
-          'https://i.ibb.co/dwwKCMS8/Mini-shell-Pouch-13.png',
-          'https://i.ibb.co/50JHRC0/Mini-shell-Pouch-14.png',
-          'https://i.ibb.co/7xDSCbWt/Mini-shell-Pouch-15.png',
-          'https://i.ibb.co/jvwp8PYN/Mini-shell-Pouch-16.png',
-          'https://i.ibb.co/Y7R6Hx30/Mini-shell-Pouch-17.png'
+          'https://i.ibb.co/xKMWpG5g/Mini-shell-Pouch-8.png'
         ],
         description: "Elegante mini bolsa em crochet com padrão de conchas texturizado em relevo ('shell stitch'). Tecida meticulosamente à mão com fios de algodão premium, é o acessório perfeito para organizar pequenos cosméticos, cartões ou joias, aliando delicadeza artesanal e sofisticação intemporal.",
         material: "- Material: 100% algodão mercerizado de alta qualidade\n- Detalhe: Fecho metálico delicado e acabamento interior premium",
@@ -326,7 +302,7 @@ const SHOP_CATEGORIES = [
   {
     id: 'vestuario',
     name: 'Vestuário',
-    items: 'Bikini Set, Triangle Top, Ponchos, Cardigans',
+    items: 'Bikini, Ponchos, Cardigans',
     img: 'https://i.ibb.co/DDt8QMp1/Capa-Vestuario.png',
     products: [
       { 
@@ -336,13 +312,9 @@ const SHOP_CATEGORIES = [
         img: 'https://i.ibb.co/whQzXMvv/Bikini-CAPA.png',
         images: [
           'https://i.ibb.co/whQzXMvv/Bikini-CAPA.png',
-          'https://i.ibb.co/Dfzz9dm2/BIKINI-FRENTE.png',
-          'https://i.ibb.co/NnHNVj8R/Marea-Bikini-Set05.png',
-          'https://i.ibb.co/zVN7TS5v/Marea-Bikini-Set03.png',
-          'https://i.ibb.co/Rk6MD3b6/Marea-Bikini-Set04.png',
-          'https://i.ibb.co/GQ7B8VGt/Marea-Bikini-Set.png',
+          'https://i.ibb.co/Dfzz9dm2/BIKINI-FRENTE.png'
         ],
-        description: "Bikini set em crochet feito à mão, com um toque artesanal único e elegante. Perfeito para os dias de sol e mar, oferecendo conforto e um estilo exclusivo para a praia ou piscina. Disponível em várias cores vibrantes e neutras.",
+        description: "Biquíni em crochet feito à mão, pensado para os dias de verão e momentos à beira-mar. O Marea Bikini combina um design de riscas delicadas com um ajuste confortável, criando um look handmade, minimalista e cozy. Disponível em várias combinações de cores.",
         material: "- Material: 100% algodão",
         care: "- Lavar à mão\n- Secar à sombra"
       },
@@ -353,17 +325,10 @@ const SHOP_CATEGORIES = [
         img: 'https://i.ibb.co/j9LYMvVw/Marea-Triangle-Top10-2.jpg',
         images: [
           'https://i.ibb.co/j9LYMvVw/Marea-Triangle-Top10-2.jpg',
-          'https://i.ibb.co/FM5Q1ct/Marea-Triangle-Top09.jpg',
-          'https://i.ibb.co/PLsP727/Marea-Triangle-Top02.png',
-          'https://i.ibb.co/8q58Xzd/Marea-Triangle-Top04.png',
-          'https://i.ibb.co/PzCPh6Tn/Marea-Triangle-Top03.png',
           'https://i.ibb.co/8gjmkHJL/Marea-Triangle-Top05.png',
-          'https://i.ibb.co/Gvh7mHth/Marea-Triangle-Top08.png',
-          'https://i.ibb.co/R4bW2xMP/Marea-Triangle-Top11-1.jpg',
-          'https://i.ibb.co/cKcyDcN8/Marea-Triangle-Top11-1.png',
-          'https://i.ibb.co/YBnsJYzY/Marea-Triangle-Top11-2.jpg'
+          'https://i.ibb.co/Gvh7mHth/Marea-Triangle-Top08.png'
         ],
-        description: "Top de biquíni em formato triângulo feito à mão em crochet, com um toque artesanal único e elegante. Perfeito para os dias de sol e mar, proporcionando conforto, versatilidade e um design intemporal.",
+        description: "Top de biquíni em crochet feito à mão, com design triangular clássico e fitas ajustáveis para maior conforto. O Marea Triangle Top foi pensado para combinar conforto e um look delicado de verão.",
         material: "- Material: 100% algodão",
         care: "- Lavar à mão\n- Secar à sombra"
       },
@@ -425,7 +390,7 @@ const SHOP_CATEGORIES = [
   {
     id: 'premium',
     name: 'Acessórios',
-    items: 'Bandanas, Headbands, Scarf Hip Bandana',
+    items: 'Bandanas, Headbands,',
     img: 'https://i.ibb.co/QvVDLDp3/Capa-Acessorios.png',
     products: [
       { 
@@ -439,10 +404,7 @@ const SHOP_CATEGORIES = [
           'https://i.ibb.co/V00ntjtS/Bandana-LIBELINHA-3.jpg',
           'https://i.ibb.co/CpfWF52W/Bandana-LIBELINHA-4.jpg',
           'https://i.ibb.co/nNbwppxF/Bandana-LIBELINHA-capa.png',
-          'https://i.ibb.co/ycdCNGhn/Bandanas-5.png',
-          'https://i.ibb.co/ycdJCtrC/Bandanas-4.png',
           'https://i.ibb.co/M5hJdHrK/Dragonfly-Bandana-Libelinha-1.png',
-          'https://i.ibb.co/Gf5WJzvk/Dragonfly-Bandana-Libelinha-2.png',
           'https://i.ibb.co/HDzn9x8m/Dragonfly-Bandana-Libelinha-3.png'
         ],
         description: "Bandana em crochet com delicado padrão de libelinhas, feita à mão para dar um toque cozy e especial ao teu look. Leve, confortável e versátil, perfeita para usar no dia a dia. Disponível em várias cores e em duas opções de material.",
@@ -451,8 +413,8 @@ const SHOP_CATEGORIES = [
       },
       { 
         id: 'v3b', 
-        name: 'Bandana', 
-        price: calculateProductRange('Bandana'), 
+        name: 'Classic Bandana', 
+        price: calculateProductRange('Classic Bandana'), 
         img: 'https://i.ibb.co/PZHFmt0D/Bandanas-2.png',
         images: [
           'https://i.ibb.co/PZHFmt0D/Bandanas-2.png',
@@ -460,7 +422,8 @@ const SHOP_CATEGORIES = [
           'https://i.ibb.co/JjHRR7vq/Bandanas-3.png',
           'https://i.ibb.co/HfSJtngW/Bandanas-1.png'
         ],
-        material: "Esta Bandana é produzida em 100% Algodão Egípcio Safran. A suavidade deste fio nobre respeita a sensibilidade da pele.",
+        description: "Bandana em crochet de design clássico, cuidadosamente feita à mão. Leve, versátil e confortável, é o acessório perfeito para dar um toque especial e artesanal ao teu visual do dia a dia.",
+        material: "Esta Classic Bandana é produzida em 100% Algodão Egípcio Safran. A suavidade deste fio nobre respeita a sensibilidade da pele.",
         care: "Lavar à mão com sabão neutro. Secar à sombra."
       },
       { 
@@ -470,10 +433,6 @@ const SHOP_CATEGORIES = [
         img: 'https://i.ibb.co/BHMDJZGM/Dragonfly-Headband.png',
         images: [
           'https://i.ibb.co/BHMDJZGM/Dragonfly-Headband.png',
-          'https://i.ibb.co/9Hj06pQ7/Dragonfly-Headband-2.png',
-          'https://i.ibb.co/8DTVnTcH/Dragonfly-Headband-1.png',
-          'https://i.ibb.co/sdBrQ9sx/Headband-Dragonfly-2.png',
-          'https://i.ibb.co/LX181Qts/Headband-Dragonfly-4.png',
           'https://i.ibb.co/zWwqkHxZ/Dragonfly-Headband-Costas.png'
         ],
         description: "Headband em crochet com delicado padrão de libelinhas, feita à mão para um toque leve e especial no dia a dia. Confortável, versátil e perfeita para complementar qualquer look com um detalhe handmade e cozy. Disponível em várias cores.",
@@ -484,17 +443,12 @@ const SHOP_CATEGORIES = [
         id: 'v3c', 
         name: 'Scarf Hip Bandana', 
         price: calculateProductRange('Scarf Hip Bandana'), 
-        img: 'https://i.ibb.co/nM17XqPf/Scarf-Hip-Bandana-3.png',
+        img: 'https://i.ibb.co/FqKX8F3t/Scarf-Hip-Bandana-12.png',
         images: [
-          'https://i.ibb.co/nM17XqPf/Scarf-Hip-Bandana-3.png',
-          'https://i.ibb.co/bRQPfFX1/Scarf-Hip-Bandana-4.png',
           'https://i.ibb.co/FqKX8F3t/Scarf-Hip-Bandana-12.png',
-          'https://i.ibb.co/8njFLFCK/Scarf-Hip-Bandana-9.png',
           'https://i.ibb.co/TBp4xHWs/Scarf-Hip-Bandana-10.png',
           'https://i.ibb.co/dsXdhvSg/Scarf-Hip-Bandana-13.png',
-          'https://i.ibb.co/0pn5hCsJ/Scarf-Hip-Bandana-14.png',
-          'https://i.ibb.co/yB5QZ0rP/Scarf-Hip-Bandana-20.png',
-          'https://i.ibb.co/dJ6hjPdC/Scarf-Hip-Bandana-16.png'
+          'https://i.ibb.co/yB5QZ0rP/Scarf-Hip-Bandana-20.png'
         ],
         description: "Versátil e charmosa bandana/lenço de quadril ('scarf hip bandana') tecida inteiramente à mão em crochet. Com um padrão delicado e franjas elegantes, é o acessório ideal para dar um toque boémio, descontraído e cheio de personalidade ao seu look de praia, festival ou dia a dia.",
         material: "- Material: 100% algodão premium leve e fresco\n- Acabamento: Detalhe de franjas artesanais na extremidade",
@@ -530,8 +484,6 @@ const PRODUCTS = [
 ];
 
 // --- Components ---
-
-const NoiseOverlay = () => <div className="noise-overlay" />;
 
 const LogoIcon = ({ className = "h-6", light = false }: { className?: string; light?: boolean }) => {
   const color = light ? '#FAF9F6' : '#243119';
@@ -1834,10 +1786,19 @@ interface ProductCardProps {
 }
 
 const ProductCard: React.FC<ProductCardProps> = ({ product, i, isFocused, isSubdued, onFocus, onPrevProduct, onNextProduct }) => {
+    const isAfricanFlowerPouch = product.name.toLowerCase().includes('african flower pouch');
+    const isMiniPouches = product.name.toLowerCase().includes('mini pouches');
+    const isDualColor = isAfricanFlowerPouch || 
+                        product.name.toLowerCase().includes('marea bikini set') ||
+                        product.name.toLowerCase().includes('marea triangle top') ||
+                        product.name.toLowerCase().includes('signature granny poncho') ||
+                        product.name.toLowerCase().includes('cardigan');
+    const initialColor = isDualColor ? 'Verde Musgo & Creme' : 'Verde Musgo';
     const defaultSize = product.sizes ? product.sizes[0] : 'M';
     const [selections, setSelections] = useState({
         tamanho: defaultSize,
-        cor: 'Verde Musgo',
+        cor: initialColor,
+        corFio: isMiniPouches ? 'Branco Creme' : '',
         quantidade: product.name.toLowerCase().includes('coasters') ? '4und.' : '2und.',
         fecho: '',
         forro: '',
@@ -1881,8 +1842,12 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, i, isFocused, isSubd
     const isVestuario = n.includes('bikini') || n.includes('top') || n.includes('cardigan') || n.includes('poncho') || n.includes('belt') || n.includes('bandana') || n.includes('headband');
     const isBag = n.includes('bag') || n.includes('pouch') || n.includes('booksleeve') || n.includes('clutch');
     const isHomeSet = n.includes('coasters') || n.includes('placemats');
+    const isCoaster = n.includes('coasters');
     
-    const hasSize = isVestuario;
+    const hasSize = isVestuario && 
+                    !n.includes('dragonfly bandana') && 
+                    !n.includes('classic bandana') && 
+                    !n.includes('dragonfly headband');
 
     const hasQuantity = isHomeSet;
 
@@ -1917,10 +1882,10 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, i, isFocused, isSubd
         ? `${rawPrice * (hasQuantity ? (parseInt(selections.quantidade) || 1) : 1)}`
         : 'Sob Consulta';
     const selectedSize = hasSize ? selections.tamanho : 'Não aplicável';
-    const selectedColor = selections.cor;
+    const selectedColor = isCoaster ? 'Padrão' : selections.cor;
     const quantity = hasQuantity ? selections.quantidade : '1';
 
-    const messageText = `Olá Carolina! Quero encomendar uma peça M★BRAVO.\n\nProduto: ${product.name}\nTamanho: ${selectedSize}\nCor: ${selectedColor}\nQuantidade: ${quantity}\n\nValor Total: ${totalPrice}€\n\nFico a aguardar os detalhes para combinarmos o envio e o pagamento. Obrigada!`;
+    const messageText = `Olá Carolina! Quero encomendar uma peça M★BRAVO.\n\nProduto: ${product.name}\nTamanho: ${selectedSize}\n${isCoaster ? '' : (isMiniPouches ? `Cor do Saquinho: ${selectedColor}\nCor do Fio: ${selections.corFio}\n` : `Cor: ${selectedColor}\n`)}Quantidade: ${quantity}\n\nValor Total: ${totalPrice}€\n\nFico a aguardar os detalhes para combinarmos o envio e o pagamento. Obrigada!`;
 
     const whatsappUrl = `https://wa.me/351912828182?text=${encodeURIComponent(messageText)}`;
 
@@ -1928,7 +1893,8 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, i, isFocused, isSubd
         if (!isFocused) {
             setSelections({ 
                 tamanho: product.sizes ? product.sizes[0] : 'M', 
-                cor: 'Verde Musgo', 
+                cor: initialColor, 
+                corFio: isMiniPouches ? 'Branco Creme' : '',
                 quantidade: product.name.toLowerCase().includes('coasters') ? '4und.' : '2und.', 
                 fecho: '', 
                 forro: '', 
@@ -1955,14 +1921,26 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, i, isFocused, isSubd
         }
     }, [isFocused, product.name, product.sizes]);
 
-    const sizes = product.sizes || (product.name.toLowerCase().includes('marea bikini') 
+    const sizes = product.sizes || (product.name.toLowerCase().includes('marea bikini') || product.name.toLowerCase().includes('marea triangle top')
         ? ['XS', 'S', 'M', 'L'] 
         : ['S', 'M', 'L']);
-    const quantities = product.name.toLowerCase().includes('coasters')
-        ? ['4und.', '6und.', '8und.']
+    const quantities = isCoaster
+        ? ['1und.', '2und.', '4und.', '6und.', '8und.']
         : ['2und.', '4und.', '6und.', '8und.'];
 
-    const colors = [
+    const colors = isDualColor ? [
+        { name: 'Verde Musgo & Creme', bg: 'linear-gradient(45deg, #2E3B26 50%, #F5F2ED 50%)' },
+        { name: 'Azul Noite & Creme', bg: 'linear-gradient(45deg, #1C2D37 50%, #F5F2ED 50%)' },
+        { name: 'Terracota & Areia', bg: 'linear-gradient(45deg, #A85B40 50%, #E3D9C6 50%)' },
+        { name: 'Mostarda & Verde Floresta', bg: 'linear-gradient(45deg, #D4A33B 50%, #1A281A 50%)' }
+    ] : isMiniPouches ? [
+        { name: 'Verde Musgo', hex: '#2E3B26' },
+        { name: 'Azul Noite', hex: '#1C2D37' },
+        { name: 'Amarelo Baunilha', hex: '#F2E3A9' },
+        { name: 'Terracota', hex: '#A85B40' },
+        { name: 'Branco Creme', hex: '#F5F2ED' },
+        { name: 'Rosa Quartzo Subtil', hex: '#EADAD6' }
+    ] : [
         { name: 'Verde Musgo', hex: '#243119' },
         { name: 'Hortelã-Pimenta', hex: '#789D8A' },
         { name: 'Petróleo', hex: '#005F6B' },
@@ -1973,6 +1951,19 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, i, isFocused, isSubd
         { name: 'Rosa Ternura', hex: '#FADADD' },
         { name: 'Castanho', hex: '#5D4037' },
         { name: 'Branco', hex: '#FFFFFF' }
+    ];
+
+    const yarnColors = isMiniPouches ? [
+        { name: 'Verde Musgo', hex: '#2E3B26' },
+        { name: 'Azul Noite', hex: '#1C2D37' },
+        { name: 'Amarelo Baunilha', hex: '#F2E3A9' },
+        { name: 'Terracota', hex: '#A85B40' },
+        { name: 'Branco Creme', hex: '#F5F2ED' },
+        { name: 'Rosa Quartzo Subtil', hex: '#EADAD6' }
+    ] : [
+        { name: 'Algodão Cru', hex: '#EFECE6' },
+        { name: 'Cacau Escuro', hex: '#4A3728' },
+        { name: 'Oliva Suave', hex: '#556B2F' }
     ];
 
     const handleToggle = () => {
@@ -1995,12 +1986,15 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, i, isFocused, isSubd
                         onClick={handleToggle}
                         style={{ borderTopLeftRadius: '16px', borderTopRightRadius: '16px' }}
                     >
-                        <div className="relative w-full h-full overflow-hidden bg-[#FAF8F5]/50">
+                        <div className="relative w-full h-full overflow-hidden bg-white">
                             <motion.img 
                                 layoutId={`product-img-${product.id}`}
                                 src={productImages[0]} 
                                 alt={product.name} 
-                                className="w-full h-full object-cover group-hover:scale-[1.05] transition-transform duration-700 ease-out"
+                                loading="eager"
+                                decoding="sync"
+                                style={{ imageRendering: 'crisp-edges', filter: 'none', opacity: 1 }}
+                                className="w-full h-full object-cover group-hover:scale-[1.05] transition-transform duration-700 ease-out antialiased filter-none opacity-100"
                             />
                         </div>
                         <div className="absolute top-4 left-4 z-10 pointer-events-none">
@@ -2035,56 +2029,40 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, i, isFocused, isSubd
     const currentImg = productImages[activeImgIndex];
 
     return (
+        <>
         <div className="w-full h-[100dvh] md:max-w-3xl md:h-[90vh] lg:max-w-6xl lg:h-[88vh] bg-[#FCFBF9] rounded-none md:rounded-[2rem] lg:rounded-[2.5rem] flex flex-col lg:flex-row shadow-2xl relative overflow-y-auto lg:overflow-hidden text-forest select-none">
             {/* a) Área de Visualização */}
             <div 
-                className={`transition-all duration-500 ease-in-out relative flex flex-col items-center justify-center p-6 lg:p-12 overflow-hidden bg-[#141A11] ${
-                    isZoomed 
-                        ? 'fixed inset-0 z-[140] w-screen h-screen bg-black/98 p-4 lg:p-8 border-none' 
-                        : 'w-full lg:w-[62%] h-[46vh] md:h-[50vh] lg:h-full shrink-0 border-b lg:border-b-0 lg:border-r border-white/5'
-                }`}
+                className="w-full lg:w-[62%] h-[52vh] md:h-[56vh] lg:h-full shrink-0 border-b lg:border-b-0 lg:border-r border-forest/10 p-1 sm:p-2 lg:p-4 flex flex-col items-center justify-center overflow-hidden bg-[#F5F2ED] relative transition-colors duration-500"
                 style={{ touchAction: 'none' }}
             >
-                {/* Back button from zoomed-in mode */}
-                {isZoomed && (
-                    <button 
-                        onClick={(e) => {
-                            e.stopPropagation();
-                            setIsZoomed(false);
-                        }}
-                        className="absolute top-6 right-6 z-50 p-3 rounded-full bg-white/10 hover:bg-white/25 text-white backdrop-blur-md transition-all border border-white/10 cursor-pointer"
-                        title="Fechar Zoom"
-                    >
-                        <X size={20} />
-                    </button>
-                )}
+                {/* Floating label in top-left corner */}
+                <div className="absolute top-6 left-6 z-20 pointer-events-none hidden lg:block">
+                    <span className="bg-forest/5 backdrop-blur-md text-forest/70 text-[8px] uppercase tracking-[0.25em] px-3.5 py-1.5 rounded-full border border-forest/10 font-medium">
+                        Clique para aproximar a foto
+                    </span>
+                </div>
 
-                {!isZoomed && (
-                    <>
-                        <div className="absolute top-6 left-6 z-20 pointer-events-none hidden lg:block">
-                            <span className="bg-white/15 backdrop-blur-md text-white/70 text-[8px] uppercase tracking-[0.25em] px-3.5 py-1.5 rounded-full border border-white/5">
-                                Clique para aproximar a foto
-                            </span>
-                        </div>
-                        {/* High-End Floating Close Button for Mobile/Tablet */}
-                        <button 
-                            onClick={handleToggle}
-                            className="fixed top-4 right-4 z-[150] lg:hidden p-3 rounded-full bg-black/60 hover:bg-black/80 text-white backdrop-blur-md transition-all border border-white/10 cursor-pointer flex items-center justify-center shadow-lg"
-                            title="Fechar Detalhes"
-                        >
-                            <X size={18} />
-                        </button>
-                    </>
-                )}
+                {/* High-End Floating Close Button for Mobile/Tablet */}
+                <button 
+                    onClick={handleToggle}
+                    className="fixed top-4 right-4 z-[150] lg:hidden p-3 rounded-full bg-forest text-cream backdrop-blur-md transition-all border border-forest/10 cursor-pointer flex items-center justify-center shadow-lg"
+                    title="Fechar Detalhes"
+                >
+                    <X size={18} />
+                </button>
 
                 {/* Main Proportional Visual Frame with layoutId */}
-                <div className="relative w-full h-full max-w-full max-h-[80vh] flex items-center justify-center">
+                <div className="relative w-full h-full max-w-full max-h-[82vh] flex items-center justify-center">
                     <AnimatePresence initial={false} custom={direction} mode="popLayout">
                         <motion.img 
                             key={activeImgIndex}
                             layoutId={activeImgIndex === 0 ? `product-img-${product.id}` : undefined}
                             src={currentImg} 
                             alt={`${product.name} - Imagem ${activeImgIndex + 1}`} 
+                            loading="eager"
+                            decoding="sync"
+                            style={{ imageRendering: 'crisp-edges', filter: 'none', opacity: 1 }}
                             custom={direction}
                             variants={slideVariants}
                             initial="enter"
@@ -2110,11 +2088,9 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, i, isFocused, isSubd
                                     }
                                 }
                             }}
-                            className={`max-w-full max-h-full object-contain cursor-grab active:cursor-grabbing select-none rounded-[1.5rem] transition-transform duration-300 ${
-                                isZoomed ? 'lg:max-h-[85vh] scale-[1.03]' : 'lg:max-h-[75vh] hover:scale-[1.01]'
-                            }`}
+                            className="max-w-full max-h-full object-contain cursor-grab active:cursor-grabbing select-none rounded-[1rem] sm:rounded-[1.5rem] transition-transform duration-300 hover:scale-[1.01] antialiased filter-none opacity-100"
                             onClick={() => {
-                                if (!isZoomed) setIsZoomed(true);
+                                setIsZoomed(true);
                             }}
                         />
                     </AnimatePresence>
@@ -2130,7 +2106,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, i, isFocused, isSubd
                                     setDirection(-1);
                                     setActiveImgIndex((prev) => (prev === 0 ? productImages.length - 1 : prev - 1));
                                 }}
-                                className="w-11 h-11 rounded-full bg-white/10 hover:bg-white text-white hover:text-forest backdrop-blur-md shadow-md flex items-center justify-center transition-all duration-300 pointer-events-auto hover:scale-105 active:scale-95 border border-white/5 cursor-pointer"
+                                className="w-11 h-11 rounded-full bg-[#FCFBF9]/85 hover:bg-forest text-forest hover:text-cream backdrop-blur-md shadow-md flex items-center justify-center transition-all duration-300 pointer-events-auto hover:scale-105 active:scale-95 border border-forest/5 cursor-pointer"
                             >
                                 <ChevronLeft size={20} />
                             </button>
@@ -2142,14 +2118,14 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, i, isFocused, isSubd
                                     setDirection(1);
                                     setActiveImgIndex((prev) => (prev === productImages.length - 1 ? 0 : prev + 1));
                                 }}
-                                className="w-11 h-11 rounded-full bg-white/10 hover:bg-white text-white hover:text-forest backdrop-blur-md shadow-md flex items-center justify-center transition-all duration-300 pointer-events-auto hover:scale-105 active:scale-95 border border-white/5 cursor-pointer"
+                                className="w-11 h-11 rounded-full bg-[#FCFBF9]/85 hover:bg-forest text-forest hover:text-cream backdrop-blur-md shadow-md flex items-center justify-center transition-all duration-300 pointer-events-auto hover:scale-105 active:scale-95 border border-forest/5 cursor-pointer"
                             >
                                 <ChevronRight size={20} />
                             </button>
                         </div>
 
                         {/* Pagination Indicator dots at bottom of viewing box */}
-                        <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-30 flex gap-2 bg-black/40 backdrop-blur-md px-4 py-2.5 rounded-full border border-white/5">
+                        <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-30 flex gap-2 bg-[#FCFBF9]/80 backdrop-blur-md px-4 py-2.5 rounded-full border border-forest/10">
                             {productImages.map((_, idx) => (
                                 <button
                                     key={idx}
@@ -2160,35 +2136,40 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, i, isFocused, isSubd
                                             setActiveImgIndex(idx);
                                         }
                                     }}
-                                    className={`h-1.5 rounded-full transition-all duration-300 ${idx === activeImgIndex ? 'w-5 bg-white' : 'w-1.5 bg-white/40 hover:bg-white'}`}
+                                    className={`h-1.5 rounded-full transition-all duration-300 ${idx === activeImgIndex ? 'w-5 bg-forest' : 'w-1.5 bg-forest/30 hover:bg-forest'}`}
                                 />
                             ))}
                         </div>
                         
                         {/* Interactive Luxury Thumbnails Strip in Viewer */}
-                        {!isZoomed && (
-                            <div className="absolute bottom-16 left-1/2 -translate-x-1/2 z-35 hidden lg:flex gap-2 p-1.5 bg-black/30 backdrop-blur-xl rounded-xl border border-white/10 max-w-[85%] overflow-x-auto no-scrollbar">
-                                {productImages.map((imgUrl, idx) => (
-                                    <button
-                                        key={idx}
-                                        onClick={(e) => {
-                                            e.stopPropagation();
-                                            if (idx !== activeImgIndex) {
-                                                setDirection(idx > activeImgIndex ? 1 : -1);
-                                                setActiveImgIndex(idx);
-                                            }
-                                        }}
-                                        className={`relative w-10 h-10 rounded-lg overflow-hidden border transition-all shrink-0 ${
-                                            idx === activeImgIndex 
-                                                ? 'border-white scale-95 shadow-lg' 
-                                                : 'border-transparent opacity-50 hover:opacity-100'
-                                        }`}
-                                    >
-                                        <img src={imgUrl} alt="" className="w-full h-full object-cover" />
-                                    </button>
-                                ))}
-                            </div>
-                        )}
+                        <div className="absolute bottom-16 left-1/2 -translate-x-1/2 z-35 hidden lg:flex gap-2 p-1.5 bg-[#FCFBF9]/90 backdrop-blur-xl rounded-xl border border-forest/10 max-w-[85%] overflow-x-auto no-scrollbar shadow-sm">
+                            {productImages.map((imgUrl, idx) => (
+                                <button
+                                    key={idx}
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        if (idx !== activeImgIndex) {
+                                            setDirection(idx > activeImgIndex ? 1 : -1);
+                                            setActiveImgIndex(idx);
+                                        }
+                                    }}
+                                    className={`relative w-10 h-10 rounded-lg overflow-hidden border transition-all shrink-0 ${
+                                        idx === activeImgIndex 
+                                            ? 'border-forest scale-95 shadow-md' 
+                                            : 'border-transparent opacity-60 hover:opacity-100'
+                                    }`}
+                                >
+                                    <img 
+                                        src={imgUrl} 
+                                        alt="" 
+                                        loading="eager"
+                                        decoding="sync"
+                                        style={{ imageRendering: 'crisp-edges', filter: 'none', opacity: 1 }}
+                                        className="w-full h-full object-cover antialiased filter-none opacity-100" 
+                                    />
+                                </button>
+                            ))}
+                        </div>
                     </>
                 )}
             </div>
@@ -2246,7 +2227,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, i, isFocused, isSubd
                                     <div className="flex justify-between border-b border-forest/5 pb-1.5">
                                         <span className="text-forest/40 uppercase tracking-wider text-[9px]">Configuração</span>
                                         <span className="font-semibold text-forest text-right">
-                                            {selections.cor} {hasSize && `| ${selections.tamanho}`} {hasQuantity && `| ${selections.quantidade}`}
+                                            {isCoaster ? '' : `${selections.cor} `}{isMiniPouches && `| Fio: ${selections.corFio} `}{hasSize && `| ${selections.tamanho}`} {hasQuantity && `| ${selections.quantidade}`}
                                         </span>
                                     </div>
                                     <div className="flex justify-between border-b border-forest/5 pb-1.5">
@@ -2310,11 +2291,18 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, i, isFocused, isSubd
                                     {/* Product Summary Mini Card */}
                                     <div className="bg-forest/5 rounded-2xl p-4 border border-forest/5 flex justify-between items-center gap-4">
                                         <div className="flex items-center gap-3">
-                                            <img src={productImages[0]} alt="" className="w-12 h-12 rounded-lg object-cover border border-forest/5" />
+                                            <img 
+                                                src={productImages[0]} 
+                                                alt="" 
+                                                loading="eager"
+                                                decoding="sync"
+                                                style={{ imageRendering: 'crisp-edges' }}
+                                                className="w-12 h-12 rounded-lg object-cover border border-forest/5 antialiased" 
+                                            />
                                             <div>
                                                 <span className="font-serif font-light text-sm text-forest block">{product.name}</span>
                                                 <span className="text-[10px] text-forest/50 uppercase tracking-wider">
-                                                    {selections.cor} {hasSize && `| ${selections.tamanho}`}
+                                                    {!isCoaster && `${selections.cor} `}{isMiniPouches && `| Fio: ${selections.corFio} `}{hasSize && `| ${selections.tamanho}`}
                                                 </span>
                                             </div>
                                         </div>
@@ -2776,30 +2764,72 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, i, isFocused, isSubd
                             {/* Container Comum para Seletores (Cores, Tamanho, Quantidade) com recuo explícito */}
                             <div id="selection-selectors-group" className="space-y-6 text-left w-full">
                                 {/* Cores */}
-                                <div className="space-y-2">
-                                    <div className="flex justify-between items-center">
-                                        <h5 className="text-[9px] uppercase tracking-[0.25em] font-bold text-forest/45 flex items-center gap-1.5">
-                                            <span className="text-[#C5A059] text-xs">●</span> COR DA PEÇA
-                                        </h5>
-                                        <span className="text-[9px] font-extrabold text-[#A68244] bg-[#FDF9F3] px-3 py-0.5 rounded-full border border-[#C5A059]/10">
-                                            {selections.cor}
-                                        </span>
+                                {!isCoaster && (
+                                    <div className="space-y-2">
+                                        <div className="flex justify-between items-center">
+                                            <h5 className="text-[9px] uppercase tracking-[0.25em] font-bold text-forest/45 flex items-center gap-1.5">
+                                                <span className="text-[#C5A059] text-xs">●</span> COR DA PEÇA
+                                            </h5>
+                                            <span className="text-[9px] font-extrabold text-[#A68244] bg-[#FDF9F3] px-3 py-0.5 rounded-full border border-[#C5A059]/10">
+                                                {selections.cor}
+                                            </span>
+                                        </div>
+                                        <div className="flex flex-wrap gap-2">
+                                            {colors.map(opt => (
+                                                <button 
+                                                    key={opt.name}
+                                                    onClick={() => setSelections(prev => ({ ...prev, cor: opt.name }))}
+                                                    className={`w-8 h-8 rounded-full border-2 transition-all p-0.5 cursor-pointer ${
+                                                        selections.cor === opt.name 
+                                                            ? (isDualColor 
+                                                                ? 'border-[#C5A059] scale-115 shadow-md shadow-[#C5A059]/25' 
+                                                                : 'border-forest scale-110 shadow-md shadow-forest/10')
+                                                            : 'border-transparent hover:scale-110'
+                                                    }`}
+                                                    title={opt.name}
+                                                >
+                                                    <div 
+                                                        className="w-full h-full rounded-full border border-forest/5" 
+                                                        style={opt.bg ? { background: opt.bg } : { backgroundColor: opt.hex }} 
+                                                    />
+                                                </button>
+                                            ))}
+                                        </div>
                                     </div>
-                                    <div className="flex flex-wrap gap-2">
-                                        {colors.map(opt => (
-                                            <button 
-                                                key={opt.name}
-                                                onClick={() => setSelections(prev => ({ ...prev, cor: opt.name }))}
-                                                className={`w-8 h-8 rounded-full border-2 transition-all p-0.5 cursor-pointer ${
-                                                    selections.cor === opt.name ? 'border-forest scale-110 shadow-md shadow-forest/10' : 'border-transparent hover:scale-110'
-                                                }`}
-                                                title={opt.name}
-                                            >
-                                                <div className="w-full h-full rounded-full border border-forest/5" style={{ backgroundColor: opt.hex }} />
-                                            </button>
-                                        ))}
+                                )}
+
+                                {/* Cor do Fio (Mini Pouches Only) */}
+                                {isMiniPouches && (
+                                    <div className="space-y-2">
+                                        <div className="flex justify-between items-center">
+                                            <h5 className="text-[9px] uppercase tracking-[0.25em] font-bold text-forest/45 flex items-center gap-1.5">
+                                                <span className="text-[#C5A059] text-xs">●</span> COR DO FIO
+                                            </h5>
+                                            <span className="text-[9px] font-extrabold text-[#A68244] bg-[#FDF9F3] px-3 py-0.5 rounded-full border border-[#C5A059]/10">
+                                                {selections.corFio}
+                                            </span>
+                                        </div>
+                                        <div className="flex flex-wrap gap-2">
+                                            {yarnColors.map(opt => (
+                                                <button 
+                                                    key={opt.name}
+                                                    onClick={() => setSelections(prev => ({ ...prev, corFio: opt.name }))}
+                                                    className={`w-8 h-8 rounded-full border-2 transition-all p-0.5 cursor-pointer ${
+                                                        selections.corFio === opt.name 
+                                                            ? 'border-forest scale-110 shadow-md shadow-forest/10'
+                                                            : 'border-transparent hover:scale-110'
+                                                    }`}
+                                                    title={opt.name}
+                                                >
+                                                    <div 
+                                                        className="w-full h-full rounded-full border border-forest/5" 
+                                                        style={{ backgroundColor: opt.hex }} 
+                                                    />
+                                                </button>
+                                            ))}
+                                        </div>
                                     </div>
-                                </div>
+                                )}
 
                                 {/* Tamanho */}
                                 {hasSize && (
@@ -2947,10 +2977,18 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, i, isFocused, isSubd
                                     </div>
 
                                     <div className="space-y-1.5 text-[11px] uppercase tracking-wider text-forest/80 font-normal">
-                                        <div className="flex justify-between items-center border-b border-forest/5 pb-1">
-                                            <span className="text-forest/40 text-[9px] tracking-[0.2em]">COR</span>
-                                            <span className="text-forest font-semibold">{selections.cor || 'Verde Musgo'}</span>
-                                        </div>
+                                        {!isCoaster && (
+                                            <div className="flex justify-between items-center border-b border-forest/5 pb-1">
+                                                <span className="text-forest/40 text-[9px] tracking-[0.2em]">{isMiniPouches ? 'COR DA PEÇA' : 'COR'}</span>
+                                                <span className="text-forest font-semibold">{selections.cor || 'Verde Musgo'}</span>
+                                            </div>
+                                        )}
+                                        {isMiniPouches && (
+                                            <div className="flex justify-between items-center border-b border-forest/5 pb-1">
+                                                <span className="text-forest/40 text-[9px] tracking-[0.2em]">COR DO FIO</span>
+                                                <span className="text-forest font-semibold">{selections.corFio || 'Branco Creme'}</span>
+                                            </div>
+                                        )}
                                         {hasSize && (
                                             <div className="flex justify-between items-center border-b border-forest/5 pb-1">
                                                 <span className="text-forest/40 text-[9px] tracking-[0.2em]">TAMANHO</span>
@@ -2986,11 +3024,19 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, i, isFocused, isSubd
                             </div>
 
                             <div className="space-y-1.5 mb-3.5 text-[11px] uppercase tracking-wider text-white/90 font-normal">
-                                <div className="flex justify-between items-center border-b border-white/5 pb-1">
-                                    <span className="text-white/40 text-[9px] tracking-[0.2em]">COR</span>
-                                    <span className="text-[#FCFBF9] font-semibold">{selections.cor || 'Verde Musgo'}</span>
-                                </div>
-                                {hasSize && (
+                                        {!isCoaster && (
+                                            <div className="flex justify-between items-center border-b border-white/5 pb-1">
+                                                <span className="text-white/40 text-[9px] tracking-[0.2em]">{isMiniPouches ? 'COR DA PEÇA' : 'COR'}</span>
+                                                <span className="text-[#FCFBF9] font-semibold">{selections.cor || 'Verde Musgo'}</span>
+                                            </div>
+                                        )}
+                                        {isMiniPouches && (
+                                            <div className="flex justify-between items-center border-b border-white/5 pb-1">
+                                                <span className="text-white/40 text-[9px] tracking-[0.2em]">COR DO FIO</span>
+                                                <span className="text-[#FCFBF9] font-semibold">{selections.corFio || 'Branco Creme'}</span>
+                                            </div>
+                                        )}
+                                        {hasSize && (
                                     <div className="flex justify-between items-center border-b border-white/5 pb-1">
                                         <span className="text-white/40 text-[9px] tracking-[0.2em]">TAMANHO</span>
                                         <span className="text-[#FCFBF9] font-semibold">{selections.tamanho}</span>
@@ -3077,6 +3123,51 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, i, isFocused, isSubd
                 </div>
             )}
         </div>
+
+        {/* HIGH-END INTERACTIVE REAL FULL-SCREEN ZOOM MODAL */}
+        <AnimatePresence>
+            {isZoomed && (
+                <motion.div 
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.25 }}
+                    onClick={() => setIsZoomed(false)}
+                    className="fixed inset-0 z-[1000] flex flex-col items-center justify-center bg-black/95 p-4 sm:p-6 lg:p-12 cursor-zoom-out select-none backdrop-blur-md"
+                >
+                    {/* Floating Close Button */}
+                    <button 
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            setIsZoomed(false);
+                        }}
+                        className="absolute top-6 right-6 z-[1010] p-4 rounded-full bg-white/10 hover:bg-white/20 text-white backdrop-blur-md transition-all border border-white/10 hover:scale-105 active:scale-95 cursor-pointer flex items-center justify-center shadow-2xl"
+                        title="Fechar Zoom"
+                    >
+                        <X size={24} />
+                    </button>
+
+                    {/* Interactive Large Image with scale transition */}
+                    <div className="relative w-full h-full max-w-5xl max-h-[85vh] flex items-center justify-center">
+                        <motion.img 
+                            initial={{ scale: 0.95, opacity: 0 }}
+                            animate={{ scale: 1, opacity: 1 }}
+                            exit={{ scale: 0.95, opacity: 0 }}
+                            transition={{ duration: 0.25, ease: "easeOut" }}
+                            src={currentImg} 
+                            alt={`${product.name} Zoom`}
+                            className="max-w-full max-h-full object-contain rounded-2xl shadow-2xl pointer-events-none"
+                        />
+                    </div>
+
+                    {/* Informative minimal note */}
+                    <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-10 text-white/50 text-[10px] uppercase tracking-widest font-sans font-light">
+                        Toca em qualquer lado para fechar
+                    </div>
+                </motion.div>
+            )}
+        </AnimatePresence>
+        </>
     );
 };
 
@@ -3168,10 +3259,10 @@ const CollectionSection = () => {
                          background: 'radial-gradient(circle, rgba(255,248,220,0.18) 0%, rgba(255,248,220,0.08) 35%, transparent 70%)'
                      }}
                  />
-                  <motion.span 
+                 <motion.span 
                     initial={{ opacity: 0 }}
                     whileInView={{ opacity: 1 }}
-                    className="text-[10px] uppercase tracking-[0.45em] font-bold text-forest/35 mb-4 block font-sans"
+                    className="text-xs tracking-[0.3em] text-gray-400 uppercase font-light mb-4 block"
                  >
                     PRODUTOS
                  </motion.span>
@@ -3180,7 +3271,7 @@ const CollectionSection = () => {
                     whileInView={{ opacity: 1, y: 0 }}
                     className="text-3xl xs:text-4xl sm:text-5xl md:text-6xl font-light tracking-[0.2em] uppercase leading-tight text-center"
                     style={{ fontFamily: "'Cormorant Garamond', serif" }}
-                 >
+                  >
                     {selectedCategory ? activeCategory?.name : (
                         <span 
                             className="inline-flex items-center gap-1 justify-center"
@@ -3199,7 +3290,7 @@ const CollectionSection = () => {
                                     WebkitTextStroke: '0px transparent', // override gold stroke on the star
                                     textShadow: 'none', // override shadow on the star
                                 } as React.CSSProperties}
-                             >
+                              >
                                 ★
                              </span>
                             BRAVO
@@ -3256,11 +3347,14 @@ const CollectionSection = () => {
                                     <img 
                                         src={cat.img} 
                                         alt={cat.name} 
-                                        className="w-full h-full object-cover grayscale brightness-75 group-hover:grayscale-0 group-hover:brightness-100 group-hover:scale-110 transition-all duration-[2s] ease-out"
+                                        loading="eager"
+                                        decoding="sync"
+                                        style={{ imageRendering: 'crisp-edges' }}
+                                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out antialiased"
                                     />
-                                    <div className="absolute inset-0 bg-gradient-to-t from-forest/90 via-forest/20 to-transparent flex flex-col justify-end p-6 sm:p-8 md:p-12 translate-y-6 group-hover:translate-y-0 transition-transform duration-700">
+                                    <div className="absolute inset-0 bg-gradient-to-t from-forest/90 via-forest/20 to-transparent flex flex-col justify-end p-6 sm:p-8 md:p-12 translate-y-0 md:translate-y-6 md:group-hover:translate-y-0 transition-transform duration-700">
                                         <h3 className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-serif text-cream mb-2 sm:mb-4">{cat.name}</h3>
-                                        <p className="text-cream/60 text-xs sm:text-sm font-light mb-6 sm:mb-10 max-w-sm opacity-0 group-hover:opacity-100 transition-opacity duration-700">{cat.items}</p>
+                                        <p className="text-cream/60 text-xs sm:text-sm font-light mb-6 sm:mb-10 max-w-sm opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-700">{cat.items}</p>
                                     </div>
                                 </motion.div>
                             ))}
@@ -3543,7 +3637,6 @@ export default function App() {
 
   return (
     <div className="relative min-h-screen bg-cream text-forest select-none overflow-x-hidden">
-      <NoiseOverlay />
       
       <AnimatePresence mode="wait">
         {loading ? (
