@@ -39,7 +39,7 @@ const BASE_PRICES: { [key: string]: number | string } = {
     'granny square sling bag': 55,
     'marea bikini set': 45,
     'luxury clutch': 35,
-    'marea triangle top': 25,
+    'coral bikini top': 25,
     'crystalline top': 25,
     'african flower pouch': 25,
     'mini pouches': 15,
@@ -54,10 +54,12 @@ const BASE_PRICES: { [key: string]: number | string } = {
     'placemats': 12,
     'bookmarks': 8,
     'daisycoasters': 4,
+    'coralinecoasters': 4,
     'yellowcoasters': 4,
     'sunflowercoasters': 4,
     'bluecoasters': 4,
-    'pinkcoasters': 4
+    'pinkcoasters': 4,
+    'classiccoasters': 4
 };
 
 const getApprovedPrice = (name: string): number | string => {
@@ -110,7 +112,7 @@ const parseMaterials = (text: string): MaterialOption[] => {
         let cleanLine = line.replace(/^[-*•●]\s*/, '').trim();
         
         // Match e.g. "Opção Leve: 100% algodão" or "Opção 2: 50% algodão / 50% lã" or "Material: 100% algodão"
-        const matchColon = cleanLine.match(/^(Opção\s+[0-9a-zA-Záéíóúâêîôûàèìòùãõç]+|Opção\s+Leve|Opção\s+Cozy|Composição|Material)\s*:\s*(.*)$/i);
+        const matchColon = cleanLine.match(/^(Opção\s+[0-9a-zA-Záéíóúâêîôûàèìòùãõç]+|Opção\s+Leve|Opção\s+Cozy|Composição|Material|Detalhes|Dimensões)\s*:\s*(.*)$/i);
         if (matchColon) {
             return {
                 title: matchColon[1],
@@ -148,19 +150,6 @@ const SHOP_CATEGORIES = [
         care: "- Lavagem delicada\n- Secar ao ar"
       },
       { 
-        id: 'h1b', 
-        name: 'Yellow Coasters', 
-        price: calculateProductRange('Yellow Coasters'), 
-        img: 'https://i.ibb.co/KzFkDncp/3-DD02495-9694-47-E5-92-DC-6-EAB62-CE957-B.png',
-        images: [
-          'https://i.ibb.co/KzFkDncp/3-DD02495-9694-47-E5-92-DC-6-EAB62-CE957-B.png',
-          'https://i.ibb.co/gZJhbCD6/IMG-2121.jpg'
-        ],
-        description: "Bases em crochet com um design floral delicado, pensadas para trazer um toque cozy e elegante ao teu espaço. Disponíveis em várias cores, mantendo sempre as pétalas brancas para um acabamento suave e delicado.",
-        material: "- Material: 100% algodão",
-        care: "- Lavagem delicada\n- Secar ao ar"
-      },
-      { 
         id: 'h1c', 
         name: 'Sunflower Coasters', 
         price: calculateProductRange('Sunflower Coasters'), 
@@ -175,31 +164,37 @@ const SHOP_CATEGORIES = [
         care: "- Lavagem delicada\n- Secar ao ar"
       },
       { 
-        id: 'h1d', 
-        name: 'Blue Coasters', 
-        price: calculateProductRange('Blue Coasters'), 
-        img: 'https://i.ibb.co/kV9xpfNL/Blue-coasters-2.png',
+        id: 'h1f', 
+        name: 'Coraline Coasters', 
+        price: calculateProductRange('Coraline Coasters'), 
+        img: 'https://i.ibb.co/mVxVF0MM/Coraline-coasters-2.png',
         images: [
-          'https://i.ibb.co/kV9xpfNL/Blue-coasters-2.png',
-          'https://i.ibb.co/HL6sMgBq/Blue-coasters-3.jpg',
-          'https://i.ibb.co/d437sBsp/Blue-coasters-4.jpg'
+          'https://i.ibb.co/mVxVF0MM/Coraline-coasters-2.png',
+          'https://i.ibb.co/FqyRfSw2/Coraline-coasters-3.png',
+          'https://i.ibb.co/VYmP3Mwv/Coraline-coasters-4.png',
+          'https://i.ibb.co/tpyY6NRY/Coraline-coasters-5.png'
         ],
-        description: "Bases em crochet com um design floral delicado, pensadas para trazer um toque cozy e elegante ao teu espaço. Disponíveis em várias cores, mantendo sempre as pétalas brancas para um acabamento suave e delicado.",
+        description: "Bases em crochet inspiradas no design Coraline, tecidas à mão com todo o carinho para trazer um toque aconchegante, elegante e especial ao teu espaço.",
         material: "- Material: 100% algodão",
         care: "- Lavagem delicada\n- Secar ao ar"
       },
       { 
-        id: 'h1e', 
-        name: 'Pink Coasters', 
-        price: calculateProductRange('Pink Coasters'), 
-        img: 'https://i.ibb.co/wZvSQ5zv/Pink-coasters.png',
+        id: 'h1_classic', 
+        name: 'Classic Coasters', 
+        price: calculateProductRange('Classic Coasters'), 
+        img: 'https://i.ibb.co/PGmrtMMx/Pink-coasters4-2.png',
         images: [
-          'https://i.ibb.co/ccTK53Lm/Pink-coasters2.png',
-          'https://i.ibb.co/gL02D64Q/Pink-coasters-2.jpg',
-          'https://i.ibb.co/PvqVqpty/Pink-coasters-3.jpg',
-          'https://i.ibb.co/kVSX4zy1/Pink-coasters-1.jpg'
+          'https://i.ibb.co/PGmrtMMx/Pink-coasters4-2.png',
+          'https://i.ibb.co/WvBLxKxN/Pink-coasters5.png',
+          'https://i.ibb.co/Kc6bxwjq/Pink-coasters3.png',
+          'https://i.ibb.co/MypCdtFK/Blue-coasters5-2.png',
+          'https://i.ibb.co/93h01qf9/Blue-coasters4.png',
+          'https://i.ibb.co/BK4VfFCx/Blue-coasters6.png',
+          'https://i.ibb.co/spZcZY4b/Yellow-Coaster6.png',
+          'https://i.ibb.co/cXVG6sfL/Yellow-Coaster3.png',
+          'https://i.ibb.co/VY68YgyL/Yellow-Coaster4.png'
         ],
-        description: "Bases em crochet com um design floral delicado, pensadas para trazer um toque cozy e elegante ao teu espaço. Disponíveis em várias cores, mantendo sempre as pétalas brancas para um acabamento suave e delicado.",
+        description: "Bases em crochet com um design floral clássico e delicado, pensadas para trazer um toque cozy e elegante ao teu espaço. Disponíveis em várias cores, mantendo sempre as pétalas brancas para um acabamento suave e delicado.",
         material: "- Material: 100% algodão",
         care: "- Lavagem delicada\n- Secar ao ar"
       },
@@ -207,10 +202,12 @@ const SHOP_CATEGORIES = [
         id: 'h2b', 
         name: 'Stella Cushion', 
         price: calculateProductRange('Stella Cushion'), 
-        img: 'https://i.ibb.co/zTH1WKcL/Stella-Cushion-1.jpg',
+        img: 'https://i.ibb.co/zWNCP5Nx/Stella-Cushion-7-1.png',
         images: [
-          'https://i.ibb.co/zTH1WKcL/Stella-Cushion-1.jpg',
-          'https://i.ibb.co/Kpn3md04/Stella-Cushion-5.jpg'
+          'https://i.ibb.co/zWNCP5Nx/Stella-Cushion-7-1.png',
+          'https://i.ibb.co/wFBSmPFt/Stella-Cushion-8.png',
+          'https://i.ibb.co/spPW5TxT/Stella-Cushion-9.png',
+          'https://i.ibb.co/KPtgjRk/Stella-Cushion-10.png'
         ],
         description: "Almofada decorativa em forma de estrela, feita à mão em crochet para dar um toque delicado e cozy a qualquer espaço. Perfeita para decorar camas, sofás, cadeiras, quartos infantis ou qualquer cantinho especial. Disponível em várias cores para combinar com diferentes estilos de decoração.",
         material: "- Material: 100% poliéster (Fio macio e estruturado, ideal para peças decorativas)",
@@ -251,8 +248,12 @@ const SHOP_CATEGORIES = [
           'https://i.ibb.co/1fcmcPSM/Mini-pouches-7.jpg',
           'https://i.ibb.co/356r9hSN/Mini-pouches-12.jpg'
         ],
-        description: "Mini pouch em crochet com design inspirado em conchas, cuidadosamente feita à mão. Compacta e prática, fecha com um botão de madeira com estrela, um detalhe especial que reflete a identidade da marca, sendo perfeita para guardar os teus essenciais do dia a dia com um toque cozy e handmade.\nIdeal para moedas, auriculares/AirPods, anéis e pequenos tesouros do dia a dia.\nDimensões aproximadas: 8,5 cm (largura) × 7,5 cm (altura)",
-        material: "- Material: 100% algodão",
+        description: `Mini pouch em crochet feito à mão, criado com um design simples e intemporal para guardar pequenos essenciais do dia a dia.
+Com fecho ajustável em cordão e um acabamento delicado handmade, é perfeito para moedas, cartões, joias, lip products ou pequenos tesouros do dia a dia.`,
+        material: `- Fecho ajustável com cordão
+- Ideal para moedas, cartões, joias ou pequenos acessórios
+- Disponível em várias cores
+- Composição: 100% algodão`,
         care: "- Lavagem delicada à mão\n- Secar ao ar em superfície plana"
       },
       { 
@@ -266,7 +267,10 @@ const SHOP_CATEGORIES = [
           'https://i.ibb.co/S4zY5CbT/Air-Pods-case-1.jpg'
         ],
         description: "Capa para AirPods em crochet feita à mão, criada para proteger os teus auriculares com charme, estilo e um toque cozy especial. Prática, delicada e perfeita para o dia a dia.",
-        material: "- Material: 100% algodão",
+        material: `- Design minimalista e intemporal
+- Ajuste seguro à caixa dos AirPods
+- Disponível em várias combinações de cores
+- Composição: 100% algodão`,
         care: "- Lavagem delicada à mão\n- Secar ao ar em superfície plana"
       },
       { 
@@ -288,14 +292,20 @@ const SHOP_CATEGORIES = [
         id: 'b2_shell', 
         name: 'Mini shell Pouch', 
         price: calculateProductRange('Mini shell Pouch'), 
-        img: 'https://i.ibb.co/xqMXmg3T/Mini-shell-Pouch-18.png',
+        img: 'https://i.ibb.co/VY1dx3nt/Mini-shell-Pouch.png',
         images: [
-          'https://i.ibb.co/xqMXmg3T/Mini-shell-Pouch-18.png',
-          'https://i.ibb.co/xKMWpG5g/Mini-shell-Pouch-8.png'
+          'https://i.ibb.co/VY1dx3nt/Mini-shell-Pouch.png',
+          'https://i.ibb.co/bRv6mfKC/Mini-shell-Pouch-1.png',
+          'https://i.ibb.co/N6QD0ksq/Mini-shell-Pouch-2.png',
+          'https://i.ibb.co/TDMrr2tc/Mini-shell-Pouch-3.png'
         ],
-        description: "Elegante mini bolsa em crochet com padrão de conchas texturizado em relevo ('shell stitch'). Tecida meticulosamente à mão com fios de algodão premium, é o acessório perfeito para organizar pequenos cosméticos, cartões ou joias, aliando delicadeza artesanal e sofisticação intemporal.",
-        material: "- Material: 100% algodão mercerizado de alta qualidade\n- Detalhe: Fecho metálico delicado e acabamento interior premium",
-        care: "- Lavagem manual com água fria e sabão neutro\n- Secar horizontalmente à sombra\n- Não torcer nem centrifugar"
+        description: `Mini pouch em crochet com design inspirado em conchas, cuidadosamente feita à mão.
+Compacta e prática, fecha com um botão de madeira com estrela, um detalhe especial que reflete a identidade da marca, sendo perfeita para guardar os teus essenciais do dia a dia com um toque cozy e handmade.`,
+        material: `- Detalhes: Ideal para moedas, auriculares/AirPods, anéis e pequenos tesouros do dia a dia
+- Dimensões: 8,5 cm (largura) × 7,5 cm (altura)
+- Composição: 100% algodão
+- Material: Botão em madeira`,
+        care: "- Lavagem delicada\n- Secar ao ar"
       }
     ]
   },
@@ -303,7 +313,7 @@ const SHOP_CATEGORIES = [
     id: 'vestuario',
     name: 'Vestuário',
     items: 'Bikini, Ponchos, Cardigans',
-    img: 'https://i.ibb.co/DDt8QMp1/Capa-Vestuario.png',
+    img: 'https://i.ibb.co/39mv372Z/IMG-2699-02.jpg',
     products: [
       { 
         id: 'v1', 
@@ -320,23 +330,27 @@ const SHOP_CATEGORIES = [
       },
       { 
         id: 'v1b', 
-        name: 'Marea Triangle Top', 
-        price: calculateProductRange('Marea Triangle Top'), 
+        name: 'Coral Bikini Top', 
+        price: calculateProductRange('Coral Bikini Top'), 
         img: 'https://i.ibb.co/j9LYMvVw/Marea-Triangle-Top10-2.jpg',
         images: [
           'https://i.ibb.co/j9LYMvVw/Marea-Triangle-Top10-2.jpg',
-          'https://i.ibb.co/8gjmkHJL/Marea-Triangle-Top05.png',
-          'https://i.ibb.co/Gvh7mHth/Marea-Triangle-Top08.png'
+          'https://i.ibb.co/8gjmkHJL/Marea-Triangle-Top05.png'
         ],
-        description: "Top de biquíni em crochet feito à mão, com design triangular clássico e fitas ajustáveis para maior conforto. O Marea Triangle Top foi pensado para combinar conforto e um look delicado de verão.",
+        description: `Bikini top em crochet feito à mão, com um design triangular clássico e detalhes delicados.
+Ajustável no pescoço e nas costas para um ajuste confortável e personalizado.
+Disponível em várias combinações de cores, foi criado para acompanhar os dias de verão com um toque artesanal.`,
         material: "- Material: 100% algodão",
         care: "- Lavar à mão\n- Secar à sombra"
       },
       { 
-        id: 'v2b', name: 'Mesh Poncho', price: calculateProductRange('Mesh Poncho'), img: 'https://i.ibb.co/0p2g0BJt/Poncho.png',
+        id: 'v2b', name: 'Mesh Poncho', price: calculateProductRange('Mesh Poncho'), img: 'https://i.ibb.co/Qj7Lgf1Q/Poncho-2.png',
         images: [
-          'https://i.ibb.co/0p2g0BJt/Poncho.png',
-          'https://i.ibb.co/844dLBLB/mockup-cardigan.png'
+          'https://i.ibb.co/Qj7Lgf1Q/Poncho-2.png',
+          'https://i.ibb.co/TBWgdX6h/Poncho-3.png',
+          'https://i.ibb.co/0vYGb2W/Poncho.png',
+          'https://i.ibb.co/TDBvCkrF/Poncho-4.png',
+          'https://i.ibb.co/9mnSzrW4/Poncho-5.png'
         ],
         description: "Poncho em crochet leve e delicado, feito à mão com um design de malha aberta para um look effortless and cozy. Perfeito para sobrepor a tops, vestidos ou biquínis, criando um toque elegante e descontraído ao outfit. Disponível em várias cores.",
         material: "- Material: 100% algodão",
@@ -391,7 +405,7 @@ const SHOP_CATEGORIES = [
     id: 'premium',
     name: 'Acessórios',
     items: 'Bandanas, Headbands,',
-    img: 'https://i.ibb.co/QvVDLDp3/Capa-Acessorios.png',
+    img: 'https://i.ibb.co/ZpMNXV24/Capa-Acessorios.jpg',
     products: [
       { 
         id: 'v3', 
@@ -422,17 +436,19 @@ const SHOP_CATEGORIES = [
           'https://i.ibb.co/JjHRR7vq/Bandanas-3.png',
           'https://i.ibb.co/HfSJtngW/Bandanas-1.png'
         ],
-        description: "Bandana em crochet de design clássico, cuidadosamente feita à mão. Leve, versátil e confortável, é o acessório perfeito para dar um toque especial e artesanal ao teu visual do dia a dia.",
-        material: "Esta Classic Bandana é produzida em 100% Algodão Egípcio Safran. A suavidade deste fio nobre respeita a sensibilidade da pele.",
-        care: "Lavar à mão com sabão neutro. Secar à sombra."
+        description: `Bandana em crochet feita à mão, com um design clássico em granny stitch.
+Leve, versátil e ajustável através de fitas, foi criada para complementar qualquer look com um toque artesanal e intemporal.
+Disponível em várias cores.`,
+        material: "- Opção 1: 100% algodão (opção leve)\n- Opção 2: 50% algodão, 50% lã (opção mais cozy)",
+        care: "- Lavagem delicada\n- Secar ao ar"
       },
       { 
         id: 'h3', 
         name: 'Dragonfly Headband', 
         price: calculateProductRange('Dragonfly Headband'), 
-        img: 'https://i.ibb.co/BHMDJZGM/Dragonfly-Headband.png',
+        img: 'https://i.ibb.co/yckQG5rv/Dragonfly-Headband.png',
         images: [
-          'https://i.ibb.co/BHMDJZGM/Dragonfly-Headband.png',
+          'https://i.ibb.co/yckQG5rv/Dragonfly-Headband.png',
           'https://i.ibb.co/zWwqkHxZ/Dragonfly-Headband-Costas.png'
         ],
         description: "Headband em crochet com delicado padrão de libelinhas, feita à mão para um toque leve e especial no dia a dia. Confortável, versátil e perfeita para complementar qualquer look com um detalhe handmade e cozy. Disponível em várias cores.",
@@ -450,7 +466,9 @@ const SHOP_CATEGORIES = [
           'https://i.ibb.co/dsXdhvSg/Scarf-Hip-Bandana-13.png',
           'https://i.ibb.co/yB5QZ0rP/Scarf-Hip-Bandana-20.png'
         ],
-        description: "Versátil e charmosa bandana/lenço de quadril ('scarf hip bandana') tecida inteiramente à mão em crochet. Com um padrão delicado e franjas elegantes, é o acessório ideal para dar um toque boémio, descontraído e cheio de personalidade ao seu look de praia, festival ou dia a dia.",
+        description: `Peça em crochet leve e versátil, cuidadosamente feita à mão.
+Pode ser usada como hip scarf ou bandana, adicionando um toque boho e handmade a qualquer look.
+Perfeita para os dias mais quentes ou para complementar o teu estilo de forma única e delicada.`,
         material: "- Material: 100% algodão premium leve e fresco\n- Acabamento: Detalhe de franjas artesanais na extremidade",
         care: "- Lavagem delicada à mão com sabão neutro\n- Secar horizontalmente à sombra para preservar as franjas\n- Não utilizar máquina de secar"
       }
@@ -602,7 +620,7 @@ const LoadingScreen = ({ onComplete }: { onComplete: () => void; key?: string })
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.8, duration: 1 }}
-        className="mt-12 text-cream/30 font-serif italic tracking-[0.3em] text-xs uppercase"
+        className="mt-12 text-cream/30 font-serif italic tracking-[0.15em] sm:tracking-[0.3em] text-[10px] sm:text-xs uppercase text-center px-6 max-w-[90vw] sm:max-w-none leading-relaxed"
       >
         Peças feitas com tempo, amor e memória.
       </motion.p>
@@ -1114,7 +1132,7 @@ const Hero = () => {
                                 style={{ 
                                     filter: "drop-shadow(0 24px 54px rgba(18,26,13,0.95)) drop-shadow(0 4px 20px rgba(197,160,89,0.18))"
                                 }}
-                                className="h-[7.4rem] sm:h-[9.5rem] md:h-[11.8rem] lg:h-[14.4rem] xl:h-[17.5rem] mb-[5px] sm:mb-[7px] md:mb-[9.5px] lg:mb-[11.5px] -mt-3 md:-mt-5 origin-center select-none"
+                                className="h-[9.5rem] sm:h-[9.5rem] md:h-[11.8rem] lg:h-[14.4rem] xl:h-[17.5rem] mb-[5px] sm:mb-[7px] md:mb-[9.5px] lg:mb-[11.5px] -mt-3 md:-mt-5 origin-center select-none"
                             >
                                 <Logo light className="h-full" />
                             </motion.div>
@@ -1196,7 +1214,7 @@ const StorySection = () => {
 
     const storyImages = [
         "https://i.ibb.co/S48hcbDp/Firefly-Gemini-Flash-Imagem-com-ambiente-cosy-tema-handmade-crochet-usar-o-logo-em-label-costirado.png",
-        "https://i.ibb.co/Gvnm8pC3/organic-cotton-labels-1.png",
+        "https://i.ibb.co/9krmWqpD/organic-cotton-labels-1.png",
         "https://i.ibb.co/XktWbR4R/laser-engraved-wood-tag-1.png"
     ];
 
@@ -1370,8 +1388,8 @@ const StorySection = () => {
                     {/* Staggered Mantras (M★Bravo Pillars) with elegant lines */}
                     <div className="space-y-6 pt-10 border-t border-forest/10 max-w-xl">
                         {[
-                            "porque algumas historias não foram feitas para ficarem guardadas.",
-                            "Foram feitos para serem sentidos."
+                            "Porque algumas histórias não foram feitas para ficarem guardadas.",
+                            "Foram feitas para serem sentidas."
                         ].map((mantra, idx) => (
                             <motion.div 
                                 key={idx}
@@ -1393,9 +1411,9 @@ const StorySection = () => {
                     <div className="pt-8 md:pt-10 flex flex-col sm:flex-row md:portrait:flex-col lg:flex-row items-center sm:items-center md:portrait:items-center lg:items-start gap-8 md:portrait:gap-8 md:portrait:w-full md:portrait:justify-center">
                         <a 
                             href="#collection" 
-                            className="group relative inline-flex items-center gap-6 px-10 py-5 bg-forest text-cream rounded-full overflow-hidden transition-all duration-500 hover:pr-14 shrink-0"
+                            className="group relative inline-flex items-center gap-6 pl-10 pr-16 py-5 bg-forest text-cream rounded-full overflow-hidden transition-all duration-500 hover:pr-20 shrink-0"
                         >
-                            <span className="relative z-10 text-[10px] uppercase tracking-[0.3em] font-semibold">
+                            <span className="relative z-10 text-[10px] uppercase tracking-[0.3em] font-semibold whitespace-nowrap">
                                 Contemplar a Matéria
                             </span>
                             <div className="absolute right-4 w-10 h-10 bg-[#C5A059] text-forest rounded-full flex items-center justify-center transition-all duration-500 group-hover:right-6">
@@ -1581,13 +1599,13 @@ const MadeWithTimeSection = () => {
                     </div>
 
                     {/* Right Column: The Refined Image (spans 5 columns) - Elegantly proportioned to balance the text column */}
-                    <div className="lg:col-span-5 space-y-8 lg:sticky lg:top-36">
+                    <div className="lg:col-span-5 space-y-8 lg:sticky lg:top-36 md:portrait:max-w-md md:portrait:mx-auto md:portrait:w-full">
                         <motion.div 
                             initial={{ opacity: 0, scale: 0.98, y: 20 }}
                             whileInView={{ opacity: 1, scale: 1, y: 0 }}
                             viewport={{ once: true, margin: "-100px" }}
                             transition={{ duration: 1.6, ease: [0.16, 1, 0.3, 1] }}
-                            className="w-full aspect-[4/5] max-h-[50vh] sm:max-h-[60vh] lg:max-h-none relative rounded-[2rem] overflow-hidden shadow-[0_24px_50px_rgba(31,42,24,0.06)] group border border-forest/5"
+                            className="w-full aspect-[4/5] max-h-[50vh] sm:max-h-[60vh] md:portrait:max-h-[450px] lg:max-h-none relative rounded-[2rem] overflow-hidden shadow-[0_24px_50px_rgba(31,42,24,0.06)] group border border-forest/5"
                         >
                             <img 
                                 src="https://i.ibb.co/j9LHyxq6/Firefly-Gemini-Flash-Imagem-com-ambiente-cosy-tema-handmade-crochet-usar-o-logo-em-label-de-cartao.png" 
@@ -1711,7 +1729,7 @@ const KnotSection = () => {
                         <img 
                             src="https://i.ibb.co/F4Z4Fp4Z/LOGOTIPOo.jpg" 
                             alt="Textura de malha" 
-                            className="w-full h-full object-cover brightness-[0.75] md:grayscale md:brightness-[0.45] md:group-hover:grayscale-0 md:group-hover:brightness-90 transition-all duration-[1.5s] ease-out scale-105 md:scale-110 md:group-hover:scale-100"
+                            className="w-full h-full object-cover brightness-95 hover:scale-105 transition-all duration-[1.5s] ease-out"
                         />
                         <div className="absolute inset-x-0 bottom-0 p-8 md:p-12 bg-gradient-to-t from-forest/90 via-forest/40 to-transparent">
                             <span className="text-[10px] uppercase tracking-[0.4em] text-cream/50 mb-1 md:mb-2 block">Premium / Bags</span>
@@ -1731,11 +1749,8 @@ const KnotSection = () => {
                             <img 
                                 src="https://i.ibb.co/d0Rn6jC7/MOOD-01.png" 
                                 alt="Mãos da artesã" 
-                                className="w-full h-full object-cover brightness-[0.75] md:grayscale md:brightness-[0.45] md:hover:grayscale-0 md:hover:brightness-100 scale-102 md:hover:scale-110 transition-all duration-[1.5s]"
+                                className="w-full h-full object-cover brightness-95 hover:scale-105 transition-all duration-[1.5s] ease-out"
                             />
-                            <div className="absolute top-4 left-4 md:top-6 md:left-6 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-300">
-                                <span className="bg-cream/15 backdrop-blur-md px-4 py-1.5 rounded-full text-[8.5px] uppercase tracking-widest text-cream">Home Essentials</span>
-                            </div>
                         </motion.div>
                         <motion.div 
                             initial={{ opacity: 0, x: 30 }}
@@ -1745,13 +1760,10 @@ const KnotSection = () => {
                             className="w-full aspect-[4/5] max-h-[50vh] sm:max-h-[60vh] lg:max-h-none overflow-hidden rounded-3xl md:rounded-[3rem] transition-all duration-1000 shadow-xl relative group"
                         >
                             <img 
-                                src="https://i.ibb.co/0pfJPj9V/emotional-thank-you-card-1.png" 
+                                src="https://i.ibb.co/PKJgWZM/emotional-thank-you-card-1.png" 
                                 alt="Detalhe de material" 
-                                className="w-full h-full object-cover brightness-[0.75] md:grayscale md:brightness-[0.45] md:hover:grayscale-0 md:hover:brightness-100 scale-102 md:hover:scale-110 transition-all duration-[1.5s]"
+                                className="w-full h-full object-cover brightness-95 hover:scale-105 transition-all duration-[1.5s] ease-out"
                             />
-                            <div className="absolute top-4 left-4 md:top-6 md:left-6 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-300">
-                                <span className="bg-cream/15 backdrop-blur-md px-4 py-1.5 rounded-full text-[8.5px] uppercase tracking-widest text-cream">Bikinis & Beach</span>
-                            </div>
                         </motion.div>
                     </div>
                 </div>
@@ -1788,12 +1800,17 @@ interface ProductCardProps {
 const ProductCard: React.FC<ProductCardProps> = ({ product, i, isFocused, isSubdued, onFocus, onPrevProduct, onNextProduct }) => {
     const isAfricanFlowerPouch = product.name.toLowerCase().includes('african flower pouch');
     const isMiniPouches = product.name.toLowerCase().includes('mini pouches');
+    const isClassicCoasters = product.name.toLowerCase().includes('classic coasters');
     const isDualColor = isAfricanFlowerPouch || 
                         product.name.toLowerCase().includes('marea bikini set') ||
-                        product.name.toLowerCase().includes('marea triangle top') ||
+                        product.name.toLowerCase().includes('coral bikini top') ||
                         product.name.toLowerCase().includes('signature granny poncho') ||
-                        product.name.toLowerCase().includes('cardigan');
-    const initialColor = isDualColor ? 'Verde Musgo & Creme' : 'Verde Musgo';
+                        product.name.toLowerCase().includes('cardigan') ||
+                        isClassicCoasters;
+    const isClassicCoastersOrBikini = isDualColor;
+    const initialColor = isDualColor 
+        ? 'Azul Água & Branco' 
+        : 'Verde Musgo';
     const defaultSize = product.sizes ? product.sizes[0] : 'M';
     const [selections, setSelections] = useState({
         tamanho: defaultSize,
@@ -1882,10 +1899,10 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, i, isFocused, isSubd
         ? `${rawPrice * (hasQuantity ? (parseInt(selections.quantidade) || 1) : 1)}`
         : 'Sob Consulta';
     const selectedSize = hasSize ? selections.tamanho : 'Não aplicável';
-    const selectedColor = isCoaster ? 'Padrão' : selections.cor;
+    const selectedColor = (isCoaster && !isClassicCoasters) ? 'Padrão' : selections.cor;
     const quantity = hasQuantity ? selections.quantidade : '1';
 
-    const messageText = `Olá Carolina! Quero encomendar uma peça M★BRAVO.\n\nProduto: ${product.name}\nTamanho: ${selectedSize}\n${isCoaster ? '' : (isMiniPouches ? `Cor do Saquinho: ${selectedColor}\nCor do Fio: ${selections.corFio}\n` : `Cor: ${selectedColor}\n`)}Quantidade: ${quantity}\n\nValor Total: ${totalPrice}€\n\nFico a aguardar os detalhes para combinarmos o envio e o pagamento. Obrigada!`;
+    const messageText = `Olá Carolina! Quero encomendar uma peça M★BRAVO.\n\nProduto: ${product.name}\nTamanho: ${selectedSize}\n${(isCoaster && !isClassicCoasters) ? '' : (isMiniPouches ? `Cor do Saquinho: ${selectedColor}\nCor do Fio: ${selections.corFio}\n` : `Cor: ${selectedColor}\n`)}Quantidade: ${quantity}\n\nValor Total: ${totalPrice}€\n\nFico a aguardar os detalhes para combinarmos o envio e o pagamento. Obrigada!`;
 
     const whatsappUrl = `https://wa.me/351912828182?text=${encodeURIComponent(messageText)}`;
 
@@ -1919,16 +1936,22 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, i, isFocused, isSubd
                 cardCvv: ''
             });
         }
-    }, [isFocused, product.name, product.sizes]);
+    }, [isFocused, product.name, product.sizes, initialColor]);
 
-    const sizes = product.sizes || (product.name.toLowerCase().includes('marea bikini') || product.name.toLowerCase().includes('marea triangle top')
+    const sizes = product.sizes || (product.name.toLowerCase().includes('marea bikini') || product.name.toLowerCase().includes('coral bikini top')
         ? ['XS', 'S', 'M', 'L'] 
         : ['S', 'M', 'L']);
     const quantities = isCoaster
         ? ['1und.', '2und.', '4und.', '6und.', '8und.']
         : ['2und.', '4und.', '6und.', '8und.'];
 
-    const colors = isDualColor ? [
+    const colors = isClassicCoastersOrBikini ? [
+        { name: 'Azul Água & Branco', bg: 'linear-gradient(45deg, #A6BCAE 50%, #FFFFFF 50%)' },
+        { name: 'Amarelo & Branco', bg: 'linear-gradient(45deg, #F4D03F 50%, #FFFFFF 50%)' },
+        { name: 'Rosa & Branco', bg: 'linear-gradient(45deg, #FADADD 50%, #FFFFFF 50%)' },
+        { name: 'Verde & Branco', bg: 'linear-gradient(45deg, #243119 50%, #FFFFFF 50%)' },
+        { name: 'Vermelho & Branco', bg: 'linear-gradient(45deg, #C0392B 50%, #FFFFFF 50%)' }
+    ] : isDualColor ? [
         { name: 'Verde Musgo & Creme', bg: 'linear-gradient(45deg, #2E3B26 50%, #F5F2ED 50%)' },
         { name: 'Azul Noite & Creme', bg: 'linear-gradient(45deg, #1C2D37 50%, #F5F2ED 50%)' },
         { name: 'Terracota & Areia', bg: 'linear-gradient(45deg, #A85B40 50%, #E3D9C6 50%)' },
@@ -2227,7 +2250,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, i, isFocused, isSubd
                                     <div className="flex justify-between border-b border-forest/5 pb-1.5">
                                         <span className="text-forest/40 uppercase tracking-wider text-[9px]">Configuração</span>
                                         <span className="font-semibold text-forest text-right">
-                                            {isCoaster ? '' : `${selections.cor} `}{isMiniPouches && `| Fio: ${selections.corFio} `}{hasSize && `| ${selections.tamanho}`} {hasQuantity && `| ${selections.quantidade}`}
+                                            {(isCoaster && !isClassicCoasters) ? '' : `${selections.cor} `}{isMiniPouches && `| Fio: ${selections.corFio} `}{hasSize && `| ${selections.tamanho}`} {hasQuantity && `| ${selections.quantidade}`}
                                         </span>
                                     </div>
                                     <div className="flex justify-between border-b border-forest/5 pb-1.5">
@@ -2302,7 +2325,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, i, isFocused, isSubd
                                             <div>
                                                 <span className="font-serif font-light text-sm text-forest block">{product.name}</span>
                                                 <span className="text-[10px] text-forest/50 uppercase tracking-wider">
-                                                    {!isCoaster && `${selections.cor} `}{isMiniPouches && `| Fio: ${selections.corFio} `}{hasSize && `| ${selections.tamanho}`}
+                                                    {(!isCoaster || isClassicCoasters) && `${selections.cor} `}{isMiniPouches && `| Fio: ${selections.corFio} `}{hasSize && `| ${selections.tamanho}`}
                                                 </span>
                                             </div>
                                         </div>
@@ -2764,7 +2787,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, i, isFocused, isSubd
                             {/* Container Comum para Seletores (Cores, Tamanho, Quantidade) com recuo explícito */}
                             <div id="selection-selectors-group" className="space-y-6 text-left w-full">
                                 {/* Cores */}
-                                {!isCoaster && (
+                                {(!isCoaster || isClassicCoasters) && (
                                     <div className="space-y-2">
                                         <div className="flex justify-between items-center">
                                             <h5 className="text-[9px] uppercase tracking-[0.25em] font-bold text-forest/45 flex items-center gap-1.5">
@@ -2774,26 +2797,27 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, i, isFocused, isSubd
                                                 {selections.cor}
                                             </span>
                                         </div>
-                                        <div className="flex flex-wrap gap-2">
-                                            {colors.map(opt => (
-                                                <button 
-                                                    key={opt.name}
-                                                    onClick={() => setSelections(prev => ({ ...prev, cor: opt.name }))}
-                                                    className={`w-8 h-8 rounded-full border-2 transition-all p-0.5 cursor-pointer ${
-                                                        selections.cor === opt.name 
-                                                            ? (isDualColor 
-                                                                ? 'border-[#C5A059] scale-115 shadow-md shadow-[#C5A059]/25' 
-                                                                : 'border-forest scale-110 shadow-md shadow-forest/10')
-                                                            : 'border-transparent hover:scale-110'
-                                                    }`}
-                                                    title={opt.name}
-                                                >
-                                                    <div 
-                                                        className="w-full h-full rounded-full border border-forest/5" 
-                                                        style={opt.bg ? { background: opt.bg } : { backgroundColor: opt.hex }} 
-                                                    />
-                                                </button>
-                                            ))}
+                                        <div className="flex flex-wrap gap-3">
+                                            {colors.map(opt => {
+                                                const isActive = selections.cor === opt.name;
+                                                return (
+                                                    <button 
+                                                        key={opt.name}
+                                                        onClick={() => setSelections(prev => ({ ...prev, cor: opt.name }))}
+                                                        className={`w-8 h-8 rounded-full border transition-all p-0.5 cursor-pointer ${
+                                                            isActive 
+                                                                ? 'border-[#D4A33B] scale-110 shadow-md shadow-[#D4A33B]/10' 
+                                                                : 'border-[#D4A33B]/20 hover:scale-110 hover:border-[#D4A33B]'
+                                                        }`}
+                                                        title={opt.name}
+                                                    >
+                                                        <div 
+                                                            className="w-full h-full rounded-full border border-forest/5" 
+                                                            style={opt.bg ? { background: opt.bg } : { backgroundColor: opt.hex }}
+                                                        />
+                                                    </button>
+                                                );
+                                            })}
                                         </div>
                                     </div>
                                 )}
@@ -2977,7 +3001,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, i, isFocused, isSubd
                                     </div>
 
                                     <div className="space-y-1.5 text-[11px] uppercase tracking-wider text-forest/80 font-normal">
-                                        {!isCoaster && (
+                                        {(!isCoaster || isClassicCoasters) && (
                                             <div className="flex justify-between items-center border-b border-forest/5 pb-1">
                                                 <span className="text-forest/40 text-[9px] tracking-[0.2em]">{isMiniPouches ? 'COR DA PEÇA' : 'COR'}</span>
                                                 <span className="text-forest font-semibold">{selections.cor || 'Verde Musgo'}</span>
@@ -3024,7 +3048,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, i, isFocused, isSubd
                             </div>
 
                             <div className="space-y-1.5 mb-3.5 text-[11px] uppercase tracking-wider text-white/90 font-normal">
-                                        {!isCoaster && (
+                                        {(!isCoaster || isClassicCoasters) && (
                                             <div className="flex justify-between items-center border-b border-white/5 pb-1">
                                                 <span className="text-white/40 text-[9px] tracking-[0.2em]">{isMiniPouches ? 'COR DA PEÇA' : 'COR'}</span>
                                                 <span className="text-[#FCFBF9] font-semibold">{selections.cor || 'Verde Musgo'}</span>
