@@ -1,6 +1,14 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence, useScroll, useTransform, useSpring, useVelocity } from 'motion/react';
 import { Menu, X, Instagram, Facebook, ArrowRight, ChevronLeft, ChevronRight, Share2, Mail, MessageCircle, Sparkles, Layers, Ban, AlertCircle, Feather, Palette, Heart } from 'lucide-react';
+import { 
+  useLanguage, 
+  translateProduct, 
+  translateCategory, 
+  translateColor, 
+  translateSize, 
+  translateQuantity 
+} from './translations';
 
 // Imported local high-quality assets for Blue and Pink Coasters cards
 import blueCoastersImg from './assets/images/regenerated_image_1778776322373.png';
@@ -599,6 +607,7 @@ const Logo = ({ className = "h-12", light = false }: { className?: string, light
 };
 
 const LoadingScreen = ({ onComplete }: { onComplete: () => void; key?: string }) => {
+  const { t } = useLanguage();
   useEffect(() => {
     const timer = setTimeout(onComplete, 3000);
     return () => clearTimeout(timer);
@@ -622,7 +631,7 @@ const LoadingScreen = ({ onComplete }: { onComplete: () => void; key?: string })
         transition={{ delay: 0.8, duration: 1 }}
         className="mt-12 text-cream/30 font-serif italic tracking-[0.15em] sm:tracking-[0.3em] text-[10px] sm:text-xs uppercase text-center px-6 max-w-[90vw] sm:max-w-none leading-relaxed"
       >
-        Peças feitas com tempo, amor e memória.
+        {t('loading.slogan')}
       </motion.p>
       
       <motion.div 
@@ -638,6 +647,13 @@ const Navbar = () => {
     const [isScrolled, setIsScrolled] = useState(false);
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const [isDarkBg, setIsDarkBg] = useState(true);
+    const { lang: activeLang, t } = useLanguage();
+    const lang = activeLang.toUpperCase() as 'PT' | 'EN';
+
+    const handleLanguageChange = (newLang: 'PT' | 'EN') => {
+        localStorage.setItem('mbravo_lang', newLang);
+        window.dispatchEvent(new CustomEvent('mbravo-lang-change', { detail: newLang }));
+    };
 
     useEffect(() => {
         const handleScroll = () => {
@@ -690,8 +706,13 @@ const Navbar = () => {
         </motion.a>
 
         {/* Desktop Nav */}
-        <div className="hidden md:flex items-center gap-10">
+        <div className="hidden md:flex items-center gap-6 lg:gap-10">
           {NAV_LINKS.map((link, i) => {
+            const displayName = link.name === 'História' 
+              ? t('nav.story') 
+              : link.name === 'Catálogo' 
+                ? t('nav.collection') 
+                : t('nav.contacts');
             const isHighlight = link.name === 'Contactos';
             return (
               <motion.a
@@ -710,13 +731,35 @@ const Navbar = () => {
                     : 'hover:opacity-60'
                 }`}
               >
-                {link.name}
+                {displayName}
                 {!isHighlight && (
                   <div className={`absolute -bottom-1 left-0 w-0 h-[1px] ${isDarkBg ? 'bg-cream' : 'bg-forest'} group-hover:w-full transition-all duration-1000 opacity-40`} />
                 )}
               </motion.a>
             );
           })}
+
+          {/* Elegant Minimalist Language Selector */}
+          <motion.div 
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.5 + (NAV_LINKS.length * 0.1), duration: 0.8 }}
+            className={`flex items-center text-[10px] uppercase tracking-[0.2em] font-medium transition-all duration-1000 pl-4 lg:pl-6 border-l ${isDarkBg ? 'border-cream/20' : 'border-forest/20'} ${textColor}`}
+          >
+            <button 
+              onClick={() => handleLanguageChange('PT')} 
+              className={`transition-all duration-500 cursor-pointer hover:text-[#C5A059] ${lang === 'PT' ? 'font-bold opacity-100' : 'opacity-40 hover:opacity-80'}`}
+            >
+              PT
+            </button>
+            <span className={`mx-2 lg:mx-3 ${isDarkBg ? 'text-cream/20' : 'text-forest/20'}`}>|</span>
+            <button 
+              onClick={() => handleLanguageChange('EN')} 
+              className={`transition-all duration-500 cursor-pointer hover:text-[#C5A059] ${lang === 'EN' ? 'font-bold opacity-100' : 'opacity-40 hover:opacity-80'}`}
+            >
+              EN
+            </button>
+          </motion.div>
         </div>
 
         {/* Mobile Toggle */}
@@ -745,19 +788,49 @@ const Navbar = () => {
              >
                 <X size={32} />
              </button>
-             {NAV_LINKS.map((link, i) => (
-              <motion.a
-                key={link.name}
-                href={link.href}
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: i * 0.05 }}
-                onClick={() => setMobileMenuOpen(false)}
-                className="text-5xl font-serif text-cream hover:text-brand-green-light hover:italic transition-all duration-500"
-              >
-                {link.name}
-              </motion.a>
-            ))}
+             {NAV_LINKS.map((link, i) => {
+              const displayName = link.name === 'História' 
+                ? t('nav.story') 
+                : link.name === 'Catálogo' 
+                  ? t('nav.collection') 
+                  : t('nav.contacts');
+              return (
+                <motion.a
+                  key={link.name}
+                  href={link.href}
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: i * 0.05 }}
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="text-5xl font-serif text-cream hover:text-brand-green-light hover:italic transition-all duration-500"
+                >
+                  {displayName}
+                </motion.a>
+              );
+             })}
+
+            {/* Mobile Language Selector */}
+            <motion.div 
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: NAV_LINKS.length * 0.05 + 0.1 }}
+                className="mt-6 flex items-center text-sm uppercase tracking-[0.3em] font-medium text-cream"
+            >
+                <button 
+                  onClick={() => handleLanguageChange('PT')} 
+                  className={`transition-all duration-500 cursor-pointer ${lang === 'PT' ? 'font-bold text-cream' : 'text-cream/40 hover:text-cream/80'}`}
+                >
+                  PT
+                </button>
+                <span className="mx-3 text-cream/20">|</span>
+                <button 
+                  onClick={() => handleLanguageChange('EN')} 
+                  className={`transition-all duration-500 cursor-pointer ${lang === 'EN' ? 'font-bold text-cream' : 'text-cream/40 hover:text-cream/80'}`}
+                >
+                  EN
+                </button>
+            </motion.div>
+
                 <div className="mt-12 flex gap-10">
                     <a href="https://www.instagram.com/mbravo.handmade/" target="_blank" rel="noopener noreferrer">
                         <Instagram className="text-cream/30 hover:text-cream transition-colors" size={24} />
@@ -994,6 +1067,7 @@ const Hero = () => {
     // Automatic rotating background slideshow
     const [bgIndex, setBgIndex] = useState(0);
     const [isFirstImageLoaded, setIsFirstImageLoaded] = useState(false);
+    const { t } = useLanguage();
 
     useEffect(() => {
         // Preload the first background image to ensure zero-lag flicker-free loading
@@ -1012,7 +1086,7 @@ const Hero = () => {
     }, []);
 
     // Words for the cinematic stagger fade-in
-    const titleWords = ["Cada", "ponto", "guarda", "uma", "memória."];
+    const titleWords = t('brand.slogan').split(" ");
 
     return (
         <>
@@ -1175,7 +1249,7 @@ const Hero = () => {
                                 }}
                                 className="italic text-xs sm:text-sm md:text-base font-light text-[#D4C3A3] max-w-[260px] sm:max-w-xs md:max-w-sm mx-auto leading-relaxed mb-0 antialiased"
                             >
-                                Criado à mão, com tempo, amor e memórias.
+                                {t('brand.subheadline')}
                             </motion.p>
                         </motion.div>
 
@@ -1201,6 +1275,7 @@ const StorySection = () => {
         target: containerRef,
         offset: ["start end", "end start"]
     });
+    const { t } = useLanguage();
 
     const smoothProgress = useSpring(scrollYProgress, {
         stiffness: 100,
@@ -1360,36 +1435,36 @@ const StorySection = () => {
                 >
                     <div className="space-y-6">
                         <span className="text-[10px] uppercase tracking-[0.45em] font-bold text-forest/35 block font-sans">
-                            MEMÓRIA CRUA
+                            {t('story.badge')}
                         </span>
                         <h2 className="text-3xl xs:text-4xl sm:text-5xl md:text-5xl lg:text-forest lg:text-7xl font-serif text-forest tracking-tight leading-tight md:leading-[1.05] font-light">
-                            Tudo começou com <br />
-                            <span className="italic font-normal text-[#C5A059]">uma memória.</span>
+                            {t('story.title.part1')} <br />
+                            <span className="italic font-normal text-[#C5A059]">{t('story.title.part2')}</span>
                         </h2>
                     </div>
                     
                     <div className="space-y-8">
                         <p className="text-forest font-serif italic text-xl md:text-2xl leading-relaxed font-light text-forest/90">
-                            Antes de existir uma marca, existia uma historia. <br />
+                            {t('story.subtitle')} <br />
                             <span className="text-base sm:text-lg font-sans not-italic text-forest/70 block mt-3 font-light leading-relaxed">
-                                Uma historia feita de afeto, de tempo e de momentos que permanecem mesmo quando os dias passam.
+                                {t('story.subtitle2')}
                             </span>
                         </p>
                         
                         <p className="text-forest font-serif italic text-xl md:text-2xl leading-relaxed font-light text-forest/95">
-                            M★Bravo nasceu desse sentimento.
+                            {t('story.p1')}
                         </p>
                         
                         <p className="text-forest/70 text-[15px] md:text-lg leading-relaxed font-sans font-light max-w-2xl">
-                            Cada peça é criada à mão, com calma e pureza, respeitando o tempo que as coisas realmente importantes merecem.
+                            {t('story.p2')}
                         </p>
                     </div>
 
                     {/* Staggered Mantras (M★Bravo Pillars) with elegant lines */}
                     <div className="space-y-6 pt-10 border-t border-forest/10 max-w-xl">
                         {[
-                            "Porque algumas histórias não foram feitas para ficarem guardadas.",
-                            "Foram feitas para serem sentidas."
+                            t('story.mantra1'),
+                            t('story.mantra2')
                         ].map((mantra, idx) => (
                             <motion.div 
                                 key={idx}
@@ -1414,7 +1489,7 @@ const StorySection = () => {
                             className="group relative inline-flex items-center gap-6 pl-10 pr-16 py-5 bg-forest text-cream rounded-full overflow-hidden transition-all duration-500 hover:pr-20 shrink-0"
                         >
                             <span className="relative z-10 text-[10px] uppercase tracking-[0.3em] font-semibold whitespace-nowrap">
-                                Contemplar a Matéria
+                                {t('story.cta')}
                             </span>
                             <div className="absolute right-4 w-10 h-10 bg-[#C5A059] text-forest rounded-full flex items-center justify-center transition-all duration-500 group-hover:right-6">
                                 <ArrowRight size={16} />
@@ -1467,6 +1542,7 @@ const StorySection = () => {
 };
 
 const MadeWithTimeSection = () => {
+    const { t } = useLanguage();
     return (
         <section id="manifesto" data-background="light" className="pt-24 pb-20 px-4 landscape:py-16 md:portrait:py-24 lg:py-32 xl:py-36 bg-[#FCFBF9] relative overflow-hidden select-none border-t border-forest/5">
             <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -1474,16 +1550,16 @@ const MadeWithTimeSection = () => {
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-16 items-baseline mb-24 md:mb-32 border-b border-forest/10 pb-16">
                     <div className="lg:col-span-7">
                         <span className="text-[10px] uppercase tracking-[0.45em] font-semibold text-forest/35 block mb-4 font-sans">
-                            A ESCOLHA
+                            {t('manifesto.choice')}
                         </span>
                         <h2 className="text-3xl sm:text-5xl md:text-5xl lg:text-6xl font-serif text-forest tracking-tight leading-tight lg:leading-[1.1] font-light">
-                            Feito com Tempo. <br />
-                            <span className="italic font-normal text-[#C5A059]">O ritmo calmo de tudo o que merece permanência.</span>
+                            {t('manifesto.title')} <br />
+                            <span className="italic font-normal text-[#C5A059]">{t('manifesto.subtitle')}</span>
                         </h2>
                     </div>
                     <div className="lg:col-span-5 lg:pl-12">
                         <p className="text-forest/70 text-lg md:text-xl font-light leading-relaxed font-serif italic border-l border-[#C5A059]/40 pl-6 py-2">
-                            "Há histórias que só as mãos sabem contar."
+                            "{t('manifesto.quote')}"
                         </p>
                     </div>
                 </div>
@@ -1506,17 +1582,17 @@ const MadeWithTimeSection = () => {
                                 <div className="flex items-center justify-between border-b border-forest/10 pb-3">
                                     <div className="flex items-center gap-2">
                                         <Feather size={14} className="text-[#C5A059] opacity-80" />
-                                        <span className="font-mono text-[9px] uppercase tracking-[0.25em] text-forest/40">01 / ARTESÃO</span>
+                                        <span className="font-mono text-[9px] uppercase tracking-[0.25em] text-forest/40">{t('manifesto.pillar1.num')}</span>
                                     </div>
                                     <span className="font-serif italic text-lg text-[#C5A059]/50 group-hover:text-[#C5A059] transition-colors duration-500 font-light select-none">I</span>
                                 </div>
                                 <h3 className="text-xl font-serif text-forest tracking-wide group-hover:text-[#C5A059] transition-colors duration-300 font-light leading-snug">
-                                    Algumas coisas precisam de tempo para nascer.
+                                    {t('manifesto.pillar1.title')}
                                 </h3>
                                 <div className="space-y-4 font-sans text-forest/65 text-sm font-light leading-relaxed">
-                                    <p>Não acredito em apressar aquilo que realmente importa.</p>
-                                    <p>Cada peça começa em silêncio, crescendo ponto a ponto, respeitando seu próprio ritmo.</p>
-                                    <p>Porque as coisas mais importantes da vida não são criadas à pressa.</p>
+                                    <p>{t('manifesto.pillar1.p1')}</p>
+                                    <p>{t('manifesto.pillar1.p2')}</p>
+                                    <p>{t('manifesto.pillar1.p3')}</p>
                                 </div>
                             </motion.div>
 
@@ -1531,17 +1607,17 @@ const MadeWithTimeSection = () => {
                                 <div className="flex items-center justify-between border-b border-forest/10 pb-3">
                                     <div className="flex items-center gap-2">
                                         <Sparkles size={14} className="text-[#C5A059] opacity-80" />
-                                        <span className="font-mono text-[9px] uppercase tracking-[0.25em] text-forest/40">02 / EXCLUSIVO</span>
+                                        <span className="font-mono text-[9px] uppercase tracking-[0.25em] text-forest/40">{t('manifesto.pillar2.num')}</span>
                                     </div>
                                     <span className="font-serif italic text-lg text-[#C5A059]/50 group-hover:text-[#C5A059] transition-colors duration-500 font-light select-none">II</span>
                                 </div>
                                 <h3 className="text-xl font-serif text-forest tracking-wide group-hover:text-[#C5A059] transition-colors duration-300 font-light leading-snug">
-                                    Nenhuma memória nasce duas vezes.
+                                    {t('manifesto.pillar2.title')}
                                 </h3>
                                 <div className="space-y-4 font-sans text-forest/65 text-sm font-light leading-relaxed">
-                                    <p>Raramente procuro recriar uma peça exatamente da mesma forma.</p>
-                                    <p>Tal como as memórias, cada criação carrega o seu próprio caráter, as suas imperfeições e a sua história.</p>
-                                    <p>É aí que vive a sua beleza.</p>
+                                    <p>{t('manifesto.pillar2.p1')}</p>
+                                    <p>{t('manifesto.pillar2.p2')}</p>
+                                    <p>{t('manifesto.pillar2.p3')}</p>
                                 </div>
                             </motion.div>
 
@@ -1556,17 +1632,17 @@ const MadeWithTimeSection = () => {
                                 <div className="flex items-center justify-between border-b border-forest/10 pb-3">
                                     <div className="flex items-center gap-2">
                                         <Palette size={14} className="text-[#C5A059] opacity-80" />
-                                        <span className="font-mono text-[9px] uppercase tracking-[0.25em] text-forest/40">03 / CONSCIENTE</span>
+                                        <span className="font-mono text-[9px] uppercase tracking-[0.25em] text-forest/40">{t('manifesto.pillar3.num')}</span>
                                     </div>
                                     <span className="font-serif italic text-lg text-[#C5A059]/50 group-hover:text-[#C5A059] transition-colors duration-500 font-light select-none">III</span>
                                 </div>
                                 <h3 className="text-xl font-serif text-forest tracking-wide group-hover:text-[#C5A059] transition-colors duration-300 font-light leading-snug">
-                                    A criação acontece no silêncio.
+                                    {t('manifesto.pillar3.title')}
                                 </h3>
                                 <div className="space-y-4 font-sans text-forest/65 text-sm font-light leading-relaxed">
-                                    <p>Muitas ideias nascem entre fios, pensamentos e momentos de quietude.</p>
-                                    <p>O processo nunca é acelerado.</p>
-                                    <p>É neste ritmo mais lento que os detalhes se revelam e a inspiração encontra o seu lugar.</p>
+                                    <p>{t('manifesto.pillar3.p1')}</p>
+                                    <p>{t('manifesto.pillar3.p2')}</p>
+                                    <p>{t('manifesto.pillar3.p3')}</p>
                                 </div>
                             </motion.div>
 
@@ -1581,17 +1657,17 @@ const MadeWithTimeSection = () => {
                                 <div className="flex items-center justify-between border-b border-forest/10 pb-3">
                                     <div className="flex items-center gap-2">
                                         <Heart size={14} className="text-[#C5A059] opacity-80" />
-                                        <span className="font-mono text-[9px] uppercase tracking-[0.25em] text-forest/40">04 / EMOCIONAL</span>
+                                        <span className="font-mono text-[9px] uppercase tracking-[0.25em] text-forest/40">{t('manifesto.pillar4.num')}</span>
                                     </div>
                                     <span className="font-serif italic text-lg text-[#C5A059]/50 group-hover:text-[#C5A059] transition-colors duration-500 font-light select-none">IV</span>
                                 </div>
                                 <h3 className="text-xl font-serif text-forest tracking-wide group-hover:text-[#C5A059] transition-colors duration-300 font-light leading-snug">
-                                    O verdadeiro valor é aquilo que permanece.
+                                    {t('manifesto.pillar4.title')}
                                 </h3>
                                 <div className="space-y-4 font-sans text-forest/65 text-sm font-light leading-relaxed">
-                                    <p>O valor de uma peça artesanal não vive apenas nos materiais.</p>
-                                    <p>Vive no cuidado, na intenção e na emoção transportada em cada ponto.</p>
-                                    <p>Muito depois de o fio ser tecido, o sentimento permanece.</p>
+                                    <p>{t('manifesto.pillar4.p1')}</p>
+                                    <p>{t('manifesto.pillar4.p2')}</p>
+                                    <p>{t('manifesto.pillar4.p3')}</p>
                                 </div>
                             </motion.div>
 
@@ -1627,7 +1703,7 @@ const MadeWithTimeSection = () => {
                             {/* Intimate overlay tag */}
                             <div className="absolute bottom-6 left-6 right-6 flex justify-between items-end">
                                 <p className="text-cream font-serif italic text-base font-light leading-snug drop-shadow-sm max-w-[200px]">
-                                    "A paciência é a alma do atelier."
+                                    "{t('manifesto.imageQuote')}"
                                 </p>
                                 <span className="font-mono text-[8px] tracking-[0.3em] text-cream/70 uppercase">M★B</span>
                             </div>
@@ -1653,6 +1729,7 @@ const KnotSection = () => {
         target: containerRef,
         offset: ["start end", "end start"]
     });
+    const { t } = useLanguage();
 
     const smoothProgress = useSpring(scrollYProgress, {
         stiffness: 100,
@@ -1689,7 +1766,7 @@ const KnotSection = () => {
                         viewport={{ once: true }}
                         className="text-[10px] uppercase tracking-[0.4em] font-bold text-cream/30 mb-4 block"
                     >
-                        Filosofia de Criação
+                        {t('feeling.badge')}
                     </motion.span>
                     <motion.h2 
                         initial={{ opacity: 0, y: 20 }}
@@ -1698,8 +1775,8 @@ const KnotSection = () => {
                         transition={{ duration: 1 }}
                         className="text-3xl sm:text-5xl md:text-6xl lg:text-8xl font-serif text-cream leading-tight mb-8 md:mb-10"
                     >
-                        O Ritmo do Coração <br />
-                        <span className="italic font-normal text-brand-green-light">em Cada Ponto.</span>
+                        {t('feeling.title.part1')} <br />
+                        <span className="italic font-normal text-brand-green-light">{t('feeling.title.part2')}</span>
                     </motion.h2>
                     <motion.p 
                         initial={{ opacity: 0, y: 20 }}
@@ -1708,11 +1785,11 @@ const KnotSection = () => {
                         transition={{ duration: 1, delay: 0.2 }}
                         className="text-cream/80 text-base sm:text-lg md:text-xl lg:text-2xl font-light leading-relaxed animate-fadeIn"
                     >
-                        Há algo especial em criar com as próprias mãos. Cada ponto nasce de um gesto simples, repetido com calma, até ganhar forma, textura e significado.
+                        {t('feeling.p1')}
                         <br /><br />
-                        Enquanto as peças crescem, também crescem as memórias, os pensamentos e as histórias que as acompanham.
+                        {t('feeling.p2')}
                         <br /><br />
-                        Talvez seja por isso que o handmade nos toca de forma diferente. Porque não transporta apenas matéria. Transporta tempo – e tudo aquilo que sentimos enquanto criamos.
+                        {t('feeling.p3')}
                     </motion.p>
                 </div>
 
@@ -1733,7 +1810,7 @@ const KnotSection = () => {
                         />
                         <div className="absolute inset-x-0 bottom-0 p-8 md:p-12 bg-gradient-to-t from-forest/90 via-forest/40 to-transparent">
                             <span className="text-[10px] uppercase tracking-[0.4em] text-cream/50 mb-1 md:mb-2 block">Premium / Bags</span>
-                            <p className="text-cream text-lg md:text-2xl font-serif italic">A trama que define o DNA Bravo.</p>
+                            <p className="text-cream text-lg md:text-2xl font-serif italic">{t('feeling.caption')}</p>
                         </div>
                     </motion.div>
 
@@ -1807,7 +1884,6 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, i, isFocused, isSubd
                         product.name.toLowerCase().includes('signature granny poncho') ||
                         product.name.toLowerCase().includes('cardigan') ||
                         isClassicCoasters;
-    const isClassicCoastersOrBikini = isDualColor;
     const initialColor = isDualColor 
         ? 'Azul Água & Branco' 
         : 'Verde Musgo';
@@ -1945,17 +2021,12 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, i, isFocused, isSubd
         ? ['1und.', '2und.', '4und.', '6und.', '8und.']
         : ['2und.', '4und.', '6und.', '8und.'];
 
-    const colors = isClassicCoastersOrBikini ? [
+    const colors = isDualColor ? [
         { name: 'Azul Água & Branco', bg: 'linear-gradient(45deg, #A6BCAE 50%, #FFFFFF 50%)' },
         { name: 'Amarelo & Branco', bg: 'linear-gradient(45deg, #F4D03F 50%, #FFFFFF 50%)' },
         { name: 'Rosa & Branco', bg: 'linear-gradient(45deg, #FADADD 50%, #FFFFFF 50%)' },
         { name: 'Verde & Branco', bg: 'linear-gradient(45deg, #243119 50%, #FFFFFF 50%)' },
         { name: 'Vermelho & Branco', bg: 'linear-gradient(45deg, #C0392B 50%, #FFFFFF 50%)' }
-    ] : isDualColor ? [
-        { name: 'Verde Musgo & Creme', bg: 'linear-gradient(45deg, #2E3B26 50%, #F5F2ED 50%)' },
-        { name: 'Azul Noite & Creme', bg: 'linear-gradient(45deg, #1C2D37 50%, #F5F2ED 50%)' },
-        { name: 'Terracota & Areia', bg: 'linear-gradient(45deg, #A85B40 50%, #E3D9C6 50%)' },
-        { name: 'Mostarda & Verde Floresta', bg: 'linear-gradient(45deg, #D4A33B 50%, #1A281A 50%)' }
     ] : isMiniPouches ? [
         { name: 'Verde Musgo', hex: '#2E3B26' },
         { name: 'Azul Noite', hex: '#1C2D37' },
@@ -3210,6 +3281,7 @@ const CollectionSection = () => {
     const [focusedProductId, setFocusedProductId] = useState<string | null>(null);
     const containerRef = useRef(null);
     const carouselRef = useRef<HTMLDivElement>(null);
+    const { lang, t } = useLanguage();
 
     const { scrollYProgress } = useScroll({
         target: containerRef,
@@ -3226,7 +3298,8 @@ const CollectionSection = () => {
     const yTrack = useTransform(smoothProgress, [0, 1], ["-35%", "25%"]);
     const opacityTrack = useTransform(smoothProgress, [0, 0.2, 0.8, 1], [0, 0.04, 0.04, 0]);
 
-    const activeCategory = SHOP_CATEGORIES.find(c => c.id === selectedCategory);
+    const translatedCategoriesList = SHOP_CATEGORIES.map(cat => translateCategory(cat, lang));
+    const activeCategory = translatedCategoriesList.find(c => c.id === selectedCategory);
 
     const handlePrevProduct = () => {
         if (!activeCategory || !focusedProductId) return;
@@ -3288,7 +3361,7 @@ const CollectionSection = () => {
                     whileInView={{ opacity: 1 }}
                     className="text-xs tracking-[0.3em] text-gray-400 uppercase font-light mb-4 block"
                  >
-                    PRODUTOS
+                    {t('collection.tag')}
                  </motion.span>
                  <motion.h2 
                     initial={{ opacity: 0, y: 20 }}
@@ -3329,7 +3402,7 @@ const CollectionSection = () => {
                          transition={{ duration: 1, delay: 0.2 }}
                          className="text-forest/60 text-lg md:text-xl font-serif font-light italic mt-6"
                      >
-                         O que começou como gesto torna-se matéria.
+                         {t('collection.subtitle')}
                      </motion.p>
                  )}
 
@@ -3341,7 +3414,7 @@ const CollectionSection = () => {
                         className="mt-12 group flex items-center gap-4 mx-auto text-[10px] uppercase tracking-[0.4em] font-bold text-forest/40 hover:text-forest transition-colors"
                     >
                         <ChevronLeft size={16} className="group-hover:-translate-x-2 transition-transform" />
-                        Voltar à Coleção
+                        {t('btn.back_collection')}
                     </motion.button>
                  )}
             </div>
@@ -3357,7 +3430,7 @@ const CollectionSection = () => {
                             transition={{ duration: 0.2, ease: "linear" }}
                             className="grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-16 lg:gap-24"
                         >
-                            {SHOP_CATEGORIES.map((cat, i) => (
+                            {translatedCategoriesList.map((cat, i) => (
                                 <motion.div 
                                     key={cat.id}
                                     initial={{ opacity: 0, y: 30 }}
@@ -3486,6 +3559,7 @@ const ContactSection = () => {
         target: containerRef,
         offset: ["start end", "end start"]
     });
+    const { lang, t } = useLanguage();
 
     const smoothProgress = useSpring(scrollYProgress, {
         stiffness: 100,
@@ -3497,6 +3571,10 @@ const ContactSection = () => {
     const yTrack = useTransform(smoothProgress, [0, 1], ["-20%", "20%"]);
     const opacityTrack = useTransform(smoothProgress, [0, 0.2, 0.8, 1], [0, 0.02, 0.02, 0]);
 
+    const whatsappMessage = lang === 'pt' 
+        ? "Olá! Vi o site da M★BRAVO e gostaria de saber mais sobre as suas peças."
+        : "Hello! I saw the M★BRAVO website and would like to know more about your pieces.";
+
     return (
         <section ref={containerRef} id="contacto" data-background="dark" className="pt-24 pb-20 px-4 landscape:py-16 md:portrait:py-24 lg:py-32 xl:py-36 bg-forest relative overflow-hidden">
              {/* Large Script Background */}
@@ -3507,15 +3585,15 @@ const ContactSection = () => {
                  M★Bravo
              </motion.div>
 
-             <div className="w-full max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
+             <div className="w-full max-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
                 <motion.div
                     initial={{ opacity: 0, y: 30 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
                 >
-                    <h2 className="text-4xl sm:text-5xl md:text-6xl lg:text-8xl font-serif text-cream mb-14 md:mb-16 leading-tight">Entre no nosso <br /><span className="italic">Universo.</span></h2>
+                    <h2 className="text-4xl sm:text-5xl md:text-6xl lg:text-8xl font-serif text-cream mb-14 md:mb-16 leading-tight">{t('contact.title_1')} <br /><span className="italic">{t('contact.title_2')}</span></h2>
                     <p className="text-cream/50 text-xl font-light mb-20 md:mb-24 leading-relaxed">
-                        Deseja uma peça personalizada ou simplesmente quer saber mais sobre o nosso processo? Estamos a um ponto de distância.
+                        {t('contact.subtitle')}
                     </p>
                     
                     <div className="flex flex-col items-center gap-6 sm:gap-10 md:gap-12">
@@ -3528,13 +3606,13 @@ const ContactSection = () => {
                         </a>
 
                         <a 
-                            href={`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent("Olá! Vi o site da M★BRAVO e gostaria de saber mais sobre as suas peças.")}`}
+                            href={`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(whatsappMessage)}`}
                             target="_blank"
                             rel="noopener noreferrer"
                             className="group flex items-center gap-3 md:gap-4 text-[15px] max-[350px]:text-[11px] xs:text-xl sm:text-2xl md:text-4xl font-serif text-cream hover:text-brand-green-light transition-all border-b border-cream/20 pb-3 md:pb-4 break-all sm:break-normal"
                         >
                             <MessageCircle size={20} className="sm:w-6 sm:h-6 md:w-8 md:h-8 opacity-40 group-hover:opacity-100 transition-opacity flex-shrink-0" />
-                            Conversar via WhatsApp
+                            {t('contact.chat_whatsapp')}
                         </a>
                     </div>
                 </motion.div>
@@ -3546,7 +3624,7 @@ const ContactSection = () => {
                     <a href={MAILTO_LINK} className="text-[10px] uppercase tracking-[0.4em] text-cream/40 hover:text-cream transition-colors">
                         E-mail
                     </a>
-                    <a href={`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent("Olá! Vi o site da M★BRAVO e gostaria de saber mais sobre as suas peças.")}`} target="_blank" rel="noopener noreferrer" className="text-[10px] uppercase tracking-[0.4em] text-cream/40 hover:text-cream transition-colors">
+                    <a href={`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(whatsappMessage)}`} target="_blank" rel="noopener noreferrer" className="text-[10px] uppercase tracking-[0.4em] text-cream/40 hover:text-cream transition-colors">
                         WhatsApp
                     </a>
                 </div>
@@ -3555,7 +3633,274 @@ const ContactSection = () => {
     );
 };
 
-const Footer = () => {
+interface LegalModalProps {
+    type: 'envios' | 'privacidade' | 'termos';
+    onClose: () => void;
+}
+
+const LegalModal = ({ type, onClose }: LegalModalProps) => {
+    const { lang } = useLanguage();
+    
+    useEffect(() => {
+        // Prevent body scroll when modal is open
+        document.body.style.overflow = 'hidden';
+        return () => {
+            document.body.style.overflow = '';
+        };
+    }, []);
+
+    const ptContent = {
+        envios: {
+            title: "Política de Envios e Devoluções",
+            body: (
+                <div className="space-y-8 text-forest">
+                    <div>
+                        <h3 className="text-xs uppercase tracking-[0.3em] font-semibold text-[#C5A059] mb-4 font-sans">
+                            Envios e Prazos de Entrega
+                        </h3>
+                        <p className="font-serif italic text-base text-forest/95 mb-6 leading-relaxed">
+                            Na M★BRAVO, cada peça é meticulosamente desenvolvida à mão, respeitando o tempo do artesanato de luxo.
+                        </p>
+                        <ul className="space-y-4 text-forest/75 text-sm font-sans font-light">
+                            <li className="flex flex-col gap-1">
+                                <strong className="font-medium text-forest text-xs uppercase tracking-wider">Prazo de Produção</strong>
+                                <span>O tempo estimado para a confeção e preparação de cada peça varia entre 4 a 7 dias úteis após a confirmação do pagamento.</span>
+                            </li>
+                            <li className="flex flex-col gap-1">
+                                <strong className="font-medium text-forest text-xs uppercase tracking-wider">Método de Envio</strong>
+                                <span>Todos os envios são realizados através de transportadora registada. Assim que a sua encomenda for expedida, receberá um e-mail com o respetivo código de rastreamento (tracking number) para acompanhar a entrega.</span>
+                            </li>
+                            <li className="flex flex-col gap-1">
+                                <strong className="font-medium text-forest text-xs uppercase tracking-wider">Custos de Envio</strong>
+                                <span>Os custos de transporte são calculados de forma automática no momento do checkout, variando consoante o destino e a distância da entrega.</span>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div className="pt-6 border-t border-forest/10">
+                        <h3 className="text-xs uppercase tracking-[0.3em] font-semibold text-[#C5A059] mb-4 font-sans">
+                            Política de Devoluções
+                        </h3>
+                        <p className="text-forest/75 text-sm font-sans font-light leading-relaxed mb-4">
+                            Por se tratarem de artigos de design autoral, confecionados artesanalmente sob encomenda, a M★BRAVO apenas aceita devoluções ou trocas em caso de defeito de fabrico comprovado.
+                        </p>
+                        <p className="text-forest/75 text-sm font-sans font-light leading-relaxed mb-4">
+                            Se detetar algum defeito na sua peça, deverá contactar-nos no prazo máximo de 14 dias após a receção, através do e-mail <a href={`mailto:${CONTACT_EMAIL}`} className="underline hover:text-forest transition-colors font-medium font-mono">{CONTACT_EMAIL}</a>, enviando fotografias detalhadas do problema.
+                        </p>
+                        <p className="text-forest/75 text-sm font-sans font-light leading-relaxed">
+                            Após a validação da nossa equipa, procederemos à recolha do artigo e ao respetivo reembolso ou substituição da peça, sem qualquer custo adicional para o cliente.
+                        </p>
+                    </div>
+                </div>
+            )
+        },
+        privacidade: {
+            title: "Política de Privacidade",
+            body: (
+                <div className="space-y-8 text-forest">
+                    <p className="font-serif italic text-base text-forest/95 leading-relaxed">
+                        A M★BRAVO está empenhada em proteger a privacidade e os dados pessoais dos seus clientes. Em conformidade com o Regulamento Geral sobre a Proteção de Dados (RGPD), informamos:
+                    </p>
+                    <ul className="space-y-6 text-forest/75 text-sm font-sans font-light">
+                        <li className="flex flex-col gap-1.5">
+                            <strong className="font-medium text-forest text-xs uppercase tracking-wider">Recolha de Dados</strong>
+                            <span>Os dados recolhidos no nosso website (nome, e-mail, telefone, morada de envio e dados de faturação) destinam-se única e exclusivamente ao processamento das suas encomendas, comunicação sobre o estado do envio e suporte ao cliente.</span>
+                        </li>
+                        <li className="flex flex-col gap-1.5">
+                            <strong className="font-medium text-forest text-xs uppercase tracking-wider">Segurança e Terceiros</strong>
+                            <span>Os seus dados de pagamento são processados de forma encriptada e segura através de plataformas parceiras certificadas (como Stripe). A M★BRAVO não armazena os seus dados bancários ou de cartões de crédito. Os seus dados de morada serão partilhados estritamente com a empresa transportadora para efeitos de entrega.</span>
+                        </li>
+                        <li className="flex flex-col gap-1.5">
+                            <strong className="font-medium text-forest text-xs uppercase tracking-wider">Direitos do Utilizador</strong>
+                            <span>O cliente tem o direito de aceder, retificar ou solicitar a eliminação definitiva dos seus dados pessoais a qualquer momento. Para exercer estes direitos, basta enviar um pedido para <a href={`mailto:${CONTACT_EMAIL}`} className="underline hover:text-forest transition-colors font-medium font-mono">{CONTACT_EMAIL}</a>.</span>
+                        </li>
+                    </ul>
+                </div>
+            )
+        },
+        termos: {
+            title: "Termos e Condições de Serviço",
+            body: (
+                <div className="space-y-8 text-forest">
+                    <p className="font-serif italic text-base text-forest/95 leading-relaxed">
+                        Ao navegar e efetuar compras no website M★BRAVO, o utilizador aceita cumprir os seguintes termos:
+                    </p>
+                    <ul className="space-y-6 text-forest/75 text-sm font-sans font-light">
+                        <li className="flex flex-col gap-1.5">
+                            <strong className="font-medium text-forest text-xs uppercase tracking-wider">Propriedade Intelectual</strong>
+                            <span>Todos os designs, imagens, fotografias de catálogo, logótipos e textos presentes neste website são propriedade exclusiva da M★BRAVO, sendo estritamente proibida a sua reprodução ou utilização sem autorização prévia.</span>
+                        </li>
+                        <li className="flex flex-col gap-1.5">
+                            <strong className="font-medium text-forest text-xs uppercase tracking-wider">Produtos e Preços</strong>
+                            <span>Sendo peças feitas à mão, podem ocorrer variações mínimas de textura ou tonalidade em comparação com as fotos apresentadas, o que confere exclusividade a cada artigo. Os preços estão indicados em Euros (€) e a M★BRAVO reserva-se o direito de os alterar sem aviso prévio, garantindo-se sempre a aplicação do preço indicado no momento da compra.</span>
+                        </li>
+                        <li className="flex flex-col gap-1.5">
+                            <strong className="font-medium text-forest text-xs uppercase tracking-wider">Suporte e Resolução de Litígios</strong>
+                            <span>Para qualquer dúvida, reclamação ou assistência, o cliente dispõe dos seguintes canais oficiais:</span>
+                            <div className="mt-2 pl-4 border-l border-forest/10 space-y-1 text-xs">
+                                <div><strong className="font-medium">E-mail:</strong> <a href={`mailto:${CONTACT_EMAIL}`} className="underline hover:text-forest transition-colors font-mono">{CONTACT_EMAIL}</a></div>
+                                <div><strong className="font-medium">Telefone/WhatsApp:</strong> <a href="tel:+351912828182" className="underline hover:text-forest transition-colors font-mono">+351 912 828 182</a> <span className="text-forest/50 font-light italic">(Chamada para a rede móvel nacional)</span></div>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            )
+        }
+    };
+
+    const enContent = {
+        envios: {
+            title: "Shipping & Returns Policy",
+            body: (
+                <div className="space-y-8 text-forest">
+                    <div>
+                        <h3 className="text-xs uppercase tracking-[0.3em] font-semibold text-[#C5A059] mb-4 font-sans">
+                            Shipping and Delivery Times
+                        </h3>
+                        <p className="font-serif italic text-base text-forest/95 mb-6 leading-relaxed">
+                            At M★BRAVO, each piece is meticulously handcrafted, respecting the pace of luxury craftsmanship.
+                        </p>
+                        <ul className="space-y-4 text-forest/75 text-sm font-sans font-light">
+                            <li className="flex flex-col gap-1">
+                                <strong className="font-medium text-forest text-xs uppercase tracking-wider">Production Time</strong>
+                                <span>The estimated time for crafting and preparing each piece varies between 4 to 7 business days after payment confirmation.</span>
+                            </li>
+                            <li className="flex flex-col gap-1">
+                                <strong className="font-medium text-forest text-xs uppercase tracking-wider">Shipping Method</strong>
+                                <span>All shipments are carried out via registered courier. Once your order is dispatched, you will receive an email with the tracking number to monitor your delivery.</span>
+                            </li>
+                            <li className="flex flex-col gap-1">
+                                <strong className="font-medium text-forest text-xs uppercase tracking-wider">Shipping Costs</strong>
+                                <span>Shipping costs are automatically calculated at checkout, varying based on the destination and delivery distance.</span>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div className="pt-6 border-t border-forest/10">
+                        <h3 className="text-xs uppercase tracking-[0.3em] font-semibold text-[#C5A059] mb-4 font-sans">
+                            Returns Policy
+                        </h3>
+                        <p className="text-forest/75 text-sm font-sans font-light leading-relaxed mb-4">
+                            Because these are signature pieces custom made-to-order, M★BRAVO only accepts returns or exchanges in the event of a proven manufacturing defect.
+                        </p>
+                        <p className="text-forest/75 text-sm font-sans font-light leading-relaxed mb-4">
+                            If you detect any defect in your piece, you must contact us within a maximum of 14 days of receipt at <a href={`mailto:${CONTACT_EMAIL}`} className="underline hover:text-forest transition-colors font-medium font-mono">{CONTACT_EMAIL}</a>, sending detailed photographs of the issue.
+                        </p>
+                        <p className="text-forest/75 text-sm font-sans font-light leading-relaxed">
+                            After validation by our team, we will collect the item and proceed with the refund or replacement of the piece at no additional cost to the client.
+                        </p>
+                    </div>
+                </div>
+            )
+        },
+        privacidade: {
+            title: "Privacy Policy",
+            body: (
+                <div className="space-y-8 text-forest">
+                    <p className="font-serif italic text-base text-forest/95 leading-relaxed">
+                        M★BRAVO is committed to protecting the privacy and personal data of its clients. In accordance with the General Data Protection Regulation (GDPR), we inform:
+                    </p>
+                    <ul className="space-y-6 text-forest/75 text-sm font-sans font-light">
+                        <li className="flex flex-col gap-1.5">
+                            <strong className="font-medium text-forest text-xs uppercase tracking-wider">Data Collection</strong>
+                            <span>The data collected on our website (name, email, telephone, shipping address, and billing data) is used solely and exclusively to process your orders, communicate about shipment status, and provide customer support.</span>
+                        </li>
+                        <li className="flex flex-col gap-1.5">
+                            <strong className="font-medium text-forest text-xs uppercase tracking-wider">Security and Third Parties</strong>
+                            <span>Your payment data is processed securely and encrypted through certified partner platforms (such as Stripe). M★BRAVO does not store your banking or credit card details. Your address details will be shared strictly with the shipping carrier for delivery purposes.</span>
+                        </li>
+                        <li className="flex flex-col gap-1.5">
+                            <strong className="font-medium text-forest text-xs uppercase tracking-wider">User Rights</strong>
+                            <span>Clients have the right to access, rectify, or request the permanent deletion of their personal data at any time. To exercise these rights, simply send a request to <a href={`mailto:${CONTACT_EMAIL}`} className="underline hover:text-forest transition-colors font-medium font-mono">{CONTACT_EMAIL}</a>.</span>
+                        </li>
+                    </ul>
+                </div>
+            )
+        },
+        termos: {
+            title: "Terms and Conditions of Service",
+            body: (
+                <div className="space-y-8 text-forest">
+                    <p className="font-serif italic text-base text-forest/95 leading-relaxed">
+                        By browsing and purchasing on the M★BRAVO website, the user agrees to comply with the following terms:
+                    </p>
+                    <ul className="space-y-6 text-forest/75 text-sm font-sans font-light">
+                        <li className="flex flex-col gap-1.5">
+                            <strong className="font-medium text-forest text-xs uppercase tracking-wider">Intellectual Property</strong>
+                            <span>All designs, images, catalog photographs, logos, and text present on this website are the exclusive property of M★BRAVO, and their reproduction or use without prior authorization is strictly prohibited.</span>
+                        </li>
+                        <li className="flex flex-col gap-1.5">
+                            <strong className="font-medium text-forest text-xs uppercase tracking-wider">Products and Prices</strong>
+                            <span>Being handmade pieces, minimal variations in texture or tone may occur compared to the photos shown, which guarantees the exclusivity of each item. Prices are shown in Euros (€) and M★BRAVO reserves the right to change them without prior notice, always guaranteeing the application of the price indicated at the time of purchase.</span>
+                        </li>
+                        <li className="flex flex-col gap-1.5">
+                            <strong className="font-medium text-forest text-xs uppercase tracking-wider">Support and Dispute Resolution</strong>
+                            <span>For any questions, claims, or assistance, the customer has the following official channels:</span>
+                            <div className="mt-2 pl-4 border-l border-forest/10 space-y-1 text-xs">
+                                <div><strong className="font-medium">E-mail:</strong> <a href={`mailto:${CONTACT_EMAIL}`} className="underline hover:text-forest transition-colors font-mono">{CONTACT_EMAIL}</a></div>
+                                <div><strong className="font-medium">Phone/WhatsApp:</strong> <a href="tel:+351912828182" className="underline hover:text-forest transition-colors font-mono">+351 912 828 182</a> <span className="text-forest/50 font-light italic">(Call to national mobile network)</span></div>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            )
+        }
+    };
+
+    const content = lang === 'pt' ? ptContent : enContent;
+    const current = content[type];
+
+    return (
+        <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-forest/40 backdrop-blur-md z-[9999] flex items-center justify-center p-4 md:p-6"
+            onClick={onClose}
+        >
+            <motion.div 
+                initial={{ opacity: 0, y: 30, scale: 0.98 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, y: 30, scale: 0.98 }}
+                transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+                className="max-w-2xl w-full bg-[#FCFBF9] text-forest rounded-[2rem] overflow-hidden shadow-[0_24px_50px_rgba(31,42,24,0.15)] flex flex-col max-h-[85vh] border border-forest/10"
+                onClick={(e) => e.stopPropagation()}
+            >
+                {/* Header */}
+                <div className="px-6 md:px-8 py-5 border-b border-forest/10 flex justify-between items-center bg-[#FCFBF9]">
+                    <h2 className="text-sm md:text-base font-serif uppercase tracking-[0.2em] font-medium text-forest">
+                        {current.title}
+                    </h2>
+                    <button 
+                        onClick={onClose}
+                        className="w-8 h-8 rounded-full bg-forest/5 hover:bg-forest/10 flex items-center justify-center transition-colors text-forest/70 hover:text-forest cursor-pointer"
+                    >
+                        <X size={16} />
+                    </button>
+                </div>
+
+                {/* Body */}
+                <div className="px-6 md:px-10 py-6 md:py-8 overflow-y-auto scrollbar-thin scrollbar-thumb-forest/10">
+                    {current.body}
+                </div>
+
+                {/* Footer */}
+                <div className="px-6 md:px-8 py-4 border-t border-forest/5 bg-forest/[0.02] flex justify-between items-center text-[10px] text-forest/40">
+                    <span className="font-mono">M★BRAVO ATELIER</span>
+                    <button 
+                        onClick={onClose}
+                        className="uppercase tracking-[0.15em] font-medium text-forest/65 hover:text-forest transition-colors cursor-pointer"
+                    >
+                        {lang === 'pt' ? 'Fechar' : 'Close'}
+                    </button>
+                </div>
+            </motion.div>
+        </motion.div>
+    );
+};
+
+const Footer = ({ onOpenLegal }: { onOpenLegal: (type: 'envios' | 'privacidade' | 'termos') => void }) => {
+    const { t } = useLanguage();
     return (
         <footer className="bg-forest text-cream py-12 px-4 border-t border-cream/5">
             <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row justify-between items-center gap-16">
@@ -3582,16 +3927,19 @@ const Footer = () => {
                     </div>
                 </div>
                 
-                <div className="flex gap-12 text-[10px] uppercase tracking-[0.2em] font-medium text-cream/30">
-                    <a href="#" className="hover:text-cream transition-colors">FAQ</a>
-                    <a href="#" className="hover:text-cream transition-colors">Envios</a>
-                    <a href="#" className="hover:text-cream transition-colors">Política</a>
+                <div className="flex flex-col sm:flex-row gap-6 sm:gap-12 text-[10px] uppercase tracking-[0.2em] font-medium text-cream/30 text-center sm:text-left">
+                    <button onClick={() => onOpenLegal('envios')} className="hover:text-cream transition-colors cursor-pointer text-left uppercase tracking-[0.2em]">{t('footer.legal_shipping')}</button>
+                    <button onClick={() => onOpenLegal('privacidade')} className="hover:text-cream transition-colors cursor-pointer text-left uppercase tracking-[0.2em]">{t('footer.legal_privacy')}</button>
+                    <button onClick={() => onOpenLegal('termos')} className="hover:text-cream transition-colors cursor-pointer text-left uppercase tracking-[0.2em]">{t('footer.legal_terms')}</button>
                 </div>
 
-                <div className="text-[9px] uppercase tracking-[0.2em] text-cream/20 text-center md:text-right">
-                    {CONTACT_EMAIL} <br />
-                    © 2025 M★BRAVO | Handmade with Love <br />
-                    Criado com tempo, em Portugal.
+                <div className="text-[9px] uppercase tracking-[0.2em] text-cream/45 text-center md:text-right flex flex-col gap-1 md:items-end">
+                    <div className="text-cream/30 text-[8px] tracking-[0.3em] uppercase mb-1">{t('footer.support')}</div>
+                    <a href={MAILTO_LINK} className="hover:text-cream transition-colors font-mono">{CONTACT_EMAIL}</a>
+                    <a href="tel:+351912828182" className="hover:text-cream transition-colors font-mono">+351 912 828 182</a>
+                    <div className="text-cream/20 mt-2 whitespace-pre-line">
+                        {t('footer.made_in')}
+                    </div>
                 </div>
             </div>
         </footer>
@@ -3599,6 +3947,7 @@ const Footer = () => {
 };
 
 const MemoryContinuesSection = () => {
+    const { t } = useLanguage();
     return (
         <section id="memoria" data-background="light" className="pt-24 pb-20 px-4 landscape:py-16 md:portrait:py-24 lg:py-32 xl:py-36 bg-[#FCFBF9] relative overflow-hidden select-none border-b border-forest/5">
             <div className="w-full max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
@@ -3612,7 +3961,7 @@ const MemoryContinuesSection = () => {
                     {/* Section label */}
                     <div className="space-y-6">
                         <span className="text-[10px] uppercase tracking-[0.45em] font-semibold text-forest/35 block font-sans">
-                            A MEMÓRIA CONTINUA
+                            {t('memory.tag')}
                         </span>
                         <div className="h-[1px] w-12 bg-forest/10 mx-auto" />
                     </div>
@@ -3620,27 +3969,27 @@ const MemoryContinuesSection = () => {
                     {/* Main text and body with elegant layout */}
                     <div className="space-y-10 lg:space-y-14">
                         <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-serif text-forest tracking-tight leading-tight font-light col-span-2">
-                            Há histórias que <br className="inline sm:hidden" /> não desaparecem.
+                            {t('memory.title')}
                         </h2>
                         
                         <p className="text-forest/70 font-serif italic text-lg sm:text-xl md:text-2xl leading-relaxed max-w-2xl mx-auto font-light">
-                            Continuam presentes nos gestos, nas memórias e nas pequenas coisas que criamos com amor.
+                            {t('memory.subtitle')}
                         </p>
                     </div>
 
                     <div className="space-y-8 max-w-xl mx-auto">
                         <p className="text-[#C5A059] font-serif italic text-xl md:text-2xl font-normal tracking-wide">
-                            M★Bravo nasceu dessa presença.
+                            {t('memory.mbravo_born')}
                         </p>
                         
                         <p className="text-forest/65 text-sm sm:text-base md:text-lg leading-relaxed font-sans font-light">
-                            Cada ponto, cada textura e cada detalhe transportam um pedaço dessa história, transformando fios em peças únicas e memórias em algo que pode ser tocado.
+                            {t('memory.desc')}
                         </p>
                     </div>
 
                     <div className="pt-12 md:pt-16 border-t border-forest/10 max-w-md mx-auto">
                         <p className="text-forest font-serif italic text-lg md:text-xl font-light leading-relaxed text-forest/80">
-                            "Mais do que croché, é uma forma de preservar aquilo que realmente importa."
+                            {t('memory.quote')}
                         </p>
                     </div>
                 </motion.div>
@@ -3653,6 +4002,8 @@ const MemoryContinuesSection = () => {
 
 export default function App() {
   const [loading, setLoading] = useState(true);
+  const [activeLegal, setActiveLegal] = useState<'envios' | 'privacidade' | 'termos' | null>(null);
+  const { t } = useLanguage();
 
   // Smooth scroll logic for standard browser behavior
   useEffect(() => {
@@ -3681,7 +4032,7 @@ export default function App() {
                 
                 {/* Scroll-linked Organic Fio Condutor (Golden Embroidery thread crossing sections) */}
                 <FioCondutor />
-
+ 
                 <div className="relative overflow-hidden">
                     <StorySection />
                     <MadeWithTimeSection />
@@ -3705,10 +4056,10 @@ export default function App() {
                     </motion.div>
                     <div className="relative z-10 text-center px-6 max-w-4xl mx-auto flex flex-col items-center gap-6 md:gap-8">
                         <h2 className="text-cream font-serif italic text-3xl sm:text-5xl md:text-6xl lg:text-7xl leading-tight">
-                            "A beleza está na alma <br className="hidden md:inline" /> que colocamos em cada gesto."
+                            {t('interlude.quote')}
                         </h2>
                         <span className="text-[#C5A059]/80 font-serif italic text-lg md:text-2xl tracking-wide font-light select-none block max-w-xl mx-auto">
-                            "Peças criadas com tempo, amor e memória."
+                            {t('interlude.sub')}
                         </span>
                     </div>
                 </div>
@@ -3718,7 +4069,13 @@ export default function App() {
                 <ContactSection />
             </div>
             
-            <Footer />
+            <Footer onOpenLegal={(type) => setActiveLegal(type)} />
+
+            <AnimatePresence>
+                {activeLegal && (
+                    <LegalModal type={activeLegal} onClose={() => setActiveLegal(null)} />
+                )}
+            </AnimatePresence>
           </motion.main>
         )}
       </AnimatePresence>
