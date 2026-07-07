@@ -860,45 +860,13 @@ export const translatedProductsData = {
   }
 };
 
-export const translatedFeaturedProducts = {
-  pt: [
-    {
-      id: 'v13',
-      title: 'Signature Granny Poncho',
-      desc: 'Croché autoral premium e intemporal',
-      img: 'https://images.unsplash.com/photo-1434389677669-e08b4cac3105?auto=format&fit=crop&q=80&w=800'
-    },
-    {
-      id: 'v14',
-      title: 'Alma Cardigan',
-      desc: 'Clássico design em granny squares',
-      img: 'https://images.unsplash.com/photo-1523381210434-271e8be1f52b?auto=format&fit=crop&q=80&w=800'
-    },
-    {
-      id: 'v5',
-      title: 'African Flower Pouch',
-      desc: 'Mala artesanal com forro e fecho premium',
-      img: 'https://images.unsplash.com/photo-1583847268964-b28dc8f51f92?auto=format&fit=crop&q=80&w=800'
-    }
-  ],
-  en: [
-    {
-      id: 'v13',
-      title: 'Signature Granny Poncho',
-      desc: 'Premium and timeless authorial crochet',
-      img: 'https://images.unsplash.com/photo-1434389677669-e08b4cac3105?auto=format&fit=crop&q=80&w=800'
-    },
-    {
-      id: 'v14',
-      title: 'Alma Cardigan',
-      desc: 'Classic design in granny squares',
-      img: 'https://images.unsplash.com/photo-1523381210434-271e8be1f52b?auto=format&fit=crop&q=80&w=800'
-    },
-    {
-      id: 'v5',
-      title: 'African Flower Pouch',
-      desc: 'Artisanal bag with premium lining and zipper',
-      img: 'https://images.unsplash.com/photo-1583847268964-b28dc8f51f92?auto=format&fit=crop&q=80&w=800'
-    }
-  ]
+export const translateBackendError = (error: string): string => {
+  if (!error) return "Ocorreu um erro inesperado. Por favor, tente novamente.";
+  if (error.includes("stripe") || error.includes("payment")) {
+    return "Erro no processamento do pagamento. Verifique os dados do cartão.";
+  }
+  if (error.includes("email") || error.includes("sendgrid")) {
+    return "Erro ao enviar o email de confirmação. O suporte foi notificado.";
+  }
+  return error;
 };
