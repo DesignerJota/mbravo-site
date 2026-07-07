@@ -1,18 +1,16 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence, useScroll, useTransform, useSpring, useVelocity } from 'motion/react';
 import { Menu, X, Instagram, Facebook, ArrowRight, ChevronLeft, ChevronRight, Share2, Mail, MessageCircle, Sparkles, Layers, Ban, AlertCircle, Feather, Palette, Heart } from 'lucide-react';
+import { loadStripe } from '@stripe/stripe-js';
 import { 
   useLanguage, 
   translateProduct, 
   translateCategory, 
   translateColor, 
   translateSize, 
-  translateQuantity 
+  translateQuantity,
+  translateBackendError
 } from './translations';
-
-// Imported local high-quality assets for Blue and Pink Coasters cards
-import blueCoastersImg from './assets/images/regenerated_image_1778776322373.png';
-import pinkCoastersImg from './assets/images/regenerated_image_1778776432487.png';
 
 // Hero background images for automatic rotation
 const HERO_BACKGROUNDS = [
@@ -161,8 +159,9 @@ const SHOP_CATEGORIES = [
         id: 'h1c', 
         name: 'Sunflower Coasters', 
         price: calculateProductRange('Sunflower Coasters'), 
-        img: 'https://i.ibb.co/7mtncnc/Sunflower-coasters-2.png',
+        img: 'https://i.ibb.co/CKSJ40LH/Sunflower-coasters-5.png',
         images: [
+          'https://i.ibb.co/CKSJ40LH/Sunflower-coasters-5.png',
           'https://i.ibb.co/7mtncnc/Sunflower-coasters-2.png',
           'https://i.ibb.co/JWxHQQwY/Sunflower-coasters-3.png',
           'https://i.ibb.co/27J2MWwz/Sunflower-coasters-4-4.png'
@@ -175,8 +174,9 @@ const SHOP_CATEGORIES = [
         id: 'h1f', 
         name: 'Coraline Coasters', 
         price: calculateProductRange('Coraline Coasters'), 
-        img: 'https://i.ibb.co/mVxVF0MM/Coraline-coasters-2.png',
+        img: 'https://i.ibb.co/ZzRSR1V8/Coraline-coasters-6.png',
         images: [
+          'https://i.ibb.co/ZzRSR1V8/Coraline-coasters-6.png',
           'https://i.ibb.co/mVxVF0MM/Coraline-coasters-2.png',
           'https://i.ibb.co/FqyRfSw2/Coraline-coasters-3.png',
           'https://i.ibb.co/VYmP3Mwv/Coraline-coasters-4.png',
@@ -190,8 +190,9 @@ const SHOP_CATEGORIES = [
         id: 'h1_classic', 
         name: 'Classic Coasters', 
         price: calculateProductRange('Classic Coasters'), 
-        img: 'https://i.ibb.co/PGmrtMMx/Pink-coasters4-2.png',
+        img: 'https://i.ibb.co/7JxTP2xq/Blue-coasters-7.png',
         images: [
+          'https://i.ibb.co/7JxTP2xq/Blue-coasters-7.png',
           'https://i.ibb.co/PGmrtMMx/Pink-coasters4-2.png',
           'https://i.ibb.co/WvBLxKxN/Pink-coasters5.png',
           'https://i.ibb.co/Kc6bxwjq/Pink-coasters3.png',
@@ -340,8 +341,9 @@ Compacta e prática, fecha com um botão de madeira com estrela, um detalhe espe
         id: 'v1b', 
         name: 'Coral Bikini Top', 
         price: calculateProductRange('Coral Bikini Top'), 
-        img: 'https://i.ibb.co/j9LYMvVw/Marea-Triangle-Top10-2.jpg',
+        img: 'https://i.ibb.co/nsShtnLn/Marea-Triangle-Top10-2.png',
         images: [
+          'https://i.ibb.co/nsShtnLn/Marea-Triangle-Top10-2.png',
           'https://i.ibb.co/j9LYMvVw/Marea-Triangle-Top10-2.jpg',
           'https://i.ibb.co/8gjmkHJL/Marea-Triangle-Top05.png'
         ],
@@ -356,9 +358,6 @@ Disponível em várias combinações de cores, foi criado para acompanhar os dia
         images: [
           'https://i.ibb.co/Qj7Lgf1Q/Poncho-2.png',
           'https://i.ibb.co/TBWgdX6h/Poncho-3.png',
-          'https://i.ibb.co/0vYGb2W/Poncho.png',
-          'https://i.ibb.co/TDBvCkrF/Poncho-4.png',
-          'https://i.ibb.co/9mnSzrW4/Poncho-5.png'
         ],
         description: "Poncho em crochet leve e delicado, feito à mão com um design de malha aberta para um look effortless and cozy. Perfeito para sobrepor a tops, vestidos ou biquínis, criando um toque elegante e descontraído ao outfit. Disponível em várias cores.",
         material: "- Material: 100% algodão",
@@ -382,7 +381,7 @@ Disponível em várias combinações de cores, foi criado para acompanhar os dia
         care: "- Lavagem delicada à mão com sabão neutro\n- Secar ao ar em superfície plana\n- Evitar máquina de secar"
       },
       { 
-        id: 'b1b', 
+        id: 'alma_cardigan', 
         name: 'Alma Cardigan', 
         price: calculateProductRange('Alma Cardigan'), 
         img: 'https://i.ibb.co/4qjnQph/Cardigan-CAPA.png',
@@ -392,7 +391,7 @@ Disponível em várias combinações de cores, foi criado para acompanhar os dia
         details: "- Modelo de manga comprida\n- Fecho em laço frontal"
       },
       { 
-        id: 'b1c', 
+        id: 'mini_alma_cardigan', 
         name: 'Mini Alma Cardigan', 
         price: calculateProductRange('Mini Alma Cardigan'), 
         img: 'https://i.ibb.co/8nQtzsbY/Mini-Alma-Cardigan-1.jpg',
@@ -1809,7 +1808,7 @@ const KnotSection = () => {
                             className="w-full h-full object-cover brightness-95 hover:scale-105 transition-all duration-[1.5s] ease-out"
                         />
                         <div className="absolute inset-x-0 bottom-0 p-8 md:p-12 bg-gradient-to-t from-forest/90 via-forest/40 to-transparent">
-                            <span className="text-[10px] uppercase tracking-[0.4em] text-cream/50 mb-1 md:mb-2 block">Premium / Bags</span>
+                            <span className="text-[10px] uppercase tracking-[0.4em] text-cream/50 mb-1 md:mb-2 block">{t('feeling.label')}</span>
                             <p className="text-cream text-lg md:text-2xl font-serif italic">{t('feeling.caption')}</p>
                         </div>
                     </motion.div>
@@ -1874,7 +1873,9 @@ interface ProductCardProps {
     onNextProduct?: () => void;
 }
 
-const ProductCard: React.FC<ProductCardProps> = ({ product, i, isFocused, isSubdued, onFocus, onPrevProduct, onNextProduct }) => {
+const ProductCard: React.FC<ProductCardProps> = ({ product: rawProduct, i, isFocused, isSubdued, onFocus, onPrevProduct, onNextProduct }) => {
+    const { lang, t } = useLanguage();
+    const product = translateProduct(rawProduct, lang);
     const isAfricanFlowerPouch = product.name.toLowerCase().includes('african flower pouch');
     const isMiniPouches = product.name.toLowerCase().includes('mini pouches');
     const isClassicCoasters = product.name.toLowerCase().includes('classic coasters');
@@ -1947,15 +1948,23 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, i, isFocused, isSubd
     // Logic for Material & Care
     const isSafran = isVestuario || product.id.startsWith('v') || product.id.startsWith('p');
     
-    const materialText = product.material || (isSafran 
-        ? "Produzido em 100% Algodão Egípcio Safran. Um fio nobre, fino e delicado, com um brilho suave e toque refrescante. Garante conforto térmico e elegância no caimento."
-        : "Produzido em 100% Algodão. Um fio de fibra grossa e penteada que confere estrutura e alta resistência. Ideal para suportar o uso diário mantendo a forma original.");
+    const materialText = product.material || (lang === 'pt' 
+        ? (isSafran 
+            ? "Produzido em 100% Algodão Egípcio Safran. Um fio nobre, fino e delicado, com um brilho suave e toque refrescante. Garante conforto térmico e elegância no caimento."
+            : "Produzido em 100% Algodão. Um fio de fibra grossa e penteada que confere estrutura e alta resistência. Ideal para suportar o uso diário mantendo a forma original.")
+        : (isSafran
+            ? "Produced in 100% Safran Egyptian Cotton. A noble, fine, and delicate yarn with a subtle sheen and refreshing touch. Guarantees thermal comfort and elegant drape."
+            : "Produced in 100% Cotton. A thick, combed fiber yarn that provides structure and high durability. Ideal for daily use while maintaining its original shape."));
 
-    const careText = product.care || (isSafran
-        ? "Lavar em ciclo delicado ou à mão (30ºC). Não usar amaciador e não deixar de molho. Secar à sombra e sempre na horizontal para evitar que a peça estique."
-        : "Lavável à máquina (40ºC). Não usar lixívia. Secar na horizontal para manter a estrutura da peça.");
+    const careText = product.care || (lang === 'pt'
+        ? (isSafran
+            ? "Lavar em ciclo delicado ou à mão (30ºC). Não usar amaciador e não deixar de molho. Secar à sombra e sempre na horizontal para evitar que a peça estique."
+            : "Lavável à máquina (40ºC). Não usar lixívia. Secar na horizontal para manter a estrutura da peça.")
+        : (isSafran
+            ? "Wash on delicate cycle or by hand (30ºC). Do not use softener and do not soak. Dry in shade and always flat to prevent stretching."
+            : "Machine washable (40ºC). Do not bleach. Dry flat to maintain the structure of the piece."));
 
-    const finalNote = "Cada peça M★BRAVO é tecida manualmente com fios certificados, garantindo exclusividade em cada detalhe.";
+    const finalNote = t('product.final_note');
 
     const calculatePrice = () => {
         const price = getApprovedPrice(product.name);
@@ -1978,7 +1987,9 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, i, isFocused, isSubd
     const selectedColor = (isCoaster && !isClassicCoasters) ? 'Padrão' : selections.cor;
     const quantity = hasQuantity ? selections.quantidade : '1';
 
-    const messageText = `Olá Carolina! Quero encomendar uma peça M★BRAVO.\n\nProduto: ${product.name}\nTamanho: ${selectedSize}\n${(isCoaster && !isClassicCoasters) ? '' : (isMiniPouches ? `Cor do Saquinho: ${selectedColor}\nCor do Fio: ${selections.corFio}\n` : `Cor: ${selectedColor}\n`)}Quantidade: ${quantity}\n\nValor Total: ${totalPrice}€\n\nFico a aguardar os detalhes para combinarmos o envio e o pagamento. Obrigada!`;
+    const messageText = lang === 'pt'
+        ? `Olá Carolina! Quero encomendar uma peça M★BRAVO.\n\nProduto: ${product.name}\nTamanho: ${selectedSize}\n${(isCoaster && !isClassicCoasters) ? '' : (isMiniPouches ? `Cor do Saquinho: ${selectedColor}\nCor do Fio: ${selections.corFio}\n` : `Cor: ${selectedColor}\n`)}Quantidade: ${quantity}\n\nValor Total: ${totalPrice}€\n\nFico a aguardar os detalhes para combinarmos o envio e o pagamento. Obrigada!`
+        : `Hello Carolina! I would like to order an M★BRAVO piece.\n\nProduct: ${product.name}\nSize: ${translateSize(selectedSize, lang)}\n${(isCoaster && !isClassicCoasters) ? '' : (isMiniPouches ? `Pouch Color: ${translateColor(selectedColor, lang)}\nYarn Color: ${translateColor(selections.corFio, lang)}\n` : `Color: ${translateColor(selectedColor, lang)}\n`)}Quantity: ${translateQuantity(quantity, lang)}\n\nTotal Price: ${totalPrice}€\n\nI look forward to details on shipping and payment. Thank you!`;
 
     const whatsappUrl = `https://wa.me/351912828182?text=${encodeURIComponent(messageText)}`;
 
@@ -2287,10 +2298,10 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, i, isFocused, isSubd
                                 className="flex items-center gap-2 text-[10px] uppercase tracking-[0.3em] font-bold text-forest/50 hover:text-forest transition-colors cursor-pointer"
                             >
                                 <ChevronLeft size={16} />
-                                {paymentCompleted ? 'Voltar ao Catálogo' : 'Voltar'}
+                                {paymentCompleted ? t('btn.back_collection') : (lang === 'pt' ? 'Voltar' : 'Back')}
                             </button>
                             <span className="text-[9px] font-mono uppercase tracking-[0.2em] text-forest/30">
-                                {paymentCompleted ? 'Pedido Concluído' : 'Checkout Seguro'}
+                                {paymentCompleted ? (lang === 'pt' ? 'Pedido Concluído' : 'Order Completed') : (lang === 'pt' ? 'Checkout Seguro' : 'Secure Checkout')}
                             </span>
                         </div>
 
@@ -2302,49 +2313,53 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, i, isFocused, isSubd
                                 </div>
                                 
                                 <h4 className="font-serif italic text-2xl lg:text-3xl font-light text-forest">
-                                    Encomenda Confirmada!
+                                    {t('payment.success_title')}
                                 </h4>
                                 
                                 <p className="text-sm text-forest/70 font-sans font-light leading-relaxed max-w-sm">
-                                    Agradecemos a sua encomenda, <strong>{checkoutForm.nome || 'Cliente'}</strong>. Enviámos um e-mail de confirmação para <strong>{checkoutForm.email}</strong> com os detalhes do envio.
+                                    {lang === 'pt' ? (
+                                        <>Agradecemos a sua encomenda, <strong>{checkoutForm.nome || 'Cliente'}</strong>. Enviámos um e-mail de confirmação para <strong>{checkoutForm.email}</strong> com os detalhes do envio.</>
+                                    ) : (
+                                        <>Thank you for your order, <strong>{checkoutForm.nome || 'Customer'}</strong>. We have sent a confirmation email to <strong>{checkoutForm.email}</strong> with the shipping details.</>
+                                    )}
                                 </p>
 
                                 <div className="bg-forest/5 rounded-2xl p-5 border border-forest/10 w-full text-left space-y-3 font-sans text-xs">
                                     <div className="flex justify-between border-b border-forest/5 pb-1.5">
-                                        <span className="text-forest/40 uppercase tracking-wider text-[9px]">ID Pedido</span>
+                                        <span className="text-forest/40 uppercase tracking-wider text-[9px]">{lang === 'pt' ? 'ID Pedido' : 'Order ID'}</span>
                                         <span className="font-semibold text-forest">{orderId}</span>
                                     </div>
                                     <div className="flex justify-between border-b border-forest/5 pb-1.5">
-                                        <span className="text-forest/40 uppercase tracking-wider text-[9px]">Artigo</span>
+                                        <span className="text-forest/40 uppercase tracking-wider text-[9px]">{lang === 'pt' ? 'Artigo' : 'Item'}</span>
                                         <span className="font-semibold text-forest">{product.name}</span>
                                     </div>
                                     <div className="flex justify-between border-b border-forest/5 pb-1.5">
-                                        <span className="text-forest/40 uppercase tracking-wider text-[9px]">Configuração</span>
+                                        <span className="text-forest/40 uppercase tracking-wider text-[9px]">{lang === 'pt' ? 'Configuração' : 'Configuration'}</span>
                                         <span className="font-semibold text-forest text-right">
-                                            {(isCoaster && !isClassicCoasters) ? '' : `${selections.cor} `}{isMiniPouches && `| Fio: ${selections.corFio} `}{hasSize && `| ${selections.tamanho}`} {hasQuantity && `| ${selections.quantidade}`}
+                                            {(isCoaster && !isClassicCoasters) ? '' : `${translateColor(selections.cor, lang)} `}{isMiniPouches && `| ${lang === 'pt' ? 'Fio: ' : 'Yarn: '}${translateColor(selections.corFio, lang)} `}{hasSize && `| ${translateSize(selections.tamanho, lang)}`} {hasQuantity && `| ${translateQuantity(selections.quantidade, lang)}`}
                                         </span>
                                     </div>
                                     <div className="flex justify-between border-b border-forest/5 pb-1.5">
-                                        <span className="text-forest/40 uppercase tracking-wider text-[9px]">Método Pagamento</span>
+                                        <span className="text-forest/40 uppercase tracking-wider text-[9px]">{lang === 'pt' ? 'Método Pagamento' : 'Payment Method'}</span>
                                         <span className="font-semibold text-forest uppercase">
-                                            {paymentMethod === 'mbway' ? 'MB WAY' : paymentMethod === 'multibanco' ? 'Referência Multibanco' : 'Cartão de Crédito'}
+                                            {paymentMethod === 'mbway' ? 'MB WAY' : paymentMethod === 'multibanco' ? (lang === 'pt' ? 'Referência Multibanco' : 'Multibanco Reference') : (lang === 'pt' ? 'Cartão de Crédito' : 'Credit Card')}
                                         </span>
                                     </div>
                                     <div className="flex justify-between pt-1 font-bold">
-                                        <span className="text-[#A68244] uppercase tracking-wider text-[10px]">Total Pago</span>
+                                        <span className="text-[#A68244] uppercase tracking-wider text-[10px]">{lang === 'pt' ? 'Total Pago' : 'Total Paid'}</span>
                                         <span className="text-base font-serif text-forest">{currentPrice}</span>
                                     </div>
                                 </div>
 
                                 <div className="bg-amber-50/50 rounded-xl p-3.5 border border-[#C5A059]/20 text-left text-[11px] text-forest/80 leading-relaxed font-sans">
-                                    <p className="font-semibold text-[#A68244] mb-1">Nota de Produção:</p>
-                                    <p>Por ser uma peça produzida inteiramente à mão, estimamos o tempo de produção e envio em 7 a 14 dias úteis.</p>
+                                    <p className="font-semibold text-[#A68244] mb-1">{t('payment.prod_note_title')}</p>
+                                    <p>{t('payment.prod_note_desc')}</p>
                                 </div>
 
                                 {sandboxEmails && (
                                     <div className="w-full bg-[#243119]/5 rounded-2xl p-4 border border-[#243119]/10 text-left space-y-3 font-sans">
-                                        <p className="text-[10px] uppercase tracking-wider text-[#A68244] font-bold">Simulações de E-mail (Sandbox)</p>
-                                        <p className="text-[11px] text-forest/70 leading-relaxed">Clique para abrir em nova aba os e-mails minimalistas de confirmação e alerta de atelier gerados em tempo real:</p>
+                                        <p className="text-[10px] uppercase tracking-wider text-[#A68244] font-bold">{t('sandbox.email_sim')}</p>
+                                        <p className="text-[11px] text-forest/70 leading-relaxed">{t('sandbox.email_desc')}</p>
                                         <div className="grid grid-cols-2 gap-2 pt-1">
                                             <a 
                                                 href={sandboxEmails.customerEmailUrl} 
@@ -2352,7 +2367,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, i, isFocused, isSubd
                                                 rel="noreferrer"
                                                 className="block text-center rounded-lg py-2 bg-white border border-[#243119]/15 text-[10px] uppercase tracking-wider font-semibold text-forest hover:bg-[#243119] hover:text-white hover:border-transparent transition-all"
                                             >
-                                                Ver E-mail Cliente
+                                                {t('sandbox.view_client')}
                                             </a>
                                             <a 
                                                 href={sandboxEmails.adminEmailUrl} 
@@ -2360,7 +2375,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, i, isFocused, isSubd
                                                 rel="noreferrer"
                                                 className="block text-center rounded-lg py-2 bg-white border border-[#243119]/15 text-[10px] uppercase tracking-wider font-semibold text-forest hover:bg-[#243119] hover:text-white hover:border-transparent transition-all"
                                             >
-                                                Ver Alerta Atelier
+                                                {t('sandbox.view_admin')}
                                             </a>
                                         </div>
                                     </div>
@@ -2375,7 +2390,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, i, isFocused, isSubd
                                     }}
                                     className="w-full rounded-full py-3 text-center font-bold bg-[#C5A059] text-[#343E2C] hover:bg-[#d5b069] text-[10px] uppercase tracking-widest cursor-pointer shadow-md transition-all font-sans"
                                 >
-                                    Fechar e Voltar ao Início
+                                    {t('payment.btn_home')}
                                 </button>
                             </div>
                         ) : (
@@ -2396,7 +2411,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, i, isFocused, isSubd
                                             <div>
                                                 <span className="font-serif font-light text-sm text-forest block">{product.name}</span>
                                                 <span className="text-[10px] text-forest/50 uppercase tracking-wider">
-                                                    {(!isCoaster || isClassicCoasters) && `${selections.cor} `}{isMiniPouches && `| Fio: ${selections.corFio} `}{hasSize && `| ${selections.tamanho}`}
+                                                    {(!isCoaster || isClassicCoasters) && `${translateColor(selections.cor, lang)} `}{isMiniPouches && `| ${lang === 'pt' ? 'Fio: ' : 'Yarn: '}${translateColor(selections.corFio, lang)} `}{hasSize && `| ${translateSize(selections.tamanho, lang)}`}
                                                 </span>
                                             </div>
                                         </div>
@@ -2406,13 +2421,13 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, i, isFocused, isSubd
                                     {/* Shipping Details form */}
                                     <div className="space-y-3">
                                         <h5 className="text-[9px] uppercase tracking-[0.25em] font-bold text-forest/45">
-                                            1. DADOS DE ENVIO & CONTATO
+                                            {lang === 'pt' ? '1. DADOS DE ENVIO & CONTATO' : '1. SHIPPING & CONTACT DETAILS'}
                                         </h5>
                                         
                                         <div className="space-y-2">
                                             <input 
                                                 type="text" 
-                                                placeholder="Nome Completo" 
+                                                placeholder={lang === 'pt' ? "Nome Completo" : "Full Name"} 
                                                 required
                                                 value={checkoutForm.nome}
                                                 onChange={(e) => setCheckoutForm(prev => ({ ...prev, nome: e.target.value }))}
@@ -2421,7 +2436,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, i, isFocused, isSubd
                                             <div className="grid grid-cols-2 gap-2">
                                                 <input 
                                                     type="email" 
-                                                    placeholder="E-mail" 
+                                                    placeholder={lang === 'pt' ? "E-mail" : "Email Address"} 
                                                     required
                                                     value={checkoutForm.email}
                                                     onChange={(e) => setCheckoutForm(prev => ({ ...prev, email: e.target.value }))}
@@ -2429,7 +2444,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, i, isFocused, isSubd
                                                 />
                                                 <input 
                                                     type="tel" 
-                                                    placeholder="Telemóvel" 
+                                                    placeholder={lang === 'pt' ? "Telemóvel" : "Phone Number"} 
                                                     required
                                                     value={checkoutForm.telefone}
                                                     onChange={(e) => setCheckoutForm(prev => ({ ...prev, telefone: e.target.value }))}
@@ -2438,7 +2453,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, i, isFocused, isSubd
                                             </div>
                                             <input 
                                                 type="text" 
-                                                placeholder="Morada de Envio" 
+                                                placeholder={lang === 'pt' ? "Morada de Envio" : "Shipping Address"} 
                                                 required
                                                 value={checkoutForm.morada}
                                                 onChange={(e) => setCheckoutForm(prev => ({ ...prev, morada: e.target.value }))}
@@ -2447,7 +2462,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, i, isFocused, isSubd
                                             <div className="grid grid-cols-2 gap-2">
                                                 <input 
                                                     type="text" 
-                                                    placeholder="Código Postal" 
+                                                    placeholder={lang === 'pt' ? "Código Postal" : "Postal Code"} 
                                                     required
                                                     value={checkoutForm.codigoPostal}
                                                     onChange={(e) => setCheckoutForm(prev => ({ ...prev, codigoPostal: e.target.value }))}
@@ -2455,7 +2470,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, i, isFocused, isSubd
                                                 />
                                                 <input 
                                                     type="text" 
-                                                    placeholder="Cidade" 
+                                                    placeholder={lang === 'pt' ? "Cidade" : "City"} 
                                                     required
                                                     value={checkoutForm.cidade}
                                                     onChange={(e) => setCheckoutForm(prev => ({ ...prev, cidade: e.target.value }))}
@@ -2468,7 +2483,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, i, isFocused, isSubd
                                     {/* Payment Gateway Selection */}
                                     <div className="space-y-3">
                                         <h5 className="text-[9px] uppercase tracking-[0.25em] font-bold text-forest/45">
-                                            2. MÉTODO DE PAGAMENTO
+                                            {lang === 'pt' ? '2. MÉTODO DE PAGAMENTO' : '2. PAYMENT METHOD'}
                                         </h5>
 
                                         <div className="grid grid-cols-3 gap-2">
@@ -2515,7 +2530,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, i, isFocused, isSubd
                                                         : 'bg-white text-forest/65 border-forest/10 hover:bg-forest/5'
                                                 }`}
                                             >
-                                                <span className="text-[10px] font-extrabold tracking-wider uppercase font-sans">CARTÃO</span>
+                                                <span className="text-[10px] font-extrabold tracking-wider uppercase font-sans">{lang === 'pt' ? 'CARTÃO' : 'CARD'}</span>
                                             </button>
                                         </div>
 
@@ -2523,7 +2538,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, i, isFocused, isSubd
                                         <div className="mt-4 p-4 bg-white border border-forest/10 rounded-2xl min-h-[120px] flex flex-col justify-center">
                                             {paymentMethod === 'mbway' && (
                                                 <div className="space-y-3 animate-fadeIn">
-                                                    <span className="text-[9px] uppercase tracking-wider text-forest/40 font-mono">Telemóvel Associado ao MB WAY</span>
+                                                    <span className="text-[9px] uppercase tracking-wider text-forest/40 font-mono">{lang === 'pt' ? 'Telemóvel Associado ao MB WAY' : 'Phone Associated with MB WAY'}</span>
                                                     <input 
                                                         type="tel" 
                                                         placeholder="9xx xxx xxx" 
@@ -2533,53 +2548,49 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, i, isFocused, isSubd
                                                         className="w-full bg-[#FCFBF9] rounded-xl px-4 py-2.5 text-xs text-forest placeholder-forest/30 border border-forest/10 focus:border-[#C5A059] focus:outline-none transition-all font-sans"
                                                     />
                                                     <p className="text-[10px] text-forest/50 font-sans leading-relaxed">
-                                                        Irá receber uma notificação na aplicação MB WAY para autorizar o pagamento no valor de <strong>{currentPrice}</strong>.
+                                                        {lang === 'pt' ? (
+                                                            <>Irá receber uma notificação na aplicação MB WAY para autorizar o pagamento no valor de <strong>{currentPrice}</strong>.</>
+                                                        ) : (
+                                                            <>You will receive a notification in the MB WAY app to authorize the payment of <strong>{currentPrice}</strong>.</>
+                                                        )}
                                                     </p>
-                                                    <div className="p-2.5 bg-forest/5 rounded-xl border border-[#C5A059]/15 text-[10px] text-forest/70 font-sans leading-relaxed space-y-1">
-                                                        <span className="font-bold text-[#A68244] uppercase tracking-wider text-[8px] block">Consola de Teste Sandbox</span>
-                                                        <ul className="list-disc list-inside space-y-0.5 text-[9px] text-forest/60">
-                                                            <li>Escreve <strong className="font-mono text-forest">911 111 111</strong> para simular <strong>Aprovação Rápida</strong>.</li>
-                                                            <li>Escreve <strong className="font-mono text-forest">922 222 222</strong> para simular <strong>Rejeição de MB WAY</strong>.</li>
-                                                            <li>Escreve <strong className="font-mono text-forest">933 333 333</strong> para simular <strong>Expiração/Timeout</strong>.</li>
-                                                        </ul>
-                                                    </div>
                                                 </div>
                                             )}
 
                                             {paymentMethod === 'multibanco' && multibancoRef && (
                                                 <div className="space-y-3 animate-fadeIn">
-                                                    <span className="text-[9px] uppercase tracking-wider text-[#A68244] font-mono font-bold block mb-1">DADOS DE PAGAMENTO (ENTIDADE & REFERÊNCIA)</span>
+                                                    <span className="text-[9px] uppercase tracking-wider text-[#A68244] font-mono font-bold block mb-1">{lang === 'pt' ? 'DADOS DE PAGAMENTO (ENTIDADE & REFERÊNCIA)' : 'PAYMENT DETAILS (ENTITY & REFERENCE)'}</span>
                                                     
                                                     <div className="space-y-1.5 font-sans text-xs bg-forest/5 p-3 rounded-xl border border-forest/5">
                                                         <div className="flex justify-between items-center border-b border-forest/5 pb-1">
-                                                            <span className="text-forest/40 text-[9px] uppercase tracking-wider">Entidade</span>
+                                                            <span className="text-forest/40 text-[9px] uppercase tracking-wider">{lang === 'pt' ? 'Entidade' : 'Entity'}</span>
                                                             <span className="font-mono font-bold text-forest">{multibancoRef.entidade}</span>
                                                         </div>
                                                         <div className="flex justify-between items-center border-b border-forest/5 pb-1">
-                                                            <span className="text-forest/40 text-[9px] uppercase tracking-wider">Referência</span>
+                                                            <span className="text-forest/40 text-[9px] uppercase tracking-wider">{lang === 'pt' ? 'Referência' : 'Reference'}</span>
                                                             <span className="font-mono font-bold text-forest">{multibancoRef.referencia}</span>
                                                         </div>
                                                         <div className="flex justify-between items-center pb-1">
-                                                            <span className="text-forest/40 text-[9px] uppercase tracking-wider">Montante</span>
+                                                            <span className="text-forest/40 text-[9px] uppercase tracking-wider">{lang === 'pt' ? 'Montante' : 'Amount'}</span>
                                                             <span className="font-mono font-bold text-forest">{currentPrice}</span>
                                                         </div>
                                                     </div>
                                                     <p className="text-[10px] text-forest/50 font-sans leading-relaxed">
-                                                        Efetue o pagamento num terminal Multibanco ou através do seu Homebanking usando a opção <i>"Pagamento de Serviços"</i>.
+                                                        {lang === 'pt' ? (
+                                                            <>Efetue o pagamento num terminal Multibanco ou através do seu Homebanking usando a opção <i>"Pagamento de Serviços"</i>.</>
+                                                        ) : (
+                                                            <>Make the payment at any Multibanco ATM or via your Homebanking using the <i>"Payment of Services"</i> option.</>
+                                                        )}
                                                     </p>
-                                                    <div className="p-2.5 bg-forest/5 rounded-xl border border-[#C5A059]/15 text-[10px] text-forest/70 font-sans leading-relaxed">
-                                                        <span className="font-bold text-[#A68244] uppercase tracking-wider text-[8px] block mb-0.5">Consola de Teste Sandbox</span>
-                                                        <p className="text-[9px] text-forest/60">Após efetuar a encomenda, o botão de pagamento abaixo simula o recebimento do webhook em tempo real.</p>
-                                                    </div>
                                                 </div>
                                             )}
 
                                             {paymentMethod === 'card' && (
                                                 <div className="space-y-3 animate-fadeIn">
-                                                    <span className="text-[9px] uppercase tracking-wider text-forest/40 font-mono">Detalhes do Cartão</span>
+                                                    <span className="text-[9px] uppercase tracking-wider text-forest/40 font-mono">{lang === 'pt' ? 'Detalhes do Cartão' : 'Card Details'}</span>
                                                     <input 
                                                         type="text" 
-                                                        placeholder="Nome no Cartão" 
+                                                        placeholder={lang === 'pt' ? "Nome no Cartão" : "Cardholder Name"} 
                                                         required
                                                         value={checkoutForm.cardName}
                                                         onChange={(e) => setCheckoutForm(prev => ({ ...prev, cardName: e.target.value }))}
@@ -2587,7 +2598,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, i, isFocused, isSubd
                                                     />
                                                     <input 
                                                         type="text" 
-                                                        placeholder="Número do Cartão" 
+                                                        placeholder={lang === 'pt' ? "Número do Cartão" : "Card Number"} 
                                                         maxLength={19}
                                                         required
                                                         value={checkoutForm.cardNumber}
@@ -2601,7 +2612,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, i, isFocused, isSubd
                                                     <div className="grid grid-cols-2 gap-2">
                                                         <input 
                                                             type="text" 
-                                                            placeholder="MM/AA" 
+                                                            placeholder="MM/YY" 
                                                             maxLength={5}
                                                             required
                                                             value={checkoutForm.cardExpiry}
@@ -2625,14 +2636,6 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, i, isFocused, isSubd
                                                             className="w-full bg-[#FCFBF9] rounded-xl px-4 py-2 text-xs text-forest placeholder-forest/30 border border-forest/10 focus:border-[#C5A059] focus:outline-none transition-all font-sans"
                                                         />
                                                     </div>
-                                                    <div className="p-2.5 bg-forest/5 rounded-xl border border-[#C5A059]/15 text-[10px] text-forest/70 font-sans leading-relaxed space-y-1">
-                                                        <span className="font-bold text-[#A68244] uppercase tracking-wider text-[8px] block">Consola de Teste Sandbox</span>
-                                                        <ul className="list-disc list-inside space-y-0.5 text-[9px] text-forest/60">
-                                                            <li>Termina em <strong className="font-mono text-forest">5001</strong> para simular <strong>Saldo Insuficiente</strong>.</li>
-                                                            <li>Termina em <strong className="font-mono text-forest">5002</strong> para simular <strong>Tempo Limite de Gateway</strong>.</li>
-                                                            <li>Qualquer outra numeração simula aprovação de <strong>Sucesso</strong> imediato.</li>
-                                                        </ul>
-                                                    </div>
                                                 </div>
                                             )}
                                         </div>
@@ -2644,7 +2647,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, i, isFocused, isSubd
                                     {checkoutError && (
                                         <div className="p-3 bg-red-50 border border-red-200/50 rounded-xl text-left text-[11px] text-red-900 leading-relaxed font-sans mb-3 flex flex-col gap-1 animate-fadeIn">
                                             <div className="flex justify-between items-center">
-                                                <span className="font-semibold uppercase tracking-wide text-[9px] text-red-700">Erro ou Falha de Pagamento</span>
+                                                <span className="font-semibold uppercase tracking-wide text-[9px] text-red-700">{lang === 'pt' ? 'Erro ou Falha de Pagamento' : 'Payment Error or Failure'}</span>
                                                 <button onClick={() => setCheckoutError(null)} className="text-red-400 hover:text-red-700 font-bold px-1 text-xs">✕</button>
                                             </div>
                                             <p>{checkoutError}</p>
@@ -2677,13 +2680,36 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, i, isFocused, isSubd
                                                             setSandboxEmails(statusData.emailLinks);
                                                         }
                                                     } else {
-                                                        throw new Error("Erro ao simular webhook de pagamento.");
+                                                        throw new Error(lang === 'pt' ? "Erro ao simular webhook de pagamento." : "Error simulating payment webhook.");
                                                     }
                                                 } catch (err: any) {
                                                     setIsPaying(false);
-                                                    setCheckoutError(err.message || 'Erro ao simular o recebimento do webhook.');
+                                                    setCheckoutError(err.message || (lang === 'pt' ? 'Erro ao simular o recebimento do webhook.' : 'Error simulating webhook receipt.'));
                                                 }
                                                 return;
+                                            }
+
+                                            let amountInCents = 0;
+
+                                            if (paymentMethod === 'card') {
+                                                try {
+                                                    // Parse Card expiry (MM/YY)
+                                                    const expiryParts = checkoutForm.cardExpiry.split('/');
+                                                    const expMonth = parseInt(expiryParts[0]?.trim());
+                                                    const expYear = parseInt(expiryParts[1]?.trim());
+
+                                                    if (isNaN(expMonth) || expMonth < 1 || expMonth > 12 || isNaN(expYear)) {
+                                                        throw new Error(lang === 'pt' ? 'Data de validade do cartão inválida. Use o formato MM/YY.' : 'Invalid card expiry date. Use MM/YY format.');
+                                                    }
+
+                                                    // Calculate price in cents
+                                                    const rawPriceNum = typeof rawPrice === 'number' ? rawPrice * (hasQuantity ? (parseInt(selections.quantidade) || 1) : 1) : 50; // default 50€ fallback
+                                                    amountInCents = Math.round(rawPriceNum * 100);
+                                                } catch (stripeErr: any) {
+                                                    setIsPaying(false);
+                                                    setCheckoutError(stripeErr.message || (lang === 'pt' ? 'Erro ao validar os detalhes do cartão.' : 'Error validating card details.'));
+                                                    return;
+                                                }
                                             }
 
                                             try {
@@ -2698,14 +2724,15 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, i, isFocused, isSubd
                                                         },
                                                         selections,
                                                         checkoutForm,
-                                                        paymentMethod
+                                                        paymentMethod,
+                                                        amountInCents
                                                     })
                                                 });
 
                                                 const data = await response.json();
 
                                                 if (!response.ok || data.error) {
-                                                    throw new Error(data.error || 'Erro ao conectar com a gateway de pagamentos.');
+                                                    throw new Error(data.error || (lang === 'pt' ? 'Erro ao conectar com a gateway de pagamentos.' : 'Error connecting to the payment gateway.'));
                                                 }
 
                                                 setOrderId(data.orderId);
@@ -2717,7 +2744,45 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, i, isFocused, isSubd
                                                         setSandboxEmails(data.emailLinks);
                                                     }
                                                 } else if (data.status === 'failed') {
-                                                    throw new Error(data.errorMessage || 'Transação recusada pela gateway.');
+                                                    throw new Error(translateBackendError(data.errorMessage, lang) || (lang === 'pt' ? 'Transação recusada pela gateway.' : 'Transaction declined by the gateway.'));
+                                                } else if (data.stripeClientSecret) {
+                                                    // Handle 3D Secure / SCA action required
+                                                    console.log("[STRIPE] Payment requires SCA action. Launching verification screen...");
+                                                    const stripePubKey = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY || "";
+                                                    const stripeObj = await loadStripe(stripePubKey);
+                                                    if (!stripeObj) {
+                                                        throw new Error('Stripe failed to load for SCA confirmation.');
+                                                    }
+
+                                                    const confirmResult = await stripeObj.confirmCardPayment(data.stripeClientSecret);
+                                                    if (confirmResult.error) {
+                                                        throw new Error(confirmResult.error.message);
+                                                    }
+
+                                                    if (confirmResult.paymentIntent && confirmResult.paymentIntent.status === 'succeeded') {
+                                                        console.log("[STRIPE] 3D Secure Verification Success! Confirming order...");
+                                                        // Inform server that payment is succeeded using the webhook simulation endpoint
+                                                        const confirmRes = await fetch('/api/payment/webhook', {
+                                                            method: 'POST',
+                                                            headers: { 'Content-Type': 'application/json' },
+                                                            body: JSON.stringify({
+                                                                orderId: data.orderId,
+                                                                event: 'payment_intent.succeeded'
+                                                            })
+                                                        });
+                                                        const confirmData = await confirmRes.json();
+                                                        if (confirmData.status === 'paid') {
+                                                            setIsPaying(false);
+                                                            setPaymentCompleted(true);
+                                                            if (confirmData.emailLinks) {
+                                                                setSandboxEmails(confirmData.emailLinks);
+                                                            }
+                                                        } else {
+                                                            throw new Error(lang === 'pt' ? "Erro ao finalizar a encomenda após autenticação." : "Error finalizing order after authentication.");
+                                                        }
+                                                    } else {
+                                                        throw new Error(lang === 'pt' ? 'A autenticação do cartão falhou ou foi cancelada.' : 'Card authentication failed or was cancelled.');
+                                                    }
                                                 } else {
                                                     // Pending payment
                                                     if (paymentMethod === 'multibanco') {
@@ -2743,7 +2808,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, i, isFocused, isSubd
                                                                 } else if (statusData.status === 'failed') {
                                                                     clearInterval(intervalId);
                                                                     setIsPaying(false);
-                                                                    setCheckoutError(statusData.errorMessage || 'Transação MB WAY recusada pelo utilizador.');
+                                                                    setCheckoutError(translateBackendError(statusData.errorMessage, lang) || (lang === 'pt' ? 'Transação MB WAY recusada pelo utilizador.' : 'MB WAY transaction declined by the user.'));
                                                                 }
                                                             } catch (pollErr) {
                                                                 console.error("Erro ao consultar status:", pollErr);
@@ -2752,14 +2817,14 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, i, isFocused, isSubd
                                                             if (attempts > 20) {
                                                                 clearInterval(intervalId);
                                                                 setIsPaying(false);
-                                                                setCheckoutError('O tempo limite de aprovação MB WAY expirou (Simulação de Exceção/Timeout).');
+                                                                setCheckoutError(lang === 'pt' ? 'O tempo limite de aprovação MB WAY expirou (Simulação de Exceção/Timeout).' : 'MB WAY approval timeout expired (Exception/Timeout simulation).');
                                                             }
                                                         }, 3000);
                                                     }
                                                 }
                                             } catch (err: any) {
                                                 setIsPaying(false);
-                                                setCheckoutError(err.message || 'Ocorreu um erro ao processar o seu pagamento.');
+                                                setCheckoutError(err.message || (lang === 'pt' ? 'Ocorreu um erro ao processar o seu pagamento.' : 'An error occurred while processing your payment.'));
                                             }
                                         }}
                                         whileHover={{ scale: 1.01 }}
@@ -2769,12 +2834,16 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, i, isFocused, isSubd
                                         {isPaying ? (
                                             <>
                                                 <span className="animate-spin rounded-full h-3.5 w-3.5 border border-[#C5A059] border-t-transparent" />
-                                                {paymentMethod === 'mbway' ? 'A AGUARDAR AUTORIZAÇÃO MB WAY...' : 'CONECTANDO GATEWAY...'}
+                                                {paymentMethod === 'mbway' 
+                                                    ? (lang === 'pt' ? 'A AGUARDAR AUTORIZAÇÃO MB WAY...' : 'AWAITING MB WAY AUTHORIZATION...') 
+                                                    : (lang === 'pt' ? 'CONECTANDO GATEWAY...' : 'CONNECTING GATEWAY...')}
                                             </>
                                         ) : paymentMethod === 'multibanco' ? (
-                                            multibancoRef ? 'SIMULAR PAGAMENTO WEBHOOK' : 'GERAR REFERÊNCIA MULTIBANCO'
+                                            multibancoRef 
+                                                ? (lang === 'pt' ? 'SIMULAR PAGAMENTO WEBHOOK' : 'SIMULATE WEBHOOK PAYMENT') 
+                                                : (lang === 'pt' ? 'GERAR REFERÊNCIA MULTIBANCO' : 'GENERATE MULTIBANCO REFERENCE')
                                         ) : (
-                                            'EFETUAR ENCOMENDA'
+                                            lang === 'pt' ? 'EFETUAR ENCOMENDA' : 'PLACE ORDER'
                                         )}
                                     </motion.button>
                                 </div>
@@ -2837,7 +2906,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, i, isFocused, isSubd
                         {product.details && (
                             <div className="mb-6 text-left max-w-prose lg:max-w-[90%] w-full">
                                 <h5 className="text-[9px] uppercase tracking-[0.25em] font-bold text-forest/45 flex items-center gap-1.5 mb-3">
-                                    <span className="text-[#C5A059] text-xs">●</span> DETALHES DO PRODUTO
+                                    <span className="text-[#C5A059] text-xs">●</span> {t('product.details_title')}
                                 </h5>
                                 <ul className="space-y-2 pl-0.5">
                                     {product.details.split('\n').map((line: string, index: number) => {
@@ -2862,10 +2931,10 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, i, isFocused, isSubd
                                     <div className="space-y-2">
                                         <div className="flex justify-between items-center">
                                             <h5 className="text-[9px] uppercase tracking-[0.25em] font-bold text-forest/45 flex items-center gap-1.5">
-                                                <span className="text-[#C5A059] text-xs">●</span> COR DA PEÇA
+                                                <span className="text-[#C5A059] text-xs">●</span> {t('product.color')}
                                             </h5>
                                             <span className="text-[9px] font-extrabold text-[#A68244] bg-[#FDF9F3] px-3 py-0.5 rounded-full border border-[#C5A059]/10">
-                                                {selections.cor}
+                                                {translateColor(selections.cor, lang)}
                                             </span>
                                         </div>
                                         <div className="flex flex-wrap gap-3">
@@ -2880,7 +2949,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, i, isFocused, isSubd
                                                                 ? 'border-[#D4A33B] scale-110 shadow-md shadow-[#D4A33B]/10' 
                                                                 : 'border-[#D4A33B]/20 hover:scale-110 hover:border-[#D4A33B]'
                                                         }`}
-                                                        title={opt.name}
+                                                        title={translateColor(opt.name, lang)}
                                                     >
                                                         <div 
                                                             className="w-full h-full rounded-full border border-forest/5" 
@@ -2898,10 +2967,10 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, i, isFocused, isSubd
                                     <div className="space-y-2">
                                         <div className="flex justify-between items-center">
                                             <h5 className="text-[9px] uppercase tracking-[0.25em] font-bold text-forest/45 flex items-center gap-1.5">
-                                                <span className="text-[#C5A059] text-xs">●</span> COR DO FIO
+                                                <span className="text-[#C5A059] text-xs">●</span> {t('product.yarn_color')}
                                             </h5>
                                             <span className="text-[9px] font-extrabold text-[#A68244] bg-[#FDF9F3] px-3 py-0.5 rounded-full border border-[#C5A059]/10">
-                                                {selections.corFio}
+                                                {translateColor(selections.corFio, lang)}
                                             </span>
                                         </div>
                                         <div className="flex flex-wrap gap-2">
@@ -2914,7 +2983,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, i, isFocused, isSubd
                                                             ? 'border-forest scale-110 shadow-md shadow-forest/10'
                                                             : 'border-transparent hover:scale-110'
                                                     }`}
-                                                    title={opt.name}
+                                                    title={translateColor(opt.name, lang)}
                                                 >
                                                     <div 
                                                         className="w-full h-full rounded-full border border-forest/5" 
@@ -2930,7 +2999,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, i, isFocused, isSubd
                                 {hasSize && (
                                     <div className="space-y-2">
                                         <h5 className="text-[9px] uppercase tracking-[0.25em] font-bold text-forest/45 flex items-center gap-1.5">
-                                            <span className="text-[#C5A059] text-xs">●</span> TAMANHO
+                                            <span className="text-[#C5A059] text-xs">●</span> {t('product.size')}
                                         </h5>
                                         <div className="flex flex-wrap gap-1.5">
                                             {sizes.map(opt => (
@@ -2943,7 +3012,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, i, isFocused, isSubd
                                                             : 'bg-white text-forest hover:bg-forest/5'
                                                     }`}
                                                 >
-                                                    {opt}
+                                                    {translateSize(opt, lang)}
                                                 </button>
                                             ))}
                                         </div>
@@ -2954,7 +3023,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, i, isFocused, isSubd
                                 {hasQuantity && (
                                     <div className="space-y-2">
                                         <h5 className="text-[9px] uppercase tracking-[0.25em] font-bold text-forest/45 flex items-center gap-1.5">
-                                            <span className="text-[#C5A059] text-xs">●</span> QUANTIDADE DO CONJUNTO
+                                            <span className="text-[#C5A059] text-xs">●</span> {t('product.quantity')}
                                         </h5>
                                         <div className="flex flex-wrap gap-1.5">
                                             {quantities.map(opt => (
@@ -2967,7 +3036,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, i, isFocused, isSubd
                                                             : 'bg-white text-forest hover:bg-forest/5'
                                                     }`}
                                                 >
-                                                    {opt}
+                                                    {translateQuantity(opt, lang)}
                                                 </button>
                                             ))}
                                         </div>
@@ -2978,7 +3047,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, i, isFocused, isSubd
                             {/* Secção de Material & Composição (Estrutura de Cartões Minimalistas) */}
                             <div className="space-y-2 text-left">
                                 <h5 className="text-[9px] uppercase tracking-[0.25em] font-bold text-forest/45 flex items-center gap-1.5">
-                                    <span className="text-[#C5A059] text-xs">●</span> MATERIAL & COMPOSIÇÃO
+                                    <span className="text-[#C5A059] text-xs">●</span> {t('product.material_label')}
                                 </h5>
                                 <div className="flex flex-col gap-2 w-full pt-1">
                                     {parseMaterials(materialText).map((item, idx) => (
@@ -3005,7 +3074,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, i, isFocused, isSubd
                             {/* Secção de Manutenção e Cuidados (Com Ícones e Legendas) */}
                             <div className="space-y-3 text-left">
                                 <h5 className="text-[9px] uppercase tracking-[0.25em] font-bold text-forest/45 flex items-center gap-1.5">
-                                    <span className="text-[#C5A059] text-xs">●</span> MANUTENÇÃO & CUIDADOS
+                                    <span className="text-[#C5A059] text-xs">●</span> {t('product.care_header')}
                                 </h5>
                                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-2 pt-1 select-none">
                                     <div className="flex flex-col items-center text-center">
@@ -3017,7 +3086,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, i, isFocused, isSubd
                                             </svg>
                                         </div>
                                         <span className="text-[9px] tracking-tight leading-tight mt-1 text-forest/70 font-light font-sans max-w-[100px] sm:max-w-[65px]">
-                                            LAVAGEM À MÃO
+                                            {t('product.care.handwash')}
                                         </span>
                                     </div>
                                     <div className="flex flex-col items-center text-center">
@@ -3028,7 +3097,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, i, isFocused, isSubd
                                             </svg>
                                         </div>
                                         <span className="text-[9px] tracking-tight leading-tight mt-1 text-forest/70 font-light font-sans max-w-[100px] sm:max-w-[65px]">
-                                            SECAR HORIZONTAL
+                                            {t('product.care.dryflat')}
                                         </span>
                                     </div>
                                     <div className="flex flex-col items-center text-center">
@@ -3041,7 +3110,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, i, isFocused, isSubd
                                             </svg>
                                         </div>
                                         <span className="text-[9px] tracking-tight leading-tight mt-1 text-forest/70 font-light font-sans max-w-[100px] sm:max-w-[65px]">
-                                            SEM SECADORA
+                                            {t('product.care.notumble')}
                                         </span>
                                     </div>
                                     <div className="flex flex-col items-center text-center">
@@ -3053,7 +3122,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, i, isFocused, isSubd
                                             </svg>
                                         </div>
                                         <span className="text-[9px] tracking-tight leading-tight mt-1 text-forest/70 font-light font-sans max-w-[100px] sm:max-w-[65px]">
-                                            EVITAR TORCER
+                                            {t('product.care.nowring')}
                                         </span>
                                     </div>
                                 </div>
@@ -3067,38 +3136,38 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, i, isFocused, isSubd
                             <div className="lg:hidden block pb-4">
                                 <div id="checkout-box-mobile" className="bg-forest/5 rounded-2xl p-5 border border-forest/10 shadow-sm relative overflow-hidden text-forest animate-fadeIn">
                                     <div className="flex justify-between items-center mb-3 pb-2.5 border-b border-forest/10">
-                                        <h4 className="text-[10px] uppercase tracking-[0.25em] font-extrabold text-[#A68244]">CONFIGURAÇÃO SELECIONADA</h4>
+                                        <h4 className="text-[10px] uppercase tracking-[0.25em] font-extrabold text-[#A68244]">{t('product.selected_config')}</h4>
                                         <span className="text-lg font-serif text-forest font-semibold tracking-tight">{currentPrice}</span>
                                     </div>
 
                                     <div className="space-y-1.5 text-[11px] uppercase tracking-wider text-forest/80 font-normal">
                                         {(!isCoaster || isClassicCoasters) && (
                                             <div className="flex justify-between items-center border-b border-forest/5 pb-1">
-                                                <span className="text-forest/40 text-[9px] tracking-[0.2em]">{isMiniPouches ? 'COR DA PEÇA' : 'COR'}</span>
-                                                <span className="text-forest font-semibold">{selections.cor || 'Verde Musgo'}</span>
+                                                <span className="text-forest/40 text-[9px] tracking-[0.2em]">{t('product.color')}</span>
+                                                <span className="text-forest font-semibold">{translateColor(selections.cor, lang) || (lang === 'pt' ? 'Verde Musgo' : 'Moss Green')}</span>
                                             </div>
                                         )}
                                         {isMiniPouches && (
                                             <div className="flex justify-between items-center border-b border-forest/5 pb-1">
-                                                <span className="text-forest/40 text-[9px] tracking-[0.2em]">COR DO FIO</span>
-                                                <span className="text-forest font-semibold">{selections.corFio || 'Branco Creme'}</span>
+                                                <span className="text-forest/40 text-[9px] tracking-[0.2em]">{t('product.yarn_color')}</span>
+                                                <span className="text-forest font-semibold">{translateColor(selections.corFio, lang) || (lang === 'pt' ? 'Branco Creme' : 'Cream White')}</span>
                                             </div>
                                         )}
                                         {hasSize && (
                                             <div className="flex justify-between items-center border-b border-forest/5 pb-1">
-                                                <span className="text-forest/40 text-[9px] tracking-[0.2em]">TAMANHO</span>
-                                                <span className="text-forest font-semibold">{selections.tamanho}</span>
+                                                <span className="text-forest/40 text-[9px] tracking-[0.2em]">{t('product.size')}</span>
+                                                <span className="text-forest font-semibold">{translateSize(selections.tamanho, lang)}</span>
                                             </div>
                                         )}
                                         {hasQuantity && (
                                             <div className="flex justify-between items-center border-b border-forest/5 pb-1">
-                                                <span className="text-forest/40 text-[9px] tracking-[0.2em]">QUANTIDADE</span>
-                                                <span className="text-forest font-semibold">{selections.quantidade}</span>
+                                                <span className="text-forest/40 text-[9px] tracking-[0.2em]">{t('product.quantity')}</span>
+                                                <span className="text-forest font-semibold">{translateQuantity(selections.quantidade, lang)}</span>
                                             </div>
                                         )}
                                         {product.dimensions && (
                                             <div className="flex justify-between items-center border-b border-forest/5 pb-1">
-                                                <span className="text-forest/40 text-[9px] tracking-[0.2em]">DIMENSÕES</span>
+                                                <span className="text-forest/40 text-[9px] tracking-[0.2em]">{t('product.dimensions')}</span>
                                                 <span className="text-forest font-semibold">{product.dimensions}</span>
                                             </div>
                                         )}
@@ -3114,38 +3183,38 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, i, isFocused, isSubd
                     <div className="hidden lg:block shrink-0 mt-2">
                         <div id="checkout-box-desktop" className="bg-[#343E2C] rounded-2xl p-5 border border-white/10 shadow-lg relative overflow-hidden text-[#FCFBF9] animate-fadeIn">
                             <div className="flex justify-between items-center mb-3 pb-2.5 border-b border-white/10">
-                                <h4 className="text-[11px] uppercase tracking-[0.25em] font-semibold bg-gradient-to-b from-[#F5E0B5] to-[#D4AF37] bg-clip-text text-transparent">COMPRA SEGURA</h4>
+                                <h4 className="text-[11px] uppercase tracking-[0.25em] font-semibold bg-gradient-to-b from-[#F5E0B5] to-[#D4AF37] bg-clip-text text-transparent">{t('product.secure_checkout')}</h4>
                                 <span className="text-2xl md:text-3xl font-serif text-[#FCFBF9] font-semibold tracking-tight">{currentPrice}</span>
                             </div>
 
                             <div className="space-y-1.5 mb-3.5 text-[11px] uppercase tracking-wider text-white/90 font-normal">
                                         {(!isCoaster || isClassicCoasters) && (
                                             <div className="flex justify-between items-center border-b border-white/5 pb-1">
-                                                <span className="text-white/40 text-[9px] tracking-[0.2em]">{isMiniPouches ? 'COR DA PEÇA' : 'COR'}</span>
-                                                <span className="text-[#FCFBF9] font-semibold">{selections.cor || 'Verde Musgo'}</span>
+                                                <span className="text-white/40 text-[9px] tracking-[0.2em]">{t('product.color')}</span>
+                                                <span className="text-[#FCFBF9] font-semibold">{translateColor(selections.cor, lang) || (lang === 'pt' ? 'Verde Musgo' : 'Moss Green')}</span>
                                             </div>
                                         )}
                                         {isMiniPouches && (
                                             <div className="flex justify-between items-center border-b border-white/5 pb-1">
-                                                <span className="text-white/40 text-[9px] tracking-[0.2em]">COR DO FIO</span>
-                                                <span className="text-[#FCFBF9] font-semibold">{selections.corFio || 'Branco Creme'}</span>
+                                                <span className="text-white/40 text-[9px] tracking-[0.2em]">{t('product.yarn_color')}</span>
+                                                <span className="text-[#FCFBF9] font-semibold">{translateColor(selections.corFio, lang) || (lang === 'pt' ? 'Branco Creme' : 'Cream White')}</span>
                                             </div>
                                         )}
                                         {hasSize && (
                                     <div className="flex justify-between items-center border-b border-white/5 pb-1">
-                                        <span className="text-white/40 text-[9px] tracking-[0.2em]">TAMANHO</span>
-                                        <span className="text-[#FCFBF9] font-semibold">{selections.tamanho}</span>
+                                        <span className="text-white/40 text-[9px] tracking-[0.2em]">{t('product.size')}</span>
+                                        <span className="text-[#FCFBF9] font-semibold">{translateSize(selections.tamanho, lang)}</span>
                                     </div>
                                 )}
                                 {hasQuantity && (
                                     <div className="flex justify-between items-center border-b border-white/5 pb-1">
-                                        <span className="text-white/40 text-[9px] tracking-[0.2em]">QUANTIDADE</span>
-                                        <span className="text-[#FCFBF9] font-semibold">{selections.quantidade}</span>
+                                        <span className="text-white/40 text-[9px] tracking-[0.2em]">{t('product.quantity')}</span>
+                                        <span className="text-[#FCFBF9] font-semibold">{translateQuantity(selections.quantidade, lang)}</span>
                                     </div>
                                 )}
                                 {product.dimensions && (
                                     <div className="flex justify-between items-center border-b border-white/5 pb-1">
-                                        <span className="text-white/40 text-[9px] tracking-[0.2em]">DIMENSÕES</span>
+                                        <span className="text-white/40 text-[9px] tracking-[0.2em]">{t('product.dimensions')}</span>
                                         <span className="text-[#FCFBF9] font-semibold">{product.dimensions}</span>
                                     </div>
                                 )}
@@ -3162,7 +3231,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, i, isFocused, isSubd
                                     whileTap={{ scale: 0.99 }}
                                     className="w-full rounded-full py-3.5 text-center font-bold bg-[#C5A059] text-[#343E2C] hover:bg-[#d5b069] active:scale-95 text-[11px] uppercase tracking-widest cursor-pointer shadow-[0_4px_15px_rgba(197,160,89,0.3)] border border-[#C5A059]/10 block transition-all duration-300"
                                 >
-                                    COMPRA IMEDIATA
+                                    {t('product.instant_buy')}
                                 </motion.button>
                                 
                                 <motion.a 
@@ -3173,7 +3242,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, i, isFocused, isSubd
                                     whileTap={{ scale: 0.99 }}
                                     className="w-full rounded-full py-3 text-center font-bold bg-transparent text-[#FCFBF9] hover:bg-white/5 active:scale-95 text-[10px] uppercase tracking-widest cursor-pointer border border-[#C5A059]/30 block transition-all duration-300"
                                 >
-                                    Personalizar o meu Design
+                                    {t('product.customize_design')}
                                 </motion.a>
                             </div>
                         </div>
@@ -3189,7 +3258,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, i, isFocused, isSubd
                 >
                     <div className="flex items-center justify-between w-full">
                         <div className="flex flex-col text-left">
-                            <span className="text-[8px] uppercase tracking-[0.2em] text-[#A68244] font-bold font-sans">IMPORTE TOTAL</span>
+                            <span className="text-[8px] uppercase tracking-[0.2em] text-[#A68244] font-bold font-sans">{t('product.total_amount')}</span>
                             <span className="text-xl sm:text-2xl font-serif text-forest font-semibold tracking-tight">{currentPrice}</span>
                         </div>
                         <motion.button 
@@ -3202,7 +3271,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, i, isFocused, isSubd
                             whileTap={{ scale: 0.99 }}
                             className="flex-1 max-w-[190px] xs:max-w-[210px] sm:max-w-[240px] rounded-full py-3.5 text-center font-bold bg-[#C5A059] text-[#343E2C] hover:bg-[#d5b069] text-[10px] sm:text-[11px] uppercase tracking-widest cursor-pointer shadow-[0_4px_15px_rgba(197,160,89,0.35)] border border-[#C5A059]/10 block font-sans"
                         >
-                            COMPRA IMEDIATA
+                            {t('product.instant_buy')}
                         </motion.button>
                     </div>
                     <motion.a 
@@ -3213,7 +3282,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, i, isFocused, isSubd
                         whileTap={{ scale: 0.99 }}
                         className="w-full rounded-full py-2.5 text-center font-medium bg-transparent text-forest hover:bg-forest/5 text-[9px] uppercase tracking-widest cursor-pointer border border-[#C5A059]/30 block font-sans"
                     >
-                        Personalizar o meu Design (WhatsApp)
+                        {t('product.customize_whatsapp')}
                     </motion.a>
                 </div>
             )}
