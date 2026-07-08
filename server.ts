@@ -2,7 +2,7 @@ import express from "express";
 import path from "path";
 import fs from "fs";
 import { createServer as createViteServer } from "vite";
-import { sendTransactionEmails, OrderData } from "./src/lib/emailService";
+import { sendTransactionEmails, sendMultibancoEmails, OrderData } from "./src/lib/emailService";
 import Stripe from "stripe";
 
 const app = express();
@@ -269,11 +269,30 @@ app.post("/api/payment/create-intent", async (req, res) => {
           }
         } catch (stripeErr: any) {
           console.error("[STRIPE MULTIBANCO ERROR]", stripeErr);
-          // Fallback reference if Stripe has key/auth issue or setup fails
-          order.multibancoRef = {
-            entidade: "12445",
-            referencia: `${Math.floor(100 + Math.random() * 900)} ${Math.floor(100 + Math.random() * 900)} ${Math.floor(100 + Math.random() * 900)}`
-          };
+          const stripeKey = process.env.STRIPE_SECRET_KEY || "";
+          const isLiveMode = stripeKey.startsWith("sk_live");
+          
+          if (isLiveMode) {
+            order.status = 'failed';
+            order.errorMessage = `Este método de pagamento (Multibanco) não está disponível ou não foi ativo na conta Stripe. Detalhe técnico: ${stripeErr.message}`;
+            
+            console.warn("\n========================================================");
+            console.warn("[STRIPE CONFIGURATION WARNING]");
+            console.warn("Multibanco payment creation failed on a live Stripe account!");
+            console.warn("Please make sure you have enabled 'Multibanco' in your Stripe Dashboard:");
+            console.warn("https://dashboard.stripe.com/settings/payment_methods");
+            console.warn("========================================================\n");
+            
+            return res.status(400).json({ 
+              error: "Este método de pagamento (Multibanco) ainda não está ativo na conta do Stripe da loja. Por favor, ative-o no painel do Stripe (Settings > Payment Methods) ou utilize outro método como Cartão de Crédito." 
+            });
+          } else {
+            // Fallback reference if Stripe has key/auth issue or setup fails in test mode
+            order.multibancoRef = {
+              entidade: "12445",
+              referencia: `${Math.floor(100 + Math.random() * 900)} ${Math.floor(100 + Math.random() * 900)} ${Math.floor(100 + Math.random() * 900)}`
+            };
+          }
         }
       } else {
         // Fallback simulation if no real Stripe configuration is present (keeps sandbox testing working)
@@ -281,6 +300,16 @@ app.post("/api/payment/create-intent", async (req, res) => {
           entidade: "12445",
           referencia: `${Math.floor(100 + Math.random() * 900)} ${Math.floor(100 + Math.random() * 900)} ${Math.floor(100 + Math.random() * 900)}`
         };
+      }
+
+      // Dispatch Multibanco payment instruction email immediately so client gets reference in inbox!
+      if (order.multibancoRef) {
+        try {
+          const mbEmails = sendMultibancoEmails(order, order.multibancoRef);
+          order.emailLinks = mbEmails;
+        } catch (emailErr) {
+          console.error("[M★BRAVO EMAIL SYSTEM ERROR] Failed to dispatch Multibanco instruction email:", emailErr);
+        }
       }
     } else if (paymentMethod === 'mbway') {
       const phone = order.mbwayPhone || '';
@@ -316,13 +345,32 @@ app.post("/api/payment/create-intent", async (req, res) => {
           order.status = 'pending_payment';
         } catch (stripeErr: any) {
           console.error("[STRIPE MBWAY ERROR]", stripeErr);
-          // Fallback simulation if Stripe fails (e.g. key issue)
-          if (phone === '922222222') {
-            order.simulatedOutcome = 'failed';
-          } else if (phone === '933333333') {
-            order.simulatedOutcome = 'expired';
+          const stripeKey = process.env.STRIPE_SECRET_KEY || "";
+          const isLiveMode = stripeKey.startsWith("sk_live");
+          
+          if (isLiveMode) {
+            order.status = 'failed';
+            order.errorMessage = `Este método de pagamento (MB WAY) não está disponível ou não foi ativo na conta Stripe. Detalhe técnico: ${stripeErr.message}`;
+            
+            console.warn("\n========================================================");
+            console.warn("[STRIPE CONFIGURATION WARNING]");
+            console.warn("MB WAY payment creation failed on a live Stripe account!");
+            console.warn("Please make sure you have enabled 'MB WAY' in your Stripe Dashboard:");
+            console.warn("https://dashboard.stripe.com/settings/payment_methods");
+            console.warn("========================================================\n");
+            
+            return res.status(400).json({ 
+              error: "Este método de pagamento (MB WAY) ainda não está ativo na conta do Stripe da loja. Por favor, ative-o no painel do Stripe (Settings > Payment Methods) ou utilize outro método como Cartão de Crédito." 
+            });
           } else {
-            order.simulatedOutcome = 'paid';
+            // Fallback simulation if Stripe fails (e.g. key issue) in test mode
+            if (phone === '922222222') {
+              order.simulatedOutcome = 'failed';
+            } else if (phone === '933333333') {
+              order.simulatedOutcome = 'expired';
+            } else {
+              order.simulatedOutcome = 'paid';
+            }
           }
         }
       } else {
