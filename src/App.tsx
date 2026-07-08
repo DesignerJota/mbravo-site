@@ -159,9 +159,9 @@ const SHOP_CATEGORIES = [
         id: 'h1c', 
         name: 'Sunflower Coasters', 
         price: calculateProductRange('Sunflower Coasters'), 
-        img: 'https://i.ibb.co/CKSJ40LH/Sunflower-coasters-5.png',
+        img: 'https://i.ibb.co/kVZvr34t/Sunflower-coasters-5.png',
         images: [
-          'https://i.ibb.co/CKSJ40LH/Sunflower-coasters-5.png',
+          'https://i.ibb.co/kVZvr34t/Sunflower-coasters-5.png',
           'https://i.ibb.co/7mtncnc/Sunflower-coasters-2.png',
           'https://i.ibb.co/JWxHQQwY/Sunflower-coasters-3.png',
           'https://i.ibb.co/27J2MWwz/Sunflower-coasters-4-4.png'
@@ -179,7 +179,7 @@ const SHOP_CATEGORIES = [
           'https://i.ibb.co/ZzRSR1V8/Coraline-coasters-6.png',
           'https://i.ibb.co/mVxVF0MM/Coraline-coasters-2.png',
           'https://i.ibb.co/FqyRfSw2/Coraline-coasters-3.png',
-          'https://i.ibb.co/VYmP3Mwv/Coraline-coasters-4.png',
+          'https://i.ibb.co/WvPWRnhs/Coraline-coasters-4.png',
           'https://i.ibb.co/tpyY6NRY/Coraline-coasters-5.png'
         ],
         description: "Bases em crochet inspiradas no design Coraline, tecidas à mão com todo o carinho para trazer um toque aconchegante, elegante e especial ao teu espaço.",
