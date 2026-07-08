@@ -2767,6 +2767,12 @@ const ProductCard: React.FC<ProductCardProps> = ({ product: rawProduct, i, isFoc
                                             }
 
                                             let amountInCents = 0;
+                                             try {
+                                                 const rawPriceNum = typeof rawPrice === 'number' ? rawPrice * (hasQuantity ? (parseInt(selections.quantidade) || 1) : 1) : 50;
+                                                 amountInCents = Math.round(rawPriceNum * 100);
+                                             } catch (e) {
+                                                 amountInCents = 5000;
+                                             }
 
                                             if (paymentMethod === 'card') {
                                                 try {
