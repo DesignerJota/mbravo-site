@@ -13,7 +13,7 @@ import {
 } from './translations';
 
 // API Base URL config for Railway production backend vs local development
-const API_BASE_URL = import.meta.env.VITE_API_URL || (import.meta.env.PROD ? 'https://api.mbravobycarolina.com' : '');
+const API_BASE_URL = import.meta.env.VITE_API_URL || '';
 
 // Hero background images for automatic rotation
 const HERO_BACKGROUNDS = [
