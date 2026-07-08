@@ -1,7 +1,7 @@
 providers = ["node"]
 
 [phases.build]
-cmds = ["npm run build:server"]
+cmds = ["npm run build"]
 
 [start]
 cmd = "node dist/server.cjs"
