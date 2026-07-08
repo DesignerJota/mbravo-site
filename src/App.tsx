@@ -1932,6 +1932,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product: rawProduct, i, isFoc
     const [orderId, setOrderId] = useState('');
     const [checkoutError, setCheckoutError] = useState<string | null>(null);
     const [sandboxEmails, setSandboxEmails] = useState<{ customerEmailUrl: string, adminEmailUrl: string } | null>(null);
+    const isLiveMode = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY?.startsWith('pk_live') || false;
 
     const productImages = product.images || [product.img];
 
@@ -2354,10 +2355,71 @@ const ProductCard: React.FC<ProductCardProps> = ({ product: rawProduct, i, isFoc
                                         </span>
                                     </div>
                                     <div className="flex justify-between pt-1 font-bold">
-                                        <span className="text-[#A68244] uppercase tracking-wider text-[10px]">{lang === 'pt' ? 'Total Pago' : 'Total Paid'}</span>
+                                        <span className="text-[#A68244] uppercase tracking-wider text-[10px]">
+                                            {paymentMethod === 'multibanco' 
+                                                ? (lang === 'pt' ? 'Total a Pagar' : 'Total to Pay')
+                                                : (lang === 'pt' ? 'Total Pago' : 'Total Paid')}
+                                        </span>
                                         <span className="text-base font-serif text-forest">{currentPrice}</span>
                                     </div>
                                 </div>
+
+                                {paymentMethod === 'multibanco' && multibancoRef && (
+                                    <div className="bg-amber-50/40 rounded-xl p-4 border border-[#C5A059]/30 text-left space-y-2 w-full font-sans animate-fadeIn">
+                                        <span className="text-[9px] uppercase tracking-wider text-[#A68244] font-mono font-bold block mb-1">
+                                            {lang === 'pt' ? 'DADOS PARA PAGAMENTO MULTIBANCO' : 'MULTIBANCO PAYMENT DETAILS'}
+                                        </span>
+                                        <div className="space-y-1.5 text-xs text-forest">
+                                            <div className="flex justify-between border-b border-forest/5 pb-1">
+                                                <span className="text-forest/40 text-[9px] uppercase tracking-wider">{lang === 'pt' ? 'Entidade' : 'Entity'}</span>
+                                                <span className="font-mono font-bold">{multibancoRef.entidade}</span>
+                                            </div>
+                                            <div className="flex justify-between border-b border-forest/5 pb-1">
+                                                <span className="text-forest/40 text-[9px] uppercase tracking-wider">{lang === 'pt' ? 'Referência' : 'Reference'}</span>
+                                                <span className="font-mono font-bold">{multibancoRef.referencia}</span>
+                                            </div>
+                                            <div className="flex justify-between pb-1">
+                                                <span className="text-forest/40 text-[9px] uppercase tracking-wider">{lang === 'pt' ? 'Montante' : 'Amount'}</span>
+                                                <span className="font-mono font-bold">{currentPrice}</span>
+                                            </div>
+                                        </div>
+                                        <p className="text-[10px] text-forest/50 leading-relaxed text-center pt-1">
+                                            {lang === 'pt' 
+                                                ? 'Efetue o pagamento através do seu Homebanking ou numa caixa ATM. Receberá um e-mail assim que o pagamento for confirmado.'
+                                                : 'Make the payment via your Homebanking or at an ATM. You will receive an email as soon as the payment is confirmed.'}
+                                        </p>
+                                        {!isLiveMode && (
+                                            <button
+                                                onClick={async () => {
+                                                    try {
+                                                        setIsPaying(true);
+                                                        const res = await fetch('/api/payment/webhook', {
+                                                            method: 'POST',
+                                                            headers: { 'Content-Type': 'application/json' },
+                                                            body: JSON.stringify({
+                                                                orderId,
+                                                                event: 'payment_intent.succeeded'
+                                                            })
+                                                        });
+                                                        const statusData = await res.json();
+                                                        if (statusData.status === 'paid') {
+                                                            setIsPaying(false);
+                                                            if (statusData.emailLinks) {
+                                                                setSandboxEmails(statusData.emailLinks);
+                                                            }
+                                                        }
+                                                    } catch (err: any) {
+                                                        setIsPaying(false);
+                                                        console.error("Erro ao simular webhook:", err);
+                                                    }
+                                                }}
+                                                className="mt-2 w-full py-2 bg-forest text-cream font-mono text-[9px] tracking-wider rounded-lg font-bold uppercase cursor-pointer hover:bg-forest/95 transition-all text-center"
+                                            >
+                                                {isPaying ? 'A Processar...' : (lang === 'pt' ? 'Simular Pagamento (Sandbox Webhook)' : 'Simulate Payment (Sandbox Webhook)')}
+                                            </button>
+                                        )}
+                                    </div>
+                                )}
 
                                 <div className="bg-amber-50/50 rounded-xl p-3.5 border border-[#C5A059]/20 text-left text-[11px] text-forest/80 leading-relaxed font-sans">
                                     <p className="font-semibold text-[#A68244] mb-1">{t('payment.prod_note_title')}</p>
@@ -2513,11 +2575,6 @@ const ProductCard: React.FC<ProductCardProps> = ({ product: rawProduct, i, isFoc
                                                 type="button"
                                                 onClick={() => {
                                                     setPaymentMethod('multibanco');
-                                                    if (!multibancoRef) {
-                                                        const entity = "12445";
-                                                        const refNum = `${Math.floor(100 + Math.random() * 900)} ${Math.floor(100 + Math.random() * 900)} ${Math.floor(100 + Math.random() * 900)}`;
-                                                        setMultibancoRef({ entidade: entity, referencia: refNum });
-                                                    }
                                                 }}
                                                 className={`flex flex-col items-center justify-center py-2.5 rounded-xl border transition-all cursor-pointer ${
                                                     paymentMethod === 'multibanco' 
@@ -2560,6 +2617,18 @@ const ProductCard: React.FC<ProductCardProps> = ({ product: rawProduct, i, isFoc
                                                             <>Irá receber uma notificação na aplicação MB WAY para autorizar o pagamento no valor de <strong>{currentPrice}</strong>.</>
                                                         ) : (
                                                             <>You will receive a notification in the MB WAY app to authorize the payment of <strong>{currentPrice}</strong>.</>
+                                                        )}
+                                                    </p>
+                                                </div>
+                                            )}
+
+                                            {paymentMethod === 'multibanco' && !multibancoRef && (
+                                                <div className="space-y-2 animate-fadeIn text-center py-4">
+                                                    <p className="text-[11px] text-forest/70 font-sans leading-relaxed">
+                                                        {lang === 'pt' ? (
+                                                            <>Será gerada uma referência Multibanco oficial para efetuar o pagamento após clicar em <strong>Gerar Referência Multibanco</strong>.</>
+                                                        ) : (
+                                                            <>An official Multibanco reference will be generated for your payment after you click <strong>Generate Multibanco Reference</strong>.</>
                                                         )}
                                                     </p>
                                                 </div>
@@ -2796,6 +2865,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product: rawProduct, i, isFoc
                                                     if (paymentMethod === 'multibanco') {
                                                         setMultibancoRef(data.multibancoRef);
                                                         setIsPaying(false);
+                                                        setPaymentCompleted(true);
                                                     } else if (paymentMethod === 'mbway') {
                                                         // Poll status
                                                         let attempts = 0;
