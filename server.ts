@@ -25,24 +25,11 @@ function getStripeInstance(): Stripe | null {
   }
 }
 
-// CORS Middleware to allow requests from the frontend domain
 app.use((req, res, next) => {
-  const origin = req.headers.origin;
-  const allowedOrigins = [
-    "https://www.mbravobycarolina.com",
-    "https://mbravobycarolina.com",
-    "http://localhost:3000",
-    "http://localhost:5173",
-  ];
-  if (origin && (allowedOrigins.includes(origin) || origin.endsWith(".pages.dev") || origin.includes("localhost"))) {
-    res.setHeader("Access-Control-Allow-Origin", origin);
-  } else {
-    res.setHeader("Access-Control-Allow-Origin", "*");
-  }
+  res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
-  res.setHeader("Access-Control-Allow-Credentials", "true");
-
+  
   if (req.method === "OPTIONS") {
     return res.sendStatus(200);
   }
