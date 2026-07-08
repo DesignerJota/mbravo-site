@@ -322,7 +322,7 @@ Compacta e prática, fecha com um botão de madeira com estrela, um detalhe espe
     id: 'vestuario',
     name: 'Vestuário',
     items: 'Bikini, Ponchos, Cardigans',
-    img: 'https://i.ibb.co/39mv372Z/IMG-2699-02.jpg',
+    img: 'https://i.ibb.co/CKMWVc9L/IMG-2691.jpg',
     products: [
       { 
         id: 'v1', 
@@ -341,11 +341,12 @@ Compacta e prática, fecha com um botão de madeira com estrela, um detalhe espe
         id: 'v1b', 
         name: 'Coral Bikini Top', 
         price: calculateProductRange('Coral Bikini Top'), 
-        img: 'https://i.ibb.co/nsShtnLn/Marea-Triangle-Top10-2.png',
+        img: 'https://i.ibb.co/sv0rY2J1/IMG-3187.jpg',
         images: [
-          'https://i.ibb.co/nsShtnLn/Marea-Triangle-Top10-2.png',
-          'https://i.ibb.co/j9LYMvVw/Marea-Triangle-Top10-2.jpg',
-          'https://i.ibb.co/8gjmkHJL/Marea-Triangle-Top05.png'
+          'https://i.ibb.co/sv0rY2J1/IMG-3187.jpg',
+          'https://i.ibb.co/TBYpCxxR/IMG-2959.jpg',
+          'https://i.ibb.co/N2QHbvnL/IMG-3020.jpg',
+          'https://i.ibb.co/sd7FbbXr/IMG-2935-2.jpg'
         ],
         description: `Bikini top em crochet feito à mão, com um design triangular clássico e detalhes delicados.
 Ajustável no pescoço e nas costas para um ajuste confortável e personalizado.
@@ -367,13 +368,14 @@ Disponível em várias combinações de cores, foi criado para acompanhar os dia
         id: 'v2c', 
         name: 'Signature Granny Poncho', 
         price: calculateProductRange('Signature Granny Poncho'), 
-        img: 'https://i.ibb.co/9H1wYzSv/IMG-2738.jpg',
+        img: 'https://i.ibb.co/3907byLt/IMG-2738-2.jpg',
         images: [
-          'https://i.ibb.co/9H1wYzSv/IMG-2738.jpg',
-          'https://i.ibb.co/Xk33krB5/IMG-2674-2.jpg',
-          'https://i.ibb.co/gL0QR9Ms/IMG-2713.jpg',
-          'https://i.ibb.co/KzGNwQgY/IMG-2820-2.jpg',
-          'https://i.ibb.co/21K1FLRn/IMG-2807-2.jpg'
+          'https://i.ibb.co/3907byLt/IMG-2738-2.jpg',
+          'https://i.ibb.co/gbVfh1Nc/IMG-2858.jpg',
+          'https://i.ibb.co/TBVVLngk/IMG-2720.jpg',
+          'https://i.ibb.co/qMKY04T8/IMG-2806.jpg',
+          'https://i.ibb.co/YB0LYVMV/IMG-2891.jpg',
+          'https://i.ibb.co/RTggwnnR/IMG-2856.jpg'
         ],
         description: "Poncho em crochet feito à mão, criado com um clássico padrão granny stitch e combinação de duas cores para um look cozy e intemporal. Com um ajuste confortável e textura aconchegante, é perfeito para sobrepor a diferentes looks e acrescentar um toque handmade e effortless ao visual.",
         details: "• Ideal para layering em diferentes looks\n• Disponível em várias combinações de cores",
@@ -384,7 +386,13 @@ Disponível em várias combinações de cores, foi criado para acompanhar os dia
         id: 'alma_cardigan', 
         name: 'Alma Cardigan', 
         price: calculateProductRange('Alma Cardigan'), 
-        img: 'https://i.ibb.co/4qjnQph/Cardigan-CAPA.png',
+        img: 'https://i.ibb.co/Xk8DF1Y7/Alma-Cardigan.jpg',
+        images: [
+          'https://i.ibb.co/Xk8DF1Y7/Alma-Cardigan.jpg',
+          'https://i.ibb.co/JFSPgpMd/image-1.jpg',
+          'https://i.ibb.co/tMphf1D6/image.jpg',
+          'https://i.ibb.co/gZwFn5mk/image-3-2.jpg'
+        ],
         description: "Cardigan em crochet feito à mão com granny squares clássicos e um design cozy e intemporal. Uma peça confortável e delicada, perfeita para dias frescos de verão, outono ou para criar um look mais acolhedor e effortless. Disponível em várias combinações de cores e materiais.",
         material: "- Opção 1: 100% algodão (Leve, respirável e ideal para dias mais amenos ou meia-estação)\n- Opção 2: 50% algodão / 50% lã (Mais quente, macio e aconchegante, ideal para dias mais frios)",
         care: "- Lavagem delicada à mão\n- Secar ao ar em superfície plana\n- Evitar torcer a peça",
@@ -418,12 +426,12 @@ Disponível em várias combinações de cores, foi criado para acompanhar os dia
         id: 'v3', 
         name: 'Dragonfly Bandana', 
         price: calculateProductRange('Dragonfly Bandana'), 
-        img: 'https://i.ibb.co/35v25TQS/Bandana-LIBELINHA-1.jpg',
+        img: 'https://i.ibb.co/xqRg1L26/IMG-2833.jpg',
         images: [
-          'https://i.ibb.co/35v25TQS/Bandana-LIBELINHA-1.jpg',
-          'https://i.ibb.co/QjmnZpkw/Bandana-LIBELINHA-2.jpg',
-          'https://i.ibb.co/V00ntjtS/Bandana-LIBELINHA-3.jpg',
-          'https://i.ibb.co/CpfWF52W/Bandana-LIBELINHA-4.jpg',
+          'https://i.ibb.co/xqRg1L26/IMG-2833.jpg',
+          'https://i.ibb.co/Hs65ksV/IMG-2777.jpg',
+          'https://i.ibb.co/h1ZRfGbb/IMG-2770.jpg',
+          'https://i.ibb.co/XfWmYnYm/IMG-2753.jpg',
           'https://i.ibb.co/nNbwppxF/Bandana-LIBELINHA-capa.png',
           'https://i.ibb.co/M5hJdHrK/Dragonfly-Bandana-Libelinha-1.png',
           'https://i.ibb.co/HDzn9x8m/Dragonfly-Bandana-Libelinha-3.png'
