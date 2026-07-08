@@ -9,13 +9,20 @@ const PORT = 3000;
 
 let stripeInstance: Stripe | null = null;
 function getStripeInstance(): Stripe | null {
-  if (!stripeInstance) {
-    const key = process.env.STRIPE_SECRET_KEY;
-    if (key && !key.startsWith("sk_test_mock")) {
-      stripeInstance = new Stripe(key);
+  try {
+    if (!stripeInstance) {
+      const key = process.env.STRIPE_SECRET_KEY;
+      if (key && key.trim() !== "" && !key.startsWith("sk_test_mock")) {
+        // Clean up any extra whitespaces, newlines or quotes that might be in the env key
+        const cleanKey = key.trim().replace(/^["']|["']$/g, '');
+        stripeInstance = new Stripe(cleanKey);
+      }
     }
+    return stripeInstance;
+  } catch (err) {
+    console.error("[STRIPE INITIALIZATION ERROR]", err);
+    return null;
   }
-  return stripeInstance;
 }
 
 // Enable JSON body parsing
@@ -74,6 +81,23 @@ app.post("/api/payment/create-intent", async (req, res) => {
 
     // Process payment using Stripe if available
     const { amountInCents } = req.body;
+    
+    // Calculate correct price in cents if not provided or 0
+    let finalAmountInCents = amountInCents;
+    if (!finalAmountInCents || finalAmountInCents <= 0) {
+      try {
+        const productPrice = typeof product.price === 'string' 
+          ? parseFloat(product.price.replace(/[^0-9.]/g, '')) 
+          : parseFloat(product.price);
+        const qty = parseInt(selections.quantidade || "1") || 1;
+        finalAmountInCents = Math.round(productPrice * qty * 100);
+        console.log(`[STRIPE] Dynamically calculated server-side amountInCents for ${orderId}: ${finalAmountInCents} cents`);
+      } catch (calcErr) {
+        console.warn(`[STRIPE WARNING] Could not calculate price for ${orderId}, falling back to 5000 cents:`, calcErr);
+        finalAmountInCents = 5000;
+      }
+    }
+
     const stripe = getStripeInstance();
 
     if (paymentMethod === 'card') {
@@ -88,7 +112,7 @@ app.post("/api/payment/create-intent", async (req, res) => {
           console.log(`[STRIPE] Creating PaymentIntent with payment_method_data for order ${orderId}`);
           
           const paymentIntent = await stripe.paymentIntents.create({
-            amount: amountInCents || 5000,
+            amount: finalAmountInCents || 5000,
             currency: 'eur',
             payment_method_data: {
               type: 'card' as any,
@@ -181,16 +205,20 @@ app.post("/api/payment/create-intent", async (req, res) => {
     } else if (paymentMethod === 'multibanco') {
       if (stripe && checkoutForm) {
         try {
-          console.log(`[STRIPE] Creating Multibanco PaymentIntent for order ${orderId}`);
+          console.log(`[STRIPE] Creating Multibanco PaymentIntent for order ${orderId} with amount ${finalAmountInCents} cents`);
+          
+          const customerName = checkoutForm.nome?.trim() || "M★BRAVO Cliente";
+          const customerEmail = checkoutForm.email?.trim() || "handmade.mbravo@gmail.com";
+
           const paymentIntent = await stripe.paymentIntents.create({
-            amount: amountInCents || 5000,
+            amount: finalAmountInCents || 5000,
             currency: 'eur',
             payment_method_types: ['multibanco'],
             payment_method_data: {
               type: 'multibanco',
               billing_details: {
-                name: checkoutForm.nome,
-                email: checkoutForm.email,
+                name: customerName,
+                email: customerEmail,
               }
             },
             confirm: true,
@@ -198,11 +226,12 @@ app.post("/api/payment/create-intent", async (req, res) => {
             description: `M★BRAVO - Encomenda ${orderId}`,
             metadata: {
               orderId,
-              customerName: checkoutForm.nome,
-              customerEmail: checkoutForm.email
+              customerName: customerName,
+              customerEmail: customerEmail
             }
           });
 
+          console.log(`[STRIPE MULTIBANCO] Created PaymentIntent ID: ${paymentIntent.id}, status: ${paymentIntent.status}`);
           order.stripePaymentIntentId = paymentIntent.id;
 
           if (paymentIntent.next_action?.multibanco_display_details) {
@@ -211,8 +240,9 @@ app.post("/api/payment/create-intent", async (req, res) => {
               entidade: details.entity,
               referencia: details.reference
             };
+            console.log(`[STRIPE MULTIBANCO] Extracted real reference details: Entidade ${details.entity}, Ref ${details.reference}`);
           } else {
-            // Default fallback references if details are missing from next_action
+            console.warn(`[STRIPE MULTIBANCO] PaymentIntent created, but no next_action.multibanco_display_details returned. Falling back to sandbox simulation values...`);
             order.multibancoRef = {
               entidade: "12445",
               referencia: `${Math.floor(100 + Math.random() * 900)} ${Math.floor(100 + Math.random() * 900)} ${Math.floor(100 + Math.random() * 900)}`
@@ -239,7 +269,7 @@ app.post("/api/payment/create-intent", async (req, res) => {
         try {
           console.log(`[STRIPE] Creating MB WAY PaymentIntent for order ${orderId}`);
           const paymentIntent = await stripe.paymentIntents.create({
-            amount: amountInCents || 5000,
+            amount: finalAmountInCents || 5000,
             currency: 'eur',
             payment_method_types: ['mb_way'],
             payment_method_data: {
