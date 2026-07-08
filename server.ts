@@ -1,5 +1,6 @@
 import express from "express";
 import path from "path";
+import fs from "fs";
 import { createServer as createViteServer } from "vite";
 import { sendTransactionEmails, OrderData } from "./src/lib/emailService";
 import Stripe from "stripe";
@@ -506,9 +507,31 @@ async function startServer() {
     app.use(vite.middlewares);
   } else {
     const distPath = path.join(process.cwd(), 'dist');
+    const indexPath = path.join(distPath, 'index.html');
     app.use(express.static(distPath));
     app.get('*', (req, res) => {
-      res.sendFile(path.join(distPath, 'index.html'));
+      if (fs.existsSync(indexPath)) {
+        res.sendFile(indexPath);
+      } else {
+        res.status(200).send(`
+          <!DOCTYPE html>
+          <html>
+            <head>
+              <title>MBravo API Server</title>
+              <style>
+                body { font-family: sans-serif; text-align: center; padding: 50px; background: #0f172a; color: #f8fafc; }
+                h1 { color: #38bdf8; }
+                p { color: #94a3b8; }
+              </style>
+            </head>
+            <body>
+              <h1>MBravo API Engine</h1>
+              <p>The backend API server is running successfully on Railway!</p>
+              <p>The client application is hosted on Cloudflare Pages.</p>
+            </body>
+          </html>
+        `);
+      }
     });
   }
 
