@@ -444,7 +444,7 @@ export function sendTransactionEmails(order: OrderData): { customerEmailUrl: str
       .catch(err => {
         console.warn(`\n[M★BRAVO EMAIL SYSTEM WARNING] Could not send Admin notification email via SendGrid:`);
         console.warn(`  - Logged Detail: ${err.message}`);
-        console.warn(`  - Action: Ensure your SendGrid Sender Identity aligns with the "from" address ('${process.env.FROM_EMAIL || 'geral@mbravo.pt'}').`);
+        console.warn(`  - Action: Ensure your SendGrid Sender Identity aligns with the "from" address ('${process.env.FROM_EMAIL || 'handmade.mbravo@gmail.com'}').`);
         console.warn(`  - Sandbox Status: Local template preview generated successfully at /emails/${adminFileName}\n`);
       });
   } else {
@@ -470,7 +470,7 @@ async function sendViaSendGrid(apiKey: string, toEmail: string, subject: string,
     },
     body: JSON.stringify({
       personalizations: [{ to: [{ email: toEmail }] }],
-      from: { email: process.env.FROM_EMAIL || 'geral@mbravo.pt', name: 'M★BRAVO' },
+      from: { email: process.env.FROM_EMAIL || 'handmade.mbravo@gmail.com', name: 'M★BRAVO' },
       subject: subject,
       content: [{ type: 'text/html', value: htmlContent }]
     })
