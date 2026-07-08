@@ -12,6 +12,9 @@ import {
   translateBackendError
 } from './translations';
 
+// API Base URL config for Railway production backend vs local development
+const API_BASE_URL = import.meta.env.VITE_API_URL || (import.meta.env.PROD ? 'https://api.mbravobycarolina.com' : '');
+
 // Hero background images for automatic rotation
 const HERO_BACKGROUNDS = [
   "https://i.ibb.co/KppF2KLq/Background.png",
@@ -2393,7 +2396,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product: rawProduct, i, isFoc
                                                 onClick={async () => {
                                                     try {
                                                         setIsPaying(true);
-                                                        const res = await fetch('/api/payment/webhook', {
+                                                        const res = await fetch(`${API_BASE_URL}/api/payment/webhook`, {
                                                             method: 'POST',
                                                             headers: { 'Content-Type': 'application/json' },
                                                             body: JSON.stringify({
@@ -2741,7 +2744,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product: rawProduct, i, isFoc
                                             // If Multibanco ref is already active, clicking simulates the manual user payment webhook confirmation
                                             if (paymentMethod === 'multibanco' && multibancoRef) {
                                                 try {
-                                                    const res = await fetch('/api/payment/webhook', {
+                                                    const res = await fetch(`${API_BASE_URL}/api/payment/webhook`, {
                                                         method: 'POST',
                                                         headers: { 'Content-Type': 'application/json' },
                                                         body: JSON.stringify({
@@ -2796,7 +2799,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product: rawProduct, i, isFoc
                                             }
 
                                             try {
-                                                const response = await fetch('/api/payment/create-intent', {
+                                                const response = await fetch(`${API_BASE_URL}/api/payment/create-intent`, {
                                                     method: 'POST',
                                                     headers: { 'Content-Type': 'application/json' },
                                                     body: JSON.stringify({
@@ -2845,7 +2848,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product: rawProduct, i, isFoc
                                                     if (confirmResult.paymentIntent && confirmResult.paymentIntent.status === 'succeeded') {
                                                         console.log("[STRIPE] 3D Secure Verification Success! Confirming order...");
                                                         // Inform server that payment is succeeded using the webhook simulation endpoint
-                                                        const confirmRes = await fetch('/api/payment/webhook', {
+                                                        const confirmRes = await fetch(`${API_BASE_URL}/api/payment/webhook`, {
                                                             method: 'POST',
                                                             headers: { 'Content-Type': 'application/json' },
                                                             body: JSON.stringify({
@@ -2878,7 +2881,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product: rawProduct, i, isFoc
                                                         const intervalId = setInterval(async () => {
                                                             attempts++;
                                                             try {
-                                                                const statusRes = await fetch(`/api/payment/status/${data.orderId}`);
+                                                                const statusRes = await fetch(`${API_BASE_URL}/api/payment/status/${data.orderId}`);
                                                                 if (!statusRes.ok) return;
                                                                 const statusData = await statusRes.json();
 
