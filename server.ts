@@ -59,7 +59,7 @@ const formatPortuguesePhone = (phone: string) => {
 };
 
 /**
- * 1. CREATE PAYMENT INTENT ENDPOINT (CORRIGIDO E SEGURO)
+ * 1. CREATE PAYMENT INTENT ENDPOINT (MÉTODO MODERNO E SEGURO)
  */
 app.post("/api/payment/create-intent", async (req, res) => {
   try {
@@ -106,60 +106,50 @@ app.post("/api/payment/create-intent", async (req, res) => {
         const qty = parseInt(selections.quantidade || "1") || 1;
         finalAmountInCents = Math.round(productPrice * qty * 100);
       } catch (calcErr) {
-        finalAmountInCents = 5000;
+        finalAmountInCents = 1500; // 15.00€ Base fallback
       }
     }
 
     const stripe = getStripeInstance();
 
-    // ---- MÉTODOS COM INTENT COMPARTILHADO (CARD, MBWAY, MULTIBANCO) ----
     if (stripe) {
       try {
+        // Define dinamicamente o método correto na API moderna da Stripe
         let paymentMethodTypes: string[] = ['card'];
-        
         if (paymentMethod === 'mbway') {
           paymentMethodTypes = ['mb_way'];
         } else if (paymentMethod === 'multibanco') {
           paymentMethodTypes = ['multibanco'];
         }
 
-        console.log(`[STRIPE] Criando PaymentIntent seguro para ${paymentMethod} - Encomenda ${orderId}`);
+        console.log(`[STRIPE] Criando PaymentIntent para ${paymentMethod} - Encomenda ${orderId}`);
         
-        // Estrutura de criação universal recomendada pela Stripe
         const intentOptions: Stripe.PaymentIntentCreateParams = {
-          amount: finalAmountInCents || 5000,
+          amount: finalAmountInCents,
           currency: 'eur',
           payment_method_types: paymentMethodTypes,
           description: `M★BRAVO - Encomenda ${orderId}`,
-          receipt_email: checkoutForm.email || undefined,
-          metadata: {
-            orderId,
-            customerName: checkoutForm.nome || "Cliente",
-            customerEmail: checkoutForm.email || "N/A"
-          }
+          metadata: { orderId, customerName: checkoutForm.nome }
         };
 
-        // Correção do erro 400 do MB WAY: Passar o telefone no sítio certo exigido pela API da Stripe
+        // Configuração obrigatória para MB WAY funcionar sem dar erro 400
         if (paymentMethod === 'mbway') {
           const rawPhone = checkoutForm.mbwayPhone || checkoutForm.telefone || '';
-          const phone = formatPortuguesePhone(rawPhone);
           intentOptions.payment_method_data = {
             type: 'mb_way',
             billing_details: {
-              phone: phone,
-              name: (checkoutForm.nome || "Cliente M★BRAVO").trim(),
-              email: (checkoutForm.email || "handmade.mbravo@gmail.com").trim(),
+              phone: formatPortuguesePhone(rawPhone),
             }
           };
         }
 
-        // Configuração inicial para o Multibanco
+        // Configuração para gerar a Entidade/Referência do Multibanco
         if (paymentMethod === 'multibanco') {
           intentOptions.payment_method_data = {
             type: 'multibanco',
             billing_details: {
-              name: (checkoutForm.nome || "Cliente M★BRAVO").trim(),
-              email: (checkoutForm.email || "handmade.mbravo@gmail.com").trim(),
+              name: checkoutForm.nome || "Cliente M★BRAVO",
+              email: checkoutForm.email || "handmade.mbravo@gmail.com",
             }
           };
         }
@@ -169,7 +159,6 @@ app.post("/api/payment/create-intent", async (req, res) => {
         order.stripePaymentIntentId = paymentIntent.id;
         order.stripeClientSecret = paymentIntent.client_secret;
 
-        // Se for Multibanco, precisamos de extrair logo as referências geradas
         if (paymentMethod === 'multibanco' && paymentIntent.next_action?.multibanco_display_details) {
           const details = paymentIntent.next_action.multibanco_display_details;
           order.multibancoRef = {
@@ -184,18 +173,16 @@ app.post("/api/payment/create-intent", async (req, res) => {
       } catch (stripeErr: any) {
         console.error("[STRIPE ENGINE ERROR]", stripeErr);
         order.status = 'failed';
-        order.errorMessage = stripeErr.message || 'Erro no Stripe';
+        order.errorMessage = stripeErr.message || 'Erro no processamento da Stripe';
         return res.status(400).json({ error: order.errorMessage });
       }
     } else {
-      // Fallback para simulação local caso não haja chaves válidas
       order.status = 'paid';
-      order.stripeClientSecret = "mock_secret_for_sandbox_testing";
+      order.stripeClientSecret = "mock_secret_for_local_testing";
     }
 
     activeOrders.set(orderId, order);
 
-    // Retornamos o clientSecret para que o frontend conclua o pagamento de forma segura
     return res.json({
       success: true,
       orderId,
@@ -234,9 +221,9 @@ app.get("/api/payment/status/:orderId", async (req, res) => {
             order.emailLinks = sendTransactionEmails(order);
             order.emailSent = true;
           }
-        } else if (intent.status === 'canceled' || (intent.last_payment_error && intent.status !== 'requires_action')) {
+        } else if (intent.status === 'canceled') {
           order.status = 'failed';
-          order.errorMessage = intent.last_payment_error?.message || `Falhou com estado: ${intent.status}`;
+          order.errorMessage = 'Pagamento cancelado ou recusado.';
         }
       } catch (err: any) {
         console.error("[STRIPE STATUS POLL ERROR]", err);
@@ -257,7 +244,6 @@ app.get("/api/payment/status/:orderId", async (req, res) => {
  * 3. REAL-TIME WEBHOOK INTEGRATION ENDPOINT
  */
 app.post("/api/payment/webhook", (req, res) => {
-  console.log("[WEBHOOK RECEIVED] Processing payload.");
   const payload = req.body;
   let orderId = payload.orderId;
   let event = payload.event || payload.type;
@@ -269,45 +255,31 @@ app.post("/api/payment/webhook", (req, res) => {
     }
   }
 
-  if (!orderId) {
-    return res.status(400).json({ error: "Webhook missing orderId target" });
-  }
+  if (!orderId) return res.status(400).json({ error: "Webhook missing orderId" });
 
   const order = activeOrders.get(orderId);
-  if (!order) {
-    return res.status(404).json({ error: "Target order for webhook not found" });
-  }
+  if (!order) return res.status(404).json({ error: "Order not found" });
 
-  if (event === "payment_intent.succeeded" || event === "payment.succeeded" || event === "charge.succeeded") {
-    console.log(`[WEBHOOK SUCCESS] Updating order ${orderId} status to PAID.`);
+  if (event === "payment_intent.succeeded" || event === "charge.succeeded") {
     order.status = "paid";
-    
     if (!order.emailSent) {
       order.emailLinks = sendTransactionEmails(order);
       order.emailSent = true;
     }
-
-    return res.json({
-      received: true,
-      status: "paid",
-      message: "Order finalized successfully",
-      emailLinks: order.emailLinks
-    });
+    return res.json({ received: true, status: "paid" });
   }
 
-  res.json({ received: true, status: order.status, message: "Unhandled event type" });
+  res.json({ received: true, status: order.status });
 });
 
 /**
- * 4. DEBUG / SANDBOX SIMULATION ENDPOINT
+ * 4. DEBUG SIMULATION ENDPOINT
  */
 app.post("/api/payment/simulate-action", (req, res) => {
   const { orderId, action } = req.body;
   const order = activeOrders.get(orderId);
 
-  if (!order) {
-    return res.status(404).json({ error: "Order not found" });
-  }
+  if (!order) return res.status(404).json({ error: "Order not found" });
 
   if (action === 'simulate_payment') {
     order.status = 'paid';
@@ -315,19 +287,12 @@ app.post("/api/payment/simulate-action", (req, res) => {
       order.emailLinks = sendTransactionEmails(order);
       order.emailSent = true;
     }
-  } else if (action === 'simulate_failure') {
-    order.status = 'failed';
-    order.errorMessage = 'Simulated failure.';
   }
-
   res.json({ success: true, order });
 });
 
 async function startServer() {
-  const isProduction = process.env.NODE_ENV === "production" || 
-                       !!process.env.RAILWAY_ENVIRONMENT || 
-                       !!process.env.PORT || 
-                       process.env.CF_PAGES === "1";
+  const isProduction = process.env.NODE_ENV === "production" || !!process.env.PORT;
 
   if (!isProduction) {
     const vite = await createViteServer({
@@ -343,22 +308,13 @@ async function startServer() {
       if (fs.existsSync(indexPath)) {
         res.sendFile(indexPath);
       } else {
-        res.status(200).send(`
-          <!DOCTYPE html>
-          <html>
-            <head><title>MBravo API Server</title></head>
-            <body>
-              <h1>MBravo API Engine</h1>
-              <p>The backend API server is running successfully on Railway!</p>
-            </body>
-          </html>
-        `);
+        res.status(200).send("MBravo API Engine Activa");
       }
     });
   }
 
   app.listen(PORT, "0.0.0.0", () => {
-    console.log(`[M★BRAVO SERVER] Fullstack engine running on port ${PORT}`);
+    console.log(`[M★BRAVO SERVER] running on port ${PORT}`);
   });
 }
 
