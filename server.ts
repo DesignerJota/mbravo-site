@@ -114,9 +114,9 @@ app.post("/api/payment/create-intent", async (req, res) => {
 
     if (stripe) {
       try {
-        // Define dinamicamente o método correto na API moderna da Stripe
+        // Define dinamicamente a lista de métodos aceites
         let paymentMethodTypes: string[] = ['card'];
-        if (paymentMethod === 'mbway') {
+        if (paymentMethod === 'mbway' || paymentMethod === 'mb_way') {
           paymentMethodTypes = ['mb_way'];
         } else if (paymentMethod === 'multibanco') {
           paymentMethodTypes = ['multibanco'];
@@ -133,7 +133,7 @@ app.post("/api/payment/create-intent", async (req, res) => {
         };
 
         // Configuração obrigatória para MB WAY funcionar sem dar erro 400
-        if (paymentMethod === 'mbway') {
+        if (paymentMethod === 'mbway' || paymentMethod === 'mb_way') {
           const rawPhone = checkoutForm.mbwayPhone || checkoutForm.telefone || '';
           intentOptions.payment_method_data = {
             type: 'mb_way',
