@@ -118,7 +118,7 @@ app.post("/api/payment/create-intent", async (req, res) => {
     }
 
     const stripe = getStripeInstance();
-    const paymentMethodConfig = (process.env.STRIPE_PAYMENT_METHOD_CONFIGURATION_ID?.trim() || "pmc_1TqbCW2FDCus4I5c6LgT17T9");
+    const paymentMethodConfig = "pmc_1TqbCW2FDCus4I5c6LgT17T9";
 
     if (paymentMethod === 'card') {
       if (stripe && checkoutForm && checkoutForm.cardNumber) {
