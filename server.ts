@@ -327,13 +327,9 @@ app.post("/api/payment/create-intent", async (req, res) => {
               type: 'mb_way',
               billing_details: {
                 email: checkoutForm.email,
+                phone: phone,
               }
             },
-            payment_method_options: {
-              mb_way: {
-                phone_number: phone,
-              }
-            } as any,
             confirm: true,
             return_url: `${req.headers.origin || 'https://www.mbravobycarolina.com'}/`,
             payment_method_configuration: paymentMethodConfig as any,
