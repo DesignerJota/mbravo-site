@@ -67,7 +67,7 @@ app.post("/api/payment/create-intent", async (req, res) => {
       return res.status(400).json({ error: "Missing required transaction fields" });
     }
 
-    // Generate distinctive Portuguese order code for M★BRAVO
+    // Generate distinctive Portuguese order code for M.BRAVO
     const orderId = `MB-2026-${Math.floor(1000 + Math.random() * 9000)}`;
     const createdAt = new Date().toISOString();
 
@@ -158,7 +158,7 @@ app.post("/api/payment/create-intent", async (req, res) => {
             return_url: `${req.headers.origin || 'https://www.mbravobycarolina.com'}/`,
             payment_method_types: ['card'],
             payment_method_configuration: paymentMethodConfig as any,
-            description: `M★BRAVO - Encomenda ${orderId}`,
+            description: `M BRAVO - Encomenda ${orderId}`,
             receipt_email: checkoutForm.email,
             metadata: {
               orderId,
@@ -228,7 +228,7 @@ app.post("/api/payment/create-intent", async (req, res) => {
         try {
           console.log(`[STRIPE] Creating Multibanco PaymentIntent for order ${orderId} with amount ${finalAmountInCents} cents`);
           
-          const customerName = checkoutForm.nome?.trim() || "M★BRAVO Cliente";
+          const customerName = checkoutForm.nome?.trim() || "M BRAVO Cliente";
           const customerEmail = checkoutForm.email?.trim() || "handmade.mbravo@gmail.com";
 
           const paymentIntent = await stripe.paymentIntents.create({
@@ -307,7 +307,7 @@ app.post("/api/payment/create-intent", async (req, res) => {
           const mbEmails = sendMultibancoEmails(order, order.multibancoRef);
           order.emailLinks = mbEmails;
         } catch (emailErr) {
-          console.error("[M★BRAVO EMAIL SYSTEM ERROR] Failed to dispatch Multibanco instruction email:", emailErr);
+          console.error("[M.BRAVO EMAIL SYSTEM ERROR] Failed to dispatch Multibanco instruction email:", emailErr);
         }
       }
     } else if (paymentMethod === 'mbway') {
@@ -593,7 +593,7 @@ async function startServer() {
   }
 
   app.listen(PORT, "0.0.0.0", () => {
-    console.log(`[M★BRAVO SERVER] Fullstack engine running on port ${PORT}`);
+    console.log(`[M.BRAVO SERVER] Fullstack engine running on port ${PORT}`);
   });
 }
 
