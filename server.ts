@@ -114,15 +114,18 @@ app.post("/api/payment/create-intent", async (req, res) => {
 
     if (stripe) {
       try {
-        // Define dinamicamente a lista de métodos aceites
+        // Forçar o método para minúsculas e limpar espaços/traços para evitar falhas de comunicação do frontend
+        const cleanMethod = String(paymentMethod).toLowerCase().replace(/[^a-z0-9]/g, '');
+
         let paymentMethodTypes: string[] = ['card'];
-        if (paymentMethod === 'mbway' || paymentMethod === 'mb_way') {
+        
+        if (cleanMethod === 'mbway' || cleanMethod === 'mbwaypayment') {
           paymentMethodTypes = ['mb_way'];
-        } else if (paymentMethod === 'multibanco') {
+        } else if (cleanMethod === 'multibanco') {
           paymentMethodTypes = ['multibanco'];
         }
 
-        console.log(`[STRIPE] Criando PaymentIntent para ${paymentMethod} - Encomenda ${orderId}`);
+        console.log(`[STRIPE] Criando PaymentIntent para ${paymentMethod} (Mapeado como: ${paymentMethodTypes[0]}) - Encomenda ${orderId}`);
         
         const intentOptions: Stripe.PaymentIntentCreateParams = {
           amount: finalAmountInCents,
@@ -133,7 +136,7 @@ app.post("/api/payment/create-intent", async (req, res) => {
         };
 
         // Configuração obrigatória para MB WAY funcionar sem dar erro 400
-        if (paymentMethod === 'mbway' || paymentMethod === 'mb_way') {
+        if (cleanMethod === 'mbway' || cleanMethod === 'mbwaypayment') {
           const rawPhone = checkoutForm.mbwayPhone || checkoutForm.telefone || '';
           intentOptions.payment_method_data = {
             type: 'mb_way',
@@ -144,7 +147,7 @@ app.post("/api/payment/create-intent", async (req, res) => {
         }
 
         // Configuração para gerar a Entidade/Referência do Multibanco
-        if (paymentMethod === 'multibanco') {
+        if (cleanMethod === 'multibanco') {
           intentOptions.payment_method_data = {
             type: 'multibanco',
             billing_details: {
@@ -159,7 +162,7 @@ app.post("/api/payment/create-intent", async (req, res) => {
         order.stripePaymentIntentId = paymentIntent.id;
         order.stripeClientSecret = paymentIntent.client_secret;
 
-        if (paymentMethod === 'multibanco' && paymentIntent.next_action?.multibanco_display_details) {
+        if (cleanMethod === 'multibanco' && paymentIntent.next_action?.multibanco_display_details) {
           const details = paymentIntent.next_action.multibanco_display_details;
           order.multibancoRef = {
             entidade: details.entity,
