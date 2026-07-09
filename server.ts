@@ -315,6 +315,12 @@ app.post("/api/payment/create-intent", async (req, res) => {
       if (stripe && checkoutForm && phone && !phone.startsWith('911') && !phone.startsWith('922') && !phone.startsWith('933')) {
         try {
           console.log(`[STRIPE] Creating MB WAY PaymentIntent for order ${orderId}`);
+          
+          let formattedPhone = phone.trim();
+          if (formattedPhone && !formattedPhone.startsWith('+')) {
+            formattedPhone = '+351' + formattedPhone;
+          }
+
           const paymentIntent = await stripe.paymentIntents.create({
             amount: finalAmountInCents || 5000,
             currency: 'eur',
@@ -322,11 +328,19 @@ app.post("/api/payment/create-intent", async (req, res) => {
             payment_method_data: {
               type: 'mb_way',
               billing_details: {
-                phone: phone,
+                phone: formattedPhone
               }
             },
             confirm: true,
-            return_url: `${req.headers.origin || 'https://www.mbravobycarolina.com'}/`,
+            mandate_data: {
+              customer_acceptance: {
+                type: 'online',
+                online: {
+                  ip_address: req.ip || '127.0.0.1',
+                  user_agent: req.headers['user-agent'] || 'unknown'
+                }
+              }
+            }
           });
 
           order.stripePaymentIntentId = paymentIntent.id;
