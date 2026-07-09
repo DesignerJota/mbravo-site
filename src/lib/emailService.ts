@@ -176,7 +176,7 @@ export function generateCustomerEmailHtml(order: OrderData): string {
     <div class="container">
       <div class="header">
         <div class="logo">M★BRAVO</div>
-        <div class="subtitle">Atelier de Alta Costura & Crochet</div>
+        <div class="subtitle">Handmade with Love</div>
       </div>
       
       <div class="greeting">
@@ -230,7 +230,7 @@ export function generateCustomerEmailHtml(order: OrderData): string {
 
       <div class="footer">
         M★BRAVO ATELIER &bull; PORTUGAL<br>
-        <a href="mailto:geral@mbravo.pt">geral@mbravo.pt</a> &bull; <a href="https://mbravo.pt">www.mbravo.pt</a><br>
+        <a href="mailto:handmade.mbravo@gmail.com">handmade.mbravo@gmail.com</a><br>
         <span style="font-size: 8px; margin-top: 15px; display: block; color: rgba(36, 49, 25, 0.25);">Esta é uma mensagem automática de confirmação de transação em Sandbox de Testes.</span>
       </div>
     </div>
@@ -249,7 +249,7 @@ export function generateAdminEmailHtml(order: OrderData): string {
 <html>
 <head>
   <meta charset="utf-8">
-  <title>[NOVO PEDIDO] M★BRAVO - ${order.orderId}</title>
+  <title>[NOVO PEDIDO] M BRAVO - ${order.orderId}</title>
   <style>
     body {
       background-color: #f4f4f4;
@@ -411,7 +411,7 @@ export function sendTransactionEmails(order: OrderData): { customerEmailUrl: str
   fs.writeFileSync(path.join(publicEmailsDir, custFileName), customerHtml, 'utf-8');
   fs.writeFileSync(path.join(publicEmailsDir, adminFileName), adminHtml, 'utf-8');
 
-  console.log(`[M★BRAVO EMAIL SYSTEM] Emails generated in Sandbox mode!`);
+  console.log(`[M.BRAVO EMAIL SYSTEM] Emails generated in Sandbox mode!`);
   console.log(`  - Customer confirmation: /emails/${custFileName}`);
   console.log(`  - Admin Atelier Notification: /emails/${adminFileName}`);
 
@@ -426,13 +426,13 @@ export function sendTransactionEmails(order: OrderData): { customerEmailUrl: str
                         !process.env.SENDGRID_API_KEY.includes("test");
 
   if (hasSendGridKey) {
-    console.log(`[M★BRAVO EMAIL SYSTEM] SendGrid API Key detected! Dispatched live email requests in background...`);
+    console.log(`[M.BRAVO EMAIL SYSTEM] SendGrid API Key detected! Dispatched live email requests in background...`);
     
     // Asynchronous send to SendGrid to prevent blocking main transaction thread
-    sendViaSendGrid(process.env.SENDGRID_API_KEY!, order.customer.email, `M★BRAVO | Encomenda Confirmada - ${order.orderId}`, customerHtml)
-      .then(() => console.log(`[M★BRAVO EMAIL SYSTEM] Customer email sent successfully via SendGrid.`))
+    sendViaSendGrid(process.env.SENDGRID_API_KEY!, order.customer.email, `M BRAVO | Encomenda Confirmada - ${order.orderId}`, customerHtml)
+      .then(() => console.log(`[M.BRAVO EMAIL SYSTEM] Customer email sent successfully via SendGrid.`))
       .catch(err => {
-        console.warn(`\n[M★BRAVO EMAIL SYSTEM WARNING] Could not send Customer email via SendGrid:`);
+        console.warn(`\n[M.BRAVO EMAIL SYSTEM WARNING] Could not send Customer email via SendGrid:`);
         console.warn(`  - Logged Detail: ${err.message}`);
         console.warn(`  - Action: Please double-check your SendGrid API Key and Sender Verification in .env or Settings.`);
         console.warn(`  - Sandbox Status: Local template preview generated successfully at /emails/${custFileName}\n`);
@@ -440,15 +440,15 @@ export function sendTransactionEmails(order: OrderData): { customerEmailUrl: str
 
     const adminEmail = process.env.ADMIN_NOTIFY_EMAIL || 'joaopedrojota83@gmail.com';
     sendViaSendGrid(process.env.SENDGRID_API_KEY!, adminEmail, `[NOVO PEDIDO] ${order.orderId} - Prioridade Atelier`, adminHtml)
-      .then(() => console.log(`[M★BRAVO EMAIL SYSTEM] Admin notification email sent successfully via SendGrid.`))
+      .then(() => console.log(`[M.BRAVO EMAIL SYSTEM] Admin notification email sent successfully via SendGrid.`))
       .catch(err => {
-        console.warn(`\n[M★BRAVO EMAIL SYSTEM WARNING] Could not send Admin notification email via SendGrid:`);
+        console.warn(`\n[M.BRAVO EMAIL SYSTEM WARNING] Could not send Admin notification email via SendGrid:`);
         console.warn(`  - Logged Detail: ${err.message}`);
         console.warn(`  - Action: Ensure your SendGrid Sender Identity aligns with the "from" address ('${process.env.FROM_EMAIL || 'handmade.mbravo@gmail.com'}').`);
         console.warn(`  - Sandbox Status: Local template preview generated successfully at /emails/${adminFileName}\n`);
       });
   } else {
-    console.log(`[M★BRAVO EMAIL SYSTEM] Live SendGrid key absent or unconfigured. Falling back entirely to Sandbox Local Previews.`);
+    console.log(`[M.BRAVO EMAIL SYSTEM] Live SendGrid key absent or unconfigured. Falling back entirely to Sandbox Local Previews.`);
   }
 
   return {
@@ -593,7 +593,7 @@ export function generateMultibancoEmailHtml(order: OrderData, multibancoRef: { e
     <div class="container">
       <div class="header">
         <div class="logo">M★BRAVO</div>
-        <div class="subtitle">Atelier de Alta Costura & Crochet</div>
+        <div class="subtitle">Handmade with Love</div>
       </div>
       
       <div class="greeting">
@@ -628,7 +628,7 @@ export function generateMultibancoEmailHtml(order: OrderData, multibancoRef: { e
 
       <div class="footer">
         M★BRAVO ATELIER &bull; PORTUGAL<br>
-        <a href="mailto:geral@mbravo.pt">geral@mbravo.pt</a> &bull; <a href="https://mbravo.pt">www.mbravo.pt</a><br>
+        <a href="mailto:handmade.mbravo@gmail.com">handmade.mbravo@gmail.com</a><br>
         <span style="font-size: 8px; margin-top: 15px; display: block; color: rgba(36, 49, 25, 0.25);">Esta é uma mensagem de instruções de pagamento automático para encomenda em processamento.</span>
       </div>
     </div>
@@ -652,7 +652,7 @@ export function sendMultibancoEmails(order: OrderData, multibancoRef: { entidade
   const custFileName = `multibanco-instruction-${order.orderId}.html`;
   fs.writeFileSync(path.join(publicEmailsDir, custFileName), customerHtml, 'utf-8');
 
-  console.log(`[M★BRAVO EMAIL SYSTEM] Multibanco Instruction Email generated in Sandbox mode!`);
+  console.log(`[M.BRAVO EMAIL SYSTEM] Multibanco Instruction Email generated in Sandbox mode!`);
   console.log(`  - Customer instructions: /emails/${custFileName}`);
 
   const hasSendGridKey = process.env.SENDGRID_API_KEY && 
@@ -664,17 +664,17 @@ export function sendMultibancoEmails(order: OrderData, multibancoRef: { entidade
                         !process.env.SENDGRID_API_KEY.includes("test");
 
   if (hasSendGridKey) {
-    console.log(`[M★BRAVO EMAIL SYSTEM] SendGrid API Key detected! Dispatched Multibanco instructions email in background...`);
+    console.log(`[M.BRAVO EMAIL SYSTEM] SendGrid API Key detected! Dispatched Multibanco instructions email in background...`);
     
-    sendViaSendGrid(process.env.SENDGRID_API_KEY!, order.customer.email, `M★BRAVO | Dados para Pagamento Multibanco - Encomenda ${order.orderId}`, customerHtml)
-      .then(() => console.log(`[M★BRAVO EMAIL SYSTEM] Multibanco instructions email sent successfully via SendGrid.`))
+    sendViaSendGrid(process.env.SENDGRID_API_KEY!, order.customer.email, `M BRAVO | Dados para Pagamento Multibanco - Encomenda ${order.orderId}`, customerHtml)
+      .then(() => console.log(`[M.BRAVO EMAIL SYSTEM] Multibanco instructions email sent successfully via SendGrid.`))
       .catch(err => {
-        console.warn(`\n[M★BRAVO EMAIL SYSTEM WARNING] Could not send Multibanco instructions email via SendGrid:`);
+        console.warn(`\n[M.BRAVO EMAIL SYSTEM WARNING] Could not send Multibanco instructions email via SendGrid:`);
         console.warn(`  - Logged Detail: ${err.message}`);
         console.warn(`  - Sandbox Status: Local template preview generated successfully at /emails/${custFileName}\n`);
       });
   } else {
-    console.log(`[M★BRAVO EMAIL SYSTEM] Live SendGrid key absent or unconfigured. Falling back entirely to Sandbox Local Previews.`);
+    console.log(`[M.BRAVO EMAIL SYSTEM] Live SendGrid key absent or unconfigured. Falling back entirely to Sandbox Local Previews.`);
   }
 
   return {
@@ -695,7 +695,7 @@ async function sendViaSendGrid(apiKey: string, toEmail: string, subject: string,
     },
     body: JSON.stringify({
       personalizations: [{ to: [{ email: toEmail }] }],
-      from: { email: process.env.FROM_EMAIL || 'handmade.mbravo@gmail.com', name: 'M★BRAVO' },
+      from: { email: process.env.FROM_EMAIL || 'handmade.mbravo@gmail.com', name: 'M BRAVO' },
       subject: subject,
       content: [{ type: 'text/html', value: htmlContent }]
     })
