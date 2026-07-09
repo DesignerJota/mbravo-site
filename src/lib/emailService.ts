@@ -1,5 +1,5 @@
-import fs from 'fs';
-import path from 'path';
+import fs from "fs";
+import path from "path";
 
 export interface OrderData {
   orderId: string;
@@ -9,6 +9,9 @@ export interface OrderData {
     cor: string;
     tamanho?: string;
     quantidade?: string;
+    comprimento?: string;
+    manga?: string;
+    cintura?: string;
   };
   customer: {
     nome: string;
@@ -18,44 +21,42 @@ export interface OrderData {
     codigoPostal: string;
     cidade: string;
   };
-  paymentMethod: 'mbway' | 'multibanco' | 'card';
-  status: 'pending_payment' | 'paid' | 'failed';
-  priority: 'ALTA (Atelier Urgente)' | 'NORMAL';
+  paymentMethod: 'card' | 'mbway' | 'multibanco';
+  status: string;
+  priority: string;
   createdAt: string;
 }
 
 /**
- * Generates the elegant cream & forest green customer purchase confirmation HTML email template.
+ * Produces elegant, transactional HTML for Order Confirmations.
+ * Adheres to the M.BRAVO high-contrast aesthetic: warm beige background, dark forest text, and gold accents.
  */
-export function generateCustomerEmailHtml(order: OrderData): string {
+function getReceiptTemplate(order: OrderData): string {
   return `<!DOCTYPE html>
 <html>
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Confirmação de Encomenda - M★BRAVO</title>
+  <title>M BRAVO - Confirmação de Pedido</title>
   <style>
     body {
+      background-color: #F8F6F0;
+      color: #243119;
+      font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
       margin: 0;
       padding: 0;
-      background-color: #F5F2ED;
-      color: #243119;
-      font-family: 'Georgia', 'Garamond', serif;
       -webkit-font-smoothing: antialiased;
     }
     .wrapper {
       width: 100%;
-      background-color: #F5F2ED;
-      padding: 40px 20px;
+      background-color: #F8F6F0;
+      padding: 40px 0;
     }
     .container {
       max-width: 600px;
       margin: 0 auto;
-      background-color: #FCFBF9;
+      background-color: #FFFFFF;
       border: 1px solid rgba(36, 49, 25, 0.08);
-      border-radius: 4px;
-      padding: 50px 40px;
-      box-shadow: 0 10px 30px rgba(36, 49, 25, 0.02);
+      padding: 50px;
     }
     .header {
       text-align: center;
@@ -67,84 +68,76 @@ export function generateCustomerEmailHtml(order: OrderData): string {
       font-weight: bold;
       color: #243119;
       text-transform: uppercase;
-      margin-bottom: 10px;
-      display: inline-block;
-      border-bottom: 1px solid #C5A059;
-      padding-bottom: 5px;
+      margin-bottom: 5px;
     }
     .subtitle {
-      font-size: 9px;
+      font-size: 10px;
+      letter-spacing: 0.2em;
       text-transform: uppercase;
-      letter-spacing: 0.4em;
-      color: #C5A059;
-      font-weight: bold;
-      font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+      color: rgba(36, 49, 25, 0.5);
     }
     .greeting {
-      font-size: 20px;
-      line-height: 1.5;
-      font-style: italic;
-      text-align: center;
-      margin-bottom: 30px;
+      font-size: 18px;
+      line-height: 1.6;
+      font-weight: 300;
+      color: #243119;
+      margin-bottom: 25px;
+    }
+    .story-text {
+      font-size: 13px;
+      line-height: 1.7;
+      color: rgba(36, 49, 25, 0.85);
+      margin-bottom: 35px;
       font-weight: 300;
     }
     .divider {
-      height: 1px;
-      background-color: rgba(36, 49, 25, 0.08);
+      border-top: 1px solid rgba(36, 49, 25, 0.1);
       margin: 30px 0;
     }
-    .story-text {
-      font-size: 14px;
-      line-height: 1.8;
-      color: rgba(36, 49, 25, 0.85);
-      text-align: justify;
-      margin-bottom: 30px;
-      font-weight: 300;
+    .section-title {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      color: rgba(36, 49, 25, 0.5);
+      margin-bottom: 15px;
+      font-weight: bold;
     }
     .order-details {
-      background-color: #FBF9F6;
-      border: 1px solid rgba(197, 160, 89, 0.15);
-      border-radius: 8px;
+      background-color: #FAF9F5;
       padding: 25px;
-      margin-bottom: 30px;
-    }
-    .section-title {
-      font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-      font-size: 10px;
-      text-transform: uppercase;
-      letter-spacing: 0.2em;
-      color: #A68244;
-      font-weight: bold;
-      margin-bottom: 15px;
+      margin-bottom: 35px;
     }
     .detail-row {
       display: flex;
       justify-content: space-between;
-      margin-bottom: 10px;
+      margin-bottom: 12px;
       font-size: 13px;
     }
+    .detail-row:last-child {
+      margin-bottom: 0;
+    }
     .detail-label {
-      color: rgba(36, 49, 25, 0.5);
+      color: rgba(36, 49, 25, 0.6);
       font-weight: 300;
     }
     .detail-value {
       font-weight: bold;
-      text-align: right;
+      color: #243119;
     }
     .shipping-box {
+      border: 1px solid rgba(36, 49, 25, 0.08);
+      padding: 25px;
+      margin-bottom: 35px;
       font-size: 13px;
       line-height: 1.6;
-      color: rgba(36, 49, 25, 0.8);
-      margin-bottom: 30px;
     }
     .shipping-title {
-      font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-      font-size: 10px;
-      text-transform: uppercase;
-      letter-spacing: 0.2em;
-      color: rgba(36, 49, 25, 0.5);
       font-weight: bold;
-      margin-bottom: 8px;
+      margin-bottom: 10px;
+      color: #243119;
+      text-transform: uppercase;
+      font-size: 11px;
+      letter-spacing: 0.1em;
     }
     .production-note {
       background-color: #FDFBF7;
@@ -230,7 +223,7 @@ export function generateCustomerEmailHtml(order: OrderData): string {
 
       <div class="footer">
         M★BRAVO ATELIER &bull; PORTUGAL<br>
-        <a href="mailto:encomendas@mbravobycarolina.com">encomendas@mbravobycarolina.com</a><br>
+        <a href="mailto:handmade.mbravo@gmail.com">handmade.mbravo@gmail.com</a><br>
         <span style="font-size: 8px; margin-top: 15px; display: block; color: rgba(36, 49, 25, 0.25);">Esta é uma mensagem automática de confirmação de transação em Sandbox de Testes.</span>
       </div>
     </div>
@@ -240,149 +233,122 @@ export function generateCustomerEmailHtml(order: OrderData): string {
 }
 
 /**
- * Generates the administrator notification HTML email template.
+ * Renders the internal administrator notification template.
+ * Highlights custom specifications, Atelier priority levels, and production workflows.
  */
-export function generateAdminEmailHtml(order: OrderData): string {
-  const priorityColor = order.priority.includes('ALTA') ? '#922B21' : '#243119';
-  
+function getAdminTemplate(order: OrderData): string {
+  const specs = order.selections;
   return `<!DOCTYPE html>
 <html>
 <head>
   <meta charset="utf-8">
-  <title>[NOVO PEDIDO] M BRAVO - ${order.orderId}</title>
+  <title>M BRAVO - Nova Encomenda Recebida</title>
   <style>
     body {
-      background-color: #f4f4f4;
-      color: #333;
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, sans-serif;
-      padding: 20px;
+      background-color: #FAF9F6;
+      color: #243119;
+      font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+      margin: 0;
+      padding: 0;
     }
-    .card {
+    .wrapper {
+      width: 100%;
+      background-color: #FAF9F6;
+      padding: 40px 0;
+    }
+    .container {
       max-width: 600px;
       margin: 0 auto;
-      background: white;
-      border: 1px solid #ddd;
-      border-radius: 8px;
-      overflow: hidden;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+      background-color: #FFFFFF;
+      border: 1px solid #EAE6DF;
+      padding: 40px;
     }
     .header {
-      background-color: #243119;
-      color: #F5F2ED;
-      padding: 20px 25px;
+      border-bottom: 2px solid #243119;
+      padding-bottom: 20px;
+      margin-bottom: 30px;
     }
-    .header h2 {
-      margin: 0;
-      font-size: 18px;
+    .title {
+      font-size: 20px;
       letter-spacing: 0.1em;
       text-transform: uppercase;
+      font-weight: bold;
+      color: #243119;
     }
     .priority-badge {
       display: inline-block;
-      background-color: ${priorityColor};
-      color: white;
-      padding: 4px 10px;
-      border-radius: 20px;
+      background-color: ${order.priority.includes('ALTA') ? '#92400e' : '#243119'};
+      color: #FFFFFF;
       font-size: 10px;
       font-weight: bold;
-      letter-spacing: 0.05em;
+      letter-spacing: 0.1em;
+      padding: 6px 12px;
       text-transform: uppercase;
-      margin-top: 8px;
-    }
-    .content {
-      padding: 25px;
+      margin-top: 10px;
     }
     .section-title {
       font-size: 11px;
+      font-weight: bold;
       text-transform: uppercase;
       letter-spacing: 0.1em;
-      color: #888;
-      border-bottom: 1px solid #eee;
+      color: rgba(36, 49, 25, 0.5);
+      margin: 25px 0 10px 0;
+      border-bottom: 1px solid #EAE6DF;
       padding-bottom: 5px;
-      margin-top: 20px;
-      margin-bottom: 12px;
     }
-    .field-row {
-      display: flex;
-      justify-content: space-between;
-      margin-bottom: 8px;
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 20px;
+    }
+    td {
+      padding: 8px 0;
       font-size: 13px;
+      border-bottom: 1px solid #F3F1ED;
     }
     .label {
-      color: #666;
+      color: rgba(36, 49, 25, 0.6);
+      width: 150px;
     }
-    .value {
-      font-weight: 600;
+    .val {
+      font-weight: bold;
     }
   </style>
 </head>
 <body>
-  <div class="card">
-    <div class="header">
-      <h2>M★BRAVO &bull; Notificação de Atelier</h2>
-      <div class="priority-badge">Prioridade: ${order.priority}</div>
-    </div>
-    <div class="content">
-      <p style="font-size: 14px; margin-top: 0;">Novo pedido recebido e processado com sucesso. Status do pagamento: <strong>PAGO (Aprovado em Sandbox)</strong>.</p>
-      
-      <div class="section-title">Dados de Produção</div>
-      <div class="field-row">
-        <span class="label">ID Encomenda:</span>
-        <span class="value" style="font-family: monospace;">${order.orderId}</span>
-      </div>
-      <div class="field-row">
-        <span class="label">Modelo:</span>
-        <span class="value">${order.productName}</span>
-      </div>
-      <div class="field-row">
-        <span class="label">Cor Selecionada:</span>
-        <span class="value">${order.selections.cor}</span>
-      </div>
-      <div class="field-row">
-        <span class="label">Tamanho:</span>
-        <span class="value">${order.selections.tamanho || 'Customizado'}</span>
-      </div>
-      <div class="field-row">
-        <span class="label">Quantidade:</span>
-        <span class="value">${order.selections.quantidade || '1'}</span>
-      </div>
-      <div class="field-row">
-        <span class="label">Método Pagamento:</span>
-        <span class="value" style="text-transform: uppercase;">${order.paymentMethod}</span>
-      </div>
-      <div class="field-row">
-        <span class="label">Total da Venda:</span>
-        <span class="value" style="color: #243119;">${order.price}</span>
+  <div class="wrapper">
+    <div class="container">
+      <div class="header">
+        <div class="title">Atelier M★BRAVO</div>
+        <div class="priority-badge">Prioridade: ${order.priority}</div>
       </div>
 
-      <div class="section-title">Dados de Envio & Contato Cliente</div>
-      <div class="field-row">
-        <span class="label">Nome Cliente:</span>
-        <span class="value">${order.customer.nome}</span>
-      </div>
-      <div class="field-row">
-        <span class="label">E-mail:</span>
-        <span class="value">${order.customer.email}</span>
-      </div>
-      <div class="field-row">
-        <span class="label">Contacto:</span>
-        <span class="value">${order.customer.telefone}</span>
-      </div>
-      <div class="field-row" style="margin-bottom: 2px;">
-        <span class="label">Morada:</span>
-        <span class="value" style="text-align: right; max-width: 70%;">${order.customer.morada}</span>
-      </div>
-      <div class="field-row">
-        <span class="label">Código Postal / Cidade:</span>
-        <span class="value">${order.customer.codigoPostal}, ${order.customer.cidade}</span>
-      </div>
+      <div class="section-title">Dados da Transação</div>
+      <table>
+        <tr><td class="label">ID Encomenda:</td><td class="val">${order.orderId}</td></tr>
+        <tr><td class="label">Data de Criação:</td><td class="val">${new Date(order.createdAt).toLocaleString('pt-PT')}</td></tr>
+        <tr><td class="label">Método Pagamento:</td><td class="val" style="text-transform: uppercase;">${order.paymentMethod}</td></tr>
+        <tr><td class="label">Valor Cobrado:</td><td class="val" style="color: #A68244;">${order.price}</td></tr>
+      </table>
 
-      <div class="section-title">Instruções Próximas Horas</div>
-      <p style="font-size: 12px; color: #555; line-height: 1.5; margin-bottom: 0;">
-        1. Validar as dimensões do molde para o tamanho <strong>${order.selections.tamanho || 'Sob Medida'}</strong>.<br>
-        2. Reservar o novelo de fio de cor <strong>${order.selections.cor}</strong> no estoque.<br>
-        3. Emitir a etiqueta em couro M★BRAVO correspondente ao pedido.
-      </p>
+      <div class="section-title">Especificações do Produto</div>
+      <table>
+        <tr><td class="label">Peça:</td><td class="val">${order.productName}</td></tr>
+        <tr><td class="label">Cor Principal:</td><td class="val">${specs.cor}</td></tr>
+        <tr><td class="label">Tamanho:</td><td class="val">${specs.tamanho || 'Sob Medida'}</td></tr>
+        <tr><td class="label">Quantidade:</td><td class="val">${specs.quantidade || '1'}</td></tr>
+        ${specs.comprimento ? `<tr><td class="label">Comprimento:</td><td class="val">${specs.comprimento}</td></tr>` : ''}
+        ${specs.manga ? `<tr><td class="label">Ajuste de Manga:</td><td class="val">${specs.manga}</td></tr>` : ''}
+        ${specs.cintura ? `<tr><td class="label">Ajuste de Cintura:</td><td class="val">${specs.cintura}</td></tr>` : ''}
+      </table>
+
+      <div class="section-title">Contacto do Cliente</div>
+      <table>
+        <tr><td class="label">Nome:</td><td class="val">${order.customer.nome}</td></tr>
+        <tr><td class="label">E-mail:</td><td class="val">${order.customer.email}</td></tr>
+        <tr><td class="label">Telemóvel:</td><td class="val">${order.customer.telefone}</td></tr>
+        <tr><td class="label">Morada:</td><td class="val">${order.customer.morada}, ${order.customer.codigoPostal} ${order.customer.cidade}</td></tr>
+      </table>
     </div>
   </div>
 </body>
@@ -390,57 +356,50 @@ export function generateAdminEmailHtml(order: OrderData): string {
 }
 
 /**
- * Main service method that log-creates visual template previews on-disk,
- * triggers terminal logs, and integrates actual email gateways when keys are provided.
+ * Primary action to send transaction emails after a successful checkout.
+ * Dispatches Client Confirmation and notifies Admin, with a fallback local file system logging.
  */
-export function sendTransactionEmails(order: OrderData): { customerEmailUrl: string; adminEmailUrl: string } {
-  const customerHtml = generateCustomerEmailHtml(order);
-  const adminHtml = generateAdminEmailHtml(order);
+export function sendTransactionEmails(order: OrderData): { clientPreviewLink?: string; adminPreviewLink?: string } {
+  const clientHtml = getReceiptTemplate(order);
+  const adminHtml = getAdminTemplate(order);
 
-  // Define static paths inside public/emails so that Express can serve them easily!
-  // This is exceptional for testing purposes.
+  const clientFileName = `${order.orderId}-recibo-cliente.html`;
+  const adminFileName = `${order.orderId}-admin-notificacao.html`;
+
   const publicEmailsDir = path.join(process.cwd(), 'public', 'emails');
-  
-  if (!fs.existsSync(publicEmailsDir)) {
-    fs.mkdirSync(publicEmailsDir, { recursive: true });
+
+  try {
+    if (!fs.existsSync(publicEmailsDir)) {
+      fs.mkdirSync(publicEmailsDir, { recursive: true });
+    }
+    fs.writeFileSync(path.join(publicEmailsDir, clientFileName), clientHtml);
+    fs.writeFileSync(path.join(publicEmailsDir, adminFileName), adminHtml);
+    console.log(`[M.BRAVO EMAIL SYSTEM] Local sandbox HTML previews created:`);
+    console.log(`  - Client Link: /emails/${clientFileName}`);
+    console.log(`  - Admin Link: /emails/${adminFileName}`);
+  } catch (fsErr) {
+    console.error("[M.BRAVO EMAIL SYSTEM] Failed to write local sandbox HTML files:", fsErr);
   }
 
-  const custFileName = `customer-${order.orderId}.html`;
-  const adminFileName = `admin-${order.orderId}.html`;
-
-  fs.writeFileSync(path.join(publicEmailsDir, custFileName), customerHtml, 'utf-8');
-  fs.writeFileSync(path.join(publicEmailsDir, adminFileName), adminHtml, 'utf-8');
-
-  console.log(`[M.BRAVO EMAIL SYSTEM] Emails generated in Sandbox mode!`);
-  console.log(`  - Customer confirmation: /emails/${custFileName}`);
-  console.log(`  - Admin Atelier Notification: /emails/${adminFileName}`);
-
-  // Integrate live gateways here if keys exist.
-  // We document these in .env.example so that users can seamlessly hook them up later!
-  const hasSendGridKey = process.env.SENDGRID_API_KEY && 
-                        process.env.SENDGRID_API_KEY !== "" && 
-                        process.env.SENDGRID_API_KEY.startsWith("SG.") &&
-                        !process.env.SENDGRID_API_KEY.includes("INSERT_") &&
-                        !process.env.SENDGRID_API_KEY.includes("YOUR_") &&
-                        !process.env.SENDGRID_API_KEY.includes("mock") &&
-                        !process.env.SENDGRID_API_KEY.includes("test");
-
-  if (hasSendGridKey) {
-    console.log(`[M.BRAVO EMAIL SYSTEM] SendGrid API Key detected! Dispatched live email requests in background...`);
+  // Check for SendGrid API key to trigger production emails
+  if (process.env.SENDGRID_API_KEY && process.env.SENDGRID_API_KEY.trim() !== "") {
+    console.log(`[M.BRAVO EMAIL SYSTEM] SendGrid API Key identified. Initiating dispatch to client: ${order.customer.email}`);
     
-    // Asynchronous send to SendGrid to prevent blocking main transaction thread
-    sendViaSendGrid(process.env.SENDGRID_API_KEY!, order.customer.email, `M BRAVO | Encomenda Confirmada - ${order.orderId}`, customerHtml)
-      .then(() => console.log(`[M.BRAVO EMAIL SYSTEM] Customer email sent successfully via SendGrid.`))
+    // Dispatch Client Receipt
+    sendSendGridEmail(order.customer.email, `M BRAVO - Confirmação de Pedido #${order.orderId}`, clientHtml)
+      .then(() => console.log(`[M.BRAVO EMAIL SYSTEM] Client receipt dispatched to: ${order.customer.email}`))
       .catch(err => {
-        console.warn(`\n[M.BRAVO EMAIL SYSTEM WARNING] Could not send Customer email via SendGrid:`);
+        console.warn(`\n[M.BRAVO EMAIL SYSTEM WARNING] Could not send Client receipt email via SendGrid:`);
         console.warn(`  - Logged Detail: ${err.message}`);
-        console.warn(`  - Action: Please double-check your SendGrid API Key and Sender Verification in .env or Settings.`);
-        console.warn(`  - Sandbox Status: Local template preview generated successfully at /emails/${custFileName}\n`);
+        console.warn(`  - Action: Ensure your SendGrid Sender Identity aligns with the "from" address ('${process.env.FROM_EMAIL || 'encomendas@mbravobycarolina.com'}').`);
+        console.warn(`  - Sandbox Status: Local template preview generated successfully at /emails/${clientFileName}\n`);
       });
 
-    const adminEmail = process.env.ADMIN_NOTIFY_EMAIL || 'joaopedrojota83@gmail.com';
-    sendViaSendGrid(process.env.SENDGRID_API_KEY!, adminEmail, `[NOVO PEDIDO] ${order.orderId} - Prioridade Atelier`, adminHtml)
-      .then(() => console.log(`[M.BRAVO EMAIL SYSTEM] Admin notification email sent successfully via SendGrid.`))
+    // Dispatch Admin Notification
+    const adminEmailDest = process.env.ADMIN_NOTIFY_EMAIL || "joaopedrojota83@gmail.com";
+    console.log(`[M.BRAVO EMAIL SYSTEM] Dispatched administrative notify to: ${adminEmailDest}`);
+    sendSendGridEmail(adminEmailDest, `[ATELIER NOTIFY] Nova Encomenda #${order.orderId} (${order.priority})`, adminHtml)
+      .then(() => console.log(`[M.BRAVO EMAIL SYSTEM] Admin receipt dispatched to: ${adminEmailDest}`))
       .catch(err => {
         console.warn(`\n[M.BRAVO EMAIL SYSTEM WARNING] Could not send Admin notification email via SendGrid:`);
         console.warn(`  - Logged Detail: ${err.message}`);
@@ -448,47 +407,50 @@ export function sendTransactionEmails(order: OrderData): { customerEmailUrl: str
         console.warn(`  - Sandbox Status: Local template preview generated successfully at /emails/${adminFileName}\n`);
       });
   } else {
-    console.log(`[M.BRAVO EMAIL SYSTEM] Live SendGrid key absent or unconfigured. Falling back entirely to Sandbox Local Previews.`);
+    console.warn("\n==================================================================");
+    console.warn("[M.BRAVO EMAIL SYSTEM NOTICE]");
+    console.warn("SENDGRID_API_KEY was not found in environment variables.");
+    console.warn("Emails will be simulated. Please check the local HTML generated previews:");
+    console.warn(`Client link: /emails/${clientFileName}`);
+    console.warn(`Admin link: /emails/${adminFileName}`);
+    console.warn("==================================================================\n");
   }
 
   return {
-    customerEmailUrl: `/emails/${custFileName}`,
-    adminEmailUrl: `/emails/${adminFileName}`
+    clientPreviewLink: `/emails/${clientFileName}`,
+    adminPreviewLink: `/emails/${adminFileName}`
   };
 }
 
 /**
- * Generates the elegant Multibanco payment instruction HTML email template.
+ * Generates an elegant email with Bank Transfer / Multibanco instructions.
  */
-export function generateMultibancoEmailHtml(order: OrderData, multibancoRef: { entidade: string; referencia: string }): string {
+function getMultibancoTemplate(order: OrderData, ref: { entidade: string; referencia: string }): string {
   return `<!DOCTYPE html>
 <html>
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dados de Pagamento Multibanco - M★BRAVO</title>
+  <title>M BRAVO - Instruções de Pagamento</title>
   <style>
     body {
+      background-color: #F8F6F0;
+      color: #243119;
+      font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
       margin: 0;
       padding: 0;
-      background-color: #F5F2ED;
-      color: #243119;
-      font-family: 'Georgia', 'Garamond', serif;
       -webkit-font-smoothing: antialiased;
     }
     .wrapper {
       width: 100%;
-      background-color: #F5F2ED;
-      padding: 40px 20px;
+      background-color: #F8F6F0;
+      padding: 40px 0;
     }
     .container {
       max-width: 600px;
       margin: 0 auto;
-      background-color: #FCFBF9;
+      background-color: #FFFFFF;
       border: 1px solid rgba(36, 49, 25, 0.08);
-      border-radius: 4px;
-      padding: 50px 40px;
-      box-shadow: 0 10px 30px rgba(36, 49, 25, 0.02);
+      padding: 50px;
     }
     .header {
       text-align: center;
@@ -500,52 +462,42 @@ export function generateMultibancoEmailHtml(order: OrderData, multibancoRef: { e
       font-weight: bold;
       color: #243119;
       text-transform: uppercase;
-      margin-bottom: 10px;
-      display: inline-block;
-      border-bottom: 1px solid #C5A059;
-      padding-bottom: 5px;
+      margin-bottom: 5px;
     }
     .subtitle {
-      font-size: 9px;
+      font-size: 10px;
+      letter-spacing: 0.2em;
       text-transform: uppercase;
-      letter-spacing: 0.4em;
-      color: #C5A059;
-      font-weight: bold;
-      font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+      color: rgba(36, 49, 25, 0.5);
     }
     .greeting {
-      font-size: 20px;
-      line-height: 1.5;
-      font-style: italic;
-      text-align: center;
+      font-size: 18px;
+      line-height: 1.6;
+      font-weight: 300;
+      color: #243119;
+      margin-bottom: 25px;
+    }
+    .instruction-text {
+      font-size: 13px;
+      line-height: 1.7;
+      color: rgba(36, 49, 25, 0.85);
       margin-bottom: 30px;
       font-weight: 300;
     }
     .divider {
-      height: 1px;
-      background-color: rgba(36, 49, 25, 0.08);
+      border-top: 1px solid rgba(36, 49, 25, 0.1);
       margin: 30px 0;
     }
-    .instruction-text {
-      font-size: 14px;
-      line-height: 1.8;
-      color: rgba(36, 49, 25, 0.85);
-      text-align: center;
-      margin-bottom: 30px;
-      font-weight: 300;
-    }
     .payment-box {
-      background-color: #FCF8F2;
-      border: 1px solid #C5A059;
-      border-radius: 12px;
-      padding: 25px;
-      margin-bottom: 30px;
+      background-color: #FAF9F5;
+      border: 1px solid rgba(166, 130, 68, 0.15);
+      padding: 30px;
+      margin: 30px 0;
     }
     .payment-title {
-      font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
       font-size: 11px;
       text-transform: uppercase;
-      letter-spacing: 0.2em;
+      letter-spacing: 0.15em;
       color: #A68244;
       font-weight: bold;
       margin-bottom: 20px;
@@ -608,11 +560,11 @@ export function generateMultibancoEmailHtml(order: OrderData, multibancoRef: { e
         <div class="payment-title">Dados para Pagamento</div>
         <div class="payment-row">
           <span class="payment-label">Entidade:</span>
-          <span class="payment-value">${multibancoRef.entidade}</span>
+          <span class="payment-value">${ref.entidade}</span>
         </div>
         <div class="payment-row">
           <span class="payment-label">Referência:</span>
-          <span class="payment-value">${multibancoRef.referencia}</span>
+          <span class="payment-value">${ref.referencia}</span>
         </div>
         <div class="payment-row">
           <span class="payment-label">Montante:</span>
@@ -628,7 +580,7 @@ export function generateMultibancoEmailHtml(order: OrderData, multibancoRef: { e
 
       <div class="footer">
         M★BRAVO ATELIER &bull; PORTUGAL<br>
-        <a href="mailto:encomendas@mbravobycarolina.com">encomendas@mbravobycarolina.com</a><br>
+        <a href="mailto:handmade.mbravo@gmail.com">handmade.mbravo@gmail.com</a><br>
         <span style="font-size: 8px; margin-top: 15px; display: block; color: rgba(36, 49, 25, 0.25);">Esta é uma mensagem de instruções de pagamento automático para encomenda em processamento.</span>
       </div>
     </div>
@@ -638,60 +590,52 @@ export function generateMultibancoEmailHtml(order: OrderData, multibancoRef: { e
 }
 
 /**
- * Main service method that log-creates visual templates of payment instructions,
- * and triggers live email delivery through SendGrid.
+ * Handles dispatching Multibanco pay instructions.
  */
-export function sendMultibancoEmails(order: OrderData, multibancoRef: { entidade: string; referencia: string }): { customerEmailUrl: string } {
-  const customerHtml = generateMultibancoEmailHtml(order, multibancoRef);
+export function sendMultibancoEmails(order: OrderData, ref: { entidade: string; referencia: string }): { clientPreviewLink?: string } {
+  const mbHtml = getMultibancoTemplate(order, ref);
+  const clientFileName = `${order.orderId}-instrucoes-pagamento.html`;
 
   const publicEmailsDir = path.join(process.cwd(), 'public', 'emails');
-  if (!fs.existsSync(publicEmailsDir)) {
-    fs.mkdirSync(publicEmailsDir, { recursive: true });
+
+  try {
+    if (!fs.existsSync(publicEmailsDir)) {
+      fs.mkdirSync(publicEmailsDir, { recursive: true });
+    }
+    fs.writeFileSync(path.join(publicEmailsDir, clientFileName), mbHtml);
+    console.log(`[M.BRAVO MULTIBANCO] Local instructions page created: /emails/${clientFileName}`);
+  } catch (err) {
+    console.error("[M.BRAVO MULTIBANCO] Local file write failed:", err);
   }
 
-  const custFileName = `multibanco-instruction-${order.orderId}.html`;
-  fs.writeFileSync(path.join(publicEmailsDir, custFileName), customerHtml, 'utf-8');
-
-  console.log(`[M.BRAVO EMAIL SYSTEM] Multibanco Instruction Email generated in Sandbox mode!`);
-  console.log(`  - Customer instructions: /emails/${custFileName}`);
-
-  const hasSendGridKey = process.env.SENDGRID_API_KEY && 
-                        process.env.SENDGRID_API_KEY !== "" && 
-                        process.env.SENDGRID_API_KEY.startsWith("SG.") &&
-                        !process.env.SENDGRID_API_KEY.includes("INSERT_") &&
-                        !process.env.SENDGRID_API_KEY.includes("YOUR_") &&
-                        !process.env.SENDGRID_API_KEY.includes("mock") &&
-                        !process.env.SENDGRID_API_KEY.includes("test");
-
-  if (hasSendGridKey) {
-    console.log(`[M.BRAVO EMAIL SYSTEM] SendGrid API Key detected! Dispatched Multibanco instructions email in background...`);
-    
-    sendViaSendGrid(process.env.SENDGRID_API_KEY!, order.customer.email, `M BRAVO | Dados para Pagamento Multibanco - Encomenda ${order.orderId}`, customerHtml)
-      .then(() => console.log(`[M.BRAVO EMAIL SYSTEM] Multibanco instructions email sent successfully via SendGrid.`))
+  if (process.env.SENDGRID_API_KEY && process.env.SENDGRID_API_KEY.trim() !== "") {
+    sendSendGridEmail(order.customer.email, `M BRAVO - Dados para Pagamento #${order.orderId}`, mbHtml)
+      .then(() => console.log(`[M.BRAVO MULTIBANCO] Dispatched instructions directly to client inbox: ${order.customer.email}`))
       .catch(err => {
-        console.warn(`\n[M.BRAVO EMAIL SYSTEM WARNING] Could not send Multibanco instructions email via SendGrid:`);
-        console.warn(`  - Logged Detail: ${err.message}`);
-        console.warn(`  - Sandbox Status: Local template preview generated successfully at /emails/${custFileName}\n`);
+        console.warn(`[M.BRAVO EMAIL SYSTEM WARNING] Could not send Multibanco instructions: ${err.message}`);
       });
-  } else {
-    console.log(`[M.BRAVO EMAIL SYSTEM] Live SendGrid key absent or unconfigured. Falling back entirely to Sandbox Local Previews.`);
   }
 
   return {
-    customerEmailUrl: `/emails/${custFileName}`
+    clientPreviewLink: `/emails/${clientFileName}`
   };
 }
 
 /**
- * Robust fetch-based SendGrid integration (zero dependencies, completely safe).
+ * Underlying helper that sends standard Web requests towards SendGrid's API v3.
+ * Eliminates custom libraries, ensuring high speed and complete platform portability.
  */
-async function sendViaSendGrid(apiKey: string, toEmail: string, subject: string, htmlContent: string) {
-  const url = 'https://api.sendgrid.com/v3/mail/send';
-  const response = await fetch(url, {
-    method: 'POST',
+async function sendSendGridEmail(toEmail: string, subject: string, htmlContent: string): Promise<void> {
+  const apiKey = process.env.SENDGRID_API_KEY;
+  if (!apiKey) {
+    throw new Error("SENDGRID_API_KEY not configured");
+  }
+
+  const response = await fetch("https://api.sendgrid.com/v3/mail/send", {
+    method: "POST",
     headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${apiKey}`
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${apiKey}`
     },
     body: JSON.stringify({
       personalizations: [{ to: [{ email: toEmail }] }],
@@ -703,6 +647,6 @@ async function sendViaSendGrid(apiKey: string, toEmail: string, subject: string,
 
   if (!response.ok) {
     const errText = await response.text();
-    throw new Error(`SendGrid API failure: ${response.status} - ${errText}`);
+    throw new Error(`SendGrid API bad status: ${response.status} - ${errText}`);
   }
 }
