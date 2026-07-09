@@ -244,13 +244,6 @@ app.post("/api/payment/create-intent", async (req, res) => {
             },
             confirm: true,
             return_url: `${req.headers.origin || 'https://www.mbravobycarolina.com'}/`,
-            payment_method_configuration: paymentMethodConfig as any,
-            description: `M★BRAVO - Encomenda ${orderId}`,
-            metadata: {
-              orderId,
-              customerName: customerName,
-              customerEmail: customerEmail
-            }
           });
 
           console.log(`[STRIPE MULTIBANCO] Created PaymentIntent ID: ${paymentIntent.id}, status: ${paymentIntent.status}`);
@@ -271,7 +264,10 @@ app.post("/api/payment/create-intent", async (req, res) => {
             };
           }
         } catch (stripeErr: any) {
-          console.error("[STRIPE MULTIBANCO ERROR]", stripeErr);
+          console.error("[STRIPE MULTIBANCO FULL ERROR OBJECT]", stripeErr);
+          if (stripeErr && typeof stripeErr === 'object') {
+            console.error(JSON.stringify(stripeErr, null, 2));
+          }
           const stripeKey = process.env.STRIPE_SECRET_KEY || "";
           const isLiveMode = stripeKey.startsWith("sk_live");
           
@@ -326,25 +322,20 @@ app.post("/api/payment/create-intent", async (req, res) => {
             payment_method_data: {
               type: 'mb_way',
               billing_details: {
-                email: checkoutForm.email,
                 phone: phone,
               }
             },
             confirm: true,
             return_url: `${req.headers.origin || 'https://www.mbravobycarolina.com'}/`,
-            payment_method_configuration: paymentMethodConfig as any,
-            description: `M★BRAVO - Encomenda ${orderId}`,
-            metadata: {
-              orderId,
-              customerName: checkoutForm.nome,
-              customerEmail: checkoutForm.email
-            }
           });
 
           order.stripePaymentIntentId = paymentIntent.id;
           order.status = 'pending_payment';
         } catch (stripeErr: any) {
-          console.error("[STRIPE MBWAY ERROR]", stripeErr);
+          console.error("[STRIPE MBWAY FULL ERROR OBJECT]", stripeErr);
+          if (stripeErr && typeof stripeErr === 'object') {
+            console.error(JSON.stringify(stripeErr, null, 2));
+          }
           const stripeKey = process.env.STRIPE_SECRET_KEY || "";
           const isLiveMode = stripeKey.startsWith("sk_live");
           
