@@ -230,7 +230,7 @@ export function generateCustomerEmailHtml(order: OrderData): string {
 
       <div class="footer">
         M★BRAVO ATELIER &bull; PORTUGAL<br>
-        <a href="mailto:handmade.mbravo@gmail.com">handmade.mbravo@gmail.com</a><br>
+        <a href="mailto:encomendas@mbravobycarolina.com">encomendas@mbravobycarolina.com</a><br>
         <span style="font-size: 8px; margin-top: 15px; display: block; color: rgba(36, 49, 25, 0.25);">Esta é uma mensagem automática de confirmação de transação em Sandbox de Testes.</span>
       </div>
     </div>
@@ -325,7 +325,7 @@ export function generateAdminEmailHtml(order: OrderData): string {
     <div class="content">
       <p style="font-size: 14px; margin-top: 0;">Novo pedido recebido e processado com sucesso. Status do pagamento: <strong>PAGO (Aprovado em Sandbox)</strong>.</p>
       
-      <div class="section-title">Dados de Production</div>
+      <div class="section-title">Dados de Produção</div>
       <div class="field-row">
         <span class="label">ID Encomenda:</span>
         <span class="value" style="font-family: monospace;">${order.orderId}</span>
@@ -397,6 +397,8 @@ export function sendTransactionEmails(order: OrderData): { customerEmailUrl: str
   const customerHtml = generateCustomerEmailHtml(order);
   const adminHtml = generateAdminEmailHtml(order);
 
+  // Define static paths inside public/emails so that Express can serve them easily!
+  // This is exceptional for testing purposes.
   const publicEmailsDir = path.join(process.cwd(), 'public', 'emails');
   
   if (!fs.existsSync(publicEmailsDir)) {
@@ -413,6 +415,8 @@ export function sendTransactionEmails(order: OrderData): { customerEmailUrl: str
   console.log(`  - Customer confirmation: /emails/${custFileName}`);
   console.log(`  - Admin Atelier Notification: /emails/${adminFileName}`);
 
+  // Integrate live gateways here if keys exist.
+  // We document these in .env.example so that users can seamlessly hook them up later!
   const hasSendGridKey = process.env.SENDGRID_API_KEY && 
                         process.env.SENDGRID_API_KEY !== "" && 
                         process.env.SENDGRID_API_KEY.startsWith("SG.") &&
@@ -424,11 +428,13 @@ export function sendTransactionEmails(order: OrderData): { customerEmailUrl: str
   if (hasSendGridKey) {
     console.log(`[M.BRAVO EMAIL SYSTEM] SendGrid API Key detected! Dispatched live email requests in background...`);
     
+    // Asynchronous send to SendGrid to prevent blocking main transaction thread
     sendViaSendGrid(process.env.SENDGRID_API_KEY!, order.customer.email, `M BRAVO | Encomenda Confirmada - ${order.orderId}`, customerHtml)
       .then(() => console.log(`[M.BRAVO EMAIL SYSTEM] Customer email sent successfully via SendGrid.`))
       .catch(err => {
         console.warn(`\n[M.BRAVO EMAIL SYSTEM WARNING] Could not send Customer email via SendGrid:`);
         console.warn(`  - Logged Detail: ${err.message}`);
+        console.warn(`  - Action: Please double-check your SendGrid API Key and Sender Verification in .env or Settings.`);
         console.warn(`  - Sandbox Status: Local template preview generated successfully at /emails/${custFileName}\n`);
       });
 
@@ -438,7 +444,265 @@ export function sendTransactionEmails(order: OrderData): { customerEmailUrl: str
       .catch(err => {
         console.warn(`\n[M.BRAVO EMAIL SYSTEM WARNING] Could not send Admin notification email via SendGrid:`);
         console.warn(`  - Logged Detail: ${err.message}`);
+        console.warn(`  - Action: Ensure your SendGrid Sender Identity aligns with the "from" address ('${process.env.FROM_EMAIL || 'encomendas@mbravobycarolina.com'}').`);
         console.warn(`  - Sandbox Status: Local template preview generated successfully at /emails/${adminFileName}\n`);
       });
   } else {
-    console.log(`[M.BRAVO EMAIL SYSTEM] Live SendGrid key absent or unconfigured. Falling back entirely to
+    console.log(`[M.BRAVO EMAIL SYSTEM] Live SendGrid key absent or unconfigured. Falling back entirely to Sandbox Local Previews.`);
+  }
+
+  return {
+    customerEmailUrl: `/emails/${custFileName}`,
+    adminEmailUrl: `/emails/${adminFileName}`
+  };
+}
+
+/**
+ * Generates the elegant Multibanco payment instruction HTML email template.
+ */
+export function generateMultibancoEmailHtml(order: OrderData, multibancoRef: { entidade: string; referencia: string }): string {
+  return `<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dados de Pagamento Multibanco - M★BRAVO</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background-color: #F5F2ED;
+      color: #243119;
+      font-family: 'Georgia', 'Garamond', serif;
+      -webkit-font-smoothing: antialiased;
+    }
+    .wrapper {
+      width: 100%;
+      background-color: #F5F2ED;
+      padding: 40px 20px;
+    }
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+      background-color: #FCFBF9;
+      border: 1px solid rgba(36, 49, 25, 0.08);
+      border-radius: 4px;
+      padding: 50px 40px;
+      box-shadow: 0 10px 30px rgba(36, 49, 25, 0.02);
+    }
+    .header {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+    .logo {
+      font-size: 24px;
+      letter-spacing: 0.3em;
+      font-weight: bold;
+      color: #243119;
+      text-transform: uppercase;
+      margin-bottom: 10px;
+      display: inline-block;
+      border-bottom: 1px solid #C5A059;
+      padding-bottom: 5px;
+    }
+    .subtitle {
+      font-size: 9px;
+      text-transform: uppercase;
+      letter-spacing: 0.4em;
+      color: #C5A059;
+      font-weight: bold;
+      font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    }
+    .greeting {
+      font-size: 20px;
+      line-height: 1.5;
+      font-style: italic;
+      text-align: center;
+      margin-bottom: 30px;
+      font-weight: 300;
+    }
+    .divider {
+      height: 1px;
+      background-color: rgba(36, 49, 25, 0.08);
+      margin: 30px 0;
+    }
+    .instruction-text {
+      font-size: 14px;
+      line-height: 1.8;
+      color: rgba(36, 49, 25, 0.85);
+      text-align: center;
+      margin-bottom: 30px;
+      font-weight: 300;
+    }
+    .payment-box {
+      background-color: #FCF8F2;
+      border: 1px solid #C5A059;
+      border-radius: 12px;
+      padding: 25px;
+      margin-bottom: 30px;
+    }
+    .payment-title {
+      font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.2em;
+      color: #A68244;
+      font-weight: bold;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+    .payment-row {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 12px;
+      font-size: 14px;
+      border-bottom: 1px dashed rgba(36, 49, 25, 0.08);
+      padding-bottom: 10px;
+    }
+    .payment-row:last-child {
+      border-bottom: none;
+      margin-bottom: 0;
+      padding-bottom: 0;
+    }
+    .payment-label {
+      color: rgba(36, 49, 25, 0.6);
+      font-weight: 300;
+    }
+    .payment-value {
+      font-weight: bold;
+      font-family: monospace;
+      font-size: 15px;
+    }
+    .footer {
+      text-align: center;
+      font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      color: rgba(36, 49, 25, 0.4);
+      line-height: 1.8;
+    }
+    .footer a {
+      color: #C5A059;
+      text-decoration: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrapper">
+    <div class="container">
+      <div class="header">
+        <div class="logo">M★BRAVO</div>
+        <div class="subtitle">Handmade with Love</div>
+      </div>
+      
+      <div class="greeting">
+        Olá, ${order.customer.nome}.<br>A sua referência Multibanco foi gerada.
+      </div>
+
+      <div class="instruction-text">
+        Para concluir a sua encomenda M★BRAVO, efetue o pagamento com os dados abaixo através de Homebanking ou caixa ATM (Pagamento de Serviços).
+      </div>
+
+      <div class="payment-box">
+        <div class="payment-title">Dados para Pagamento</div>
+        <div class="payment-row">
+          <span class="payment-label">Entidade:</span>
+          <span class="payment-value">${multibancoRef.entidade}</span>
+        </div>
+        <div class="payment-row">
+          <span class="payment-label">Referência:</span>
+          <span class="payment-value">${multibancoRef.referencia}</span>
+        </div>
+        <div class="payment-row">
+          <span class="payment-label">Montante:</span>
+          <span class="payment-value" style="color: #A68244; font-size: 16px;">${order.price}</span>
+        </div>
+      </div>
+
+      <div class="instruction-text" style="font-size: 12px; font-style: italic; color: rgba(36, 49, 25, 0.6);">
+        Nota: O prazo limite para pagamento desta referência é de 3 dias. Assim que efetuar o pagamento, receberá um e-mail de confirmação automático e iniciaremos a confecção da sua peça.
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="footer">
+        M★BRAVO ATELIER &bull; PORTUGAL<br>
+        <a href="mailto:encomendas@mbravobycarolina.com">encomendas@mbravobycarolina.com</a><br>
+        <span style="font-size: 8px; margin-top: 15px; display: block; color: rgba(36, 49, 25, 0.25);">Esta é uma mensagem de instruções de pagamento automático para encomenda em processamento.</span>
+      </div>
+    </div>
+  </div>
+</body>
+</html>`;
+}
+
+/**
+ * Main service method that log-creates visual templates of payment instructions,
+ * and triggers live email delivery through SendGrid.
+ */
+export function sendMultibancoEmails(order: OrderData, multibancoRef: { entidade: string; referencia: string }): { customerEmailUrl: string } {
+  const customerHtml = generateMultibancoEmailHtml(order, multibancoRef);
+
+  const publicEmailsDir = path.join(process.cwd(), 'public', 'emails');
+  if (!fs.existsSync(publicEmailsDir)) {
+    fs.mkdirSync(publicEmailsDir, { recursive: true });
+  }
+
+  const custFileName = `multibanco-instruction-${order.orderId}.html`;
+  fs.writeFileSync(path.join(publicEmailsDir, custFileName), customerHtml, 'utf-8');
+
+  console.log(`[M.BRAVO EMAIL SYSTEM] Multibanco Instruction Email generated in Sandbox mode!`);
+  console.log(`  - Customer instructions: /emails/${custFileName}`);
+
+  const hasSendGridKey = process.env.SENDGRID_API_KEY && 
+                        process.env.SENDGRID_API_KEY !== "" && 
+                        process.env.SENDGRID_API_KEY.startsWith("SG.") &&
+                        !process.env.SENDGRID_API_KEY.includes("INSERT_") &&
+                        !process.env.SENDGRID_API_KEY.includes("YOUR_") &&
+                        !process.env.SENDGRID_API_KEY.includes("mock") &&
+                        !process.env.SENDGRID_API_KEY.includes("test");
+
+  if (hasSendGridKey) {
+    console.log(`[M.BRAVO EMAIL SYSTEM] SendGrid API Key detected! Dispatched Multibanco instructions email in background...`);
+    
+    sendViaSendGrid(process.env.SENDGRID_API_KEY!, order.customer.email, `M BRAVO | Dados para Pagamento Multibanco - Encomenda ${order.orderId}`, customerHtml)
+      .then(() => console.log(`[M.BRAVO EMAIL SYSTEM] Multibanco instructions email sent successfully via SendGrid.`))
+      .catch(err => {
+        console.warn(`\n[M.BRAVO EMAIL SYSTEM WARNING] Could not send Multibanco instructions email via SendGrid:`);
+        console.warn(`  - Logged Detail: ${err.message}`);
+        console.warn(`  - Sandbox Status: Local template preview generated successfully at /emails/${custFileName}\n`);
+      });
+  } else {
+    console.log(`[M.BRAVO EMAIL SYSTEM] Live SendGrid key absent or unconfigured. Falling back entirely to Sandbox Local Previews.`);
+  }
+
+  return {
+    customerEmailUrl: `/emails/${custFileName}`
+  };
+}
+
+/**
+ * Robust fetch-based SendGrid integration (zero dependencies, completely safe).
+ */
+async function sendViaSendGrid(apiKey: string, toEmail: string, subject: string, htmlContent: string) {
+  const url = 'https://api.sendgrid.com/v3/mail/send';
+  const response = await fetch(url, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${apiKey}`
+    },
+    body: JSON.stringify({
+      personalizations: [{ to: [{ email: toEmail }] }],
+      from: { email: process.env.FROM_EMAIL || 'encomendas@mbravobycarolina.com', name: 'M BRAVO' },
+      subject: subject,
+      content: [{ type: 'text/html', value: htmlContent }]
+    })
+  });
+
+  if (!response.ok) {
+    const errText = await response.text();
+    throw new Error(`SendGrid API failure: ${response.status} - ${errText}`);
+  }
+}
