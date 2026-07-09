@@ -547,7 +547,12 @@ app.post("/api/payment/simulate-action", (req, res) => {
 
 // Configure Vite middleware in development or serve production build
 async function startServer() {
-  if (process.env.NODE_ENV !== "production") {
+  const isProduction = process.env.NODE_ENV === "production" || 
+                       !!process.env.RAILWAY_ENVIRONMENT || 
+                       !!process.env.PORT || 
+                       process.env.CF_PAGES === "1";
+
+  if (!isProduction) {
     const vite = await createViteServer({
       server: { middlewareMode: true },
       appType: "spa",
