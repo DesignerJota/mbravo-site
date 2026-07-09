@@ -54,6 +54,16 @@ const activeOrders = new Map<string, any>();
 // Serve public directory statically so sandbox emails can be viewed in browser tabs
 app.use('/emails', express.static(path.join(process.cwd(), 'public', 'emails')));
 
+// Helper to guarantee Portuguese phone numbers carry the mandatory country prefix for Stripe
+const formatPortuguesePhone = (phone: string) => {
+  if (!phone) return "";
+  const clean = phone.replace(/\s+/g, "");
+  if (clean.startsWith("9") && clean.length === 9) {
+    return `+351${clean}`;
+  }
+  return clean.startsWith("+") ? clean : `+${clean}`;
+};
+
 /**
  * 1. CREATE PAYMENT INTENT ENDPOINT
  * Handles Credit Card, MB WAY and Multibanco initial creation.
@@ -133,8 +143,9 @@ app.post("/api/payment/create-intent", async (req, res) => {
           const paymentIntent = await stripe.paymentIntents.create({
             amount: finalAmountInCents || 5000,
             currency: 'eur',
+            payment_method_types: ['card'],
             payment_method_data: {
-              type: 'card' as any,
+              type: 'card',
               card: {
                 number: checkoutForm.cardNumber.replace(/\s+/g, ''),
                 exp_month: expMonth,
@@ -142,26 +153,25 @@ app.post("/api/payment/create-intent", async (req, res) => {
                 cvc: checkoutForm.cardCvv?.trim(),
               },
               billing_details: {
-                name: checkoutForm.cardName || checkoutForm.nome,
-                email: checkoutForm.email,
-                phone: checkoutForm.telefone,
+                name: (checkoutForm.cardName || checkoutForm.nome || "Cliente M★BRAVO").trim(),
+                email: (checkoutForm.email || "handmade.mbravo@gmail.com").trim(),
+                phone: formatPortuguesePhone(checkoutForm.telefone),
                 address: {
-                  line1: checkoutForm.morada,
-                  postal_code: checkoutForm.codigoPostal,
-                  city: checkoutForm.cidade,
+                  line1: checkoutForm.morada || "N/A",
+                  postal_code: checkoutForm.codigoPostal || "0000-000",
+                  city: checkoutForm.cidade || "Portugal",
                   country: 'PT'
                 }
               }
-            } as any,
+            },
             confirm: true,
             return_url: `${req.headers.origin || 'https://www.mbravobycarolina.com'}/`,
-            payment_method_types: ['card'],
             description: `M★BRAVO - Encomenda ${orderId}`,
-            receipt_email: checkoutForm.email,
+            receipt_email: checkoutForm.email || undefined,
             metadata: {
               orderId,
-              customerName: checkoutForm.nome,
-              customerEmail: checkoutForm.email
+              customerName: checkoutForm.nome || "Cliente",
+              customerEmail: checkoutForm.email || "N/A"
             }
           });
 
@@ -206,15 +216,12 @@ app.post("/api/payment/create-intent", async (req, res) => {
         // Fallback simulation if no real Stripe configuration is present (keeps sandbox testing working)
         const cardNum = order.cardNumber || '';
         if (cardNum.endsWith('5001')) {
-          // Immediate failure test card
           order.status = 'failed';
           order.errorMessage = 'Declined by credit card gateway (Simulation Error 5001 - Insufficient Funds)';
         } else if (cardNum.endsWith('5002')) {
-          // Immediate expiration / fraud test card
           order.status = 'failed';
           order.errorMessage = 'Credit card transaction timeout/expired (Simulation Error 5002)';
         } else {
-          // Successful card transaction
           order.status = 'paid';
           const emailLinks = sendTransactionEmails(order);
           order.emailSent = true;
@@ -287,7 +294,6 @@ app.post("/api/payment/create-intent", async (req, res) => {
               error: "Este método de pagamento (Multibanco) ainda não está ativo na conta do Stripe da loja. Por favor, ative-o no painel do Stripe (Settings > Payment Methods) ou utilize outro método como Cartão de Crédito." 
             });
           } else {
-            // Fallback reference if Stripe has key/auth issue or setup fails in test mode
             order.multibancoRef = {
               entidade: "12445",
               referencia: `${Math.floor(100 + Math.random() * 900)} ${Math.floor(100 + Math.random() * 900)} ${Math.floor(100 + Math.random() * 900)}`
@@ -295,14 +301,12 @@ app.post("/api/payment/create-intent", async (req, res) => {
           }
         }
       } else {
-        // Fallback simulation if no real Stripe configuration is present (keeps sandbox testing working)
         order.multibancoRef = {
           entidade: "12445",
           referencia: `${Math.floor(100 + Math.random() * 900)} ${Math.floor(100 + Math.random() * 900)} ${Math.floor(100 + Math.random() * 900)}`
         };
       }
 
-      // Dispatch Multibanco payment instruction email immediately so client gets reference in inbox!
       if (order.multibancoRef) {
         try {
           const mbEmails = sendMultibancoEmails(order, order.multibancoRef);
@@ -312,10 +316,12 @@ app.post("/api/payment/create-intent", async (req, res) => {
         }
       }
     } else if (paymentMethod === 'mbway') {
-      const phone = order.mbwayPhone || '';
-      if (stripe && checkoutForm && phone && !phone.startsWith('911') && !phone.startsWith('922') && !phone.startsWith('933')) {
+      const rawPhone = order.mbwayPhone || checkoutForm.telefone || '';
+      const phone = formatPortuguesePhone(rawPhone);
+      
+      if (stripe && checkoutForm && phone && !phone.includes('911') && !phone.includes('922') && !phone.includes('933')) {
         try {
-          console.log(`[STRIPE] Creating MB WAY PaymentIntent for order ${orderId}`);
+          console.log(`[STRIPE] Creating MB WAY PaymentIntent for order ${orderId} with phone ${phone}`);
           const paymentIntent = await stripe.paymentIntents.create({
             amount: finalAmountInCents || 5000,
             currency: 'eur',
@@ -323,7 +329,9 @@ app.post("/api/payment/create-intent", async (req, res) => {
             payment_method_data: {
               type: 'mb_way',
               billing_details: {
-                email: checkoutForm.email,
+                name: (checkoutForm.nome || "Cliente M★BRAVO").trim(),
+                email: (checkoutForm.email || "handmade.mbravo@gmail.com").trim(),
+                phone: phone,
               }
             },
             payment_method_options: {
@@ -336,8 +344,8 @@ app.post("/api/payment/create-intent", async (req, res) => {
             description: `M★BRAVO - Encomenda ${orderId}`,
             metadata: {
               orderId,
-              customerName: checkoutForm.nome,
-              customerEmail: checkoutForm.email
+              customerName: checkoutForm.nome || "Cliente M★BRAVO",
+              customerEmail: checkoutForm.email || "N/A"
             }
           });
 
@@ -363,10 +371,9 @@ app.post("/api/payment/create-intent", async (req, res) => {
               error: "Este método de pagamento (MB WAY) ainda não está ativo na conta do Stripe da loja. Por favor, ative-o no painel do Stripe (Settings > Payment Methods) ou utilize outro método como Cartão de Crédito." 
             });
           } else {
-            // Fallback simulation if Stripe fails (e.g. key issue) in test mode
-            if (phone === '922222222') {
+            if (phone.includes('922222222')) {
               order.simulatedOutcome = 'failed';
-            } else if (phone === '933333333') {
+            } else if (phone.includes('933333333')) {
               order.simulatedOutcome = 'expired';
             } else {
               order.simulatedOutcome = 'paid';
@@ -374,10 +381,9 @@ app.post("/api/payment/create-intent", async (req, res) => {
           }
         }
       } else {
-        // Fallback simulation if sandbox numbers are used or Stripe is unavailable
-        if (phone === '922222222') {
+        if (phone.includes('922222222')) {
           order.simulatedOutcome = 'failed';
-        } else if (phone === '933333333') {
+        } else if (phone.includes('933333333')) {
           order.simulatedOutcome = 'expired';
         } else {
           order.simulatedOutcome = 'paid';
