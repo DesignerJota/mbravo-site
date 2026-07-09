@@ -13,8 +13,7 @@ import {
 } from './translations';
 
 // API Base URL config for Railway production backend vs local development
-const API_BASE_URL = import.meta.env.VITE_API_URL || '';
-
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://precious-solace-mbravo-site.up.railway.app';
 // Hero background images for automatic rotation
 const HERO_BACKGROUNDS = [
   "https://i.ibb.co/KppF2KLq/Background.png",
