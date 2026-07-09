@@ -544,7 +544,7 @@ app.post("/api/payment/simulate-action", (req, res) => {
     }
   } else if (action === 'simulate_failure') {
     order.status = 'failed';
-    order.errorMessage = 'Simulated administrative cancellation / Gateway declined.';
+    order.errorMessage = 'Simulated administrative administrative cancellation / Gateway declined.';
   }
 
   res.json({ success: true, order });
