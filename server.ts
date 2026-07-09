@@ -229,7 +229,8 @@ app.post("/api/payment/create-intent", async (req, res) => {
           console.log(`[STRIPE] Creating Multibanco PaymentIntent for order ${orderId} with amount ${finalAmountInCents} cents`);
           
           const customerName = checkoutForm.nome?.trim() || "M BRAVO Cliente";
-          const customerEmail = checkoutForm.email?.trim() || "handmade.mbravo@gmail.com";
+          // CORREÇÃO: Removido o fallback para o gmail antigo
+          const customerEmail = checkoutForm.email?.trim() || "encomendas@mbravobycarolina.com";
 
           const paymentIntent = await stripe.paymentIntents.create({
             amount: finalAmountInCents || 5000,
@@ -544,7 +545,7 @@ app.post("/api/payment/simulate-action", (req, res) => {
     }
   } else if (action === 'simulate_failure') {
     order.status = 'failed';
-    order.errorMessage = 'Simulated administrative administrative cancellation / Gateway declined.';
+    order.errorMessage = 'Simulated administrative cancellation / Gateway declined.';
   }
 
   res.json({ success: true, order });
