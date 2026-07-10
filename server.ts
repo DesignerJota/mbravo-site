@@ -666,7 +666,7 @@ app.post("/api/payment/ship-order", (req, res) => {
 /**
  * 6. ADMINISTRATIVE DASHBOARD ENDPOINTS
  */
-const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'mbravo2026';
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'CarolinaM26';
 
 function verifyAdmin(req: any, res: any, next: any) {
   const auth = req.headers['x-admin-password'] || req.headers['authorization'];
