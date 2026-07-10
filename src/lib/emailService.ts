@@ -79,29 +79,34 @@ export function generateCustomerEmailHtml(order: OrderData): string {
           </div>
 
           <!-- ORDER DETAILS TABLE -->
-          <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #FBF9F6; border: 1px solid rgba(197, 160, 89, 0.15); border-radius: 8px; padding: 25px; margin-bottom: 30px; border-collapse: collapse; font-family: 'Georgia', 'Garamond', serif;">
-            <tr style="font-size: 13px;">
-              <td style="color: rgba(36, 49, 25, 0.5); font-weight: 300; padding-bottom: 10px;">ID da Encomenda:</td>
-              <td align="right" style="font-weight: bold; font-family: monospace; padding-bottom: 10px; color: #243119;">${order.orderId}</td>
-            </tr>
-            <tr style="font-size: 13px;">
-              <td style="color: rgba(36, 49, 25, 0.5); font-weight: 300; padding-bottom: 10px;">Peça Selecionada:</td>
-              <td align="right" style="font-weight: bold; padding-bottom: 10px; color: #243119;">${order.productName}</td>
-            </tr>
-            <tr style="font-size: 13px;">
-              <td style="color: rgba(36, 49, 25, 0.5); font-weight: 300; padding-bottom: 10px;">Especificações:</td>
-              <td align="right" style="font-weight: bold; padding-bottom: 10px; color: #243119;">${order.selections.cor} ${order.selections.tamanho ? `| Tam. ${order.selections.tamanho}` : ''} ${order.selections.quantidade ? `| Qtd. ${order.selections.quantidade}` : ''}</td>
-            </tr>
-            <tr style="font-size: 13px;">
-              <td style="color: rgba(36, 49, 25, 0.5); font-weight: 300; padding-bottom: 15px;">Método de Pagamento:</td>
-              <td align="right" style="font-weight: bold; text-transform: uppercase; padding-bottom: 15px; color: #243119;">${order.paymentMethod === 'mbway' ? 'MB WAY' : order.paymentMethod === 'multibanco' ? 'Referência Multibanco' : 'Cartão de Crédito'}</td>
-            </tr>
+          <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #FBF9F6; border: 1px solid rgba(197, 160, 89, 0.15); border-radius: 8px; border-collapse: collapse; font-family: 'Georgia', 'Garamond', serif; margin-bottom: 30px;">
             <tr>
-              <td colspan="2" style="padding-top: 15px; border-top: 1px solid rgba(36, 49, 25, 0.05);">
+              <td style="padding: 25px;">
                 <table width="100%" cellpadding="0" cellspacing="0" style="border-collapse: collapse;">
-                  <tr style="font-size: 15px;">
-                    <td style="color: #243119; font-weight: bold; font-family: 'Georgia', 'Garamond', serif;">Total:</td>
-                    <td align="right" style="color: #A68244; font-weight: bold; font-family: 'Georgia', 'Garamond', serif;">${order.price}</td>
+                  <!-- Row: ID -->
+                  <tr>
+                    <td style="color: rgba(36, 49, 25, 0.5); font-weight: 300; padding-bottom: 12px; font-size: 13px; text-align: left; border-bottom: 1px dashed rgba(36, 49, 25, 0.08);">ID da Encomenda:</td>
+                    <td align="right" style="font-weight: bold; font-family: monospace; padding-bottom: 12px; font-size: 13px; color: #243119; text-align: right; border-bottom: 1px dashed rgba(36, 49, 25, 0.08);">${order.orderId}</td>
+                  </tr>
+                  <!-- Row: Peça -->
+                  <tr>
+                    <td style="color: rgba(36, 49, 25, 0.5); font-weight: 300; padding-top: 12px; padding-bottom: 12px; font-size: 13px; text-align: left; border-bottom: 1px dashed rgba(36, 49, 25, 0.08);">Peça Selecionada:</td>
+                    <td align="right" style="font-weight: bold; padding-top: 12px; padding-bottom: 12px; font-size: 13px; color: #243119; text-align: right; border-bottom: 1px dashed rgba(36, 49, 25, 0.08);">${order.productName}</td>
+                  </tr>
+                  <!-- Row: Especificações -->
+                  <tr>
+                    <td style="color: rgba(36, 49, 25, 0.5); font-weight: 300; padding-top: 12px; padding-bottom: 12px; font-size: 13px; text-align: left; border-bottom: 1px dashed rgba(36, 49, 25, 0.08);">Especificações:</td>
+                    <td align="right" style="font-weight: bold; padding-top: 12px; padding-bottom: 12px; font-size: 13px; color: #243119; text-align: right; border-bottom: 1px dashed rgba(36, 49, 25, 0.08);">${order.selections.cor} ${order.selections.tamanho ? `| Tam. ${order.selections.tamanho}` : ''} ${order.selections.quantidade ? `| Qtd. ${order.selections.quantidade}` : ''}</td>
+                  </tr>
+                  <!-- Row: Método de Pagamento -->
+                  <tr>
+                    <td style="color: rgba(36, 49, 25, 0.5); font-weight: 300; padding-top: 12px; padding-bottom: 15px; font-size: 13px; text-align: left; border-bottom: 1px solid rgba(36, 49, 25, 0.05);">Método de Pagamento:</td>
+                    <td align="right" style="font-weight: bold; text-transform: uppercase; padding-top: 12px; padding-bottom: 15px; font-size: 13px; color: #243119; text-align: right; border-bottom: 1px solid rgba(36, 49, 25, 0.05);">${order.paymentMethod === 'mbway' ? 'MB WAY' : order.paymentMethod === 'multibanco' ? 'Referência Multibanco' : 'Cartão de Crédito'}</td>
+                  </tr>
+                  <!-- Row: Total -->
+                  <tr>
+                    <td style="color: #243119; font-weight: bold; padding-top: 15px; font-size: 15px; text-align: left;">Total:</td>
+                    <td align="right" style="color: #A68244; font-weight: bold; padding-top: 15px; font-size: 16px; text-align: right;">${order.price}</td>
                   </tr>
                 </table>
               </td>
@@ -109,7 +114,7 @@ export function generateCustomerEmailHtml(order: OrderData): string {
           </table>
 
           <!-- SHIPPING BOX -->
-          <div style="font-size: 13px; line-height: 1.6; color: rgba(36, 49, 25, 0.8); margin-bottom: 30px;">
+          <div style="font-size: 13px; line-height: 1.6; color: rgba(36, 49, 25, 0.8; margin-bottom: 30px;">
             <div style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 10px; text-transform: uppercase; letter-spacing: 0.2em; color: rgba(36, 49, 25, 0.5); font-weight: bold; margin-bottom: 8px;">
               Morada de Entrega
             </div>
@@ -121,7 +126,7 @@ export function generateCustomerEmailHtml(order: OrderData): string {
           </div>
 
           <!-- PRODUCTION NOTE -->
-          <div style="background-color: #FDFBF7; border-left: 3px solid #C5A059; padding: 15px; font-size: 12px; line-height: 1.6; font-style: italic; color: rgba(36, 49, 25, 0.8); margin-bottom: 35px;">
+          <div style="background-color: #FDFBF7; border-left: 3px solid #C5A059; padding: 15px; font-size: 12px; line-height: 1.6; font-style: italic; color: rgba(36, 49, 25, 0.8; margin-bottom: 35px;">
             <strong>Nota de Confecção:</strong> Por se tratar de um processo meticuloso e 100% manual, estimamos que a sua peça seja expedida num prazo de 7 a 14 dias úteis. Receberá uma nova notificação com o código de acompanhamento assim que for enviada.
           </div>
 
@@ -403,27 +408,36 @@ export function generateMultibancoEmailHtml(order: OrderData, multibancoRef: { e
 
           <!-- INSTRUCTION TEXT -->
           <div style="font-size: 14px; line-height: 1.8; color: rgba(36, 49, 25, 0.85); text-align: center; margin-bottom: 30px; font-weight: 300;">
-            Para concluir a sua encomenda M★BRAVO, efetue o pagamento com os dados abaixo através de Homebanking ou caixa ATM (Pagamento de Serviços).
+            Para concluir a sua encomenda M★BRAVO, efeteue o pagamento com os dados abaixo através de Homebanking ou caixa ATM (Pagamento de Serviços).
           </div>
 
           <!-- PAYMENT BOX TABLE -->
-          <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #FCF8F2; border: 1px solid #C5A059; border-radius: 12px; padding: 25px; margin-bottom: 30px; border-collapse: collapse; font-family: 'Georgia', 'Garamond', serif;">
+          <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #FCF8F2; border: 1px solid #C5A059; border-radius: 12px; border-collapse: collapse; font-family: 'Georgia', 'Garamond', serif; margin-bottom: 30px;">
             <tr>
-              <td colspan="2" align="center" style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 11px; text-transform: uppercase; letter-spacing: 0.2em; color: #A68244; font-weight: bold; padding-bottom: 20px;">
-                Dados para Pagamento
+              <td style="padding: 25px;">
+                <table width="100%" cellpadding="0" cellspacing="0" style="border-collapse: collapse;">
+                  <tr>
+                    <td colspan="2" align="center" style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 11px; text-transform: uppercase; letter-spacing: 0.2em; color: #A68244; font-weight: bold; padding-bottom: 20px; text-align: center;">
+                      Dados para Pagamento
+                    </td>
+                  </tr>
+                  <!-- Row: Entidade -->
+                  <tr>
+                    <td style="color: rgba(36, 49, 25, 0.6); font-weight: 300; padding-bottom: 12px; font-size: 14px; text-align: left; border-bottom: 1px dashed rgba(36, 49, 25, 0.08);">Entidade:</td>
+                    <td align="right" style="font-weight: bold; font-family: monospace; font-size: 15px; padding-bottom: 12px; color: #243119; text-align: right; border-bottom: 1px dashed rgba(36, 49, 25, 0.08);">${multibancoRef.entidade}</td>
+                  </tr>
+                  <!-- Row: Referência -->
+                  <tr>
+                    <td style="color: rgba(36, 49, 25, 0.6); font-weight: 300; padding-top: 12px; padding-bottom: 12px; font-size: 14px; text-align: left; border-bottom: 1px dashed rgba(36, 49, 25, 0.08);">Referência:</td>
+                    <td align="right" style="font-weight: bold; font-family: monospace; font-size: 15px; padding-top: 12px; padding-bottom: 12px; color: #243119; text-align: right; border-bottom: 1px dashed rgba(36, 49, 25, 0.08);">${multibancoRef.referencia}</td>
+                  </tr>
+                  <!-- Row: Montante -->
+                  <tr>
+                    <td style="color: rgba(36, 49, 25, 0.6); font-weight: 300; padding-top: 12px; font-size: 14px; text-align: left;">Montante:</td>
+                    <td align="right" style="font-weight: bold; color: #A68244; font-size: 16px; padding-top: 12px; text-align: right;">Total: ${order.price}</td>
+                  </tr>
+                </table>
               </td>
-            </tr>
-            <tr style="font-size: 14px;">
-              <td style="color: rgba(36, 49, 25, 0.6); font-weight: 300; padding-bottom: 10px; border-bottom: 1px dashed rgba(36, 49, 25, 0.08);">Entidade:</td>
-              <td align="right" style="font-weight: bold; font-family: monospace; font-size: 15px; padding-bottom: 10px; border-bottom: 1px dashed rgba(36, 49, 25, 0.08); color: #243119;">${multibancoRef.entidade}</td>
-            </tr>
-            <tr style="font-size: 14px;">
-              <td style="color: rgba(36, 49, 25, 0.6); font-weight: 300; padding-top: 10px; padding-bottom: 10px; border-bottom: 1px dashed rgba(36, 49, 25, 0.08);">Referência:</td>
-              <td align="right" style="font-weight: bold; font-family: monospace; font-size: 15px; padding-top: 10px; padding-bottom: 10px; border-bottom: 1px dashed rgba(36, 49, 25, 0.08); color: #243119;">${multibancoRef.referencia}</td>
-            </tr>
-            <tr style="font-size: 14px;">
-              <td style="color: rgba(36, 49, 25, 0.6); font-weight: 300; padding-top: 10px;">Montante:</td>
-              <td align="right" style="font-weight: bold; color: #A68244; font-size: 16px; padding-top: 10px;">${order.price}</td>
             </tr>
           </table>
 
