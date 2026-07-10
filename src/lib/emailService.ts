@@ -17,6 +17,7 @@ export interface OrderData {
     morada: string;
     codigoPostal: string;
     cidade: string;
+    nif?: string;
   };
   paymentMethod: 'mbway' | 'multibanco' | 'card';
   status: 'pending_payment' | 'paid' | 'failed';
@@ -61,8 +62,18 @@ export function generateCustomerEmailHtml(order: OrderData): string {
           </table>
 
           <!-- GREETING -->
-          <div style="font-size: 20px; line-height: 1.5; font-style: italic; text-align: center; margin-bottom: 30px; font-weight: 300; color: #243119;">
-            Olá, ${order.customer.nome}.<br>O seu pedido foi recebido com afeto.
+          <div style="font-size: 20px; line-height: 1.5; font-style: italic; text-align: center; margin-bottom: 25px; font-weight: 300; color: #243119;">
+            Olá, ${order.customer.nome}.<br>O seu pagamento foi confirmado!
+          </div>
+
+          <!-- RECEIPT BANNER -->
+          <div style="background-color: #E2EAD9; border: 1px solid #BACAA5; border-radius: 8px; padding: 18px; margin-bottom: 30px; text-align: center; font-family: 'Georgia', 'Garamond', serif;">
+            <div style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 10px; text-transform: uppercase; letter-spacing: 0.25em; color: #243119; font-weight: bold; margin-bottom: 6px;">
+              RECIBO DE PAGAMENTO &bull; COMPROVATIVO
+            </div>
+            <div style="font-size: 13px; color: #243119; font-style: italic; line-height: 1.5;">
+              Este documento serve como comprovativo de pagamento elegível da sua encomenda. O pagamento foi validado com sucesso e a peça entrou em confecção.
+            </div>
           </div>
 
           <!-- STORY TEXT -->
@@ -75,7 +86,7 @@ export function generateCustomerEmailHtml(order: OrderData): string {
 
           <!-- ORDER DETAILS TITLE -->
           <div style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 10px; text-transform: uppercase; letter-spacing: 0.2em; color: #A68244; font-weight: bold; margin-bottom: 15px;">
-            Detalhes do Pedido
+            Artigos & Dados Faturação
           </div>
 
           <!-- ORDER DETAILS TABLE -->
@@ -100,12 +111,24 @@ export function generateCustomerEmailHtml(order: OrderData): string {
                   </tr>
                   <!-- Row: Método de Pagamento -->
                   <tr>
-                    <td style="color: rgba(36, 49, 25, 0.5); font-weight: 300; padding-top: 12px; padding-bottom: 15px; font-size: 13px; text-align: left; border-bottom: 1px solid rgba(36, 49, 25, 0.05);">Método de Pagamento:</td>
-                    <td align="right" style="font-weight: bold; text-transform: uppercase; padding-top: 12px; padding-bottom: 15px; font-size: 13px; color: #243119; text-align: right; border-bottom: 1px solid rgba(36, 49, 25, 0.05);">${order.paymentMethod === 'mbway' ? 'MB WAY' : order.paymentMethod === 'multibanco' ? 'Referência Multibanco' : 'Cartão de Crédito'}</td>
+                    <td style="color: rgba(36, 49, 25, 0.5); font-weight: 300; padding-top: 12px; padding-bottom: 12px; font-size: 13px; text-align: left; border-bottom: 1px dashed rgba(36, 49, 25, 0.08);">Método de Pagamento:</td>
+                    <td align="right" style="font-weight: bold; text-transform: uppercase; padding-top: 12px; padding-bottom: 12px; font-size: 13px; color: #243119; text-align: right; border-bottom: 1px dashed rgba(36, 49, 25, 0.08);">${order.paymentMethod === 'mbway' ? 'MB WAY' : order.paymentMethod === 'multibanco' ? 'Referência Multibanco' : 'Cartão de Crédito'}</td>
+                  </tr>
+                  ${order.customer.nif ? `
+                  <!-- Row: NIF -->
+                  <tr>
+                    <td style="color: rgba(36, 49, 25, 0.5); font-weight: 300; padding-top: 12px; padding-bottom: 12px; font-size: 13px; text-align: left; border-bottom: 1px dashed rgba(36, 49, 25, 0.08);">NIF do Adquirente:</td>
+                    <td align="right" style="font-weight: bold; padding-top: 12px; padding-bottom: 12px; font-size: 13px; color: #243119; text-align: right; border-bottom: 1px dashed rgba(36, 49, 25, 0.08);">${order.customer.nif}</td>
+                  </tr>
+                  ` : ''}
+                  <!-- Row: Estado Pagamento -->
+                  <tr>
+                    <td style="color: rgba(36, 49, 25, 0.5); font-weight: 300; padding-top: 12px; padding-bottom: 15px; font-size: 13px; text-align: left; border-bottom: 1px solid rgba(36, 49, 25, 0.05);">Estado da Transação:</td>
+                    <td align="right" style="font-weight: bold; text-transform: uppercase; padding-top: 12px; padding-bottom: 15px; font-size: 13px; color: #243119; text-align: right; border-bottom: 1px solid rgba(36, 49, 25, 0.05);">LIQUIDADO / CONFIRMADO</td>
                   </tr>
                   <!-- Row: Total -->
                   <tr>
-                    <td style="color: #243119; font-weight: bold; padding-top: 15px; font-size: 15px; text-align: left;">Total:</td>
+                    <td style="color: #243119; font-weight: bold; padding-top: 15px; font-size: 15px; text-align: left;">Total Recebido:</td>
                     <td align="right" style="color: #A68244; font-weight: bold; padding-top: 15px; font-size: 16px; text-align: right;">${order.price}</td>
                   </tr>
                 </table>
