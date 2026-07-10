@@ -2,7 +2,7 @@ import express from "express";
 import path from "path";
 import fs from "fs";
 import { createServer as createViteServer } from "vite";
-import { sendTransactionEmails, sendMultibancoEmails, OrderData } from "./src/lib/emailService";
+import { sendTransactionEmails, sendMultibancoEmails, sendShippedEmails, OrderData } from "./src/lib/emailService";
 import Stripe from "stripe";
 
 const app = express();
@@ -549,6 +549,43 @@ app.post("/api/payment/simulate-action", (req, res) => {
   }
 
   res.json({ success: true, order });
+});
+
+/**
+ * 5. SHIP ORDER ENDPOINT
+ * Generates and triggers the shipped/dispatched notification email with tracking.
+ */
+app.post("/api/payment/ship-order", (req, res) => {
+  const { orderId, trackingCode = "DA123456789PT" } = req.body;
+  const order = activeOrders.get(orderId);
+
+  if (!order) {
+    return res.status(404).json({ error: "Order not found" });
+  }
+
+  try {
+    const { shippedEmailUrl } = sendShippedEmails(order, trackingCode);
+    order.status = 'paid'; // ensure it's paid or handled
+    order.shippedEmailUrl = shippedEmailUrl;
+    order.trackingCode = trackingCode;
+    activeOrders.set(orderId, order);
+
+    // Merge shipped links into order email links so the frontend can display them easily!
+    if (!order.emailLinks) {
+      order.emailLinks = {};
+    }
+    order.emailLinks.shippedEmailUrl = shippedEmailUrl;
+
+    res.json({
+      success: true,
+      shippedEmailUrl,
+      emailLinks: order.emailLinks,
+      order
+    });
+  } catch (error: any) {
+    console.error("[SHIP ORDER ERROR]", error);
+    res.status(500).json({ error: "Internal server error generating shipped email" });
+  }
 });
 
 // Configure Vite middleware in development or serve production build
