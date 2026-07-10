@@ -13,7 +13,8 @@ import {
 } from './translations';
 
 // API Base URL config for Railway production backend vs local development
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://precious-solace-mbravo-site.up.railway.app';
+const API_BASE_URL = import.meta.env.VITE_API_URL || '';
+
 // Hero background images for automatic rotation
 const HERO_BACKGROUNDS = [
   "https://i.ibb.co/KppF2KLq/Background.png",
@@ -1933,7 +1934,28 @@ const ProductCard: React.FC<ProductCardProps> = ({ product: rawProduct, i, isFoc
     const [multibancoRef, setMultibancoRef] = useState<{ entidade: string, referencia: string } | null>(null);
     const [orderId, setOrderId] = useState('');
     const [checkoutError, setCheckoutError] = useState<string | null>(null);
-    const [sandboxEmails, setSandboxEmails] = useState<{ customerEmailUrl: string, adminEmailUrl: string } | null>(null);
+    const [sandboxEmails, setSandboxEmails] = useState<{ customerEmailUrl: string, adminEmailUrl: string, shippedEmailUrl?: string } | null>(null);
+    const [isShipping, setIsShipping] = useState(false);
+
+    const handleShipOrder = async () => {
+        if (!orderId) return;
+        setIsShipping(true);
+        try {
+            const res = await fetch(`${API_BASE_URL}/api/payment/ship-order`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ orderId, trackingCode: "DA" + Math.floor(100000000 + Math.random() * 900000000) + "PT" })
+            });
+            const data = await res.json();
+            if (data.success && data.shippedEmailUrl) {
+                setSandboxEmails(prev => prev ? { ...prev, shippedEmailUrl: data.shippedEmailUrl } : null);
+            }
+        } catch (err) {
+            console.error("Error shipping order simulation:", err);
+        } finally {
+            setIsShipping(false);
+        }
+    };
     const isLiveMode = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY?.startsWith('pk_live') || false;
 
     const productImages = product.images || [product.img];
@@ -2432,23 +2454,43 @@ const ProductCard: React.FC<ProductCardProps> = ({ product: rawProduct, i, isFoc
                                     <div className="w-full bg-[#243119]/5 rounded-2xl p-4 border border-[#243119]/10 text-left space-y-3 font-sans">
                                         <p className="text-[10px] uppercase tracking-wider text-[#A68244] font-bold">{t('sandbox.email_sim')}</p>
                                         <p className="text-[11px] text-forest/70 leading-relaxed">{t('sandbox.email_desc')}</p>
-                                        <div className="grid grid-cols-2 gap-2 pt-1">
-                                            <a 
-                                                href={sandboxEmails.customerEmailUrl} 
-                                                target="_blank" 
-                                                rel="noreferrer"
-                                                className="block text-center rounded-lg py-2 bg-white border border-[#243119]/15 text-[10px] uppercase tracking-wider font-semibold text-forest hover:bg-[#243119] hover:text-white hover:border-transparent transition-all"
-                                            >
-                                                {t('sandbox.view_client')}
-                                            </a>
-                                            <a 
-                                                href={sandboxEmails.adminEmailUrl} 
-                                                target="_blank" 
-                                                rel="noreferrer"
-                                                className="block text-center rounded-lg py-2 bg-white border border-[#243119]/15 text-[10px] uppercase tracking-wider font-semibold text-forest hover:bg-[#243119] hover:text-white hover:border-transparent transition-all"
-                                            >
-                                                {t('sandbox.view_admin')}
-                                            </a>
+                                        <div className="flex flex-col gap-2 pt-1">
+                                            <div className="grid grid-cols-2 gap-2">
+                                                <a 
+                                                    href={sandboxEmails.customerEmailUrl} 
+                                                    target="_blank" 
+                                                    rel="noreferrer"
+                                                    className="block text-center rounded-lg py-2 bg-white border border-[#243119]/15 text-[10px] uppercase tracking-wider font-semibold text-forest hover:bg-[#243119] hover:text-white hover:border-transparent transition-all"
+                                                >
+                                                    {t('sandbox.view_client')}
+                                                </a>
+                                                <a 
+                                                    href={sandboxEmails.adminEmailUrl} 
+                                                    target="_blank" 
+                                                    rel="noreferrer"
+                                                    className="block text-center rounded-lg py-2 bg-white border border-[#243119]/15 text-[10px] uppercase tracking-wider font-semibold text-forest hover:bg-[#243119] hover:text-white hover:border-transparent transition-all"
+                                                >
+                                                    {t('sandbox.view_admin')}
+                                                </a>
+                                            </div>
+                                            {sandboxEmails.shippedEmailUrl ? (
+                                                <a 
+                                                    href={sandboxEmails.shippedEmailUrl} 
+                                                    target="_blank" 
+                                                    rel="noreferrer"
+                                                    className="block text-center rounded-lg py-2 bg-amber-500/10 border border-amber-500/30 text-[10px] uppercase tracking-wider font-bold text-[#A68244] hover:bg-amber-500 hover:text-white hover:border-transparent transition-all"
+                                                >
+                                                    {t('sandbox.view_shipped')}
+                                                </a>
+                                            ) : (
+                                                <button 
+                                                    onClick={handleShipOrder}
+                                                    disabled={isShipping}
+                                                    className="block w-full text-center rounded-lg py-2 bg-[#243119] text-white text-[10px] uppercase tracking-wider font-bold hover:bg-[#1a2412] disabled:opacity-50 transition-all cursor-pointer"
+                                                >
+                                                    {isShipping ? (lang === 'pt' ? 'A ENVIAR...' : 'SHIPPING...') : t('sandbox.ship_order')}
+                                                </button>
+                                            )}
                                         </div>
                                     </div>
                                 )}
