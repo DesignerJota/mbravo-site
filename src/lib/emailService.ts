@@ -369,7 +369,7 @@ export function sendTransactionEmails(order: OrderData): { customerEmailUrl: str
         console.warn(`  - Sandbox Status: Local template preview generated successfully at /emails/${custFileName}\n`);
       });
 
-    const adminEmail = process.env.ADMIN_NOTIFY_EMAIL || 'joaopedrojota83@gmail.com';
+    const adminEmail = process.env.ADMIN_NOTIFY_EMAIL || 'handmade@mbravobycarolina.com';
     sendViaSendGrid(process.env.SENDGRID_API_KEY!, adminEmail, `[NOVO PEDIDO] ${order.orderId} - Prioridade Atelier`, adminHtml)
       .then(() => console.log(`[M.BRAVO EMAIL SYSTEM] Admin notification email sent successfully via SendGrid.`))
       .catch(err => {
