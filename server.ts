@@ -576,8 +576,10 @@ app.post("/api/payment/webhook", (req, res) => {
   }
 
   if (!orderId) {
-    console.warn("[WEBHOOK ERROR] Could not determine orderId from payload metadata, description, query params, or payment intent id mapping");
-    return res.status(400).json({ error: "Webhook missing orderId target" });
+    const randomId = Math.random().toString(36).substring(2, 7).toUpperCase();
+    const cleanIntentSuffix = stripeIntentId ? stripeIntentId.slice(-5).toUpperCase() : randomId;
+    orderId = `MB-RECU-${cleanIntentSuffix}`;
+    console.log(`[WEBHOOK AUTO-RECOVERY] Could not find orderId in payload. Generated fallback recovery orderId: ${orderId}`);
   }
 
   let order = activeOrders.get(orderId);
@@ -645,6 +647,7 @@ app.post("/api/payment/webhook", (req, res) => {
     };
 
     activeOrders.set(orderId, order);
+    saveOrders(activeOrders);
     console.log(`[WEBHOOK AUTO-RECOVERY] Successfully reconstructed and added order ${orderId} to local persistent database.`);
   }
 
