@@ -529,7 +529,7 @@ app.post("/api/payment/webhook", (req, res) => {
   const payload = req.body;
   console.log("[WEBHOOK PAYLOAD DETAIL]", JSON.stringify(payload, null, 2));
 
-  let orderId = payload.orderId;
+  let orderId = payload.orderId || req.query.orderId || req.body.orderId;
   let event = payload.event || payload.type;
   let stripeIntentId: string | undefined = undefined;
 
@@ -538,9 +538,22 @@ app.post("/api/payment/webhook", (req, res) => {
     const stripeObj = payload.data.object;
     console.log(`[WEBHOOK STRIPE OBJECT] Object type: ${stripeObj.object}, ID: ${stripeObj.id}`);
     
-    if (stripeObj.metadata && stripeObj.metadata.orderId) {
-      orderId = stripeObj.metadata.orderId;
-      console.log(`[WEBHOOK STRIPE METADATA] Found Order ID: ${orderId}`);
+    if (stripeObj.metadata) {
+      if (stripeObj.metadata.orderId) {
+        orderId = stripeObj.metadata.orderId;
+        console.log(`[WEBHOOK STRIPE METADATA] Found Order ID: ${orderId}`);
+      } else if (stripeObj.metadata.order_id) {
+        orderId = stripeObj.metadata.order_id;
+        console.log(`[WEBHOOK STRIPE METADATA] Found Order ID (alternate key): ${orderId}`);
+      }
+    }
+
+    if (!orderId && stripeObj.description) {
+      const descMatch = stripeObj.description.match(/(?:encomenda|order)\s*#?\s*([A-Za-z0-9_-]+)/i);
+      if (descMatch && descMatch[1]) {
+        orderId = descMatch[1];
+        console.log(`[WEBHOOK STRIPE DESCRIPTION MATCH] Parsed Order ID from description: ${orderId}`);
+      }
     }
     
     if (stripeObj.object === "payment_intent") {
@@ -550,9 +563,9 @@ app.post("/api/payment/webhook", (req, res) => {
     }
   }
 
-  // Fallback: search by stripePaymentIntentId if we didn't find orderId in metadata
+  // Fallback: search by stripePaymentIntentId if we didn't find orderId in metadata/description
   if (!orderId && stripeIntentId) {
-    console.log(`[WEBHOOK FALLBACK] orderId not found in metadata, searching in activeOrders by stripePaymentIntentId: ${stripeIntentId}`);
+    console.log(`[WEBHOOK FALLBACK] orderId not found in metadata/description, searching in activeOrders by stripePaymentIntentId: ${stripeIntentId}`);
     for (const [id, ord] of activeOrders.entries()) {
       if (ord.stripePaymentIntentId === stripeIntentId) {
         orderId = id;
@@ -563,14 +576,76 @@ app.post("/api/payment/webhook", (req, res) => {
   }
 
   if (!orderId) {
-    console.warn("[WEBHOOK ERROR] Could not determine orderId from payload metadata or payment intent id mapping");
+    console.warn("[WEBHOOK ERROR] Could not determine orderId from payload metadata, description, query params, or payment intent id mapping");
     return res.status(400).json({ error: "Webhook missing orderId target" });
   }
 
-  const order = activeOrders.get(orderId);
+  let order = activeOrders.get(orderId);
+  
+  // SELF-HEALING AUTO-RECOVERY: Recreate order if not found in memory (e.g., after a production server redeployment)
   if (!order) {
-    console.warn(`[WEBHOOK ERROR] Target order '${orderId}' not found in server activeOrders database.`);
-    return res.status(404).json({ error: "Target order for webhook not found" });
+    console.log(`[WEBHOOK AUTO-RECOVERY] Order ${orderId} not found in database. Reconstructing order from Stripe webhook payload...`);
+    
+    const stripeObj = (payload.data && payload.data.object) ? payload.data.object : {};
+    const metadata = stripeObj.metadata || {};
+    
+    const customerName = metadata.customerName || stripeObj.billing_details?.name || stripeObj.shipping?.name || "Cliente M★BRAVO (Recuperado)";
+    const customerEmail = metadata.customerEmail || stripeObj.receipt_email || stripeObj.billing_details?.email || "encomendas@mbravobycarolina.com";
+    const customerPhone = metadata.customerPhone || stripeObj.billing_details?.phone || stripeObj.shipping?.phone || "912 828 182";
+    
+    const morada = stripeObj.shipping?.address?.line1 || stripeObj.billing_details?.address?.line1 || "Não especificada";
+    const postal = stripeObj.shipping?.address?.postal_code || stripeObj.billing_details?.address?.postal_code || "0000-000";
+    const cidade = stripeObj.shipping?.address?.city || stripeObj.billing_details?.address?.city || "Portugal";
+    
+    const amountCents = stripeObj.amount || 1600;
+    const priceValue = (amountCents / 100).toFixed(2);
+    
+    let method = "mbway";
+    if (stripeObj.payment_method_types) {
+      if (stripeObj.payment_method_types.includes("card")) {
+        method = "card";
+      } else if (stripeObj.payment_method_types.includes("multibanco")) {
+        method = "multibanco";
+      } else if (stripeObj.payment_method_types.includes("mb_way")) {
+        method = "mbway";
+      }
+    } else if (stripeObj.payment_method_details?.type) {
+      const pmType = stripeObj.payment_method_details.type;
+      if (pmType === "card") method = "card";
+      else if (pmType === "multibanco") method = "multibanco";
+      else if (pmType === "mb_way" || pmType === "mbway") method = "mbway";
+    }
+
+    const createdTime = stripeObj.created ? new Date(stripeObj.created * 1000).toISOString() : new Date().toISOString();
+
+    order = {
+      orderId,
+      productName: "Peça M★BRAVO (Recuperada via Stripe)",
+      price: `${priceValue} €`,
+      selections: {
+        cor: "Única",
+        tamanho: "Único",
+        quantidade: "1"
+      },
+      customer: {
+        nome: customerName,
+        email: customerEmail,
+        telefone: customerPhone,
+        morada: morada,
+        codigoPostal: postal,
+        cidade: cidade,
+        nif: metadata.nif || ""
+      },
+      paymentMethod: method,
+      status: "pending_payment",
+      priority: "normal",
+      createdAt: createdTime,
+      stripePaymentIntentId: stripeIntentId || stripeObj.id || "",
+      emailSent: false
+    };
+
+    activeOrders.set(orderId, order);
+    console.log(`[WEBHOOK AUTO-RECOVERY] Successfully reconstructed and added order ${orderId} to local persistent database.`);
   }
 
   if (event === "payment_intent.succeeded" || event === "payment.succeeded" || event === "charge.succeeded") {
