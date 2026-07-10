@@ -48,8 +48,35 @@ app.use((req, res, next) => {
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Temporary in-memory order store to simulate database persistence during sandbox testing
-const activeOrders = new Map<string, any>();
+// Persistent file-backed order store to preserve data during sandbox testing and server restarts
+const ORDERS_FILE = path.join(process.cwd(), "orders.json");
+
+function loadOrders() {
+  const map = new Map<string, any>();
+  if (fs.existsSync(ORDERS_FILE)) {
+    try {
+      const data = JSON.parse(fs.readFileSync(ORDERS_FILE, 'utf8'));
+      for (const [id, ord] of Object.entries(data)) {
+        map.set(id, ord);
+      }
+      console.log(`[ORDERS DATABASE] Loaded ${map.size} orders from persistent orders.json`);
+    } catch (err) {
+      console.error("[ORDERS DATABASE ERROR] Failed to load orders.json", err);
+    }
+  }
+  return map;
+}
+
+function saveOrders(map: Map<string, any>) {
+  try {
+    const obj = Object.fromEntries(map);
+    fs.writeFileSync(ORDERS_FILE, JSON.stringify(obj, null, 2), 'utf8');
+  } catch (err) {
+    console.error("[ORDERS DATABASE ERROR] Failed to save orders.json", err);
+  }
+}
+
+const activeOrders = loadOrders();
 
 // Serve public directory statically so sandbox emails can be viewed in browser tabs
 app.use('/emails', express.static(path.join(process.cwd(), 'public', 'emails')));
@@ -87,7 +114,8 @@ app.post("/api/payment/create-intent", async (req, res) => {
         telefone: checkoutForm.telefone,
         morada: checkoutForm.morada,
         codigoPostal: checkoutForm.codigoPostal,
-        cidade: checkoutForm.cidade
+        cidade: checkoutForm.cidade,
+        nif: checkoutForm.nif
       },
       paymentMethod,
       status: "pending_payment",
@@ -245,6 +273,13 @@ app.post("/api/payment/create-intent", async (req, res) => {
             },
             confirm: true,
             return_url: `${req.headers.origin || 'https://www.mbravobycarolina.com'}/`,
+            description: `M BRAVO - Encomenda ${orderId}`,
+            receipt_email: customerEmail,
+            metadata: {
+              orderId,
+              customerName,
+              customerEmail
+            }
           });
 
           console.log(`[STRIPE MULTIBANCO] Created PaymentIntent ID: ${paymentIntent.id}, status: ${paymentIntent.status}`);
@@ -341,6 +376,13 @@ app.post("/api/payment/create-intent", async (req, res) => {
                   user_agent: req.headers['user-agent'] || 'unknown'
                 }
               }
+            },
+            description: `M BRAVO - Encomenda ${orderId}`,
+            receipt_email: checkoutForm.email,
+            metadata: {
+              orderId,
+              customerName: checkoutForm.nome,
+              customerEmail: checkoutForm.email
             }
           });
 
@@ -485,23 +527,49 @@ app.post("/api/payment/webhook", (req, res) => {
   console.log("[WEBHOOK RECEIVED] Processing payload.");
   
   const payload = req.body;
+  console.log("[WEBHOOK PAYLOAD DETAIL]", JSON.stringify(payload, null, 2));
+
   let orderId = payload.orderId;
   let event = payload.event || payload.type;
+  let stripeIntentId: string | undefined = undefined;
 
   // Handle Stripe Webhook format where metadata holds the orderId
   if (payload.data && payload.data.object) {
     const stripeObj = payload.data.object;
+    console.log(`[WEBHOOK STRIPE OBJECT] Object type: ${stripeObj.object}, ID: ${stripeObj.id}`);
+    
     if (stripeObj.metadata && stripeObj.metadata.orderId) {
       orderId = stripeObj.metadata.orderId;
+      console.log(`[WEBHOOK STRIPE METADATA] Found Order ID: ${orderId}`);
+    }
+    
+    if (stripeObj.object === "payment_intent") {
+      stripeIntentId = stripeObj.id;
+    } else if (stripeObj.object === "charge") {
+      stripeIntentId = stripeObj.payment_intent;
+    }
+  }
+
+  // Fallback: search by stripePaymentIntentId if we didn't find orderId in metadata
+  if (!orderId && stripeIntentId) {
+    console.log(`[WEBHOOK FALLBACK] orderId not found in metadata, searching in activeOrders by stripePaymentIntentId: ${stripeIntentId}`);
+    for (const [id, ord] of activeOrders.entries()) {
+      if (ord.stripePaymentIntentId === stripeIntentId) {
+        orderId = id;
+        console.log(`[WEBHOOK FALLBACK] Found matching order in memory store: ${orderId}`);
+        break;
+      }
     }
   }
 
   if (!orderId) {
+    console.warn("[WEBHOOK ERROR] Could not determine orderId from payload metadata or payment intent id mapping");
     return res.status(400).json({ error: "Webhook missing orderId target" });
   }
 
   const order = activeOrders.get(orderId);
   if (!order) {
+    console.warn(`[WEBHOOK ERROR] Target order '${orderId}' not found in server activeOrders database.`);
     return res.status(404).json({ error: "Target order for webhook not found" });
   }
 
@@ -510,10 +578,14 @@ app.post("/api/payment/webhook", (req, res) => {
     order.status = "paid";
     
     if (!order.emailSent) {
+      console.log(`[WEBHOOK EMAIL TRIGGER] Dispatching transactional confirmation emails for order: ${orderId}`);
       order.emailLinks = sendTransactionEmails(order);
       order.emailSent = true;
+    } else {
+      console.log(`[WEBHOOK EMAIL SKIP] Emails already sent for order: ${orderId}`);
     }
 
+    saveOrders(activeOrders);
     return res.json({
       received: true,
       status: "paid",
@@ -522,7 +594,8 @@ app.post("/api/payment/webhook", (req, res) => {
     });
   }
 
-  res.json({ received: true, status: order.status, message: "Unhandled event type" });
+  saveOrders(activeOrders);
+  res.json({ received: true, status: order.status, message: `Unhandled event type: ${event}` });
 });
 
 /**
@@ -548,6 +621,7 @@ app.post("/api/payment/simulate-action", (req, res) => {
     order.errorMessage = 'Simulated administrative cancellation / Gateway declined.';
   }
 
+  saveOrders(activeOrders);
   res.json({ success: true, order });
 });
 
@@ -576,6 +650,7 @@ app.post("/api/payment/ship-order", (req, res) => {
     }
     order.emailLinks.shippedEmailUrl = shippedEmailUrl;
 
+    saveOrders(activeOrders);
     res.json({
       success: true,
       shippedEmailUrl,
@@ -587,6 +662,81 @@ app.post("/api/payment/ship-order", (req, res) => {
     res.status(500).json({ error: "Internal server error generating shipped email" });
   }
 });
+
+/**
+ * 6. ADMINISTRATIVE DASHBOARD ENDPOINTS
+ */
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'mbravo2026';
+
+function verifyAdmin(req: any, res: any, next: any) {
+  const auth = req.headers['x-admin-password'] || req.headers['authorization'];
+  if (auth === ADMIN_PASSWORD) {
+    next();
+  } else {
+    res.status(401).json({ error: "Acesso administrativo não autorizado. Palavra-passe incorreta." });
+  }
+}
+
+// Endpoint to verify password
+app.post("/api/admin/login", (req, res) => {
+  const { password } = req.body;
+  if (password === ADMIN_PASSWORD) {
+    return res.json({ success: true });
+  }
+  return res.status(401).json({ error: "Palavra-passe incorreta" });
+});
+
+// Endpoint to fetch all orders
+app.get("/api/admin/orders", verifyAdmin, (req, res) => {
+  const ordersList = Array.from(activeOrders.values());
+  // Sort by createdAt descending (newest first)
+  ordersList.sort((a: any, b: any) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+  res.json({ success: true, orders: ordersList });
+});
+
+// Endpoint to update an order
+app.post("/api/admin/orders/update", verifyAdmin, (req, res) => {
+  const { orderId, status, trackingCode, priority, selections } = req.body;
+  const order = activeOrders.get(orderId);
+
+  if (!order) {
+    return res.status(404).json({ error: "Order not found" });
+  }
+
+  if (status) {
+    order.status = status;
+  }
+  if (trackingCode !== undefined) {
+    order.trackingCode = trackingCode;
+  }
+  if (priority) {
+    order.priority = priority;
+  }
+  if (selections) {
+    order.selections = { ...order.selections, ...selections };
+  }
+
+  // If status is updated to shipped, generate the shipped email!
+  if (status === 'shipped') {
+    try {
+      const code = trackingCode || order.trackingCode || "DA123456789PT";
+      const { shippedEmailUrl } = sendShippedEmails(order, code);
+      order.shippedEmailUrl = shippedEmailUrl;
+      if (!order.emailLinks) {
+        order.emailLinks = {};
+      }
+      order.emailLinks.shippedEmailUrl = shippedEmailUrl;
+    } catch (emailErr: any) {
+      console.error("[ADMIN SHIPPED EMAIL ERROR]", emailErr);
+    }
+  }
+
+  activeOrders.set(orderId, order);
+  saveOrders(activeOrders);
+
+  res.json({ success: true, order });
+});
+
 
 // Configure Vite middleware in development or serve production build
 async function startServer() {
