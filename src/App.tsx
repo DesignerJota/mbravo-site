@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence, useScroll, useTransform, useSpring, useVelocity } from 'motion/react';
 import { Menu, X, Instagram, Facebook, ArrowRight, ChevronLeft, ChevronRight, Share2, Mail, MessageCircle, Sparkles, Layers, Ban, AlertCircle, Feather, Palette, Heart } from 'lucide-react';
 import { loadStripe } from '@stripe/stripe-js';
+import AdminDashboardModal from './components/AdminDashboardModal';
 import { 
   useLanguage, 
   translateProduct, 
@@ -14,6 +15,86 @@ import {
 
 // API Base URL config for Railway production backend vs local development
 const API_BASE_URL = import.meta.env.VITE_API_URL || '';
+
+// Strict email validation checking for invalid characters, spaces, and standard format in real time
+export function isValidEmail(email: string): boolean {
+  if (!email) return false;
+  const trimmed = email.trim();
+  const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+  if (trimmed.includes(' ') || trimmed.includes('@@') || trimmed.includes(',')) {
+    return false;
+  }
+  return emailRegex.test(trimmed);
+}
+
+// Intelligent automatic spelling correction suggester (similar to Mailcheck library, zero external dependencies)
+export function suggestCorrectEmail(email: string): string | null {
+  if (!email) return null;
+  let trimmed = email.trim().toLowerCase();
+  
+  // Replace trailing commas or typos
+  trimmed = trimmed.replace(/,com$/, '.com');
+  trimmed = trimmed.replace(/,pt$/, '.pt');
+  trimmed = trimmed.replace(/,net$/, '.net');
+  trimmed = trimmed.replace(/,org$/, '.org');
+  
+  // Fix multiple @ symbols
+  if (trimmed.includes('@@')) {
+    trimmed = trimmed.replace(/@@+/g, '@');
+  }
+  
+  const parts = trimmed.split('@');
+  if (parts.length !== 2) return null;
+  const [local, domain] = parts;
+  if (!local || !domain) return null;
+
+  const domainSuggestions: Record<string, string> = {
+    'gamil.com': 'gmail.com',
+    'gmaill.com': 'gmail.com',
+    'gmal.com': 'gmail.com',
+    'gmeil.com': 'gmail.com',
+    'gmial.com': 'gmail.com',
+    'gamil.co': 'gmail.com',
+    'gamil.com.pt': 'gmail.com',
+    'gmail.co': 'gmail.com',
+    'gmail.com.pt': 'gmail.com',
+    'hotamil.com': 'hotmail.com',
+    'hotmial.com': 'hotmail.com',
+    'hotmaill.com': 'hotmail.com',
+    'hotmal.com': 'hotmail.com',
+    'outlok.com': 'outlook.com',
+    'outloo.com': 'outlook.com',
+    'yaho.com': 'yahoo.com',
+    'yaho.com.br': 'yahoo.com',
+    'icoud.com': 'icloud.com',
+    'iclod.com': 'icloud.com',
+    'icloud.co': 'icloud.com',
+    'sapo,pt': 'sapo.pt',
+    'sapo.p': 'sapo.pt'
+  };
+
+  if (domainSuggestions[domain]) {
+    return `${local}@${domainSuggestions[domain]}`;
+  }
+
+  // Handle generic TLD typo checks
+  if (domain.endsWith('.con')) {
+    return `${local}@${domain.slice(0, -4)}.com`;
+  }
+  if (domain.endsWith('.cm')) {
+    return `${local}@${domain.slice(0, -3)}.com`;
+  }
+  if (domain.endsWith('.coom')) {
+    return `${local}@${domain.slice(0, -5)}.com`;
+  }
+
+  const candidate = `${local}@${domain}`;
+  if (candidate !== email.trim().toLowerCase()) {
+    return candidate;
+  }
+
+  return null;
+}
 
 // Hero background images for automatic rotation
 const HERO_BACKGROUNDS = [
@@ -1923,6 +2004,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product: rawProduct, i, isFoc
         morada: '',
         codigoPostal: '',
         cidade: '',
+        nif: '',
         mbwayPhone: '',
         cardNumber: '',
         cardName: '',
@@ -2049,6 +2131,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product: rawProduct, i, isFoc
                 morada: '',
                 codigoPostal: '',
                 cidade: '',
+                nif: '',
                 mbwayPhone: '',
                 cardNumber: '',
                 cardName: '',
@@ -2548,23 +2631,80 @@ const ProductCard: React.FC<ProductCardProps> = ({ product: rawProduct, i, isFoc
                                                 className="w-full bg-white rounded-xl px-4 py-2.5 text-xs text-forest placeholder-forest/30 border border-forest/10 focus:border-[#C5A059] focus:outline-none transition-all font-sans"
                                             />
                                             <div className="grid grid-cols-2 gap-2">
+                                                <div className="flex flex-col gap-1">
+                                                    <input 
+                                                        type="email" 
+                                                        placeholder={lang === 'pt' ? "E-mail" : "Email Address"} 
+                                                        required
+                                                        value={checkoutForm.email}
+                                                        onChange={(e) => setCheckoutForm(prev => ({ ...prev, email: e.target.value }))}
+                                                        className={`w-full bg-white rounded-xl px-4 py-2.5 text-xs text-forest placeholder-forest/30 border focus:outline-none transition-all font-sans ${
+                                                            checkoutForm.email && !isValidEmail(checkoutForm.email)
+                                                                ? 'border-red-300 focus:border-red-400' 
+                                                                : 'border-forest/10 focus:border-[#C5A059]'
+                                                        }`}
+                                                    />
+                                                </div>
+                                                <div className="flex flex-col gap-1">
+                                                    <input 
+                                                        type="tel" 
+                                                        placeholder={lang === 'pt' ? "Telemóvel" : "Phone Number"} 
+                                                        required
+                                                        value={checkoutForm.telefone}
+                                                        onChange={(e) => setCheckoutForm(prev => ({ ...prev, telefone: e.target.value }))}
+                                                        className="w-full bg-white rounded-xl px-4 py-2.5 text-xs text-forest placeholder-forest/30 border border-forest/10 focus:border-[#C5A059] focus:outline-none transition-all font-sans"
+                                                    />
+                                                </div>
+                                            </div>
+
+                                            {/* NIF Optional Field */}
+                                            <div className="mt-2">
                                                 <input 
-                                                    type="email" 
-                                                    placeholder={lang === 'pt' ? "E-mail" : "Email Address"} 
-                                                    required
-                                                    value={checkoutForm.email}
-                                                    onChange={(e) => setCheckoutForm(prev => ({ ...prev, email: e.target.value }))}
-                                                    className="w-full bg-white rounded-xl px-4 py-2.5 text-xs text-forest placeholder-forest/30 border border-forest/10 focus:border-[#C5A059] focus:outline-none transition-all font-sans"
-                                                />
-                                                <input 
-                                                    type="tel" 
-                                                    placeholder={lang === 'pt' ? "Telemóvel" : "Phone Number"} 
-                                                    required
-                                                    value={checkoutForm.telefone}
-                                                    onChange={(e) => setCheckoutForm(prev => ({ ...prev, telefone: e.target.value }))}
+                                                    type="text" 
+                                                    placeholder={lang === 'pt' ? "NIF (Opcional - Para Fatura/Recibo)" : "NIF (Optional - For Receipt)"} 
+                                                    maxLength={9}
+                                                    value={checkoutForm.nif}
+                                                    onChange={(e) => setCheckoutForm(prev => ({ ...prev, nif: e.target.value.replace(/\D/g, '') }))}
                                                     className="w-full bg-white rounded-xl px-4 py-2.5 text-xs text-forest placeholder-forest/30 border border-forest/10 focus:border-[#C5A059] focus:outline-none transition-all font-sans"
                                                 />
                                             </div>
+
+                                            {/* Real-time Email Spelling Check & Format Validation Suggestions */}
+                                            {checkoutForm.email && (
+                                                <div className="space-y-1">
+                                                    {!isValidEmail(checkoutForm.email) && (
+                                                        <div className="text-[10px] text-red-500 font-sans flex items-center gap-1 pl-1">
+                                                            <span className="inline-block w-1.5 h-1.5 rounded-full bg-red-500"></span>
+                                                            {lang === 'pt' 
+                                                                ? 'Por favor introduza um e-mail válido (ex: nome@dominio.com).' 
+                                                                : 'Please enter a valid email address (e.g. name@domain.com).'}
+                                                        </div>
+                                                    )}
+                                                    {suggestCorrectEmail(checkoutForm.email) && (
+                                                        <div className="text-[11px] text-amber-800 bg-amber-50/50 border border-amber-200/40 rounded-xl p-3 flex items-center justify-between gap-2 font-sans mt-1">
+                                                            <div className="flex items-start gap-1.5">
+                                                                <span className="text-amber-500 text-xs mt-0.5">💡</span>
+                                                                <span>
+                                                                    {lang === 'pt' ? 'Quis dizer ' : 'Did you mean '}
+                                                                    <strong 
+                                                                        className="underline cursor-pointer text-amber-950 font-semibold"
+                                                                        onClick={() => setCheckoutForm(prev => ({ ...prev, email: suggestCorrectEmail(checkoutForm.email)! }))}
+                                                                    >
+                                                                        {suggestCorrectEmail(checkoutForm.email)}
+                                                                    </strong>?
+                                                                </span>
+                                                            </div>
+                                                            <button 
+                                                                type="button"
+                                                                onClick={() => setCheckoutForm(prev => ({ ...prev, email: suggestCorrectEmail(checkoutForm.email)! }))}
+                                                                className="text-[10px] font-bold text-[#C5A059] hover:text-[#A68244] uppercase tracking-wider whitespace-nowrap bg-white/80 hover:bg-white border border-forest/5 rounded-lg px-2 py-1 transition-all"
+                                                            >
+                                                                {lang === 'pt' ? 'Corrigir' : 'Correct'}
+                                                            </button>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            )}
                                             <input 
                                                 type="text" 
                                                 placeholder={lang === 'pt' ? "Morada de Envio" : "Shipping Address"} 
@@ -2776,7 +2916,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product: rawProduct, i, isFoc
                                     )}
 
                                     <motion.button
-                                        disabled={isPaying || !checkoutForm.nome || !checkoutForm.email || !checkoutForm.morada || (paymentMethod === 'mbway' && !checkoutForm.mbwayPhone) || (paymentMethod === 'card' && (!checkoutForm.cardNumber || !checkoutForm.cardExpiry || !checkoutForm.cardCvv))}
+                                        disabled={isPaying || !checkoutForm.nome || !checkoutForm.email || !isValidEmail(checkoutForm.email) || !checkoutForm.morada || (paymentMethod === 'mbway' && !checkoutForm.mbwayPhone) || (paymentMethod === 'card' && (!checkoutForm.cardNumber || !checkoutForm.cardExpiry || !checkoutForm.cardCvv))}
                                         onClick={async () => {
                                             setIsPaying(true);
                                             setCheckoutError(null);
@@ -4096,7 +4236,7 @@ const LegalModal = ({ type, onClose }: LegalModalProps) => {
     );
 };
 
-const Footer = ({ onOpenLegal }: { onOpenLegal: (type: 'envios' | 'privacidade' | 'termos') => void }) => {
+const Footer = ({ onOpenLegal, onOpenAdmin }: { onOpenLegal: (type: 'envios' | 'privacidade' | 'termos') => void, onOpenAdmin?: () => void }) => {
     const { t } = useLanguage();
     return (
         <footer className="bg-forest text-cream py-12 px-4 border-t border-cream/5">
@@ -4135,7 +4275,18 @@ const Footer = ({ onOpenLegal }: { onOpenLegal: (type: 'envios' | 'privacidade' 
                     <a href={MAILTO_LINK} className="hover:text-cream transition-colors font-mono">{CONTACT_EMAIL}</a>
                     <a href="tel:+351912828182" className="hover:text-cream transition-colors font-mono">+351 912 828 182</a>
                     <div className="text-cream/20 mt-2 whitespace-pre-line">
-                        {t('footer.made_in')}
+                        <span 
+                            onClick={onOpenAdmin}
+                            className="cursor-default select-none active:opacity-80"
+                        >
+                            {t('footer.made_in').split('\n')[0]}
+                        </span>
+                        {t('footer.made_in').includes('\n') && (
+                            <>
+                                <br />
+                                {t('footer.made_in').split('\n')[1]}
+                            </>
+                        )}
                     </div>
                 </div>
             </div>
@@ -4200,6 +4351,7 @@ const MemoryContinuesSection = () => {
 export default function App() {
   const [loading, setLoading] = useState(true);
   const [activeLegal, setActiveLegal] = useState<'envios' | 'privacidade' | 'termos' | null>(null);
+  const [showAdmin, setShowAdmin] = useState(false);
   const { t } = useLanguage();
 
   // Smooth scroll logic for standard browser behavior
@@ -4266,11 +4418,14 @@ export default function App() {
                 <ContactSection />
             </div>
             
-            <Footer onOpenLegal={(type) => setActiveLegal(type)} />
+            <Footer onOpenLegal={(type) => setActiveLegal(type)} onOpenAdmin={() => setShowAdmin(true)} />
 
             <AnimatePresence>
                 {activeLegal && (
                     <LegalModal type={activeLegal} onClose={() => setActiveLegal(null)} />
+                )}
+                {showAdmin && (
+                    <AdminDashboardModal onClose={() => setShowAdmin(false)} />
                 )}
             </AnimatePresence>
           </motion.main>
