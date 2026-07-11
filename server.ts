@@ -446,6 +446,41 @@ app.post("/api/payment/create-intent", async (req, res) => {
           order.simulatedOutcome = 'paid';
         }
       }
+    } else if (paymentMethod === 'wallet') {
+      if (stripe) {
+        try {
+          console.log(`[STRIPE WALLET] Creating PaymentIntent for digital wallet order ${orderId}`);
+          
+          const paymentIntent = await stripe.paymentIntents.create({
+            amount: finalAmountInCents || 5000,
+            currency: 'eur',
+            payment_method_types: ['card'], // Wallet payments (Apple Pay / Google Pay) are processed as cards under the hood
+            payment_method_configuration: paymentMethodConfig as any,
+            description: `M BRAVO - Encomenda ${orderId}`,
+            receipt_email: checkoutForm.email,
+            metadata: {
+              orderId,
+              customerName: checkoutForm.nome,
+              customerEmail: checkoutForm.email
+            }
+          });
+
+          order.stripePaymentIntentId = paymentIntent.id;
+          order.stripeClientSecret = paymentIntent.client_secret;
+          order.status = 'pending_payment';
+          console.log(`[STRIPE WALLET] Created PaymentIntent ID ${paymentIntent.id}, status: ${paymentIntent.status}`);
+        } catch (stripeErr: any) {
+          console.error("[STRIPE WALLET ERROR]", stripeErr);
+          order.status = 'failed';
+          order.errorMessage = stripeErr.message || 'Erro ao inicializar carteira com Stripe';
+        }
+      } else {
+        // Fallback simulation for local sandbox / testing
+        order.status = 'paid';
+        const emailLinks = sendTransactionEmails(order);
+        order.emailSent = true;
+        order.emailLinks = emailLinks;
+      }
     }
 
     // Save order in memory and write to disk immediately to persist and sync across containers/webhooks
