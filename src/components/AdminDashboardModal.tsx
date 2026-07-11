@@ -4,7 +4,7 @@ import {
   X, Search, Lock, Unlock, User, Mail, Phone, MapPin, 
   CreditCard, Clock, Truck, FileText, CheckCircle, AlertCircle, 
   ExternalLink, Eye, RefreshCw, Sliders, Calendar, DollarSign, 
-  Package, ChevronRight, AlertTriangle, ShieldCheck
+  Package, ChevronRight, AlertTriangle, ShieldCheck, Plus
 } from 'lucide-react';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || '';
@@ -30,6 +30,98 @@ export default function AdminDashboardModal({ onClose }: AdminDashboardModalProp
   const [trackingInputs, setTrackingInputs] = useState<{ [orderId: string]: string }>({});
   const [actionLoading, setActionLoading] = useState<{ [orderId: string]: boolean }>({});
   const [actionSuccess, setActionSuccess] = useState<{ [orderId: string]: string }>({});
+
+  // Manual Order states
+  const [showManualForm, setShowManualForm] = useState(false);
+  const [manualForm, setManualForm] = useState({
+    productName: '',
+    price: '',
+    cor: '',
+    tamanho: '',
+    quantidade: '1',
+    customerNome: '',
+    customerEmail: '',
+    customerTelefone: '',
+    customerMorada: '',
+    customerCodigoPostal: '',
+    customerCidade: '',
+    customerNif: '',
+    paymentMethod: 'card',
+    status: 'paid',
+    priority: 'NORMAL'
+  });
+  const [isCreatingManual, setIsCreatingManual] = useState(false);
+
+  const handleCreateManualOrder = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!manualForm.productName || !manualForm.customerNome) {
+      alert("Nome do Produto e Nome do Cliente são obrigatórios.");
+      return;
+    }
+
+    setIsCreatingManual(true);
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/admin/orders/create`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-admin-password': password
+        },
+        body: JSON.stringify({
+          productName: manualForm.productName,
+          price: parseFloat(manualForm.price) || 0,
+          selections: {
+            cor: manualForm.cor || 'Padrão',
+            tamanho: manualForm.tamanho || 'Único',
+            quantidade: manualForm.quantidade || '1'
+          },
+          customer: {
+            nome: manualForm.customerNome,
+            email: manualForm.customerEmail,
+            telefone: manualForm.customerTelefone,
+            morada: manualForm.customerMorada,
+            codigoPostal: manualForm.customerCodigoPostal,
+            cidade: manualForm.customerCidade,
+            nif: manualForm.customerNif
+          },
+          paymentMethod: manualForm.paymentMethod,
+          status: manualForm.status,
+          priority: manualForm.priority,
+          createdAt: new Date().toISOString()
+        })
+      });
+
+      const data = await res.json();
+      if (res.ok && data.success) {
+        alert("Encomenda manual registada com sucesso na base de dados!");
+        setManualForm({
+          productName: '',
+          price: '',
+          cor: '',
+          tamanho: '',
+          quantidade: '1',
+          customerNome: '',
+          customerEmail: '',
+          customerTelefone: '',
+          customerMorada: '',
+          customerCodigoPostal: '',
+          customerCidade: '',
+          customerNif: '',
+          paymentMethod: 'card',
+          status: 'paid',
+          priority: 'NORMAL'
+        });
+        setShowManualForm(false);
+        fetchOrders();
+      } else {
+        alert(data.error || "Erro ao registar encomenda.");
+      }
+    } catch (err) {
+      alert("Erro de rede/ligação ao servidor.");
+    } finally {
+      setIsCreatingManual(false);
+    }
+  };
 
   // Check saved session on mount
   useEffect(() => {
@@ -440,8 +532,255 @@ export default function AdminDashboardModal({ onClose }: AdminDashboardModalProp
                   >
                     <RefreshCw className={`w-4 h-4 ${loadingOrders ? 'animate-spin' : ''}`} />
                   </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setShowManualForm(!showManualForm)}
+                    className="px-3 py-1.5 rounded-lg font-medium transition-all bg-[#BACAA5] text-[#243119] hover:bg-[#a3b38e] flex items-center gap-1.5 font-sans text-xs cursor-pointer"
+                  >
+                    <Plus className="w-3.5 h-3.5" /> Registar Venda Manual
+                  </button>
                 </div>
               </div>
+
+              {/* MANUAL ORDER FORM CONTAINER */}
+              {showManualForm && (
+                <form onSubmit={handleCreateManualOrder} className="bg-cream/45 border border-[#C5A059]/30 rounded-[20px] p-6 space-y-4 animate-fade-in text-xs text-forest">
+                  <div className="flex items-center justify-between border-b border-[#C5A059]/10 pb-3">
+                    <h4 className="font-serif text-sm font-medium text-forest flex items-center gap-2">
+                      <Package className="w-4 h-4 text-[#C5A059]" />
+                      Registar Encomenda Manual (Recuperação ou Venda Direta)
+                    </h4>
+                    <button 
+                      type="button" 
+                      onClick={() => setShowManualForm(false)}
+                      className="p-1.5 hover:bg-forest/5 rounded-full text-forest/40 cursor-pointer"
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    {/* Product Name */}
+                    <div className="space-y-1">
+                      <label className="font-bold uppercase tracking-wider text-[10px] text-forest/50">Nome do Produto *</label>
+                      <input 
+                        type="text" 
+                        placeholder="Ex: Daisy Coasters (Set de 4)" 
+                        value={manualForm.productName}
+                        onChange={(e) => setManualForm(prev => ({ ...prev, productName: e.target.value }))}
+                        className="w-full bg-white border border-forest/15 rounded-xl px-3 py-2.5 focus:outline-none focus:border-[#C5A059]"
+                        required
+                      />
+                    </div>
+
+                    {/* Price */}
+                    <div className="space-y-1">
+                      <label className="font-bold uppercase tracking-wider text-[10px] text-forest/50">Preço (€) *</label>
+                      <input 
+                        type="number" 
+                        step="0.01" 
+                        placeholder="Ex: 24.00" 
+                        value={manualForm.price}
+                        onChange={(e) => setManualForm(prev => ({ ...prev, price: e.target.value }))}
+                        className="w-full bg-white border border-forest/15 rounded-xl px-3 py-2.5 focus:outline-none focus:border-[#C5A059]"
+                        required
+                      />
+                    </div>
+
+                    {/* Selections Quantity, Color, Size */}
+                    <div className="grid grid-cols-3 gap-2">
+                      <div className="space-y-1">
+                        <label className="font-bold uppercase tracking-wider text-[10px] text-forest/50">Cor</label>
+                        <input 
+                          type="text" 
+                          placeholder="Cru" 
+                          value={manualForm.cor}
+                          onChange={(e) => setManualForm(prev => ({ ...prev, cor: e.target.value }))}
+                          className="w-full bg-white border border-forest/15 rounded-xl px-3 py-2.5 focus:outline-none"
+                        />
+                      </div>
+                      <div className="space-y-1">
+                        <label className="font-bold uppercase tracking-wider text-[10px] text-forest/50">Tam.</label>
+                        <input 
+                          type="text" 
+                          placeholder="Único" 
+                          value={manualForm.tamanho}
+                          onChange={(e) => setManualForm(prev => ({ ...prev, tamanho: e.target.value }))}
+                          className="w-full bg-white border border-forest/15 rounded-xl px-3 py-2.5 focus:outline-none"
+                        />
+                      </div>
+                      <div className="space-y-1">
+                        <label className="font-bold uppercase tracking-wider text-[10px] text-forest/50">Qtd.</label>
+                        <input 
+                          type="text" 
+                          placeholder="1" 
+                          value={manualForm.quantidade}
+                          onChange={(e) => setManualForm(prev => ({ ...prev, quantidade: e.target.value }))}
+                          className="w-full bg-white border border-forest/15 rounded-xl px-3 py-2.5 focus:outline-none"
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    {/* Customer Name */}
+                    <div className="space-y-1">
+                      <label className="font-bold uppercase tracking-wider text-[10px] text-forest/50">Nome do Cliente *</label>
+                      <input 
+                        type="text" 
+                        placeholder="Ex: Maria Santos" 
+                        value={manualForm.customerNome}
+                        onChange={(e) => setManualForm(prev => ({ ...prev, customerNome: e.target.value }))}
+                        className="w-full bg-white border border-forest/15 rounded-xl px-3 py-2.5 focus:outline-none focus:border-[#C5A059]"
+                        required
+                      />
+                    </div>
+
+                    {/* Customer Email */}
+                    <div className="space-y-1">
+                      <label className="font-bold uppercase tracking-wider text-[10px] text-forest/50">E-mail do Cliente</label>
+                      <input 
+                        type="email" 
+                        placeholder="cliente@email.com" 
+                        value={manualForm.customerEmail}
+                        onChange={(e) => setManualForm(prev => ({ ...prev, customerEmail: e.target.value }))}
+                        className="w-full bg-white border border-forest/15 rounded-xl px-3 py-2.5 focus:outline-none focus:border-[#C5A059]"
+                      />
+                    </div>
+
+                    {/* Customer Phone */}
+                    <div className="space-y-1">
+                      <label className="font-bold uppercase tracking-wider text-[10px] text-forest/50">Telefone do Cliente</label>
+                      <input 
+                        type="text" 
+                        placeholder="Ex: 912345678" 
+                        value={manualForm.customerTelefone}
+                        onChange={(e) => setManualForm(prev => ({ ...prev, customerTelefone: e.target.value }))}
+                        className="w-full bg-white border border-forest/15 rounded-xl px-3 py-2.5 focus:outline-none focus:border-[#C5A059]"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    {/* Address */}
+                    <div className="space-y-1 md:col-span-2">
+                      <label className="font-bold uppercase tracking-wider text-[10px] text-forest/50">Morada de Envio</label>
+                      <input 
+                        type="text" 
+                        placeholder="Ex: Rua Direita, 123 2º Esq" 
+                        value={manualForm.customerMorada}
+                        onChange={(e) => setManualForm(prev => ({ ...prev, customerMorada: e.target.value }))}
+                        className="w-full bg-white border border-forest/15 rounded-xl px-3 py-2.5 focus:outline-none focus:border-[#C5A059]"
+                      />
+                    </div>
+
+                    {/* Cod Postal */}
+                    <div className="space-y-1">
+                      <label className="font-bold uppercase tracking-wider text-[10px] text-forest/50">Código Postal</label>
+                      <input 
+                        type="text" 
+                        placeholder="Ex: 1000-123" 
+                        value={manualForm.customerCodigoPostal}
+                        onChange={(e) => setManualForm(prev => ({ ...prev, customerCodigoPostal: e.target.value }))}
+                        className="w-full bg-white border border-forest/15 rounded-xl px-3 py-2.5 focus:outline-none focus:border-[#C5A059]"
+                      />
+                    </div>
+
+                    {/* Cidade */}
+                    <div className="space-y-1">
+                      <label className="font-bold uppercase tracking-wider text-[10px] text-forest/50">Cidade</label>
+                      <input 
+                        type="text" 
+                        placeholder="Ex: Lisboa" 
+                        value={manualForm.customerCidade}
+                        onChange={(e) => setManualForm(prev => ({ ...prev, customerCidade: e.target.value }))}
+                        className="w-full bg-white border border-forest/15 rounded-xl px-3 py-2.5 focus:outline-none focus:border-[#C5A059]"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    {/* NIF */}
+                    <div className="space-y-1">
+                      <label className="font-bold uppercase tracking-wider text-[10px] text-forest/50">NIF (Opcional)</label>
+                      <input 
+                        type="text" 
+                        placeholder="Ex: 123456789" 
+                        value={manualForm.customerNif}
+                        onChange={(e) => setManualForm(prev => ({ ...prev, customerNif: e.target.value }))}
+                        className="w-full bg-white border border-forest/15 rounded-xl px-3 py-2.5 focus:outline-none focus:border-[#C5A059]"
+                      />
+                    </div>
+
+                    {/* Payment Method */}
+                    <div className="space-y-1">
+                      <label className="font-bold uppercase tracking-wider text-[10px] text-forest/50">Método de Pagamento</label>
+                      <select 
+                        value={manualForm.paymentMethod}
+                        onChange={(e) => setManualForm(prev => ({ ...prev, paymentMethod: e.target.value }))}
+                        className="w-full bg-white border border-forest/15 rounded-xl px-3 py-2.5 focus:outline-none focus:border-[#C5A059]"
+                      >
+                        <option value="card">Cartão de Crédito</option>
+                        <option value="mbway">MB WAY</option>
+                        <option value="multibanco">Multibanco</option>
+                        <option value="manual">Dinheiro / Transferência</option>
+                      </select>
+                    </div>
+
+                    {/* Status */}
+                    <div className="space-y-1">
+                      <label className="font-bold uppercase tracking-wider text-[10px] text-forest/50">Estado da Encomenda</label>
+                      <select 
+                        value={manualForm.status}
+                        onChange={(e) => setManualForm(prev => ({ ...prev, status: e.target.value }))}
+                        className="w-full bg-white border border-forest/15 rounded-xl px-3 py-2.5 focus:outline-none focus:border-[#C5A059]"
+                      >
+                        <option value="paid">Paga (No Atelier)</option>
+                        <option value="pending_payment">Aguardando Pagamento</option>
+                        <option value="shipped">Expedida (CTT)</option>
+                      </select>
+                    </div>
+
+                    {/* Priority */}
+                    <div className="space-y-1">
+                      <label className="font-bold uppercase tracking-wider text-[10px] text-forest/50">Prioridade</label>
+                      <select 
+                        value={manualForm.priority}
+                        onChange={(e) => setManualForm(prev => ({ ...prev, priority: e.target.value }))}
+                        className="w-full bg-white border border-forest/15 rounded-xl px-3 py-2.5 focus:outline-none focus:border-[#C5A059]"
+                      >
+                        <option value="NORMAL">NORMAL</option>
+                        <option value="ALTA (Atelier Urgente)">URGENTE (Atelier)</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div className="flex justify-end gap-3 pt-2">
+                    <button 
+                      type="button" 
+                      onClick={() => setShowManualForm(false)}
+                      className="px-4 py-2 bg-cream hover:bg-cream/70 text-forest rounded-xl font-medium cursor-pointer"
+                    >
+                      Cancelar
+                    </button>
+                    <button 
+                      type="submit" 
+                      disabled={isCreatingManual}
+                      className="px-5 py-2 bg-[#243119] hover:bg-[#1a2412] text-cream rounded-xl font-medium flex items-center gap-2 cursor-pointer"
+                    >
+                      {isCreatingManual ? (
+                        <>
+                          <span className="animate-spin rounded-full h-3 w-3 border border-cream border-t-transparent" />
+                          Gravando...
+                        </>
+                      ) : (
+                        "Gravar e Adicionar Encomenda"
+                      )}
+                    </button>
+                  </div>
+                </form>
+              )}
 
               {/* ORDERS LIST CONTAINER */}
               {loadingOrders && orders.length === 0 ? (
