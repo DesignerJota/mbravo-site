@@ -923,7 +923,7 @@ const Navbar = () => {
             </motion.div>
 
                 <div className="mt-12 flex gap-10">
-                    <a href="https://www.instagram.com/mbravo.handmade/" target="_blank" rel="noopener noreferrer">
+                    <a href="https://instagram.com/mbravobycarolina/" target="_blank" rel="noopener noreferrer">
                         <Instagram className="text-cream/30 hover:text-cream transition-colors" size={24} />
                     </a>
                     <a href={MAILTO_LINK}>
@@ -4182,7 +4182,7 @@ const ContactSection = () => {
                 </motion.div>
 
                 <div className="mt-20 sm:mt-32 md:mt-48 flex flex-wrap justify-center gap-6 sm:gap-14 md:gap-16 lg:gap-20">
-                    <a href="https://www.instagram.com/mbravo.handmade/" target="_blank" rel="noopener noreferrer" className="text-[10px] uppercase tracking-[0.4em] text-cream/40 hover:text-cream transition-colors">
+                    <a href="https://instagram.com/mbravobycarolina/" target="_blank" rel="noopener noreferrer" className="text-[10px] uppercase tracking-[0.4em] text-cream/40 hover:text-cream transition-colors">
                         Instagram
                     </a>
                     <a href={MAILTO_LINK} className="text-[10px] uppercase tracking-[0.4em] text-cream/40 hover:text-cream transition-colors">
@@ -4573,6 +4573,110 @@ const MemoryContinuesSection = () => {
     );
 };
 
+const InstagramSection = () => {
+    const { t } = useLanguage();
+    
+    const posts = [
+        {
+            id: 1,
+            img: 'https://i.ibb.co/mCmVm2rL/mockup-coosters-luxury-1.png',
+            alt: 'Daisy Coasters M★BRAVO',
+            likes: '48',
+            comments: '3'
+        },
+        {
+            id: 2,
+            img: 'https://i.ibb.co/NnCJyRTF/African-Flower-Pouch-10-1.png',
+            alt: 'African Flower Pouch M★BRAVO',
+            likes: '64',
+            comments: '8'
+        },
+        {
+            id: 3,
+            img: 'https://i.ibb.co/zWNCP5Nx/Stella-Cushion-7-1.png',
+            alt: 'Stella Cushion M★BRAVO',
+            likes: '72',
+            comments: '5'
+        },
+        {
+            id: 4,
+            img: 'https://i.ibb.co/wNdC8NNG/Granny-square-sling-bag-20.png',
+            alt: 'Granny Square Sling Bag M★BRAVO',
+            likes: '59',
+            comments: '6'
+        },
+        {
+            id: 5,
+            img: 'https://i.ibb.co/kVZvr34t/Sunflower-coasters-5.png',
+            alt: 'Sunflower Coasters M★BRAVO',
+            likes: '41',
+            comments: '2'
+        },
+        {
+            id: 6,
+            img: 'https://i.ibb.co/VY1dx3nt/Mini-shell-Pouch.png',
+            alt: 'Mini Shell Pouch M★BRAVO',
+            likes: '53',
+            comments: '4'
+        }
+    ];
+
+    return (
+        <section id="instagram-feed" className="py-24 px-4 bg-[#FCFBF9] border-t border-forest/5 relative overflow-hidden">
+            <div className="w-full max-w-7xl mx-auto">
+                <div className="text-center space-y-4 mb-16">
+                    <span className="text-[10px] uppercase tracking-[0.45em] font-semibold text-forest/35 block font-sans">
+                        {t('instagram.feed.title')}
+                    </span>
+                    <a 
+                        href="https://instagram.com/mbravobycarolina/" 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="inline-block text-2xl sm:text-3xl font-serif text-[#C5A059] hover:text-[#B38E47] transition-colors duration-300 font-light select-none tracking-tight"
+                    >
+                        {t('instagram.feed.handle')}
+                    </a>
+                    <div className="h-[1px] w-12 bg-forest/10 mx-auto mt-4" />
+                </div>
+
+                <div className="flex overflow-x-auto pb-4 gap-4 snap-x snap-mandatory -mx-4 px-4 sm:-mx-6 sm:px-6 lg:mx-0 lg:px-0 lg:grid lg:grid-cols-6 lg:overflow-x-visible lg:pb-0 lg:snap-none scrollbar-none [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+                    {posts.map((post, idx) => (
+                        <motion.a
+                            key={post.id}
+                            href="https://instagram.com/mbravobycarolina/"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            initial={{ opacity: 0, y: 20 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            viewport={{ once: true }}
+                            transition={{ duration: 0.8, delay: idx * 0.1, ease: [0.16, 1, 0.3, 1] }}
+                            className="shrink-0 w-[68vw] sm:w-[40vw] md:w-[28vw] lg:w-auto aspect-square snap-align-start group block relative overflow-hidden bg-forest/5 rounded-lg shadow-sm hover:shadow-md border border-forest/5 transition-all duration-300"
+                        >
+                            <img 
+                                src={post.img} 
+                                alt={post.alt}
+                                className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+                                style={{ imageRendering: 'crisp-edges' }}
+                            />
+                            {/* Overlay on Hover */}
+                            <div className="absolute inset-0 bg-forest/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col items-center justify-center gap-2 text-cream z-10 p-2 text-center">
+                                <div className="flex items-center gap-1.5 text-sm font-sans font-medium">
+                                    <Heart size={16} fill="currentColor" className="text-cream" />
+                                    <span>{post.likes}</span>
+                                </div>
+                                <div className="flex items-center gap-1.5 text-xs font-sans font-medium opacity-90 mt-1">
+                                    <Instagram size={14} className="text-cream" />
+                                    <span className="text-[9px] uppercase tracking-wider font-semibold">{t('instagram.feed.view_profile')}</span>
+                                </div>
+                            </div>
+                        </motion.a>
+                    ))}
+                </div>
+            </div>
+        </section>
+    );
+};
+
 // --- Main App ---
 
 export default function App() {
@@ -4641,6 +4745,8 @@ export default function App() {
                 </div>
 
                 <MemoryContinuesSection />
+
+                <InstagramSection />
 
                 <ContactSection />
             </div>
