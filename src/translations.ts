@@ -240,6 +240,9 @@ export const translations = {
     // Interlude
     "interlude.quote": "\"A beleza está na alma que colocamos em cada gesto.\"",
     "interlude.sub": "\"Peças criadas com tempo, amor e memória.\"",
+    "instagram.feed.title": "Siga-nos no Instagram",
+    "instagram.feed.handle": "@mbravobycarolina",
+    "instagram.feed.view_profile": "Ver Perfil",
     
     // ProductCard Details
     "product.exclusive": "EXCLUSIVO M★BRAVO",
@@ -437,6 +440,9 @@ export const translations = {
     // Interlude
     "interlude.quote": "\"Beauty is in the soul we put into every gesture.\"",
     "interlude.sub": "\"Pieces created with time, love, and memory.\"",
+    "instagram.feed.title": "Follow us on Instagram",
+    "instagram.feed.handle": "@mbravobycarolina",
+    "instagram.feed.view_profile": "View Profile",
     
     // ProductCard Details
     "product.exclusive": "M★BRAVO EXCLUSIVE",
