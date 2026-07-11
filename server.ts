@@ -529,6 +529,13 @@ app.post("/api/payment/webhook", (req, res) => {
   const payload = req.body;
   console.log("[WEBHOOK PAYLOAD DETAIL]", JSON.stringify(payload, null, 2));
 
+  // Reload current orders from disk to stay perfectly synchronized in multi-container/cluster environments
+  const currentOrders = loadOrders();
+  activeOrders.clear();
+  for (const [id, ord] of currentOrders.entries()) {
+    activeOrders.set(id, ord);
+  }
+
   let orderId = payload.orderId || req.query.orderId || req.body.orderId;
   let event = payload.event || payload.type;
   let stripeIntentId: string | undefined = undefined;
@@ -592,7 +599,7 @@ app.post("/api/payment/webhook", (req, res) => {
     const metadata = stripeObj.metadata || {};
     
     const customerName = metadata.customerName || stripeObj.billing_details?.name || stripeObj.shipping?.name || "Cliente M★BRAVO (Recuperado)";
-    const customerEmail = metadata.customerEmail || stripeObj.receipt_email || stripeObj.billing_details?.email || "encomendas@mbravobycarolina.com";
+    const customerEmail = metadata.customerEmail || stripeObj.receipt_email || stripeObj.billing_details?.email || "";
     const customerPhone = metadata.customerPhone || stripeObj.billing_details?.phone || stripeObj.shipping?.phone || "912 828 182";
     
     const morada = stripeObj.shipping?.address?.line1 || stripeObj.billing_details?.address?.line1 || "Não especificada";
@@ -766,6 +773,13 @@ app.post("/api/admin/login", (req, res) => {
 
 // Endpoint to fetch all orders
 app.get("/api/admin/orders", verifyAdmin, (req, res) => {
+  // Reload current orders from disk to stay perfectly synchronized in multi-container/cluster environments
+  const currentOrders = loadOrders();
+  activeOrders.clear();
+  for (const [id, ord] of currentOrders.entries()) {
+    activeOrders.set(id, ord);
+  }
+
   const ordersList = Array.from(activeOrders.values());
   // Sort by createdAt descending (newest first)
   ordersList.sort((a: any, b: any) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
@@ -775,6 +789,14 @@ app.get("/api/admin/orders", verifyAdmin, (req, res) => {
 // Endpoint to update an order
 app.post("/api/admin/orders/update", verifyAdmin, (req, res) => {
   const { orderId, status, trackingCode, priority, selections } = req.body;
+  
+  // Reload current orders from disk to stay perfectly synchronized
+  const currentOrders = loadOrders();
+  activeOrders.clear();
+  for (const [id, ord] of currentOrders.entries()) {
+    activeOrders.set(id, ord);
+  }
+
   const order = activeOrders.get(orderId);
 
   if (!order) {
