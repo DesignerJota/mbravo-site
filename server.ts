@@ -433,8 +433,9 @@ app.post("/api/payment/create-intent", async (req, res) => {
       }
     }
 
-    // Save order in memory
+    // Save order in memory and write to disk immediately to persist and sync across containers/webhooks
     activeOrders.set(orderId, order);
+    saveOrders(activeOrders);
 
     res.json({
       success: true,
@@ -658,8 +659,8 @@ app.post("/api/payment/webhook", (req, res) => {
     console.log(`[WEBHOOK AUTO-RECOVERY] Successfully reconstructed and added order ${orderId} to local persistent database.`);
   }
 
-  if (event === "payment_intent.succeeded" || event === "payment.succeeded" || event === "charge.succeeded") {
-    console.log(`[WEBHOOK SUCCESS] Updating order ${orderId} status to PAID.`);
+  if (event === "payment_intent.succeeded" || event === "payment.succeeded" || event === "charge.succeeded" || event === "checkout.session.completed" || event === "checkout.session.async_payment_succeeded") {
+    console.log(`[WEBHOOK SUCCESS] Webhook event "${event}" received. Updating order ${orderId} status to PAID.`);
     order.status = "paid";
     
     if (!order.emailSent) {
