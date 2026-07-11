@@ -49,7 +49,22 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Persistent file-backed order store to preserve data during sandbox testing and server restarts
-const ORDERS_FILE = path.join(process.cwd(), "orders.json");
+// On Railway with a persistent volume mounted at /app/data/, write to /app/data/orders.json. Fall back to current directory otherwise.
+const getOrdersFilePath = () => {
+  const railwayPersistentDir = "/app/data";
+  try {
+    if (!fs.existsSync(railwayPersistentDir)) {
+      fs.mkdirSync(railwayPersistentDir, { recursive: true });
+    }
+    console.log(`[ORDERS DATABASE] Using Railway persistent storage directory: ${railwayPersistentDir}`);
+    return path.join(railwayPersistentDir, "orders.json");
+  } catch (e) {
+    console.warn("[ORDERS DATABASE] /app/data is not accessible or writable. Falling back to local workspace orders.json.");
+    return path.join(process.cwd(), "orders.json");
+  }
+};
+
+const ORDERS_FILE = getOrdersFilePath();
 
 function loadOrders() {
   const map = new Map<string, any>();
