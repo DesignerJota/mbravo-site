@@ -360,16 +360,21 @@ export function sendTransactionEmails(order: OrderData): { customerEmailUrl: str
     console.log(`[M.BRAVO EMAIL SYSTEM] SendGrid API Key detected! Dispatched live email requests in background...`);
     
     // Asynchronous send to SendGrid to prevent blocking main transaction thread
-    sendViaSendGrid(process.env.SENDGRID_API_KEY!, order.customer.email, `M BRAVO | Encomenda Confirmada - ${order.orderId}`, customerHtml)
-      .then(() => console.log(`[M.BRAVO EMAIL SYSTEM] Customer email sent successfully via SendGrid.`))
-      .catch(err => {
-        console.warn(`\n[M.BRAVO EMAIL SYSTEM WARNING] Could not send Customer email via SendGrid:`);
-        console.warn(`  - Logged Detail: ${err.message}`);
-        console.warn(`  - Action: Please double-check your SendGrid API Key and Sender Verification in .env or Settings.`);
-        console.warn(`  - Sandbox Status: Local template preview generated successfully at /emails/${custFileName}\n`);
-      });
+    const customerEmail = (order.customer.email || "").trim();
+    if (customerEmail && customerEmail.includes('@')) {
+      sendViaSendGrid(process.env.SENDGRID_API_KEY!, customerEmail, `M BRAVO | Encomenda Confirmada - ${order.orderId}`, customerHtml)
+        .then(() => console.log(`[M.BRAVO EMAIL SYSTEM] Customer email sent successfully via SendGrid to ${customerEmail}.`))
+        .catch(err => {
+          console.warn(`\n[M.BRAVO EMAIL SYSTEM WARNING] Could not send Customer email via SendGrid:`);
+          console.warn(`  - Logged Detail: ${err.message}`);
+          console.warn(`  - Action: Please double-check your SendGrid API Key and Sender Verification in .env or Settings.`);
+          console.warn(`  - Sandbox Status: Local template preview generated successfully at /emails/${custFileName}\n`);
+        });
+    } else {
+      console.log(`[M.BRAVO EMAIL SYSTEM] Skipping customer email dispatch because customer email address is absent or invalid.`);
+    }
 
-    const adminEmail = process.env.ADMIN_NOTIFY_EMAIL || 'handmade@mbravobycarolina.com';
+    const adminEmail = 'handmade@mbravobycarolina.com';
     sendViaSendGrid(process.env.SENDGRID_API_KEY!, adminEmail, `[NOVO PEDIDO] ${order.orderId} - Prioridade Atelier`, adminHtml)
       .then(() => console.log(`[M.BRAVO EMAIL SYSTEM] Admin notification email sent successfully via SendGrid.`))
       .catch(err => {
