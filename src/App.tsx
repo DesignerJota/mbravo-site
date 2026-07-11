@@ -1968,6 +1968,17 @@ interface ProductCardProps {
 const ProductCard: React.FC<ProductCardProps> = ({ product: rawProduct, i, isFocused, isSubdued, onFocus, onPrevProduct, onNextProduct }) => {
     const { lang, t } = useLanguage();
     const product = translateProduct(rawProduct, lang);
+    const n = product.name.toLowerCase();
+    const isVestuario = n.includes('bikini') || n.includes('top') || n.includes('cardigan') || n.includes('poncho') || n.includes('belt') || n.includes('bandana') || n.includes('headband');
+    const isBag = n.includes('bag') || n.includes('pouch') || n.includes('booksleeve') || n.includes('clutch');
+    const isHomeSet = n.includes('coasters') || n.includes('placemats');
+    const isCoaster = n.includes('coasters');
+    const hasSize = isVestuario && 
+                    !n.includes('dragonfly bandana') && 
+                    !n.includes('classic bandana') && 
+                    !n.includes('dragonfly headband');
+    const hasQuantity = isHomeSet;
+    const rawPrice = getApprovedPrice(product.name);
     const isAfricanFlowerPouch = product.name.toLowerCase().includes('african flower pouch');
     const isMiniPouches = product.name.toLowerCase().includes('mini pouches');
     const isClassicCoasters = product.name.toLowerCase().includes('classic coasters');
@@ -1990,13 +2001,16 @@ const ProductCard: React.FC<ProductCardProps> = ({ product: rawProduct, i, isFoc
         forro: '',
         detalhe: ''
     });
+    const totalPrice = typeof rawPrice === 'number' 
+        ? `${rawPrice * (hasQuantity ? (parseInt(selections.quantidade) || 1) : 1)}`
+        : 'Sob Consulta';
     const cardRef = useRef<HTMLDivElement>(null);
     const [activeImgIndex, setActiveImgIndex] = useState(0);
     const [direction, setDirection] = useState(0);
 
     // New Direct Checkout Gateway States
     const [isCheckingOut, setIsCheckingOut] = useState(false);
-    const [paymentMethod, setPaymentMethod] = useState<'mbway' | 'multibanco' | 'card'>('mbway');
+    const [paymentMethod, setPaymentMethod] = useState<'mbway' | 'multibanco' | 'card' | 'wallet'>('mbway');
     const [checkoutForm, setCheckoutForm] = useState({
         nome: '',
         email: '',
@@ -2018,6 +2032,8 @@ const ProductCard: React.FC<ProductCardProps> = ({ product: rawProduct, i, isFoc
     const [checkoutError, setCheckoutError] = useState<string | null>(null);
     const [sandboxEmails, setSandboxEmails] = useState<{ customerEmailUrl: string, adminEmailUrl: string, shippedEmailUrl?: string } | null>(null);
     const [isShipping, setIsShipping] = useState(false);
+    const [canUseWallet, setCanUseWallet] = useState(false);
+    const prButtonRef = useRef<any>(null);
 
     const handleShipOrder = async () => {
         if (!orderId) return;
@@ -2038,6 +2054,189 @@ const ProductCard: React.FC<ProductCardProps> = ({ product: rawProduct, i, isFoc
             setIsShipping(false);
         }
     };
+
+    // Live Stripe Wallet/ApplePay/GooglePay Initialization & Orchestration
+    useEffect(() => {
+        let active = true;
+        if (!isCheckingOut) return;
+
+        const initStripeWallet = async () => {
+            const stripePubKey = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY || "";
+            if (!stripePubKey) {
+                console.warn("[STRIPE WALLET] Stripe Publishable Key not configured in .env");
+                return;
+            }
+
+            try {
+                const stripe = await loadStripe(stripePubKey);
+                if (!stripe || !active) return;
+
+                let amountInCents = 5000;
+                try {
+                    const priceVal = typeof rawPrice === 'number' ? rawPrice : parseFloat(String(rawPrice).replace(/[^0-9.]/g, ''));
+                    const qty = hasQuantity ? (parseInt(selections.quantidade) || 1) : 1;
+                    amountInCents = Math.round(priceVal * qty * 100);
+                } catch (e) {
+                    amountInCents = 5000;
+                }
+
+                console.log(`[STRIPE WALLET] Registering payment request for ${amountInCents} cents.`);
+
+                const paymentRequest = stripe.paymentRequest({
+                    country: 'PT',
+                    currency: 'eur',
+                    total: {
+                        label: `M.BRAVO - ${product.name.substring(0, 25)}`,
+                        amount: amountInCents,
+                    },
+                    requestPayerName: true,
+                    requestPayerEmail: true,
+                    requestPayerPhone: true,
+                    requestShipping: false, // We collect customized PT address on checkout step 1 which is more accurate
+                });
+
+                const result = await paymentRequest.canMakePayment();
+                if (result && active) {
+                    console.log("[STRIPE WALLET] Apple Pay / Google Pay is fully supported on this device/browser!");
+                    setCanUseWallet(true);
+
+                    if (paymentMethod === 'wallet') {
+                        setTimeout(() => {
+                            if (!active) return;
+                            const container = document.getElementById('payment-request-button');
+                            if (container) {
+                                container.innerHTML = ''; // Clear previous instances
+                                const elements = stripe.elements();
+                                const prButton = elements.create('paymentRequestButton', {
+                                    paymentRequest,
+                                    style: {
+                                        paymentRequestButton: {
+                                            theme: 'dark',
+                                            height: '44px',
+                                        },
+                                    },
+                                });
+                                prButton.mount('#payment-request-button');
+                                prButtonRef.current = prButton;
+                                console.log("[STRIPE WALLET] Payment Request Button successfully mounted.");
+                            }
+                        }, 150);
+                    }
+                } else {
+                    console.log("[STRIPE WALLET] Apple Pay / Google Pay not available on this device/browser.");
+                    setCanUseWallet(false);
+                }
+
+                // Stripe paymentmethod authorized callback
+                paymentRequest.on('paymentmethod', async (ev) => {
+                    console.log("[STRIPE WALLET SUCCESS] Wallet sheet authorized. Capturing buyer details:", ev.paymentMethod);
+                    
+                    const buyerName = ev.payerName || checkoutForm.nome || "Cliente Carteira Digital";
+                    const buyerEmail = ev.payerEmail || checkoutForm.email || "encomendas@mbravobycarolina.com";
+                    const buyerPhone = ev.payerPhone || checkoutForm.telefone || "";
+
+                    // Synchronize React state
+                    setCheckoutForm(prev => ({
+                        ...prev,
+                        nome: buyerName,
+                        email: buyerEmail,
+                        telefone: buyerPhone
+                    }));
+
+                    setIsPaying(true);
+                    setCheckoutError(null);
+
+                    try {
+                        const response = await fetch(`${API_BASE_URL}/api/payment/create-intent`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                product: {
+                                    id: product.id,
+                                    name: product.name,
+                                    price: currentPrice
+                                },
+                                selections,
+                                checkoutForm: {
+                                    ...checkoutForm,
+                                    nome: buyerName,
+                                    email: buyerEmail,
+                                    telefone: buyerPhone,
+                                },
+                                paymentMethod: 'wallet',
+                                amountInCents
+                            })
+                        });
+
+                        const data = await response.json();
+
+                        if (!response.ok || data.error) {
+                            throw new Error(data.error || "Falha do servidor ao inicializar transação de carteira.");
+                        }
+
+                        console.log("[STRIPE WALLET] PaymentIntent created, client secret received. Confirming client-side...");
+                        setOrderId(data.orderId);
+
+                        // Confirm Stripe PaymentIntent
+                        const { paymentIntent, error: confirmError } = await stripe.confirmCardPayment(
+                            data.stripeClientSecret,
+                            { payment_method: ev.paymentMethod.id },
+                            { handleActions: false }
+                        );
+
+                        if (confirmError) {
+                            ev.complete('fail');
+                            throw new Error(confirmError.message);
+                        }
+
+                        if (paymentIntent && paymentIntent.status === 'succeeded') {
+                            ev.complete('success');
+                            console.log("[STRIPE WALLET CONFIRMED] Confirming success webhook with server...");
+
+                            // Notify webhook endpoint of successful payment completion
+                            const confirmRes = await fetch(`${API_BASE_URL}/api/payment/webhook`, {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({
+                                    orderId: data.orderId,
+                                    event: 'payment_intent.succeeded'
+                                })
+                            });
+
+                            const confirmData = await confirmRes.json();
+                            setIsPaying(false);
+                            setPaymentCompleted(true);
+                            if (confirmData.emailLinks) {
+                                setSandboxEmails(confirmData.emailLinks);
+                            }
+                        } else {
+                            ev.complete('fail');
+                            throw new Error("A autorização da carteira digital não pôde ser completada.");
+                        }
+                    } catch (err: any) {
+                        console.error("[STRIPE WALLET PROCESS ERROR]", err);
+                        setCheckoutError(err.message || "Erro durante o processamento do Apple/Google Pay.");
+                        setIsPaying(false);
+                    }
+                });
+
+            } catch (err) {
+                console.error("[STRIPE WALLET SYSTEM ERROR]", err);
+            }
+        };
+
+        initStripeWallet();
+
+        return () => {
+            active = false;
+            if (prButtonRef.current) {
+                try {
+                    prButtonRef.current.unmount();
+                    console.log("[STRIPE WALLET] Unmounted payment request button.");
+                } catch (e) {}
+            }
+        };
+    }, [isCheckingOut, paymentMethod, totalPrice, lang]);
     const isLiveMode = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY?.startsWith('pk_live') || false;
 
     const productImages = product.images || [product.img];
@@ -2046,19 +2245,6 @@ const ProductCard: React.FC<ProductCardProps> = ({ product: rawProduct, i, isFoc
         setActiveImgIndex(0);
         setDirection(0);
     }, [product.id, isFocused]);
-
-    const n = product.name.toLowerCase();
-    const isVestuario = n.includes('bikini') || n.includes('top') || n.includes('cardigan') || n.includes('poncho') || n.includes('belt') || n.includes('bandana') || n.includes('headband');
-    const isBag = n.includes('bag') || n.includes('pouch') || n.includes('booksleeve') || n.includes('clutch');
-    const isHomeSet = n.includes('coasters') || n.includes('placemats');
-    const isCoaster = n.includes('coasters');
-    
-    const hasSize = isVestuario && 
-                    !n.includes('dragonfly bandana') && 
-                    !n.includes('classic bandana') && 
-                    !n.includes('dragonfly headband');
-
-    const hasQuantity = isHomeSet;
 
     // Logic for Material & Care
     const isSafran = isVestuario || product.id.startsWith('v') || product.id.startsWith('p');
@@ -2094,10 +2280,6 @@ const ProductCard: React.FC<ProductCardProps> = ({ product: rawProduct, i, isFoc
 
     const currentPrice = calculatePrice();
 
-    const rawPrice = getApprovedPrice(product.name);
-    const totalPrice = typeof rawPrice === 'number' 
-        ? `${rawPrice * (hasQuantity ? (parseInt(selections.quantidade) || 1) : 1)}`
-        : 'Sob Consulta';
     const selectedSize = hasSize ? selections.tamanho : 'Não aplicável';
     const selectedColor = (isCoaster && !isClassicCoasters) ? 'Padrão' : selections.cor;
     const quantity = hasQuantity ? selections.quantidade : '1';
@@ -2740,7 +2922,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product: rawProduct, i, isFoc
                                             {lang === 'pt' ? '2. MÉTODO DE PAGAMENTO' : '2. PAYMENT METHOD'}
                                         </h5>
 
-                                        <div className="grid grid-cols-3 gap-2">
+                                        <div className={`grid ${canUseWallet ? 'grid-cols-4' : 'grid-cols-3'} gap-2`}>
                                             {/* MBWAY */}
                                             <button
                                                 type="button"
@@ -2781,6 +2963,21 @@ const ProductCard: React.FC<ProductCardProps> = ({ product: rawProduct, i, isFoc
                                             >
                                                 <span className="text-[10px] font-extrabold tracking-wider uppercase font-sans">{lang === 'pt' ? 'CARTÃO' : 'CARD'}</span>
                                             </button>
+
+                                            {/* Carteiras Digitais (Apple Pay / Google Pay) */}
+                                            {canUseWallet && (
+                                                <button
+                                                    type="button"
+                                                    onClick={() => setPaymentMethod('wallet')}
+                                                    className={`flex flex-col items-center justify-center py-2.5 rounded-xl border transition-all cursor-pointer ${
+                                                        paymentMethod === 'wallet' 
+                                                            ? 'bg-[#343E2C] text-[#C5A059] border-[#C5A059]' 
+                                                            : 'bg-white text-forest/65 border-forest/10 hover:bg-forest/5'
+                                                    }`}
+                                                >
+                                                    <span className="text-[10px] font-extrabold tracking-wider uppercase font-sans">PAY</span>
+                                                </button>
+                                            )}
                                         </div>
 
                                         {/* Conditional Payment Method Input Panels */}
@@ -2899,6 +3096,28 @@ const ProductCard: React.FC<ProductCardProps> = ({ product: rawProduct, i, isFoc
                                                     </div>
                                                 </div>
                                             )}
+
+                                            {paymentMethod === 'wallet' && (
+                                                <div className="space-y-3 animate-fadeIn text-center py-2 flex flex-col items-center justify-center">
+                                                    <span className="text-[9px] uppercase tracking-wider text-[#C5A059] font-mono font-bold">
+                                                        {lang === 'pt' ? 'PAGAMENTO EXPRESSO COM CARTEIRA DIGITAL' : 'EXPRESS DIGITAL WALLET PAYMENT'}
+                                                    </span>
+                                                    
+                                                    <div className="w-full max-w-[320px] min-h-[44px] mt-2 flex justify-center">
+                                                        <div id="payment-request-button" className="w-full"></div>
+                                                    </div>
+                                                    
+                                                    {!canUseWallet && (
+                                                        <p className="text-[10px] text-red-500/80 font-sans leading-relaxed mt-2">
+                                                            {lang === 'pt' ? (
+                                                                'O Apple Pay ou Google Pay não está disponível no seu navegador atual. Por favor, use outro método de pagamento ou ative o Apple Pay/Google Pay.'
+                                                            ) : (
+                                                                'Apple Pay or Google Pay is not available on your current browser. Please use another payment method or enable Apple Pay/Google Pay.'
+                                                            )}
+                                                        </p>
+                                                    )}
+                                                </div>
+                                            )}
                                         </div>
                                     </div>
                                 </div>
@@ -2915,9 +3134,10 @@ const ProductCard: React.FC<ProductCardProps> = ({ product: rawProduct, i, isFoc
                                         </div>
                                     )}
 
-                                    <motion.button
-                                        disabled={isPaying || !checkoutForm.nome || !checkoutForm.email || !isValidEmail(checkoutForm.email) || !checkoutForm.morada || (paymentMethod === 'mbway' && !checkoutForm.mbwayPhone) || (paymentMethod === 'card' && (!checkoutForm.cardNumber || !checkoutForm.cardExpiry || !checkoutForm.cardCvv))}
-                                        onClick={async () => {
+                                    {paymentMethod !== 'wallet' ? (
+                                        <motion.button
+                                            disabled={isPaying || !checkoutForm.nome || !checkoutForm.email || !isValidEmail(checkoutForm.email) || !checkoutForm.morada || (paymentMethod === 'mbway' && !checkoutForm.mbwayPhone) || (paymentMethod === 'card' && (!checkoutForm.cardNumber || !checkoutForm.cardExpiry || !checkoutForm.cardCvv))}
+                                            onClick={async () => {
                                             setIsPaying(true);
                                             setCheckoutError(null);
                                             setSandboxEmails(null);
@@ -3113,7 +3333,14 @@ const ProductCard: React.FC<ProductCardProps> = ({ product: rawProduct, i, isFoc
                                         ) : (
                                             lang === 'pt' ? 'EFETUAR ENCOMENDA' : 'PLACE ORDER'
                                         )}
-                                    </motion.button>
+                                        </motion.button>
+                                    ) : (
+                                        <div className="w-full text-center py-4 px-4 bg-[#C5A059]/5 border border-[#C5A059]/20 rounded-2xl font-sans animate-fadeIn">
+                                            <p className="text-[10px] uppercase tracking-wider text-[#C5A059] font-bold">
+                                                {lang === 'pt' ? 'Clique no botão oficial acima para concluir o pagamento' : 'Click the official button above to complete payment'}
+                                            </p>
+                                        </div>
+                                    )}
                                 </div>
                             </div>
                         )}
