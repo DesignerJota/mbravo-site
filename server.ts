@@ -853,6 +853,51 @@ app.post("/api/admin/orders/update", verifyAdmin, (req, res) => {
   res.json({ success: true, order });
 });
 
+// Endpoint to manually register/add an order (e.g. past manual purchases or recovery)
+app.post("/api/admin/orders/create", verifyAdmin, (req, res) => {
+  const { productName, price, selections, customer, paymentMethod, status, priority, createdAt } = req.body;
+
+  if (!productName || !customer || !customer.nome) {
+    return res.status(400).json({ error: "Nome do produto e Nome do cliente são obrigatórios" });
+  }
+
+  // Generate distinctive order ID
+  const orderId = `MB-2026-${Math.floor(1000 + Math.random() * 9000)}`;
+  
+  const newOrder = {
+    orderId,
+    productName,
+    price: price || 0,
+    selections: selections || { cor: "Padrão", tamanho: "M", quantidade: "1" },
+    customer: {
+      nome: customer.nome,
+      email: customer.email || "",
+      telefone: customer.telefone || "",
+      morada: customer.morada || "",
+      codigoPostal: customer.codigoPostal || "",
+      cidade: customer.cidade || "",
+      nif: customer.nif || ""
+    },
+    paymentMethod: paymentMethod || "manual",
+    status: status || "paid",
+    priority: priority || "NORMAL",
+    createdAt: createdAt || new Date().toISOString(),
+    emailSent: false
+  };
+
+  // Reload current orders to stay perfectly synchronized
+  const currentOrders = loadOrders();
+  activeOrders.clear();
+  for (const [id, ord] of currentOrders.entries()) {
+    activeOrders.set(id, ord);
+  }
+
+  activeOrders.set(orderId, newOrder);
+  saveOrders(activeOrders);
+
+  res.json({ success: true, order: newOrder });
+});
+
 
 // Configure Vite middleware in development or serve production build
 async function startServer() {
