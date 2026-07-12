@@ -1394,7 +1394,7 @@ const StorySection = () => {
     }, []);
 
     return (
-        <section ref={containerRef} id="sobre" data-background="light" className="pt-24 pb-24 px-6 landscape:pt-24 landscape:pb-20 md:pt-24 md:portrait:px-12 lg:pt-32 lg:pb-32 xl:pt-36 xl:pb-36 relative z-10 overflow-hidden select-none" style={{ backgroundColor: '#FCFBF9' }}>
+        <section ref={containerRef} id="sobre" data-background="light" className="pt-24 pb-12 px-6 landscape:pt-24 landscape:pb-12 md:pt-24 md:portrait:px-12 lg:pt-32 lg:pb-16 xl:pt-36 xl:pb-20 relative z-10 overflow-hidden select-none" style={{ backgroundColor: '#FCFBF9' }}>
             {/* Elements of Fundo Subtis: Handcrafted loose cotton fibers / wavy spinning threads running deep inside the cream canvas, completely backgrounded */}
             <div className="absolute inset-x-0 bottom-0 top-[150px] pointer-events-none z-0 overflow-hidden">
                 {/* Subtle organic textile noise */}
@@ -1475,45 +1475,6 @@ const StorySection = () => {
                             ))}
                         </div>
                     </div>
-
-                    {/* Luxurious Rotating Brand Badge */}
-                    <div className="absolute -bottom-10 -right-4 md:-bottom-12 md:-right-12 w-36 h-36 md:w-44 md:h-44 lg:w-48 lg:h-48 hidden sm:flex md:portrait:hidden lg:flex items-center justify-center bg-forest rounded-full p-1 border-4 border-cream shadow-[0_25px_60px_rgba(36,49,25,0.25)] z-20 overflow-hidden group">
-                        <motion.div 
-                            animate={{ rotate: 360 }}
-                            transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
-                            className="w-full h-full relative flex items-center justify-center"
-                        >
-                            <svg viewBox="0 0 100 100" className="w-full h-full">
-                                <path
-                                    id="circlePathBadge"
-                                    d="M 50, 50 m -36, 0 a 36,36 0 1, 1 72,0 a 36,36 0 1, 1 -72,0"
-                                    fill="none"
-                                />
-                                <text style={{ fontSize: '9px', lineHeight: '13.5px' }} className="font-bold uppercase tracking-[0.14em] fill-cream">
-                                    <textPath href="#circlePathBadge" startOffset="0%" style={{ fontSize: '9px', lineHeight: '13.5px' }}>
-                                        M★BRAVO ★ HANDMADE ★ EST. 2025 ★
-                                    </textPath>
-                                </text>
-                            </svg>
-                        </motion.div>
-                        <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                            <svg viewBox="0 0 120 120" className="w-16 h-16 md:w-20 md:h-20">
-                                <path 
-                                    d="M60 0 L78 38 L118 42 L90 71 L96 111 L60 93 L24 111 L30 71 L2 42 L42 38 Z" 
-                                    fill="#C5A059" 
-                                />
-                                <text 
-                                    x="60" 
-                                    y="72" 
-                                    textAnchor="middle" 
-                                    fill="#243119" 
-                                    style={{ fontSize: '32px', fontFamily: 'Playfair Display, serif', fontWeight: 'bold' }}
-                                >
-                                    M
-                                </text>
-                            </svg>
-                        </div>
-                    </div>
                 </motion.div>
 
                 {/* Right Side: Emotional Storytelling & Pure Philosophy */}
@@ -1572,61 +1533,54 @@ const StorySection = () => {
                             </motion.div>
                         ))}
                     </div>
-
-                    {/* Elegant, Non-Commercial CTA */}
-                    <div className="pt-8 md:pt-10 flex flex-col sm:flex-row md:portrait:flex-col lg:flex-row items-center sm:items-center md:portrait:items-center lg:items-start gap-8 md:portrait:gap-8 md:portrait:w-full md:portrait:justify-center">
-                        <a 
-                            href="#collection" 
-                            className="group relative inline-flex items-center gap-6 pl-10 pr-16 py-5 bg-forest text-cream rounded-full overflow-hidden transition-all duration-500 hover:pr-20 shrink-0"
-                        >
-                            <span className="relative z-10 text-[10px] uppercase tracking-[0.3em] font-semibold whitespace-nowrap">
-                                {t('story.cta')}
-                            </span>
-                            <div className="absolute right-4 w-10 h-10 bg-[#C5A059] text-forest rounded-full flex items-center justify-center transition-all duration-500 group-hover:right-6">
-                                <ArrowRight size={16} />
-                            </div>
-                        </a>
-
-                        {/* Fluid Brand Badge shown only in md:portrait and xs/sm mobile views, below the text flow smoothly */}
-                        <div className="flex sm:hidden md:portrait:flex lg:hidden items-center justify-center relative w-36 h-36 md:w-40 md:h-40 bg-forest rounded-full p-1 border-4 border-cream shadow-[0_25px_60px_rgba(36,49,25,0.25)] overflow-hidden group shrink-0">
-                            <motion.div 
-                                animate={{ rotate: 360 }}
-                                transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
-                                className="w-full h-full relative flex items-center justify-center"
-                            >
-                                <svg viewBox="0 0 100 100" className="w-full h-full">
-                                    <path
-                                        id="circlePathBadgeFluid"
-                                        d="M 50, 50 m -36, 0 a 36,36 0 1, 1 72,0 a 36,36 0 1, 1 -72,0"
-                                        fill="none"
-                                    />
-                                    <text style={{ fontSize: '9px', lineHeight: '13.5px' }} className="font-bold uppercase tracking-[0.14em] fill-cream">
-                                        <textPath href="#circlePathBadgeFluid" startOffset="0%" style={{ fontSize: '9px', lineHeight: '13.5px' }}>
-                                            M★BRAVO ★ HANDMADE ★ EST. 2025 ★
-                                        </textPath>
-                                    </text>
-                                </svg>
-                            </motion.div>
-                            <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                                <svg viewBox="0 0 120 120" className="w-14 h-14 md:w-16 md:h-16">
-                                    <path 
-                                        d="M60 0 L78 38 L118 42 L90 71 L96 111 L60 93 L24 111 L30 71 L2 42 L42 38 Z" 
-                                        fill="#C5A059" 
-                                    />
-                                    <text 
-                                        x="60" 
-                                        y="72" 
-                                        textAnchor="middle" 
-                                        fill="#243119" 
-                                        style={{ fontSize: '32px', fontFamily: 'Playfair Display, serif', fontWeight: 'bold' }}
-                                    >
-                                        M
-                                    </text>
-                                </svg>
-                            </div>
-                        </div>
-                    </div>
                 </motion.div>
+            </div>
+
+            {/* Centered Transitional Slogan and Rotating Badge Seal */}
+            <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-16 md:mt-24 text-center relative z-10">
+                <div className="h-[1px] w-24 bg-forest/10 mx-auto mb-10" />
+                <p className="text-center text-forest/40 font-serif italic text-base md:text-xl tracking-wide max-w-xl mx-auto mb-10 leading-relaxed select-text">
+                    "{t('interlude.sub')}"
+                </p>
+                
+                {/* Rotating Brand Badge */}
+                <div className="mx-auto w-36 h-36 md:w-40 md:h-40 bg-forest rounded-full p-1 border-4 border-cream shadow-[0_15px_40px_rgba(36,49,25,0.15)] overflow-hidden group relative">
+                    <motion.div 
+                        animate={{ rotate: 360 }}
+                        transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
+                        className="w-full h-full relative flex items-center justify-center"
+                    >
+                        <svg viewBox="0 0 100 100" className="w-full h-full">
+                            <path
+                                id="circlePathBadgeCentered"
+                                d="M 50, 50 m -36, 0 a 36,36 0 1, 1 72,0 a 36,36 0 1, 1 -72,0"
+                                fill="none"
+                            />
+                            <text style={{ fontSize: '9px', lineHeight: '13.5px' }} className="font-bold uppercase tracking-[0.14em] fill-cream">
+                                <textPath href="#circlePathBadgeCentered" startOffset="0%" style={{ fontSize: '9px', lineHeight: '13.5px' }}>
+                                    M★BRAVO ★ HANDMADE ★ EST. 2025 ★
+                                </textPath>
+                            </text>
+                        </svg>
+                    </motion.div>
+                    <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                        <svg viewBox="0 0 120 120" className="w-14 h-14 md:w-16 md:h-16">
+                            <path 
+                                d="M60 0 L78 38 L118 42 L90 71 L96 111 L60 93 L24 111 L30 71 L2 42 L42 38 Z" 
+                                fill="#C5A059" 
+                            />
+                            <text 
+                                x="60" 
+                                y="72" 
+                                textAnchor="middle" 
+                                fill="#243119" 
+                                style={{ fontSize: '32px', fontFamily: 'Playfair Display, serif', fontWeight: 'bold' }}
+                            >
+                                M
+                            </text>
+                        </svg>
+                    </div>
+                </div>
             </div>
         </section>
     );
@@ -1635,7 +1589,7 @@ const StorySection = () => {
 const MadeWithTimeSection = () => {
     const { t } = useLanguage();
     return (
-        <section id="manifesto" data-background="light" className="pt-24 pb-20 px-4 landscape:py-16 md:portrait:py-24 lg:py-32 xl:py-36 bg-[#FCFBF9] relative overflow-hidden select-none border-t border-forest/5">
+        <section id="manifesto" data-background="light" className="pt-16 pb-16 px-4 landscape:py-12 md:portrait:py-20 lg:pt-20 lg:pb-24 xl:pt-24 xl:pb-28 bg-[#FCFBF9] relative overflow-hidden select-none border-t border-forest/5">
             <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 {/* Header: Large Asymmetrical Editorial Typography */}
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-16 items-baseline mb-24 md:mb-32 border-b border-forest/10 pb-16">
@@ -3901,7 +3855,7 @@ const CollectionSection = () => {
     }, [focusedProductId]);
 
     return (
-        <section ref={containerRef} id="collection" data-background="light" className="pt-24 pb-20 px-4 landscape:py-16 md:portrait:py-24 lg:py-32 xl:py-36 bg-[#FCFBF9] min-h-screen relative overflow-hidden">
+        <section ref={containerRef} id="collection" data-background="light" className="pt-12 pb-16 px-4 landscape:py-12 md:portrait:py-16 lg:pt-16 lg:pb-24 xl:pt-20 xl:pb-28 bg-[#FCFBF9] min-h-[85vh] relative overflow-hidden">
 
             <motion.div 
                 style={{ x: xTrack, y: yTrack, opacity: opacityTrack, fontFamily: "'Cormorant Garamond', serif" }}
@@ -3923,15 +3877,14 @@ const CollectionSection = () => {
                  <motion.span 
                     initial={{ opacity: 0 }}
                     whileInView={{ opacity: 1 }}
-                    className="text-xs tracking-[0.3em] text-gray-400 uppercase font-light mb-4 block"
+                    className="text-[10px] uppercase tracking-[0.45em] font-bold text-forest/35 block font-sans mb-4"
                  >
                     {t('collection.tag')}
                  </motion.span>
                  <motion.h2 
                     initial={{ opacity: 0, y: 20 }}
                     whileInView={{ opacity: 1, y: 0 }}
-                    className="text-3xl xs:text-4xl sm:text-5xl md:text-6xl font-light tracking-[0.2em] uppercase leading-tight text-center"
-                    style={{ fontFamily: "'Cormorant Garamond', serif" }}
+                    className="text-3xl xs:text-4xl sm:text-5xl md:text-6xl font-light tracking-[0.2em] uppercase leading-tight text-center font-serif"
                   >
                     {selectedCategory ? activeCategory?.name : (
                         <span 
@@ -4715,10 +4668,10 @@ export default function App() {
  
                 <div className="relative overflow-hidden">
                     <StorySection />
+                    <CollectionSection />
                     <MadeWithTimeSection />
                     <KnotSection />
                 </div>
-                <CollectionSection />
                 
                 {/* Visual Interlude */}
                 <div data-background="dark" className="h-[60vh] md:h-[100vh] bg-forest relative overflow-hidden flex items-center justify-center">
