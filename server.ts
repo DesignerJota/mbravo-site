@@ -934,6 +934,70 @@ app.post("/api/admin/orders/create", verifyAdmin, (req, res) => {
 });
 
 
+// Persistent file-backed Testimonials store
+const getTestimonialsFilePath = () => {
+  const railwayPersistentDir = "/app/data";
+  try {
+    if (!fs.existsSync(railwayPersistentDir)) {
+      fs.mkdirSync(railwayPersistentDir, { recursive: true });
+    }
+    return path.join(railwayPersistentDir, "testimonials.json");
+  } catch (e) {
+    return path.join(process.cwd(), "testimonials.json");
+  }
+};
+
+const TESTIMONIALS_FILE = getTestimonialsFilePath();
+
+function loadTestimonials() {
+  if (fs.existsSync(TESTIMONIALS_FILE)) {
+    try {
+      const data = JSON.parse(fs.readFileSync(TESTIMONIALS_FILE, 'utf8'));
+      if (Array.isArray(data)) return data;
+    } catch (err) {
+      console.error("[TESTIMONIALS DATABASE ERROR] Failed to load testimonials.json", err);
+    }
+  }
+  return [];
+}
+
+function saveTestimonials(list: any[]) {
+  try {
+    fs.writeFileSync(TESTIMONIALS_FILE, JSON.stringify(list, null, 2), 'utf8');
+  } catch (err) {
+    console.error("[TESTIMONIALS DATABASE ERROR] Failed to save testimonials.json", err);
+  }
+}
+
+let activeTestimonials = loadTestimonials();
+
+// Testimonials Endpoints
+app.get("/api/testimonials", (req, res) => {
+  res.json(activeTestimonials);
+});
+
+app.post("/api/testimonials", (req, res) => {
+  try {
+    const { name, text, product, rating } = req.body;
+    if (!name || !text) {
+      return res.status(400).json({ error: "Name and comment are required." });
+    }
+    const testimonial = {
+      name,
+      text,
+      product: product || "",
+      rating: rating ? parseInt(rating, 10) : 5,
+      createdAt: new Date().toISOString()
+    };
+    activeTestimonials.unshift(testimonial); // Add newest first
+    saveTestimonials(activeTestimonials);
+    res.json({ success: true, testimonial });
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+
 // Configure Vite middleware in development or serve production build
 async function startServer() {
   const isProduction = process.env.NODE_ENV === "production" || 
