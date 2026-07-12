@@ -4,6 +4,7 @@ import fs from "fs";
 import { createServer as createViteServer } from "vite";
 import { sendTransactionEmails, sendMultibancoEmails, sendShippedEmails, OrderData } from "./src/lib/emailService";
 import Stripe from "stripe";
+import pg from "pg";
 
 const app = express();
 const PORT = process.env.PORT ? parseInt(process.env.PORT, 10) : 3000;
@@ -934,7 +935,39 @@ app.post("/api/admin/orders/create", verifyAdmin, (req, res) => {
 });
 
 
-// Persistent file-backed Testimonials store
+// Supabase PostgreSQL Connection Pool & Initialization
+const connectionString = process.env.DATABASE_URL || "postgresql://postgres:DesignerJota83$$@db.trmsteycllxspudgpxsu.supabase.co:5432/postgres";
+
+const dbPool = new pg.Pool({
+  connectionString,
+  ssl: {
+    rejectUnauthorized: false
+  },
+  connectionTimeoutMillis: 5000 // fail fast if wrong credentials or unreachable
+});
+
+// Create table if not exists on startup
+async function initDatabase() {
+  try {
+    await dbPool.query(`
+      CREATE TABLE IF NOT EXISTS testimonials (
+        id SERIAL PRIMARY KEY,
+        name VARCHAR(255) NOT NULL,
+        text TEXT NOT NULL,
+        product VARCHAR(255) DEFAULT '',
+        rating INTEGER DEFAULT 5,
+        created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+      );
+    `);
+    console.log("[DATABASE SUCCESS] PostgreSQL testimonials table initialized successfully.");
+  } catch (err) {
+    console.error("[DATABASE ERROR] Failed to initialize testimonials table in Supabase. Check credentials.", err);
+  }
+}
+
+initDatabase();
+
+// Persistent file-backed Testimonials store (used as fallback)
 const getTestimonialsFilePath = () => {
   const railwayPersistentDir = "/app/data";
   try {
@@ -971,27 +1004,47 @@ function saveTestimonials(list: any[]) {
 
 let activeTestimonials = loadTestimonials();
 
-// Testimonials Endpoints
-app.get("/api/testimonials", (req, res) => {
-  res.json(activeTestimonials);
+// Testimonials Endpoints with Direct database sync + fallback
+app.get("/api/testimonials", async (req, res) => {
+  try {
+    const result = await dbPool.query(
+      `SELECT name, text, product, rating, created_at AS "createdAt" FROM testimonials ORDER BY id DESC LIMIT 100`
+    );
+    res.json(result.rows);
+  } catch (err) {
+    console.error("[DATABASE READ ERROR] Falling back to file storage.", err);
+    res.json(activeTestimonials);
+  }
 });
 
-app.post("/api/testimonials", (req, res) => {
+app.post("/api/testimonials", async (req, res) => {
   try {
     const { name, text, product, rating } = req.body;
     if (!name || !text) {
       return res.status(400).json({ error: "Name and comment are required." });
     }
-    const testimonial = {
-      name,
-      text,
-      product: product || "",
-      rating: rating ? parseInt(rating, 10) : 5,
-      createdAt: new Date().toISOString()
-    };
-    activeTestimonials.unshift(testimonial); // Add newest first
-    saveTestimonials(activeTestimonials);
-    res.json({ success: true, testimonial });
+    const cleanRating = rating ? parseInt(rating, 10) : 5;
+    const cleanProduct = product || "";
+
+    try {
+      const result = await dbPool.query(
+        `INSERT INTO testimonials (name, text, product, rating) VALUES ($1, $2, $3, $4) RETURNING name, text, product, rating, created_at AS "createdAt"`,
+        [name, text, cleanProduct, cleanRating]
+      );
+      res.json({ success: true, testimonial: result.rows[0] });
+    } catch (dbErr) {
+      console.error("[DATABASE WRITE ERROR] Falling back to file storage.", dbErr);
+      const testimonial = {
+        name,
+        text,
+        product: cleanProduct,
+        rating: cleanRating,
+        createdAt: new Date().toISOString()
+      };
+      activeTestimonials.unshift(testimonial); // Add newest first
+      saveTestimonials(activeTestimonials);
+      res.json({ success: true, testimonial });
+    }
   } catch (err: any) {
     res.status(500).json({ error: err.message });
   }
