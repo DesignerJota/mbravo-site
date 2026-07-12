@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence, useScroll, useTransform, useSpring, useVelocity } from 'motion/react';
-import { Menu, X, Instagram, Facebook, ArrowRight, ChevronLeft, ChevronRight, Share2, Mail, MessageCircle, Sparkles, Layers, Ban, AlertCircle, Feather, Palette, Heart } from 'lucide-react';
+import { Menu, X, Instagram, Facebook, ArrowRight, ArrowLeft, ChevronLeft, ChevronRight, Share2, Mail, MessageCircle, Sparkles, Layers, Ban, AlertCircle, Feather, Palette, Heart } from 'lucide-react';
 import { loadStripe } from '@stripe/stripe-js';
 import AdminDashboardModal from './components/AdminDashboardModal';
 import { 
@@ -123,26 +123,27 @@ const BASE_PRICES: { [key: string]: number | string } = {
     'm★bravo cardigan': 95,
     'geometric poncho': 75,
     'cozy mesh poncho': 75,
-    'signature granny poncho': 75,
-    'mini alma cardigan': 55,
-    'granny square bag': 55,
-    'granny square sling bag': 55,
-    'marea bikini set': 45,
-    'luxury clutch': 35,
-    'coral bikini top': 25,
-    'crystalline top': 25,
-    'african flower pouch': 25,
-    'mini pouches': 15,
-    'mini shell pouch': 18,
-    'airpods case': 12,
-    'booksleeve': 25,
-    'stella cushion': 20,
-    'dragonfly bandana': 22,
-    'classic bandana': 20,
-    'scarf hip bandana': 22,
-    'dragonfly headband': 12,
-    'placemats': 12,
-    'bookmarks': 8,
+    'mesh poncho': 75,
+    'signature granny poncho': 83,
+    'mini alma cardigan': 65,
+    'granny square bag': 75,
+    'granny square sling bag': 75,
+    'marea bikini set': 75,
+    'luxury clutch': 45,
+    'coral bikini top': 35,
+    'crystalline top': 35,
+    'african flower pouch': 40,
+    'mini pouches': 22,
+    'mini shell pouch': 25,
+    'airpods case': 18,
+    'booksleeve': 32,
+    'stella cushion': 38,
+    'dragonfly bandana': 30,
+    'classic bandana': 25,
+    'scarf hip bandana': 35,
+    'dragonfly headband': 18,
+    'placemats': 18,
+    'bookmarks': 12,
     'daisycoasters': 4,
     'coralinecoasters': 4,
     'yellowcoasters': 4,
@@ -154,9 +155,17 @@ const BASE_PRICES: { [key: string]: number | string } = {
 
 const getApprovedPrice = (name: string): number | string => {
     const n = name.toLowerCase().trim().replace(/\s+/g, '');
+    // Try exact match first
     for (const key in BASE_PRICES) {
         const cleanKey = key.replace(/\s+/g, '');
-        if (n === cleanKey || n.includes(cleanKey)) {
+        if (n === cleanKey) {
+            return BASE_PRICES[key];
+        }
+    }
+    // Substring fallback
+    for (const key in BASE_PRICES) {
+        const cleanKey = key.replace(/\s+/g, '');
+        if (n.includes(cleanKey)) {
             return BASE_PRICES[key];
         }
     }
@@ -734,7 +743,7 @@ const LoadingScreen = ({ onComplete }: { onComplete: () => void; key?: string })
   );
 };
 
-const Navbar = () => {
+const Navbar = ({ currentPage, setCurrentPage }: { currentPage: 'home' | 'essence', setCurrentPage: (page: 'home' | 'essence') => void }) => {
     const [isScrolled, setIsScrolled] = useState(false);
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const [isDarkBg, setIsDarkBg] = useState(true);
@@ -746,15 +755,83 @@ const Navbar = () => {
         window.dispatchEvent(new CustomEvent('mbravo-lang-change', { detail: newLang }));
     };
 
+    const NAV_LINKS_LIST = [
+        { name: 'História', href: '#sobre', key: 'nav.story' },
+        { name: 'Catálogo', href: '#collection', key: 'nav.collection' },
+        { name: 'Essência', href: 'essence', key: 'nav.philosophy' },
+        { name: 'Contactos', href: '#contacto', key: 'nav.contacts' },
+    ];
+
+    const handleLinkClick = (e: React.MouseEvent, href: string) => {
+        setMobileMenuOpen(false);
+        if (href === 'essence') {
+            e.preventDefault();
+            setCurrentPage('essence');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        } else {
+            if (currentPage !== 'home') {
+                e.preventDefault();
+                setCurrentPage('home');
+                setTimeout(() => {
+                    const element = document.getElementById(href.replace('#', ''));
+                    if (element) {
+                        element.scrollIntoView({ behavior: 'smooth' });
+                    }
+                }, 100);
+            }
+        }
+    };
+
     useEffect(() => {
+        // Set initial color state based on page type
+        if (currentPage === 'essence') {
+            setIsDarkBg(false); // EssenceHero has data-background="light"
+        } else {
+            setIsDarkBg(true);  // Hero has data-background="dark"
+        }
+
         const handleScroll = () => {
             setIsScrolled(window.scrollY > 50);
+            
+            // Fast background sensing fallback on scroll
+            const sections = document.querySelectorAll('section[data-background], div[data-background]');
+            let topBg = null;
+            sections.forEach((section) => {
+                const rect = section.getBoundingClientRect();
+                if (rect.top <= 100 && rect.bottom >= 0) {
+                    const bg = section.getAttribute('data-background');
+                    if (bg) {
+                        topBg = bg;
+                    }
+                }
+            });
+            if (topBg) {
+                setIsDarkBg(topBg === 'dark');
+            }
+        };
+
+        const runInitialDetection = () => {
+            const sections = document.querySelectorAll('section[data-background], div[data-background]');
+            let detected = false;
+            sections.forEach((section) => {
+                const rect = section.getBoundingClientRect();
+                if (rect.top <= 120 && rect.bottom >= 30) {
+                    const bg = section.getAttribute('data-background');
+                    if (bg) {
+                        setIsDarkBg(bg === 'dark');
+                        detected = true;
+                    }
+                }
+            });
+            if (!detected) {
+                setIsDarkBg(currentPage === 'home');
+            }
         };
 
         const sections = document.querySelectorAll('section, [data-background]');
         const observerOptions = {
             root: null,
-            rootMargin: '0px 0px -95% 0px', // Target the top portion of the screen
+            rootMargin: '0px 0px -90% 0px', // Target the top portion of the screen
             threshold: 0
         };
 
@@ -772,22 +849,32 @@ const Navbar = () => {
         sections.forEach(section => observer.observe(section));
         window.addEventListener('scroll', handleScroll);
         
+        const initialTimer = setTimeout(runInitialDetection, 150);
+        const secondTimer = setTimeout(runInitialDetection, 400); // safety fallback after AnimatePresence finishes
+        
         return () => {
             observer.disconnect();
             window.removeEventListener('scroll', handleScroll);
+            clearTimeout(initialTimer);
+            clearTimeout(secondTimer);
         };
-    }, []);
+    }, [currentPage]);
 
     // Totally transparent with contrast-based dynamic text color as requested
     const navBg = 'bg-transparent';
     const textColor = isDarkBg ? 'text-cream' : 'text-forest';
 
   return (
-    <nav className={`fixed top-0 left-0 w-full z-[100] transition-all duration-1000 ${isScrolled ? 'py-4' : 'py-8'} ${navBg}`}>
+    <nav className={`fixed top-0 left-0 w-full z-[100] transition-all duration-300 ${isScrolled ? 'py-4' : 'py-8'} ${navBg}`}>
       <div className="max-w-7xl mx-auto px-6 flex justify-between items-center">
         {/* Logo with entry animation and Smart Invert */}
         <motion.a 
             href="#" 
+            onClick={(e) => {
+                e.preventDefault();
+                setCurrentPage('home');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }}
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 1, ease: "easeOut" }}
@@ -798,33 +885,31 @@ const Navbar = () => {
 
         {/* Desktop Nav */}
         <div className="hidden md:flex items-center gap-6 lg:gap-10">
-          {NAV_LINKS.map((link, i) => {
-            const displayName = link.name === 'História' 
-              ? t('nav.story') 
-              : link.name === 'Catálogo' 
-                ? t('nav.collection') 
-                : t('nav.contacts');
+          {NAV_LINKS_LIST.map((link, i) => {
+            const displayName = t(link.key);
             const isHighlight = link.name === 'Contactos';
+            const isActive = (link.href === 'essence' && currentPage === 'essence') || (link.href !== 'essence' && currentPage === 'home' && typeof window !== 'undefined' && window.location.hash === link.href);
             return (
               <motion.a
                 key={link.name}
                 href={link.href}
+                onClick={(e) => handleLinkClick(e, link.href)}
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.5 + (i * 0.1), duration: 0.8 }}
-                className={`text-[10px] uppercase tracking-[0.4em] font-bold transition-all duration-1000 relative group ${textColor} ${
+                className={`text-[10px] uppercase tracking-[0.4em] font-bold transition-all duration-200 relative group ${textColor} ${
                   isHighlight 
-                    ? `px-6 py-2 border rounded-full ${
+                    ? `px-6 py-2 border rounded-full transition-all duration-200 ${
                         isDarkBg 
                           ? 'border-cream/30 hover:bg-cream hover:text-forest' 
                           : 'border-forest/30 hover:bg-forest hover:text-cream'
                       }` 
                     : 'hover:opacity-60'
-                }`}
+                } ${isActive ? 'text-[#C5A059]' : ''}`}
               >
                 {displayName}
                 {!isHighlight && (
-                  <div className={`absolute -bottom-1 left-0 w-0 h-[1px] ${isDarkBg ? 'bg-cream' : 'bg-forest'} group-hover:w-full transition-all duration-1000 opacity-40`} />
+                  <div className={`absolute -bottom-1 left-0 w-0 h-[1px] ${isDarkBg ? 'bg-cream' : 'bg-forest'} group-hover:w-full transition-all duration-200 opacity-40`} />
                 )}
               </motion.a>
             );
@@ -834,19 +919,19 @@ const Navbar = () => {
           <motion.div 
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.5 + (NAV_LINKS.length * 0.1), duration: 0.8 }}
-            className={`flex items-center text-[10px] uppercase tracking-[0.2em] font-medium transition-all duration-1000 pl-4 lg:pl-6 border-l ${isDarkBg ? 'border-cream/20' : 'border-forest/20'} ${textColor}`}
+            transition={{ delay: 0.5 + (NAV_LINKS_LIST.length * 0.1), duration: 0.8 }}
+            className={`flex items-center text-[10px] uppercase tracking-[0.2em] font-medium transition-all duration-200 pl-4 lg:pl-6 border-l ${isDarkBg ? 'border-cream/20' : 'border-forest/20'} ${textColor}`}
           >
             <button 
               onClick={() => handleLanguageChange('PT')} 
-              className={`transition-all duration-500 cursor-pointer hover:text-[#C5A059] ${lang === 'PT' ? 'font-bold opacity-100' : 'opacity-40 hover:opacity-80'}`}
+              className={`transition-all duration-200 cursor-pointer hover:text-[#C5A059] ${lang === 'PT' ? 'font-bold opacity-100' : 'opacity-40 hover:opacity-80'}`}
             >
               PT
             </button>
             <span className={`mx-2 lg:mx-3 ${isDarkBg ? 'text-cream/20' : 'text-forest/20'}`}>|</span>
             <button 
               onClick={() => handleLanguageChange('EN')} 
-              className={`transition-all duration-500 cursor-pointer hover:text-[#C5A059] ${lang === 'EN' ? 'font-bold opacity-100' : 'opacity-40 hover:opacity-80'}`}
+              className={`transition-all duration-200 cursor-pointer hover:text-[#C5A059] ${lang === 'EN' ? 'font-bold opacity-100' : 'opacity-40 hover:opacity-80'}`}
             >
               EN
             </button>
@@ -857,7 +942,7 @@ const Navbar = () => {
         <motion.button 
           initial={{ opacity: 0, x: 20 }}
           animate={{ opacity: 1, x: 0 }}
-          className={`md:hidden transition-colors duration-1000 ${textColor}`}
+          className={`md:hidden transition-colors duration-200 ${textColor}`}
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
         >
           {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
@@ -879,20 +964,16 @@ const Navbar = () => {
              >
                 <X size={32} />
              </button>
-             {NAV_LINKS.map((link, i) => {
-              const displayName = link.name === 'História' 
-                ? t('nav.story') 
-                : link.name === 'Catálogo' 
-                  ? t('nav.collection') 
-                  : t('nav.contacts');
+             {NAV_LINKS_LIST.map((link, i) => {
+              const displayName = t(link.key);
               return (
                 <motion.a
                   key={link.name}
                   href={link.href}
+                  onClick={(e) => handleLinkClick(e, link.href)}
                   initial={{ opacity: 0, scale: 0.8 }}
                   animate={{ opacity: 1, scale: 1 }}
                   transition={{ delay: i * 0.05 }}
-                  onClick={() => setMobileMenuOpen(false)}
                   className="text-5xl font-serif text-cream hover:text-brand-green-light hover:italic transition-all duration-500"
                 >
                   {displayName}
@@ -904,7 +985,7 @@ const Navbar = () => {
             <motion.div 
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: NAV_LINKS.length * 0.05 + 0.1 }}
+                transition={{ delay: NAV_LINKS_LIST.length * 0.05 + 0.1 }}
                 className="mt-6 flex items-center text-sm uppercase tracking-[0.3em] font-medium text-cream"
             >
                 <button 
@@ -1046,9 +1127,9 @@ const FioCondutor = () => {
 
                         {/* Transparent fading gradient for the shiny specular highlight */}
                         <linearGradient id="specularGradient" x1="0%" y1="0%" x2="0%" y2="100%">
-                            <stop offset="0%" stopColor="#FFFFFF" stopOpacity="0.95" />
-                            <stop offset="85%" stopColor="#FFFFFF" stopOpacity="0.55" />
-                            <stop offset="100%" stopColor="#FFFFFF" stopOpacity="0" />
+                            <stop offset="0%" stopColor="#FFE8B6" stopOpacity="0.95" />
+                            <stop offset="85%" stopColor="#FFE8B6" stopOpacity="0.55" />
+                            <stop offset="100%" stopColor="#FFE8B6" stopOpacity="0" />
                         </linearGradient>
 
                         {/* Warm, soft focus sunbeam blur/glow for active light particles */}
@@ -1078,21 +1159,43 @@ const FioCondutor = () => {
                         strokeLinecap="round"
                     />
 
-                    {/* 3. Soft warm sunlight catching the thread, breathing gently */}
+                    {/* 3. Soft warm sunlight catching the thread, breathing gently with a slow downward flow */}
                     <motion.path 
                         d={pathD}
                         stroke="url(#warmSunlight)" 
                         strokeWidth={glowStrokeWidth} 
                         strokeLinecap="round"
                         filter="url(#subtleThreadGlow)"
+                        animate={{
+                            strokeDashoffset: [1200, 0]
+                        }}
+                        transition={{
+                            duration: 25,
+                            ease: "linear",
+                            repeat: Infinity
+                        }}
+                        style={{
+                            strokeDasharray: "150 450"
+                        }}
                     />
 
-                    {/* 4. Ultra-thin glowing specular highlight catching natural afternoon glare */}
+                    {/* 4. Ultra-thin glowing specular highlight catching natural afternoon glare, flowing in counter-pulse */}
                     <motion.path 
                         d={pathD}
                         stroke="url(#specularGradient)" 
                         strokeWidth={specularStrokeWidth} 
                         strokeLinecap="round"
+                        animate={{
+                            strokeDashoffset: [0, 1200]
+                        }}
+                        transition={{
+                            duration: 35,
+                            ease: "linear",
+                            repeat: Infinity
+                        }}
+                        style={{
+                            strokeDasharray: "80 240"
+                        }}
                     />
 
                     {/* Star Group centered exactly around its bottom indent (0, 0), and positioned dynamically with spring-driven scroll tracking */}
@@ -1297,7 +1400,7 @@ const Hero = () => {
                                 style={{ 
                                     filter: "drop-shadow(0 24px 54px rgba(18,26,13,0.95)) drop-shadow(0 4px 20px rgba(197,160,89,0.18))"
                                 }}
-                                className="h-[9.5rem] sm:h-[9.5rem] md:h-[11.8rem] lg:h-[14.4rem] xl:h-[17.5rem] mb-[5px] sm:mb-[7px] md:mb-[9.5px] lg:mb-[11.5px] -mt-3 md:-mt-5 origin-center select-none"
+                                className="h-16 xs:h-24 sm:h-[9.5rem] md:h-[11.8rem] lg:h-[14.4rem] xl:h-[17.5rem] mb-[5px] sm:mb-[7px] md:mb-[9.5px] lg:mb-[11.5px] -mt-3 md:-mt-5 origin-center select-none"
                             >
                                 <Logo light className="h-full" />
                             </motion.div>
@@ -1307,25 +1410,29 @@ const Hero = () => {
                                 style={{ 
                                     fontFamily: "'Cormorant Garamond', serif",
                                     textShadow: "0 15px 40px rgba(18, 26, 13, 0.95), 0 4px 12px rgba(18, 26, 13, 0.7)",
-                                    letterSpacing: "-0.015em"
+                                    letterSpacing: "-0.012em"
                                 }}
-                                className="italic text-2xl sm:text-3xl md:text-4xl lg:text-[2.85rem] leading-tight font-normal text-[#FFFDF9] mb-4 md:mb-5 antialiased selection:bg-[#C5A059]/30 flex flex-wrap justify-center gap-x-[0.25em] md:gap-x-[0.28em] max-w-2xl"
+                                className="italic text-[clamp(0.85rem,4.5vw,2.85rem)] leading-tight font-normal mb-4 md:mb-5 antialiased selection:bg-[#C5A059]/30 flex flex-nowrap justify-center gap-x-[0.22em] md:gap-x-[0.25em] max-w-none w-full whitespace-nowrap"
                             >
-                                {titleWords.map((word, i) => (
-                                    <motion.span
-                                        key={i}
-                                        initial={{ opacity: 0, y: 12, filter: "blur(4px)" }}
-                                        animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-                                        transition={{
-                                            delay: 1.5 + i * 0.25,
-                                            duration: 1.5,
-                                            ease: [0.25, 1, 0.5, 1]
-                                        }}
-                                        className="inline-block text-[#FFFDF9]"
-                                    >
-                                        {word}
-                                    </motion.span>
-                                ))}
+                                {titleWords.map((word, i) => {
+                                    // Highlight the core brand word "memória." or "memory." in the signature gold color for stunning luxury contrast
+                                    const isGoldWord = word.toLowerCase().includes('memória') || word.toLowerCase().includes('memory');
+                                    return (
+                                        <motion.span
+                                            key={i}
+                                            initial={{ opacity: 0, y: 12, filter: "blur(4px)" }}
+                                            animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+                                            transition={{
+                                                delay: 1.5 + i * 0.25,
+                                                duration: 1.5,
+                                                ease: [0.25, 1, 0.5, 1]
+                                            }}
+                                            className={`inline-block ${isGoldWord ? 'text-[#C5A059] font-medium' : 'text-[#F5EEDC]'}`}
+                                        >
+                                            {word}
+                                        </motion.span>
+                                    );
+                                })}
                             </h1>
          
                             {/* Estado 3: Subheadline: "Criado à mão, com tempo, amor e memórias." - Soft, quiet luxury whispering text layout starting at t = 4.0s */}
@@ -1394,7 +1501,7 @@ const StorySection = () => {
     }, []);
 
     return (
-        <section ref={containerRef} id="sobre" data-background="light" className="pt-24 pb-12 px-6 landscape:pt-24 landscape:pb-12 md:pt-24 md:portrait:px-12 lg:pt-32 lg:pb-16 xl:pt-36 xl:pb-20 relative z-10 overflow-hidden select-none" style={{ backgroundColor: '#FCFBF9' }}>
+        <section ref={containerRef} id="sobre" data-background="light" className="py-12 xs:py-16 sm:py-20 md:py-24 lg:py-32 xl:py-36 relative z-10 overflow-hidden select-none px-4 sm:px-6 md:portrait:px-12" style={{ backgroundColor: '#F6F1E5' }}>
             {/* Elements of Fundo Subtis: Handcrafted loose cotton fibers / wavy spinning threads running deep inside the cream canvas, completely backgrounded */}
             <div className="absolute inset-x-0 bottom-0 top-[150px] pointer-events-none z-0 overflow-hidden">
                 {/* Subtle organic textile noise */}
@@ -1489,25 +1596,25 @@ const StorySection = () => {
                         <span className="text-[10px] uppercase tracking-[0.45em] font-bold text-forest/35 block font-sans">
                             {t('story.badge')}
                         </span>
-                        <h2 className="text-3xl xs:text-4xl sm:text-5xl md:text-5xl lg:text-forest lg:text-7xl font-serif text-forest tracking-tight leading-tight md:leading-[1.05] font-light">
-                            {t('story.title.part1')} <br />
+                        <h2 className="text-[clamp(1.25rem,4.5vw,3rem)] font-serif text-forest tracking-tight leading-tight font-light">
+                            {t('story.title.part1')}{" "}
                             <span className="italic font-normal text-[#C5A059]">{t('story.title.part2')}</span>
                         </h2>
                     </div>
                     
                     <div className="space-y-8">
-                        <p className="text-forest font-serif italic text-xl md:text-2xl leading-relaxed font-light text-forest/90">
+                        <p className="text-forest font-serif italic text-[clamp(1.125rem,2.5vw,1.5rem)] leading-relaxed font-light text-forest/90">
                             {t('story.subtitle')} <br />
-                            <span className="text-base sm:text-lg font-sans not-italic text-forest/70 block mt-3 font-light leading-relaxed">
+                            <span className="text-[clamp(0.75rem,1.8vw,1.125rem)] font-sans not-italic text-forest/70 block mt-3 font-light leading-relaxed">
                                 {t('story.subtitle2')}
                             </span>
                         </p>
                         
-                        <p className="text-forest font-serif italic text-xl md:text-2xl leading-relaxed font-light text-forest/95">
+                        <p className="text-forest font-serif italic text-[clamp(1.125rem,2.5vw,1.5rem)] leading-relaxed font-light text-forest/95">
                             {t('story.p1')}
                         </p>
                         
-                        <p className="text-forest/70 text-[15px] md:text-lg leading-relaxed font-sans font-light max-w-2xl">
+                        <p className="text-forest/70 text-[clamp(0.75rem,1.8vw,1.125rem)] leading-relaxed font-sans font-light max-w-2xl">
                             {t('story.p2')}
                         </p>
                     </div>
@@ -1527,7 +1634,7 @@ const StorySection = () => {
                                 className="flex items-center gap-4 group"
                             >
                                 <span className="text-[#C5A059] text-xs font-serif select-none transition-transform duration-500 group-hover:scale-125">★</span>
-                                <span className="text-forest lg:text-forest font-serif text-[16px] md:text-xl font-light tracking-wide">
+                                <span className="text-forest lg:text-forest font-serif text-sm xs:text-base md:text-xl font-light tracking-wide">
                                     {mantra}
                                 </span>
                             </motion.div>
@@ -1589,144 +1696,144 @@ const StorySection = () => {
 const MadeWithTimeSection = () => {
     const { t } = useLanguage();
     return (
-        <section id="manifesto" data-background="light" className="pt-16 pb-16 px-4 landscape:py-12 md:portrait:py-20 lg:pt-20 lg:pb-24 xl:pt-24 xl:pb-28 bg-[#FCFBF9] relative overflow-hidden select-none border-t border-forest/5">
-            <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <section id="manifesto" data-background="light" className="py-[clamp(3rem,8vw,5.5rem)] bg-[#FCFBF9] relative overflow-hidden select-none border-t border-forest/5 px-6 sm:px-10 lg:px-16">
+            <div className="w-full max-w-7xl mx-auto">
                 {/* Header: Large Asymmetrical Editorial Typography */}
-                <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-16 items-baseline mb-24 md:mb-32 border-b border-forest/10 pb-16">
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-16 items-baseline mb-12 sm:mb-16 md:mb-16 border-b border-forest/10 pb-8 md:pb-12">
                     <div className="lg:col-span-7">
                         <span className="text-[10px] uppercase tracking-[0.45em] font-semibold text-forest/35 block mb-4 font-sans">
                             {t('manifesto.choice')}
                         </span>
-                        <h2 className="text-3xl sm:text-5xl md:text-5xl lg:text-6xl font-serif text-forest tracking-tight leading-tight lg:leading-[1.1] font-light">
+                        <h2 className="text-[clamp(1.35rem,4.5vw,2.5rem)] font-serif text-forest tracking-tight leading-tight lg:leading-[1.15] font-light">
                             {t('manifesto.title')} <br />
                             <span className="italic font-normal text-[#C5A059]">{t('manifesto.subtitle')}</span>
                         </h2>
                     </div>
-                    <div className="lg:col-span-5 lg:pl-12">
-                        <p className="text-forest/70 text-lg md:text-xl font-light leading-relaxed font-serif italic border-l border-[#C5A059]/40 pl-6 py-2">
+                    <div className="lg:col-span-5 lg:pl-8">
+                        <p className="text-forest/70 text-[clamp(0.9rem,1.8vw,1.1rem)] font-light leading-relaxed font-serif italic border-l border-[#C5A059]/40 pl-6 py-2">
                             "{t('manifesto.quote')}"
                         </p>
                     </div>
                 </div>
 
                 {/* Main Content Grid: Balanced 12-column layout */}
-                <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-12 items-start">
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-start">
                     
                     {/* Left Column: The 4 editorial pillars (spans 7 columns) */}
                     <div className="lg:col-span-7">
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 lg:gap-x-12 lg:gap-y-16">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 md:gap-6">
                             
                             {/* Pillar 1 - O Ritmo */}
                             <motion.div 
-                                initial={{ opacity: 0, y: 30 }}
+                                initial={{ opacity: 0, y: 20 }}
                                 whileInView={{ opacity: 1, y: 0 }}
                                 viewport={{ once: true }}
-                                transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1] }}
-                                className="space-y-4 text-left group"
+                                transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
+                                className="group flex flex-col justify-between bg-[#FAF8F5]/80 hover:bg-white p-5 sm:p-6 rounded-2xl border border-forest/5 hover:border-[#C5A059]/30 transition-all duration-500 shadow-sm hover:shadow-md h-full space-y-4"
                             >
-                                <div className="flex items-center justify-between border-b border-forest/10 pb-3">
-                                    <div className="flex items-center gap-2">
-                                        <Feather size={14} className="text-[#C5A059] opacity-80" />
-                                        <span className="font-mono text-[9px] uppercase tracking-[0.25em] text-forest/40">{t('manifesto.pillar1.num')}</span>
+                                <div className="space-y-3">
+                                    <div className="flex items-center justify-between border-b border-forest/10 pb-2.5">
+                                        <div className="flex items-center gap-2">
+                                            <Feather size={14} className="text-[#C5A059] opacity-80" />
+                                            <span className="font-mono text-[9px] uppercase tracking-[0.25em] text-forest/40">{t('manifesto.pillar1.num')}</span>
+                                        </div>
+                                        <span className="font-serif italic text-sm text-[#C5A059]/50 group-hover:text-[#C5A059] transition-colors duration-500 font-light select-none">I</span>
                                     </div>
-                                    <span className="font-serif italic text-lg text-[#C5A059]/50 group-hover:text-[#C5A059] transition-colors duration-500 font-light select-none">I</span>
+                                    <h3 className="text-[clamp(1rem,2vw,1.15rem)] font-serif text-forest tracking-normal group-hover:text-[#C5A059] transition-colors duration-300 font-light leading-snug">
+                                        {t('manifesto.pillar1.title')}
+                                    </h3>
                                 </div>
-                                <h3 className="text-xl font-serif text-forest tracking-wide group-hover:text-[#C5A059] transition-colors duration-300 font-light leading-snug">
-                                    {t('manifesto.pillar1.title')}
-                                </h3>
-                                <div className="space-y-4 font-sans text-forest/65 text-sm font-light leading-relaxed">
-                                    <p>{t('manifesto.pillar1.p1')}</p>
-                                    <p>{t('manifesto.pillar1.p2')}</p>
-                                    <p>{t('manifesto.pillar1.p3')}</p>
-                                </div>
+                                <p className="text-forest/65 font-sans font-light text-[clamp(0.75rem,1.4vw,0.8125rem)] leading-relaxed text-justify">
+                                    {t('manifesto.pillar1.p1')} {t('manifesto.pillar1.p2')} {t('manifesto.pillar1.p3')}
+                                </p>
                             </motion.div>
 
                             {/* Pillar 2 - A Presença */}
                             <motion.div 
-                                initial={{ opacity: 0, y: 30 }}
+                                initial={{ opacity: 0, y: 20 }}
                                 whileInView={{ opacity: 1, y: 0 }}
                                 viewport={{ once: true }}
-                                transition={{ duration: 1.2, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
-                                className="space-y-4 text-left group lg:translate-y-12"
+                                transition={{ duration: 1, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
+                                className="group flex flex-col justify-between bg-[#FAF8F5]/80 hover:bg-white p-5 sm:p-6 rounded-2xl border border-forest/5 hover:border-[#C5A059]/30 transition-all duration-500 shadow-sm hover:shadow-md h-full space-y-4"
                             >
-                                <div className="flex items-center justify-between border-b border-forest/10 pb-3">
-                                    <div className="flex items-center gap-2">
-                                        <Sparkles size={14} className="text-[#C5A059] opacity-80" />
-                                        <span className="font-mono text-[9px] uppercase tracking-[0.25em] text-forest/40">{t('manifesto.pillar2.num')}</span>
+                                <div className="space-y-3">
+                                    <div className="flex items-center justify-between border-b border-forest/10 pb-2.5">
+                                        <div className="flex items-center gap-2">
+                                            <Sparkles size={14} className="text-[#C5A059] opacity-80" />
+                                            <span className="font-mono text-[9px] uppercase tracking-[0.25em] text-forest/40">{t('manifesto.pillar2.num')}</span>
+                                        </div>
+                                        <span className="font-serif italic text-sm text-[#C5A059]/50 group-hover:text-[#C5A059] transition-colors duration-500 font-light select-none">II</span>
                                     </div>
-                                    <span className="font-serif italic text-lg text-[#C5A059]/50 group-hover:text-[#C5A059] transition-colors duration-500 font-light select-none">II</span>
+                                    <h3 className="text-[clamp(1rem,2vw,1.15rem)] font-serif text-forest tracking-normal group-hover:text-[#C5A059] transition-colors duration-300 font-light leading-snug">
+                                        {t('manifesto.pillar2.title')}
+                                    </h3>
                                 </div>
-                                <h3 className="text-xl font-serif text-forest tracking-wide group-hover:text-[#C5A059] transition-colors duration-300 font-light leading-snug">
-                                    {t('manifesto.pillar2.title')}
-                                </h3>
-                                <div className="space-y-4 font-sans text-forest/65 text-sm font-light leading-relaxed">
-                                    <p>{t('manifesto.pillar2.p1')}</p>
-                                    <p>{t('manifesto.pillar2.p2')}</p>
-                                    <p>{t('manifesto.pillar2.p3')}</p>
-                                </div>
+                                <p className="text-forest/65 font-sans font-light text-[clamp(0.75rem,1.4vw,0.8125rem)] leading-relaxed text-justify">
+                                    {t('manifesto.pillar2.p1')} {t('manifesto.pillar2.p2')} {t('manifesto.pillar2.p3')}
+                                </p>
                             </motion.div>
 
                             {/* Pillar 3 - A Matéria */}
                             <motion.div 
-                                initial={{ opacity: 0, y: 30 }}
+                                initial={{ opacity: 0, y: 20 }}
                                 whileInView={{ opacity: 1, y: 0 }}
                                 viewport={{ once: true }}
-                                transition={{ duration: 1.2, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
-                                className="space-y-4 text-left group lg:-mt-12"
+                                transition={{ duration: 1, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
+                                className="group flex flex-col justify-between bg-[#FAF8F5]/80 hover:bg-white p-5 sm:p-6 rounded-2xl border border-forest/5 hover:border-[#C5A059]/30 transition-all duration-500 shadow-sm hover:shadow-md h-full space-y-4"
                             >
-                                <div className="flex items-center justify-between border-b border-forest/10 pb-3">
-                                    <div className="flex items-center gap-2">
-                                        <Palette size={14} className="text-[#C5A059] opacity-80" />
-                                        <span className="font-mono text-[9px] uppercase tracking-[0.25em] text-forest/40">{t('manifesto.pillar3.num')}</span>
+                                <div className="space-y-3">
+                                    <div className="flex items-center justify-between border-b border-forest/10 pb-2.5">
+                                        <div className="flex items-center gap-2">
+                                            <Palette size={14} className="text-[#C5A059] opacity-80" />
+                                            <span className="font-mono text-[9px] uppercase tracking-[0.25em] text-forest/40">{t('manifesto.pillar3.num')}</span>
+                                        </div>
+                                        <span className="font-serif italic text-sm text-[#C5A059]/50 group-hover:text-[#C5A059] transition-colors duration-500 font-light select-none">III</span>
                                     </div>
-                                    <span className="font-serif italic text-lg text-[#C5A059]/50 group-hover:text-[#C5A059] transition-colors duration-500 font-light select-none">III</span>
+                                    <h3 className="text-[clamp(1rem,2vw,1.15rem)] font-serif text-forest tracking-normal group-hover:text-[#C5A059] transition-colors duration-300 font-light leading-snug">
+                                        {t('manifesto.pillar3.title')}
+                                    </h3>
                                 </div>
-                                <h3 className="text-xl font-serif text-forest tracking-wide group-hover:text-[#C5A059] transition-colors duration-300 font-light leading-snug">
-                                    {t('manifesto.pillar3.title')}
-                                </h3>
-                                <div className="space-y-4 font-sans text-forest/65 text-sm font-light leading-relaxed">
-                                    <p>{t('manifesto.pillar3.p1')}</p>
-                                    <p>{t('manifesto.pillar3.p2')}</p>
-                                    <p>{t('manifesto.pillar3.p3')}</p>
-                                </div>
+                                <p className="text-forest/65 font-sans font-light text-[clamp(0.75rem,1.4vw,0.8125rem)] leading-relaxed text-justify">
+                                    {t('manifesto.pillar3.p1')} {t('manifesto.pillar3.p2')} {t('manifesto.pillar3.p3')}
+                                </p>
                             </motion.div>
 
                             {/* Pillar 4 - O Afeto */}
                             <motion.div 
-                                initial={{ opacity: 0, y: 30 }}
+                                initial={{ opacity: 0, y: 20 }}
                                 whileInView={{ opacity: 1, y: 0 }}
                                 viewport={{ once: true }}
-                                transition={{ duration: 1.2, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
-                                className="space-y-4 text-left group lg:translate-y-12"
+                                transition={{ duration: 1, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
+                                className="group flex flex-col justify-between bg-[#FAF8F5]/80 hover:bg-white p-5 sm:p-6 rounded-2xl border border-forest/5 hover:border-[#C5A059]/30 transition-all duration-500 shadow-sm hover:shadow-md h-full space-y-4"
                             >
-                                <div className="flex items-center justify-between border-b border-forest/10 pb-3">
-                                    <div className="flex items-center gap-2">
-                                        <Heart size={14} className="text-[#C5A059] opacity-80" />
-                                        <span className="font-mono text-[9px] uppercase tracking-[0.25em] text-forest/40">{t('manifesto.pillar4.num')}</span>
+                                <div className="space-y-3">
+                                    <div className="flex items-center justify-between border-b border-forest/10 pb-2.5">
+                                        <div className="flex items-center gap-2">
+                                            <Heart size={14} className="text-[#C5A059] opacity-80" />
+                                            <span className="font-mono text-[9px] uppercase tracking-[0.25em] text-forest/40">{t('manifesto.pillar4.num')}</span>
+                                        </div>
+                                        <span className="font-serif italic text-sm text-[#C5A059]/50 group-hover:text-[#C5A059] transition-colors duration-500 font-light select-none">IV</span>
                                     </div>
-                                    <span className="font-serif italic text-lg text-[#C5A059]/50 group-hover:text-[#C5A059] transition-colors duration-500 font-light select-none">IV</span>
+                                    <h3 className="text-[clamp(1rem,2vw,1.15rem)] font-serif text-forest tracking-normal group-hover:text-[#C5A059] transition-colors duration-300 font-light leading-snug">
+                                        {t('manifesto.pillar4.title')}
+                                    </h3>
                                 </div>
-                                <h3 className="text-xl font-serif text-forest tracking-wide group-hover:text-[#C5A059] transition-colors duration-300 font-light leading-snug">
-                                    {t('manifesto.pillar4.title')}
-                                </h3>
-                                <div className="space-y-4 font-sans text-forest/65 text-sm font-light leading-relaxed">
-                                    <p>{t('manifesto.pillar4.p1')}</p>
-                                    <p>{t('manifesto.pillar4.p2')}</p>
-                                    <p>{t('manifesto.pillar4.p3')}</p>
-                                </div>
+                                <p className="text-forest/65 font-sans font-light text-[clamp(0.75rem,1.4vw,0.8125rem)] leading-relaxed text-justify">
+                                    {t('manifesto.pillar4.p1')} {t('manifesto.pillar4.p2')} {t('manifesto.pillar4.p3')}
+                                </p>
                             </motion.div>
 
                         </div>
                     </div>
 
                     {/* Right Column: The Refined Image (spans 5 columns) - Elegantly proportioned to balance the text column */}
-                    <div className="lg:col-span-5 space-y-8 lg:sticky lg:top-36 md:portrait:max-w-md md:portrait:mx-auto md:portrait:w-full">
+                    <div className="lg:col-span-5 space-y-6 lg:sticky lg:top-36 md:portrait:max-w-md md:portrait:mx-auto md:portrait:w-full">
                         <motion.div 
                             initial={{ opacity: 0, scale: 0.98, y: 20 }}
                             whileInView={{ opacity: 1, scale: 1, y: 0 }}
                             viewport={{ once: true, margin: "-100px" }}
                             transition={{ duration: 1.6, ease: [0.16, 1, 0.3, 1] }}
-                            className="w-full aspect-[4/5] max-h-[50vh] sm:max-h-[60vh] md:portrait:max-h-[450px] lg:max-h-none relative rounded-[2rem] overflow-hidden shadow-[0_24px_50px_rgba(31,42,24,0.06)] group border border-forest/5"
+                            className="w-full aspect-[3/4] relative rounded-2xl overflow-hidden shadow-[0_20px_40px_rgba(31,42,24,0.05)] group border border-forest/5"
                         >
                             <img 
                                 src="https://i.ibb.co/j9LHyxq6/Firefly-Gemini-Flash-Imagem-com-ambiente-cosy-tema-handmade-crochet-usar-o-logo-em-label-de-cartao.png" 
@@ -1746,8 +1853,8 @@ const MadeWithTimeSection = () => {
                             <div className="absolute inset-0 bg-gradient-to-t from-forest/30 via-transparent to-transparent opacity-80" />
 
                             {/* Intimate overlay tag */}
-                            <div className="absolute bottom-6 left-6 right-6 flex justify-between items-end">
-                                <p className="text-cream font-serif italic text-base font-light leading-snug drop-shadow-sm max-w-[200px]">
+                            <div className="absolute bottom-5 left-5 right-5 flex justify-between items-end">
+                                <p className="text-cream font-serif italic text-sm font-light leading-snug drop-shadow-sm max-w-[180px]">
                                     "{t('manifesto.imageQuote')}"
                                 </p>
                                 <span className="font-mono text-[8px] tracking-[0.3em] text-cream/70 uppercase">M★B</span>
@@ -1755,7 +1862,7 @@ const MadeWithTimeSection = () => {
                         </motion.div>
                         
                         {/* Under-image captioning */}
-                        <div className="flex justify-between items-center px-4 py-2 border-t border-forest/10 font-sans text-forest/40 select-none">
+                        <div className="flex justify-between items-center px-4 py-1.5 border-t border-forest/10 font-sans text-forest/40 select-none">
                             <span className="text-[9px] uppercase tracking-[0.2em] font-mono">ESTÚDIO DE CRIAÇÃO / REGISTO N° 0124</span>
                             <span className="text-[9px] uppercase tracking-[0.2em] font-mono">PORTUGAL</span>
                         </div>
@@ -1791,7 +1898,7 @@ const KnotSection = () => {
             ref={containerRef} 
             id="feeling" 
             data-background="dark" 
-            className="pt-24 pb-20 px-4 landscape:py-16 md:portrait:py-24 lg:py-32 xl:py-36 relative overflow-hidden" 
+            className="py-[clamp(3rem,8vw,5.5rem)] relative overflow-hidden px-6 sm:px-10 lg:px-16" 
             style={{ 
                 backgroundColor: '#243119'
             }}
@@ -1803,91 +1910,103 @@ const KnotSection = () => {
                 Handmade
             </motion.div>
 
-            <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-                <div className="max-w-3xl mb-16 md:mb-20 lg:mb-24">
-                    <motion.span 
-                        initial={{ opacity: 0, y: 10 }}
-                        whileInView={{ opacity: 1, y: 0 }}
-                        viewport={{ once: true }}
-                        className="text-[10px] uppercase tracking-[0.4em] font-bold text-cream/30 mb-4 block"
-                    >
-                        {t('feeling.badge')}
-                    </motion.span>
-                    <motion.h2 
-                        initial={{ opacity: 0, y: 20 }}
-                        whileInView={{ opacity: 1, y: 0 }}
-                        viewport={{ once: true }}
-                        transition={{ duration: 1 }}
-                        className="text-3xl sm:text-5xl md:text-6xl lg:text-8xl font-serif text-cream leading-tight mb-8 md:mb-10"
-                    >
-                        {t('feeling.title.part1')} <br />
-                        <span className="italic font-normal text-brand-green-light">{t('feeling.title.part2')}</span>
-                    </motion.h2>
-                    <motion.p 
-                        initial={{ opacity: 0, y: 20 }}
-                        whileInView={{ opacity: 1, y: 0 }}
-                        viewport={{ once: true }}
-                        transition={{ duration: 1, delay: 0.2 }}
-                        className="text-cream/80 text-base sm:text-lg md:text-xl lg:text-2xl font-light leading-relaxed animate-fadeIn"
-                    >
-                        {t('feeling.p1')}
-                        <br /><br />
-                        {t('feeling.p2')}
-                        <br /><br />
-                        {t('feeling.p3')}
-                    </motion.p>
+            <div className="w-full max-w-7xl mx-auto relative z-10">
+                {/* Editorial Split Header */}
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-16 items-start mb-12 md:mb-16">
+                    <div className="lg:col-span-6 space-y-4 text-center lg:text-left">
+                        <motion.span 
+                            initial={{ opacity: 0, y: 10 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            viewport={{ once: true }}
+                            className="text-[10px] uppercase tracking-[0.4em] font-bold text-[#C5A059] mb-2 block"
+                        >
+                            {t('feeling.badge')}
+                        </motion.span>
+                        <motion.h2 
+                            initial={{ opacity: 0, y: 20 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            viewport={{ once: true }}
+                            transition={{ duration: 1 }}
+                            className="text-[clamp(1.5rem,4.5vw,2.5rem)] font-serif text-cream leading-tight tracking-tight font-light"
+                        >
+                            {t('feeling.title.part1')} <br />
+                            <span className="italic font-normal text-brand-green-light">{t('feeling.title.part2')}</span>
+                        </motion.h2>
+                    </div>
+                    
+                    <div className="lg:col-span-6 text-center lg:text-left">
+                        <motion.div 
+                            initial={{ opacity: 0, y: 20 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            viewport={{ once: true }}
+                            transition={{ duration: 1, delay: 0.2 }}
+                            className="space-y-4 text-cream/75 font-sans font-light text-[clamp(0.8125rem,1.5vw,0.95rem)] leading-relaxed max-w-xl mx-auto lg:mx-0"
+                        >
+                            <p>{t('feeling.p1')}</p>
+                            <p>{t('feeling.p2')}</p>
+                            <p>{t('feeling.p3')}</p>
+                        </motion.div>
+                    </div>
                 </div>
 
-                {/* Minimalist Details Gallery */}
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-6 lg:gap-12">
-                    {/* Main Focus Detail */}
+                {/* Compact Horizontal Gallery (3 columns) */}
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 lg:gap-8 mt-12 md:mt-16">
+                    {/* Card 1 */}
                     <motion.div 
-                        initial={{ opacity: 0, scale: 0.98 }}
-                        whileInView={{ opacity: 1, scale: 1 }}
+                        initial={{ opacity: 0, y: 30 }}
+                        whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true }}
-                        transition={{ duration: 1.5 }}
-                        className="col-span-1 md:col-span-1 lg:col-span-7 w-full aspect-[4/5] max-h-[50vh] sm:max-h-[60vh] lg:max-h-none overflow-hidden rounded-3xl md:rounded-[3rem] relative group shadow-2xl max-w-2xl mx-auto md:max-w-none"
+                        transition={{ duration: 1.2 }}
+                        className="aspect-[3/4] overflow-hidden rounded-2xl md:rounded-[2rem] relative group shadow-2xl"
                     >
                         <img 
                             src="https://i.ibb.co/F4Z4Fp4Z/LOGOTIPOo.jpg" 
                             alt="Textura de malha" 
-                            className="w-full h-full object-cover brightness-95 hover:scale-105 transition-all duration-[1.5s] ease-out"
+                            className="w-full h-full object-cover brightness-95 group-hover:scale-105 transition-all duration-[1.5s] ease-out"
                         />
-                        <div className="absolute inset-x-0 bottom-0 p-8 md:p-12 bg-gradient-to-t from-forest/90 via-forest/40 to-transparent">
-                            <span className="text-[10px] uppercase tracking-[0.4em] text-cream/50 mb-1 md:mb-2 block">{t('feeling.label')}</span>
-                            <p className="text-cream text-lg md:text-2xl font-serif italic">{t('feeling.caption')}</p>
+                        <div className="absolute inset-x-0 bottom-0 p-6 bg-gradient-to-t from-[#121a0d]/90 via-[#121a0d]/40 to-transparent">
+                            <span className="text-[9px] uppercase tracking-[0.4em] text-cream/50 mb-1 block">{t('feeling.label')}</span>
+                            <p className="text-cream text-sm md:text-base font-serif italic">{t('feeling.caption')}</p>
                         </div>
                     </motion.div>
 
-                    {/* Secondary Details */}
-                    <div className="col-span-1 md:col-span-1 lg:col-span-5 flex flex-col gap-6 md:gap-14 lg:gap-16 justify-center max-w-2xl mx-auto md:max-w-none w-full">
-                        <motion.div 
-                            initial={{ opacity: 0, x: 30 }}
-                            whileInView={{ opacity: 1, x: 0 }}
-                            viewport={{ once: true }}
-                            transition={{ duration: 1.2, delay: 0.3 }}
-                            className="w-full aspect-[4/5] max-h-[50vh] sm:max-h-[60vh] lg:max-h-none overflow-hidden rounded-3xl md:rounded-[3rem] transition-all duration-1000 shadow-xl relative group"
-                        >
-                            <img 
-                                src="https://i.ibb.co/d0Rn6jC7/MOOD-01.png" 
-                                alt="Mãos da artesã" 
-                                className="w-full h-full object-cover brightness-95 hover:scale-105 transition-all duration-[1.5s] ease-out"
-                            />
-                        </motion.div>
-                        <motion.div 
-                            initial={{ opacity: 0, x: 30 }}
-                            whileInView={{ opacity: 1, x: 0 }}
-                            viewport={{ once: true }}
-                            transition={{ duration: 1.2, delay: 0.5 }}
-                            className="w-full aspect-[4/5] max-h-[50vh] sm:max-h-[60vh] lg:max-h-none overflow-hidden rounded-3xl md:rounded-[3rem] transition-all duration-1000 shadow-xl relative group"
-                        >
-                            <img 
-                                src="https://i.ibb.co/PKJgWZM/emotional-thank-you-card-1.png" 
-                                alt="Detalhe de material" 
-                                className="w-full h-full object-cover brightness-95 hover:scale-105 transition-all duration-[1.5s] ease-out"
-                            />
-                        </motion.div>
-                    </div>
+                    {/* Card 2 */}
+                    <motion.div 
+                        initial={{ opacity: 0, y: 30 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true }}
+                        transition={{ duration: 1.2, delay: 0.2 }}
+                        className="aspect-[3/4] overflow-hidden rounded-2xl md:rounded-[2rem] relative group shadow-2xl"
+                    >
+                        <img 
+                            src="https://i.ibb.co/d0Rn6jC7/MOOD-01.png" 
+                            alt="Mãos da artesã" 
+                            className="w-full h-full object-cover brightness-95 group-hover:scale-105 transition-all duration-[1.5s] ease-out"
+                        />
+                        <div className="absolute inset-x-0 bottom-0 p-6 bg-gradient-to-t from-[#121a0d]/90 via-[#121a0d]/40 to-transparent">
+                            <span className="text-[9px] uppercase tracking-[0.4em] text-cream/50 mb-1 block">Process</span>
+                            <p className="text-cream text-sm md:text-base font-serif italic">Mãos que tecem histórias.</p>
+                        </div>
+                    </motion.div>
+
+                    {/* Card 3 */}
+                    <motion.div 
+                        initial={{ opacity: 0, y: 30 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true }}
+                        transition={{ duration: 1.2, delay: 0.4 }}
+                        className="aspect-[3/4] overflow-hidden rounded-2xl md:rounded-[2rem] relative group shadow-2xl"
+                    >
+                        <img 
+                            src="https://i.ibb.co/PKJgWZM/emotional-thank-you-card-1.png" 
+                            alt="Detalhe de material" 
+                            className="w-full h-full object-cover brightness-95 group-hover:scale-105 transition-all duration-[1.5s] ease-out"
+                        />
+                        <div className="absolute inset-x-0 bottom-0 p-6 bg-gradient-to-t from-[#121a0d]/90 via-[#121a0d]/40 to-transparent">
+                            <span className="text-[9px] uppercase tracking-[0.4em] text-cream/50 mb-1 block">Detail</span>
+                            <p className="text-cream text-sm md:text-base font-serif italic">A delicadeza do acabamento.</p>
+                        </div>
+                    </motion.div>
                 </div>
             </div>
         </section>
@@ -2362,18 +2481,18 @@ const ProductCard: React.FC<ProductCardProps> = ({ product: rawProduct, i, isFoc
                     </div>
 
                     {/* Content Section */}
-                    <div className="p-6 flex flex-col justify-between flex-grow bg-white">
+                    <div className="p-4 xs:p-5 sm:p-6 flex flex-col justify-between flex-grow bg-white">
                         <div>
-                            <h3 className="text-lg font-serif font-normal tracking-wide text-forest mb-1">{product.name}</h3>
-                            <p className="text-forest/40 text-[9px] uppercase tracking-[0.3em] font-semibold mb-4 font-sans">HANDMADE EXCLUSIVE</p>
+                            <h3 className="text-sm sm:text-base lg:text-lg font-serif font-normal tracking-wide text-forest mb-1 line-clamp-1">{product.name}</h3>
+                            <p className="text-forest/40 text-[8px] sm:text-[9px] uppercase tracking-[0.3em] font-semibold mb-3 sm:mb-4 font-sans">HANDMADE EXCLUSIVE</p>
                         </div>
                         <div className="flex justify-between items-end">
-                            <span className="text-sm font-sans font-semibold tracking-wider text-forest/70">{product.price}</span>
+                            <span className="text-xs sm:text-sm font-sans font-semibold tracking-wider text-forest/70">{product.price}</span>
                             <button 
                                 onClick={handleToggle}
-                                className="p-2 rounded-full bg-forest text-cream hover:bg-forest/90 transition-all shadow-lg shadow-forest/10 hover:scale-105 active:scale-95 duration-200"
+                                className="p-1.5 sm:p-2 rounded-full bg-forest text-cream hover:bg-forest/90 transition-all shadow-lg shadow-forest/10 hover:scale-105 active:scale-95 duration-200"
                             >
-                                <ArrowRight size={15} />
+                                <ArrowRight size={14} />
                             </button>
                         </div>
                     </div>
@@ -2721,7 +2840,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product: rawProduct, i, isFoc
                                         setMultibancoRef(null);
                                         handleToggle(); // Close modal using existing trigger
                                     }}
-                                    className="w-full rounded-full py-3 text-center font-bold bg-[#C5A059] text-[#343E2C] hover:bg-[#d5b069] text-[10px] uppercase tracking-widest cursor-pointer shadow-md transition-all font-sans"
+                                    className="w-full rounded-full py-2 px-4 sm:py-2.5 sm:px-6 md:py-3 md:px-8 text-center font-bold bg-[#C5A059] text-[#343E2C] hover:bg-[#d5b069] text-[9px] sm:text-[10px] uppercase tracking-widest cursor-pointer shadow-md transition-all font-sans"
                                 >
                                     {t('payment.btn_home')}
                                 </button>
@@ -3271,7 +3390,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product: rawProduct, i, isFoc
                                         }}
                                         whileHover={{ scale: 1.01 }}
                                         whileTap={{ scale: 0.99 }}
-                                        className="w-full rounded-full py-4 text-center font-bold bg-[#343E2C] text-[#C5A059] hover:bg-[#2c3525] active:scale-95 text-[11px] uppercase tracking-widest cursor-pointer shadow-lg disabled:opacity-40 disabled:cursor-not-allowed border border-[#C5A059]/10 flex items-center justify-center gap-2 transition-all duration-300 font-sans"
+                                        className="w-full rounded-full py-2.5 px-4 sm:py-3.5 sm:px-6 md:py-4 md:px-8 text-center font-bold bg-[#343E2C] text-[#C5A059] hover:bg-[#2c3525] active:scale-95 text-[9px] sm:text-[10px] md:text-[11px] uppercase tracking-widest cursor-pointer shadow-lg disabled:opacity-40 disabled:cursor-not-allowed border border-[#C5A059]/10 flex items-center justify-center gap-2 transition-all duration-300 font-sans"
                                     >
                                         {isPaying ? (
                                             <>
@@ -3678,7 +3797,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product: rawProduct, i, isFoc
                                     }}
                                     whileHover={{ scale: 1.01 }}
                                     whileTap={{ scale: 0.99 }}
-                                    className="w-full rounded-full py-3.5 text-center font-bold bg-[#C5A059] text-[#343E2C] hover:bg-[#d5b069] active:scale-95 text-[11px] uppercase tracking-widest cursor-pointer shadow-[0_4px_15px_rgba(197,160,89,0.3)] border border-[#C5A059]/10 block transition-all duration-300"
+                                    className="w-full rounded-full py-2.5 px-4 sm:py-3.5 sm:px-6 md:py-4 md:px-8 text-center font-bold bg-[#C5A059] text-[#343E2C] hover:bg-[#d5b069] active:scale-95 text-[9px] sm:text-[10px] md:text-[11px] uppercase tracking-widest cursor-pointer shadow-[0_4px_15px_rgba(197,160,89,0.3)] border border-[#C5A059]/10 block transition-all duration-300 font-sans"
                                 >
                                     {t('product.instant_buy')}
                                 </motion.button>
@@ -3689,7 +3808,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product: rawProduct, i, isFoc
                                     rel="noopener noreferrer"
                                     whileHover={{ scale: 1.01 }}
                                     whileTap={{ scale: 0.99 }}
-                                    className="w-full rounded-full py-3 text-center font-bold bg-transparent text-[#FCFBF9] hover:bg-white/5 active:scale-95 text-[10px] uppercase tracking-widest cursor-pointer border border-[#C5A059]/30 block transition-all duration-300"
+                                    className="w-full rounded-full py-2 px-4 sm:py-2.5 sm:px-6 md:py-3 md:px-8 text-center font-bold bg-transparent text-[#FCFBF9] hover:bg-white/5 active:scale-95 text-[8px] sm:text-[9px] md:text-[10px] uppercase tracking-widest cursor-pointer border border-[#C5A059]/30 block transition-all duration-300 font-sans"
                                 >
                                     {t('product.customize_design')}
                                 </motion.a>
@@ -3718,7 +3837,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product: rawProduct, i, isFoc
                             }}
                             whileHover={{ scale: 1.01 }}
                             whileTap={{ scale: 0.99 }}
-                            className="flex-1 max-w-[190px] xs:max-w-[210px] sm:max-w-[240px] rounded-full py-3.5 text-center font-bold bg-[#C5A059] text-[#343E2C] hover:bg-[#d5b069] text-[10px] sm:text-[11px] uppercase tracking-widest cursor-pointer shadow-[0_4px_15px_rgba(197,160,89,0.35)] border border-[#C5A059]/10 block font-sans"
+                            className="flex-1 max-w-[190px] xs:max-w-[210px] sm:max-w-[240px] rounded-full py-2 px-3 sm:py-3 sm:px-6 md:py-3.5 md:px-8 text-center font-bold bg-[#C5A059] text-[#343E2C] hover:bg-[#d5b069] text-[9px] sm:text-[10px] md:text-[11px] uppercase tracking-widest cursor-pointer shadow-[0_4px_15px_rgba(197,160,89,0.35)] border border-[#C5A059]/10 block font-sans"
                         >
                             {t('product.instant_buy')}
                         </motion.button>
@@ -3729,7 +3848,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product: rawProduct, i, isFoc
                         rel="noopener noreferrer"
                         whileHover={{ scale: 1.01 }}
                         whileTap={{ scale: 0.99 }}
-                        className="w-full rounded-full py-2.5 text-center font-medium bg-transparent text-forest hover:bg-forest/5 text-[9px] uppercase tracking-widest cursor-pointer border border-[#C5A059]/30 block font-sans"
+                        className="w-full rounded-full py-2 px-3 sm:py-2.5 sm:px-6 md:py-3 md:px-8 text-center font-medium bg-transparent text-forest hover:bg-forest/5 text-[8px] sm:text-[9px] uppercase tracking-widest cursor-pointer border border-[#C5A059]/30 block font-sans"
                     >
                         {t('product.customize_whatsapp')}
                     </motion.a>
@@ -3786,7 +3905,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product: rawProduct, i, isFoc
 
 const CarouselItem: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     return (
-        <div className="flex-none w-full md:w-1/2 lg:w-[calc(100%/3)] px-4 snap-center md:snap-start">
+        <div className="flex-none w-[78%] xs:w-[70%] sm:w-[46%] md:w-[45%] lg:w-[31.5%] xl:w-[31.5%] px-3 snap-center md:snap-start">
             <div className="w-full h-full">
                 {children}
             </div>
@@ -3855,7 +3974,7 @@ const CollectionSection = () => {
     }, [focusedProductId]);
 
     return (
-        <section ref={containerRef} id="collection" data-background="light" className="pt-12 pb-16 px-4 landscape:py-12 md:portrait:py-16 lg:pt-16 lg:pb-24 xl:pt-20 xl:pb-28 bg-[#FCFBF9] min-h-[85vh] relative overflow-hidden">
+        <section ref={containerRef} id="collection" data-background="light" className="py-10 xs:py-12 sm:py-16 lg:py-24 xl:py-28 bg-[#F6F1E5] min-h-[85vh] relative overflow-hidden px-4 sm:px-6 lg:px-8">
 
             <motion.div 
                 style={{ x: xTrack, y: yTrack, opacity: opacityTrack, fontFamily: "'Cormorant Garamond', serif" }}
@@ -3864,7 +3983,7 @@ const CollectionSection = () => {
                 M★Bravo
             </motion.div>
 
-            <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-16 sm:mb-24 md:mb-32 text-center relative z-10">
+            <div className="w-full max-w-7xl mx-auto mb-8 xs:mb-12 sm:mb-20 md:mb-24 text-center relative z-10">
                  {/* Halo radial suave atrás do título */}
                  <div 
                      className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none -z-10 rounded-full"
@@ -3884,7 +4003,7 @@ const CollectionSection = () => {
                  <motion.h2 
                     initial={{ opacity: 0, y: 20 }}
                     whileInView={{ opacity: 1, y: 0 }}
-                    className="text-3xl xs:text-4xl sm:text-5xl md:text-6xl font-light tracking-[0.2em] uppercase leading-tight text-center font-serif"
+                    className="text-[clamp(1.5rem,5.5vw,3.75rem)] font-light tracking-[0.1em] xs:tracking-[0.15em] sm:tracking-[0.2em] uppercase leading-tight text-center font-serif"
                   >
                     {selectedCategory ? activeCategory?.name : (
                         <span 
@@ -4093,7 +4212,7 @@ const ContactSection = () => {
         : "Hello! I saw the M★BRAVO website and would like to know more about your pieces.";
 
     return (
-        <section ref={containerRef} id="contacto" data-background="dark" className="pt-24 pb-20 px-4 landscape:py-16 md:portrait:py-24 lg:py-32 xl:py-36 bg-forest relative overflow-hidden">
+        <section ref={containerRef} id="contacto" data-background="dark" className="py-[clamp(3rem,8vh,9rem)] bg-forest relative overflow-hidden px-4 sm:px-6 lg:px-8">
              {/* Large Script Background */}
              <motion.div 
                 style={{ x: xTrack, y: yTrack, opacity: opacityTrack, fontFamily: "'Cormorant Garamond', serif" }}
@@ -4102,23 +4221,23 @@ const ContactSection = () => {
                  M★Bravo
              </motion.div>
 
-             <div className="w-full max-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
+             <div className="w-full max-w-4xl mx-auto text-center relative z-10">
                 <motion.div
                     initial={{ opacity: 0, y: 30 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
                 >
-                    <h2 className="text-4xl sm:text-5xl md:text-6xl lg:text-8xl font-serif text-cream mb-14 md:mb-16 leading-tight">{t('contact.title_1')} <br /><span className="italic">{t('contact.title_2')}</span></h2>
-                    <p className="text-cream/50 text-xl font-light mb-20 md:mb-24 leading-relaxed">
+                    <h2 className="text-[clamp(1.5rem,5.5vw,4.5rem)] font-serif text-cream mb-[clamp(1.5rem,4vw,3rem)] leading-tight">{t('contact.title_1')} <br /><span className="italic">{t('contact.title_2')}</span></h2>
+                    <p className="text-cream/50 text-[clamp(0.875rem,2vw,1.25rem)] font-light mb-[clamp(2rem,5vw,4rem)] leading-relaxed max-w-2xl mx-auto">
                         {t('contact.subtitle')}
                     </p>
                     
-                    <div className="flex flex-col items-center gap-6 sm:gap-10 md:gap-12">
+                    <div className="flex flex-col items-center gap-[clamp(1rem,3vw,3rem)]">
                         <a 
                             href={MAILTO_LINK}
-                            className="group flex items-center gap-3 md:gap-4 text-[15px] max-[350px]:text-[13px] xs:text-xl sm:text-2xl md:text-4xl font-serif text-cream hover:text-brand-green-light transition-all border-b border-cream/20 pb-3 md:pb-4 break-all sm:break-normal"
+                            className="group flex items-center gap-[clamp(0.5rem,1.5vw,1rem)] text-[clamp(0.9rem,4vw,2.25rem)] font-serif text-cream hover:text-brand-green-light transition-all border-b border-cream/20 pb-[clamp(0.5rem,1.2vw,1rem)] break-all"
                         >
-                            <Mail size={20} className="sm:w-6 sm:h-6 md:w-8 md:h-8 opacity-40 group-hover:opacity-100 transition-opacity flex-shrink-0" />
+                            <Mail className="w-[clamp(1.25rem,4vw,2rem)] h-[clamp(1.25rem,4vw,2rem)] opacity-40 group-hover:opacity-100 transition-opacity flex-shrink-0" />
                             {CONTACT_EMAIL}
                         </a>
 
@@ -4126,15 +4245,15 @@ const ContactSection = () => {
                             href={`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(whatsappMessage)}`}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="group flex items-center gap-3 md:gap-4 text-[15px] max-[350px]:text-[11px] xs:text-xl sm:text-2xl md:text-4xl font-serif text-cream hover:text-brand-green-light transition-all border-b border-cream/20 pb-3 md:pb-4 break-all sm:break-normal"
+                            className="group flex items-center gap-[clamp(0.5rem,1.5vw,1rem)] text-[clamp(0.9rem,4vw,2.25rem)] font-serif text-cream hover:text-brand-green-light transition-all border-b border-cream/20 pb-[clamp(0.5rem,1.2vw,1rem)] break-all"
                         >
-                            <MessageCircle size={20} className="sm:w-6 sm:h-6 md:w-8 md:h-8 opacity-40 group-hover:opacity-100 transition-opacity flex-shrink-0" />
+                            <MessageCircle className="w-[clamp(1.25rem,4vw,2rem)] h-[clamp(1.25rem,4vw,2rem)] opacity-40 group-hover:opacity-100 transition-opacity flex-shrink-0" />
                             {t('contact.chat_whatsapp')}
                         </a>
                     </div>
                 </motion.div>
 
-                <div className="mt-20 sm:mt-32 md:mt-48 flex flex-wrap justify-center gap-6 sm:gap-14 md:gap-16 lg:gap-20">
+                <div className="mt-[clamp(3rem,8vw,12rem)] flex flex-wrap justify-center gap-[clamp(1rem,4vw,4rem)]">
                     <a href="https://instagram.com/mbravobycarolina/" target="_blank" rel="noopener noreferrer" className="text-[10px] uppercase tracking-[0.4em] text-cream/40 hover:text-cream transition-colors">
                         Instagram
                     </a>
@@ -4419,10 +4538,10 @@ const LegalModal = ({ type, onClose }: LegalModalProps) => {
 const Footer = ({ onOpenLegal, onOpenAdmin }: { onOpenLegal: (type: 'envios' | 'privacidade' | 'termos') => void, onOpenAdmin?: () => void }) => {
     const { t } = useLanguage();
     return (
-        <footer className="bg-forest text-cream py-12 px-4 border-t border-cream/5">
-            <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row justify-between items-center gap-16">
-                <div className="flex flex-col items-center md:items-start gap-4">
-                    <Logo light className="opacity-50 h-28 md:h-48" />
+        <footer className="bg-forest text-cream py-[clamp(2.5rem,6vw,4rem)] px-4 border-t border-cream/5">
+            <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col lg:flex-row justify-between items-center gap-10 lg:gap-16">
+                <div className="flex flex-col items-center lg:items-start gap-4">
+                    <Logo light className="opacity-50 h-[clamp(5rem,10vw,9rem)]" />
                     {/* Minimalist Soft-Gold Payment Seals */}
                     <div className="flex items-center gap-4 text-[#C5A059]/40 mt-1" title="Métodos de Pagamento Seguros">
                         {/* MBWAY */}
@@ -4444,17 +4563,17 @@ const Footer = ({ onOpenLegal, onOpenAdmin }: { onOpenLegal: (type: 'envios' | '
                     </div>
                 </div>
                 
-                <div className="flex flex-col sm:flex-row gap-6 sm:gap-12 text-[10px] uppercase tracking-[0.2em] font-medium text-cream/30 text-center sm:text-left">
-                    <button onClick={() => onOpenLegal('envios')} className="hover:text-cream transition-colors cursor-pointer text-left uppercase tracking-[0.2em]">{t('footer.legal_shipping')}</button>
-                    <button onClick={() => onOpenLegal('privacidade')} className="hover:text-cream transition-colors cursor-pointer text-left uppercase tracking-[0.2em]">{t('footer.legal_privacy')}</button>
-                    <button onClick={() => onOpenLegal('termos')} className="hover:text-cream transition-colors cursor-pointer text-left uppercase tracking-[0.2em]">{t('footer.legal_terms')}</button>
+                <div className="flex flex-col sm:flex-row gap-6 sm:gap-12 text-[10px] uppercase tracking-[0.2em] font-medium text-cream/30 text-center lg:text-left">
+                    <button onClick={() => onOpenLegal('envios')} className="hover:text-cream transition-colors cursor-pointer text-center lg:text-left uppercase tracking-[0.2em]">{t('footer.legal_shipping')}</button>
+                    <button onClick={() => onOpenLegal('privacidade')} className="hover:text-cream transition-colors cursor-pointer text-center lg:text-left uppercase tracking-[0.2em]">{t('footer.legal_privacy')}</button>
+                    <button onClick={() => onOpenLegal('termos')} className="hover:text-cream transition-colors cursor-pointer text-center lg:text-left uppercase tracking-[0.2em]">{t('footer.legal_terms')}</button>
                 </div>
 
-                <div className="text-[9px] uppercase tracking-[0.2em] text-cream/45 text-center md:text-right flex flex-col gap-1 md:items-end">
+                <div className="text-[9px] uppercase tracking-[0.2em] text-cream/45 text-center lg:text-right flex flex-col gap-1 items-center lg:items-end">
                     <div className="text-cream/30 text-[8px] tracking-[0.3em] uppercase mb-1">{t('footer.support')}</div>
                     <a href={MAILTO_LINK} className="hover:text-cream transition-colors font-mono">{CONTACT_EMAIL}</a>
                     <a href="tel:+351912828182" className="hover:text-cream transition-colors font-mono">+351 912 828 182</a>
-                    <div className="text-cream/20 mt-2 whitespace-pre-line">
+                    <div className="text-cream/20 mt-2 whitespace-pre-line text-center lg:text-right">
                         <span 
                             onClick={onOpenAdmin}
                             className="cursor-default select-none active:opacity-80"
@@ -4474,53 +4593,63 @@ const Footer = ({ onOpenLegal, onOpenAdmin }: { onOpenLegal: (type: 'envios' | '
     );
 };
 
-const MemoryContinuesSection = () => {
+const MemoryContinuesSection = ({ onDiscoverEssence }: { onDiscoverEssence: () => void }) => {
     const { t } = useLanguage();
     return (
-        <section id="memoria" data-background="light" className="pt-24 pb-20 px-4 landscape:py-16 md:portrait:py-24 lg:py-32 xl:py-36 bg-[#FCFBF9] relative overflow-hidden select-none border-b border-forest/5">
-            <div className="w-full max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
-                <motion.div
-                    initial={{ opacity: 0, y: 30 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true, margin: "-100px" }}
-                    transition={{ duration: 1.5, ease: [0.16, 1, 0.3, 1] }}
-                    className="space-y-10 sm:space-y-16 md:space-y-24"
-                >
-                    {/* Section label */}
-                    <div className="space-y-6">
-                        <span className="text-[10px] uppercase tracking-[0.45em] font-semibold text-forest/35 block font-sans">
-                            {t('memory.tag')}
-                        </span>
-                        <div className="h-[1px] w-12 bg-forest/10 mx-auto" />
+        <section id="memoria" data-background="light" className="py-[clamp(3rem,8vw,5.5rem)] bg-[#F6F1E5] relative overflow-hidden select-none border-b border-forest/5 px-6 sm:px-10 lg:px-16">
+            <div className="w-full max-w-7xl mx-auto relative z-10">
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16 items-start">
+                    
+                    {/* Left Column: Title and Call to Action */}
+                    <div className="lg:col-span-5 lg:sticky lg:top-28 text-center lg:text-left space-y-6">
+                        <div className="space-y-3">
+                            <span className="text-[10px] uppercase tracking-[0.45em] font-semibold text-forest/35 block font-sans">
+                                {t('memory.tag')}
+                            </span>
+                            <div className="h-[1px] w-12 bg-forest/10 mx-auto lg:mx-0" />
+                        </div>
+
+                        <div className="space-y-4">
+                            <h2 className="text-[clamp(1.35rem,3.5vw,2rem)] font-serif text-forest tracking-tight leading-tight font-light">
+                                {t('memory.title')}
+                            </h2>
+                            
+                            <p className="text-forest/70 font-serif italic text-[clamp(0.95rem,1.8vw,1.125rem)] leading-relaxed font-light max-w-xl mx-auto lg:mx-0">
+                                {t('memory.subtitle')}
+                            </p>
+                        </div>
+
+                        <div className="pt-4">
+                            <button
+                                onClick={onDiscoverEssence}
+                                className="group inline-flex items-center gap-2.5 px-5 py-2.5 sm:px-7 sm:py-3 md:px-8 md:py-3.5 border border-forest/20 text-forest hover:bg-forest hover:text-cream rounded-full text-[9px] sm:text-[10px] uppercase tracking-[0.22em] sm:tracking-[0.3em] font-semibold transition-all duration-700 cursor-pointer hover:scale-[1.02] active:scale-[0.98] shadow-sm hover:shadow-md"
+                            >
+                                {t('btn.discover_philosophy')}
+                                <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform duration-500" />
+                            </button>
+                        </div>
                     </div>
 
-                    {/* Main text and body with elegant layout */}
-                    <div className="space-y-10 lg:space-y-14">
-                        <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-serif text-forest tracking-tight leading-tight font-light col-span-2">
-                            {t('memory.title')}
-                        </h2>
-                        
-                        <p className="text-forest/70 font-serif italic text-lg sm:text-xl md:text-2xl leading-relaxed max-w-2xl mx-auto font-light">
-                            {t('memory.subtitle')}
-                        </p>
+                    {/* Right Column: Biographical Narrative & Quote */}
+                    <div className="lg:col-span-7 lg:border-l lg:border-forest/10 lg:pl-12 text-center lg:text-left space-y-8">
+                        <div className="space-y-6">
+                            <p className="text-[#C5A059] font-serif italic text-[clamp(1rem,1.8vw,1.2rem)] font-normal tracking-wide">
+                                {t('memory.mbravo_born')}
+                            </p>
+                            
+                            <p className="text-forest/65 text-[clamp(0.8125rem,1.5vw,0.875rem)] leading-relaxed font-sans font-light whitespace-pre-line">
+                                {t('memory.desc')}
+                            </p>
+                        </div>
+
+                        <div className="pt-8 border-t border-forest/10 space-y-4">
+                            <p className="text-forest font-serif italic text-[clamp(0.875rem,1.8vw,1rem)] font-light leading-relaxed text-forest/80 max-w-xl mx-auto lg:mx-0">
+                                {t('memory.quote')}
+                            </p>
+                        </div>
                     </div>
 
-                    <div className="space-y-8 max-w-xl mx-auto">
-                        <p className="text-[#C5A059] font-serif italic text-xl md:text-2xl font-normal tracking-wide">
-                            {t('memory.mbravo_born')}
-                        </p>
-                        
-                        <p className="text-forest/65 text-sm sm:text-base md:text-lg leading-relaxed font-sans font-light">
-                            {t('memory.desc')}
-                        </p>
-                    </div>
-
-                    <div className="pt-12 md:pt-16 border-t border-forest/10 max-w-md mx-auto">
-                        <p className="text-forest font-serif italic text-lg md:text-xl font-light leading-relaxed text-forest/80">
-                            {t('memory.quote')}
-                        </p>
-                    </div>
-                </motion.div>
+                </div>
             </div>
         </section>
     );
@@ -4528,6 +4657,19 @@ const MemoryContinuesSection = () => {
 
 const InstagramSection = () => {
     const { t } = useLanguage();
+    const beholdId = import.meta.env.VITE_BEHOLD_WIDGET_ID || "";
+    
+    useEffect(() => {
+        if (beholdId) {
+            const existingScript = document.querySelector('script[src="https://w.behold.so/widget.js"]');
+            if (!existingScript) {
+                const script = document.createElement('script');
+                script.src = "https://w.behold.so/widget.js";
+                script.type = "module";
+                document.body.appendChild(script);
+            }
+        }
+    }, [beholdId]);
     
     const posts = [
         {
@@ -4575,9 +4717,9 @@ const InstagramSection = () => {
     ];
 
     return (
-        <section id="instagram-feed" className="py-24 px-4 bg-[#FCFBF9] border-t border-forest/5 relative overflow-hidden">
+        <section id="instagram-feed" className="py-12 xs:py-16 sm:py-20 md:py-24 px-4 bg-[#F6F1E5] border-t border-forest/5 relative overflow-hidden">
             <div className="w-full max-w-7xl mx-auto">
-                <div className="text-center space-y-4 mb-16">
+                <div className="text-center space-y-4 mb-8 sm:mb-12">
                     <span className="text-[10px] uppercase tracking-[0.45em] font-semibold text-forest/35 block font-sans">
                         {t('instagram.feed.title')}
                     </span>
@@ -4585,47 +4727,530 @@ const InstagramSection = () => {
                         href="https://instagram.com/mbravobycarolina/" 
                         target="_blank" 
                         rel="noopener noreferrer"
-                        className="inline-block text-2xl sm:text-3xl font-serif text-[#C5A059] hover:text-[#B38E47] transition-colors duration-300 font-light select-none tracking-tight"
+                        className="inline-block text-[clamp(1.25rem,4vw,1.875rem)] font-serif text-[#C5A059] hover:text-[#B38E47] transition-colors duration-300 font-light select-none tracking-tight"
                     >
                         {t('instagram.feed.handle')}
                     </a>
                     <div className="h-[1px] w-12 bg-forest/10 mx-auto mt-4" />
                 </div>
 
-                <div className="flex overflow-x-auto pb-4 gap-4 snap-x snap-mandatory -mx-4 px-4 sm:-mx-6 sm:px-6 lg:mx-0 lg:px-0 lg:grid lg:grid-cols-6 lg:overflow-x-visible lg:pb-0 lg:snap-none scrollbar-none [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-                    {posts.map((post, idx) => (
-                        <motion.a
-                            key={post.id}
-                            href="https://instagram.com/mbravobycarolina/"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            initial={{ opacity: 0, y: 20 }}
-                            whileInView={{ opacity: 1, y: 0 }}
-                            viewport={{ once: true }}
-                            transition={{ duration: 0.8, delay: idx * 0.1, ease: [0.16, 1, 0.3, 1] }}
-                            className="shrink-0 w-[68vw] sm:w-[40vw] md:w-[28vw] lg:w-auto aspect-square snap-align-start group block relative overflow-hidden bg-forest/5 rounded-lg shadow-sm hover:shadow-md border border-forest/5 transition-all duration-300"
+                {beholdId ? (
+                    /* Dynamic Behold.so Feed */
+                    <div className="w-full overflow-hidden rounded-xl bg-white/50 p-4 border border-forest/5 shadow-sm">
+                        <div data-behold-id={beholdId}></div>
+                    </div>
+                ) : (
+                    /* Elegant Fallback Grid */
+                    <div className="flex overflow-x-auto pb-4 gap-4 snap-x snap-mandatory -mx-4 px-4 sm:-mx-6 sm:px-6 lg:mx-0 lg:px-0 lg:grid lg:grid-cols-6 lg:overflow-x-visible lg:pb-0 lg:snap-none scrollbar-none [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+                        {posts.map((post, idx) => (
+                            <motion.a
+                                key={post.id}
+                                href="https://instagram.com/mbravobycarolina/"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                initial={{ opacity: 0, y: 20 }}
+                                whileInView={{ opacity: 1, y: 0 }}
+                                viewport={{ once: true }}
+                                transition={{ duration: 0.8, delay: idx * 0.1, ease: [0.16, 1, 0.3, 1] }}
+                                className="shrink-0 w-[68vw] sm:w-[40vw] md:w-[28vw] lg:w-auto aspect-square snap-align-start group block relative overflow-hidden bg-forest/5 rounded-lg shadow-sm hover:shadow-md border border-forest/5 transition-all duration-300"
+                            >
+                                <img 
+                                    src={post.img} 
+                                    alt={post.alt}
+                                    className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+                                    style={{ imageRendering: 'crisp-edges' }}
+                                />
+                                {/* Overlay on Hover */}
+                                <div className="absolute inset-0 bg-forest/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col items-center justify-center gap-2 text-cream z-10 p-2 text-center">
+                                    <div className="flex items-center gap-1.5 text-sm font-sans font-medium">
+                                        <Heart size={16} fill="currentColor" className="text-cream" />
+                                        <span>{post.likes}</span>
+                                    </div>
+                                    <div className="flex items-center gap-1.5 text-xs font-sans font-medium opacity-90 mt-1">
+                                        <Instagram size={14} className="text-cream" />
+                                        <span className="text-[9px] uppercase tracking-wider font-semibold">{t('instagram.feed.view_profile')}</span>
+                                    </div>
+                                </div>
+                            </motion.a>
+                        ))}
+                    </div>
+                )}
+            </div>
+        </section>
+    );
+};
+
+const EssenceHero = ({ onBackToHome }: { onBackToHome: () => void }) => {
+    const { t } = useLanguage();
+    return (
+        <section data-background="light" className="relative bg-[#FCFBF9] pt-24 xs:pt-28 sm:pt-32 pb-10 sm:pb-14 px-4 sm:px-6 overflow-hidden border-b border-forest/5 select-none">
+            {/* Elegant Background organic line representing the thread (Fio) with movement */}
+            <div className="absolute inset-0 pointer-events-none z-0">
+                <svg className="w-full h-full opacity-[0.12]" viewBox="0 0 1440 600" fill="none" preserveAspectRatio="none">
+                    <motion.path 
+                        d="M -100 150 C 300 80, 600 350, 1000 200 C 1200 120, 1350 400, 1600 300" 
+                        stroke="#C5A059" 
+                        strokeWidth="1.5" 
+                        strokeLinecap="round" 
+                        initial={{ pathLength: 0 }}
+                        animate={{ pathLength: 1 }}
+                        transition={{ duration: 4, ease: "easeInOut", repeat: Infinity, repeatType: "reverse" }}
+                    />
+                    <motion.path 
+                        d="M -100 180 C 250 110, 550 320, 950 250 C 1150 170, 1300 380, 1600 320" 
+                        stroke="#C5A059" 
+                        strokeWidth="0.75" 
+                        strokeLinecap="round" 
+                        initial={{ y: 0 }}
+                        animate={{ y: [-15, 15, -15] }}
+                        transition={{ duration: 15, ease: "easeInOut", repeat: Infinity }}
+                    />
+                </svg>
+            </div>
+
+            <div className="relative z-10 max-w-6xl mx-auto flex flex-col space-y-8">
+                {/* Back Link positioned elegantly at the top left */}
+                <motion.div
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.8 }}
+                    className="self-start"
+                >
+                    <button 
+                        onClick={onBackToHome}
+                        className="group inline-flex items-center gap-2 px-4 py-1.5 border border-forest/10 hover:border-forest/30 text-forest/60 hover:text-forest rounded-full text-[9px] uppercase tracking-[0.3em] font-semibold transition-all duration-300 cursor-pointer bg-white/60 backdrop-blur-sm"
+                    >
+                        <ArrowLeft size={10} className="group-hover:-translate-x-1 transition-transform duration-300 text-forest/40 group-hover:text-forest" />
+                        {t('nav.home')}
+                    </button>
+                </motion.div>
+
+                {/* Main Content Layout: Grid for PC / Tablet, Flex/Column for Mobile */}
+                <div className="grid grid-cols-1 md:grid-cols-12 gap-8 md:gap-12 items-center">
+                    {/* Left Column: Copy & Text */}
+                    <div className="md:col-span-7 text-center md:text-left space-y-4 md:space-y-6">
+                        <motion.span 
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 0.5 }}
+                            transition={{ duration: 1.2, delay: 0.2 }}
+                            className="text-[9px] uppercase tracking-[0.6em] font-bold text-forest block font-sans"
                         >
+                            {t('nav.philosophy')}
+                        </motion.span>
+                        
+                        <motion.h1 
+                            initial={{ opacity: 0, y: 15 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 1.2, delay: 0.3, ease: [0.16, 1, 0.3, 1] }}
+                            className="text-[clamp(1.5rem,4vw,3.25rem)] font-serif text-forest leading-tight font-light tracking-tight select-text"
+                        >
+                            {t('brand.slogan')}
+                        </motion.h1>
+                        
+                        <motion.div 
+                            initial={{ width: 0 }}
+                            animate={{ width: 48 }}
+                            transition={{ duration: 1.2, delay: 0.5 }}
+                            className="h-[1px] bg-[#C5A059] mx-auto md:mx-0 my-4 md:my-6" 
+                        />
+                        
+                        <motion.p 
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 1.2, delay: 0.6 }}
+                            className="text-forest/70 font-serif italic text-sm sm:text-base md:text-lg max-w-xl mx-auto md:mx-0 font-light leading-relaxed select-text"
+                        >
+                            "{t('manifesto.quote')}"
+                        </motion.p>
+                    </div>
+
+                    {/* Right Column: Branded Cosy Crochet Image with Gold Thread Detail */}
+                    <motion.div 
+                        initial={{ opacity: 0, scale: 0.95 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        transition={{ duration: 1.4, delay: 0.4 }}
+                        className="md:col-span-5 flex justify-center"
+                    >
+                        <div className="relative group/heroimg max-w-xs sm:max-w-sm md:max-w-full w-full aspect-[4/3] rounded-2xl overflow-hidden shadow-xl border border-forest/10 bg-white">
+                            {/* Signature Poncho brand image */}
                             <img 
-                                src={post.img} 
-                                alt={post.alt}
-                                className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
-                                style={{ imageRendering: 'crisp-edges' }}
+                                src="https://i.ibb.co/3907byLt/IMG-2738-2.jpg" 
+                                alt="Signature Granny Poncho" 
+                                className="w-full h-full object-cover group-hover/heroimg:scale-105 transition-transform duration-700 ease-out"
                             />
-                            {/* Overlay on Hover */}
-                            <div className="absolute inset-0 bg-forest/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col items-center justify-center gap-2 text-cream z-10 p-2 text-center">
-                                <div className="flex items-center gap-1.5 text-sm font-sans font-medium">
-                                    <Heart size={16} fill="currentColor" className="text-cream" />
-                                    <span>{post.likes}</span>
-                                </div>
-                                <div className="flex items-center gap-1.5 text-xs font-sans font-medium opacity-90 mt-1">
-                                    <Instagram size={14} className="text-cream" />
-                                    <span className="text-[9px] uppercase tracking-wider font-semibold">{t('instagram.feed.view_profile')}</span>
-                                </div>
+                            
+                            {/* Golden overlay thread animation */}
+                            <div className="absolute inset-0 border border-[#C5A059]/20 rounded-2xl pointer-events-none m-3 transition-all duration-500 group-hover/heroimg:m-2" />
+                            
+                            {/* Soft glowing ambient brand badge */}
+                            <div className="absolute bottom-4 right-4 bg-forest/90 backdrop-blur-md px-3 py-1 text-[8px] tracking-[0.3em] text-cream uppercase rounded-full font-bold shadow-md">
+                                ARTISAN MADE
                             </div>
-                        </motion.a>
-                    ))}
+                        </div>
+                    </motion.div>
                 </div>
             </div>
+        </section>
+    );
+};
+
+const TestimonialsSection = () => {
+    const { lang, t } = useLanguage();
+    const [activeIndex, setActiveIndex] = useState(0);
+    const [showWriteModal, setShowWriteModal] = useState(false);
+    const [apiTestimonials, setApiTestimonials] = useState<any[]>([]);
+    
+    // Support for 3rd-party automated widget HTML (e.g. Judge.me / Google Reviews / Elfsight / Trustpilot)
+    const widgetHtml = import.meta.env.VITE_TESTIMONIALS_WIDGET_HTML || "";
+
+    // Default translated testimonials
+    const defaultTestimonials = [
+        {
+            name: t('testimonial.1.name'),
+            text: t('testimonial.1.text'),
+            product: t('testimonial.1.product'),
+            rating: 5
+        },
+        {
+            name: t('testimonial.2.name'),
+            text: t('testimonial.2.text'),
+            product: t('testimonial.2.product'),
+            rating: 5
+        },
+        {
+            name: t('testimonial.3.name'),
+            text: t('testimonial.3.text'),
+            product: t('testimonial.3.product'),
+            rating: 5
+        },
+        {
+            name: t('testimonial.4.name'),
+            text: t('testimonial.4.text'),
+            product: t('testimonial.4.product'),
+            rating: 5
+        },
+        {
+            name: t('testimonial.5.name'),
+            text: t('testimonial.5.text'),
+            product: t('testimonial.5.product'),
+            rating: 5
+        }
+    ];
+
+    // Fetch persistent reviews globally from live back-end database
+    useEffect(() => {
+        if (!widgetHtml) {
+            fetch('/api/testimonials')
+                .then(res => res.json())
+                .then(data => {
+                    if (Array.isArray(data)) {
+                        setApiTestimonials(data);
+                    }
+                })
+                .catch(err => console.error('[TESTIMONIALS FETCH ERROR]', err));
+        }
+    }, [widgetHtml]);
+
+    // Script injection hook for dynamic widgets if the widgetHtml contains scripts
+    useEffect(() => {
+        if (widgetHtml) {
+            // Find any script tags inside the widget HTML and execute them
+            const container = document.getElementById('testimonials-widget-container');
+            if (container) {
+                const scripts = container.getElementsByTagName('script');
+                Array.from(scripts).forEach(oldScript => {
+                    const newScript = document.createElement('script');
+                    Array.from(oldScript.attributes).forEach(attr => {
+                        newScript.setAttribute(attr.name, attr.value);
+                    });
+                    if (oldScript.src) {
+                        newScript.src = oldScript.src;
+                    } else {
+                        newScript.textContent = oldScript.textContent;
+                    }
+                    oldScript.parentNode?.replaceChild(newScript, oldScript);
+                });
+            }
+        }
+    }, [widgetHtml]);
+
+    const allTestimonials = [...defaultTestimonials, ...apiTestimonials];
+
+    // Form states
+    const [newReview, setNewReview] = useState({
+        name: '',
+        text: '',
+        product: '',
+        rating: 5
+    });
+    const [successMessage, setSuccessMessage] = useState(false);
+    const [isSubmitting, setIsSubmitting] = useState(false);
+
+    const next = () => {
+        setActiveIndex((prev) => (prev + 1) % allTestimonials.length);
+    };
+
+    const prev = () => {
+        setActiveIndex((prev) => (prev - 1 + allTestimonials.length) % allTestimonials.length);
+    };
+
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!newReview.name || !newReview.text) return;
+        
+        setIsSubmitting(true);
+        try {
+            const res = await fetch('/api/testimonials', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(newReview)
+            });
+            const data = await res.json();
+            
+            if (data.success && data.testimonial) {
+                setApiTestimonials(prevReviews => [data.testimonial, ...prevReviews]);
+                setNewReview({ name: '', text: '', product: '', rating: 5 });
+                setSuccessMessage(true);
+                // Highlight the new review
+                setActiveIndex(defaultTestimonials.length);
+                setTimeout(() => {
+                    setSuccessMessage(false);
+                    setShowWriteModal(false);
+                }, 3000);
+            }
+        } catch (err) {
+            console.error('[TESTIMONIALS POST ERROR]', err);
+        } finally {
+            setIsSubmitting(false);
+        }
+    };
+
+    return (
+        <section id="testimonials" data-background="light" className="py-8 sm:py-12 md:py-14 bg-[#F6F1E5] relative overflow-hidden select-none border-t border-forest/5">
+            {/* Elegant design detail */}
+            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1px] h-10 bg-forest/10" />
+            
+            <div className="w-full max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+                {/* Header */}
+                <div className="text-center mb-6 sm:mb-8">
+                    <span className="text-[10px] uppercase tracking-[0.45em] font-semibold text-forest/35 block mb-2 font-sans">
+                        {t('testimonials.tag')}
+                    </span>
+                    <h2 className="text-[clamp(1.25rem,4vw,2.25rem)] font-serif text-forest tracking-tight leading-tight font-light mb-2">
+                        {t('testimonials.title')}
+                    </h2>
+                    <p className="text-forest/60 font-serif italic text-xs sm:text-sm max-w-xl mx-auto mb-4">
+                        {t('testimonials.subtitle')}
+                    </p>
+                    {!widgetHtml && (
+                        <button
+                            onClick={() => setShowWriteModal(true)}
+                            className="inline-flex items-center gap-2 px-4 py-1.5 border border-forest/15 hover:border-forest text-forest/70 hover:text-forest text-[9px] uppercase tracking-widest font-semibold rounded-full bg-white/40 hover:bg-white/80 transition-all duration-300 shadow-sm cursor-pointer"
+                        >
+                            <MessageCircle size={11} />
+                            {t('testimonials.write_button')}
+                        </button>
+                    )}
+                </div>
+
+                {widgetHtml ? (
+                    /* Render Dynamic Widget Embed (Google Reviews, Judge.me, etc.) */
+                    <div 
+                        id="testimonials-widget-container"
+                        className="max-w-4xl mx-auto rounded-xl bg-white/50 p-4 border border-forest/5 shadow-sm overflow-hidden"
+                        dangerouslySetInnerHTML={{ __html: widgetHtml }}
+                    />
+                ) : (
+                    /* Bespoke Dynamic Carousel with server-persisted database */
+                    <div className="relative max-w-3xl mx-auto px-2 md:px-10">
+                        {/* Star icon with elegant glow and outline */}
+                        <div className="flex items-center justify-center gap-1 mb-4">
+                            {[...Array(allTestimonials[activeIndex]?.rating || 5)].map((_, i) => (
+                                <svg key={i} className="w-3.5 h-3.5 text-[#C5A059]" fill="currentColor" viewBox="0 0 20 20">
+                                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                                </svg>
+                            ))}
+                        </div>
+
+                        {/* Standardized smaller height container to avoid scrolling */}
+                        <div className="overflow-hidden min-h-[90px] sm:min-h-[80px] flex items-center justify-center">
+                            <AnimatePresence mode="wait">
+                                <motion.div
+                                    key={activeIndex}
+                                    initial={{ opacity: 0, y: 10 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    exit={{ opacity: 0, y: -10 }}
+                                    transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+                                    className="text-center space-y-3 max-w-xl mx-auto"
+                                >
+                                    <blockquote className="text-forest/85 text-xs sm:text-sm md:text-base font-serif italic leading-relaxed font-light select-text">
+                                        "{allTestimonials[activeIndex]?.text}"
+                                    </blockquote>
+                                    
+                                    <div className="space-y-0.5">
+                                        <cite className="not-italic text-[9px] sm:text-[10px] font-semibold uppercase tracking-[0.25em] text-forest block font-sans">
+                                            {allTestimonials[activeIndex]?.name}
+                                        </cite>
+                                        {allTestimonials[activeIndex]?.product && (
+                                            <span className="text-[8px] sm:text-[9px] uppercase tracking-[0.15em] text-[#C5A059] block font-mono">
+                                                {allTestimonials[activeIndex]?.product}
+                                            </span>
+                                        )}
+                                    </div>
+                                </motion.div>
+                            </AnimatePresence>
+                        </div>
+
+                        {/* Left/Right controls - tighter layout */}
+                        <div className="flex items-center justify-center gap-4 mt-6">
+                            <button
+                                onClick={prev}
+                                className="w-8 h-8 rounded-full border border-forest/10 hover:border-forest text-forest hover:bg-forest hover:text-cream flex items-center justify-center transition-all duration-300 cursor-pointer group bg-white/20"
+                                aria-label="Previous feedback"
+                            >
+                                <ChevronLeft size={14} className="group-hover:-translate-x-0.5 transition-transform duration-300" />
+                            </button>
+                            
+                            {/* Pagination indicators */}
+                            <div className="flex gap-1.5 flex-wrap justify-center max-w-[150px] sm:max-w-full">
+                                {allTestimonials.map((_, idx) => (
+                                    <button
+                                        key={idx}
+                                        onClick={() => setActiveIndex(idx)}
+                                        className={`h-1 rounded-full transition-all duration-500 cursor-pointer ${
+                                            activeIndex === idx ? 'w-4 bg-[#C5A059]' : 'w-1 bg-forest/10 hover:bg-forest/30'
+                                        }`}
+                                        aria-label={`Go to feedback ${idx + 1}`}
+                                    />
+                                ))}
+                            </div>
+
+                            <button
+                                onClick={next}
+                                className="w-8 h-8 rounded-full border border-forest/10 hover:border-forest text-forest hover:bg-forest hover:text-cream flex items-center justify-center transition-all duration-300 cursor-pointer group bg-white/20"
+                                aria-label="Next feedback"
+                            >
+                                <ChevronRight size={14} className="group-hover:translate-x-0.5 transition-transform duration-300" />
+                            </button>
+                        </div>
+                    </div>
+                )}
+            </div>
+
+            {/* Write Testimonial Luxury Modal */}
+            <AnimatePresence>
+                {showWriteModal && (
+                    <div className="fixed inset-0 z-[200] flex items-center justify-center p-4">
+                        <motion.div
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            onClick={() => setShowWriteModal(false)}
+                            className="absolute inset-0 bg-forest/40 backdrop-blur-md"
+                        />
+
+                        <motion.div
+                            initial={{ scale: 0.95, y: 15, opacity: 0 }}
+                            animate={{ scale: 1, y: 0, opacity: 1 }}
+                            exit={{ scale: 0.95, y: 15, opacity: 0 }}
+                            transition={{ type: "spring", duration: 0.5 }}
+                            className="relative bg-white w-full max-w-md rounded-2xl p-6 shadow-xl border border-forest/10 overflow-hidden text-forest text-left"
+                        >
+                            <button
+                                onClick={() => setShowWriteModal(false)}
+                                className="absolute top-4 right-4 text-forest/40 hover:text-forest p-1 rounded-full hover:bg-forest/5 transition-all"
+                            >
+                                <X size={16} />
+                            </button>
+
+                            <h3 className="font-serif text-lg font-normal mb-1">{t('testimonials.modal_title')}</h3>
+                            <p className="text-forest/50 text-[10px] uppercase tracking-wider mb-4 font-sans">M★BRAVO Guestbook</p>
+
+                            {successMessage ? (
+                                <motion.div
+                                    initial={{ opacity: 0 }}
+                                    animate={{ opacity: 1 }}
+                                    className="py-8 text-center space-y-3"
+                                >
+                                    <div className="w-12 h-12 bg-forest/5 text-forest rounded-full flex items-center justify-center mx-auto">
+                                        <Heart size={20} className="fill-current text-[#C5A059]" />
+                                    </div>
+                                    <p className="text-sm font-medium font-sans text-forest/90">
+                                        {t('testimonials.success_message')}
+                                    </p>
+                                </motion.div>
+                            ) : (
+                                <form onSubmit={handleSubmit} className="space-y-4 font-sans text-xs">
+                                    <div className="space-y-1">
+                                        <label className="font-semibold text-forest/70">{t('testimonials.label_name')} *</label>
+                                        <input
+                                            required
+                                            type="text"
+                                            value={newReview.name}
+                                            onChange={(e) => setNewReview({ ...newReview, name: e.target.value })}
+                                            className="w-full bg-forest/[0.02] border border-forest/10 rounded-xl px-3 py-2 text-forest focus:border-[#C5A059] focus:outline-none transition-all"
+                                            placeholder="ex: Joana Santos"
+                                        />
+                                    </div>
+
+                                    <div className="space-y-1">
+                                        <label className="font-semibold text-forest/70">{t('testimonials.label_product')}</label>
+                                        <input
+                                            type="text"
+                                            value={newReview.product}
+                                            onChange={(e) => setNewReview({ ...newReview, product: e.target.value })}
+                                            className="w-full bg-forest/[0.02] border border-forest/10 rounded-xl px-3 py-2 text-forest focus:border-[#C5A059] focus:outline-none transition-all"
+                                            placeholder="ex: Mala Daisy"
+                                        />
+                                    </div>
+
+                                    <div className="space-y-1">
+                                        <label className="font-semibold text-forest/70">{t('testimonials.label_text')} *</label>
+                                        <textarea
+                                            required
+                                            rows={3}
+                                            value={newReview.text}
+                                            onChange={(e) => setNewReview({ ...newReview, text: e.target.value })}
+                                            className="w-full bg-forest/[0.02] border border-forest/10 rounded-xl px-3 py-2 text-forest focus:border-[#C5A059] focus:outline-none transition-all resize-none"
+                                            placeholder="Partilhe a sua experiência..."
+                                        />
+                                    </div>
+
+                                    <div className="space-y-1">
+                                        <label className="font-semibold text-forest/70">Rating</label>
+                                        <div className="flex gap-2">
+                                            {[1, 2, 3, 4, 5].map((star) => (
+                                                <button
+                                                    key={star}
+                                                    type="button"
+                                                    onClick={() => setNewReview({ ...newReview, rating: star })}
+                                                    className="p-1 hover:scale-110 transition-transform"
+                                                >
+                                                    <svg
+                                                        className={`w-5 h-5 ${star <= newReview.rating ? 'text-[#C5A059]' : 'text-forest/10'}`}
+                                                        fill="currentColor"
+                                                        viewBox="0 0 20 20"
+                                                    >
+                                                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                                                    </svg>
+                                                </button>
+                                            ))}
+                                        </div>
+                                    </div>
+
+                                    <button
+                                        type="submit"
+                                        disabled={isSubmitting}
+                                        className="w-full bg-[#343E2C] text-cream hover:bg-[#1C2713] disabled:opacity-50 transition-all py-3 rounded-full font-bold uppercase tracking-widest text-[9px]"
+                                    >
+                                        {isSubmitting ? '...' : t('testimonials.submit_button')}
+                                    </button>
+                                </form>
+                            )}
+                        </motion.div>
+                    </div>
+                )}
+            </AnimatePresence>
         </section>
     );
 };
@@ -4636,6 +5261,7 @@ export default function App() {
   const [loading, setLoading] = useState(true);
   const [activeLegal, setActiveLegal] = useState<'envios' | 'privacidade' | 'termos' | null>(null);
   const [showAdmin, setShowAdmin] = useState(false);
+  const [currentPage, setCurrentPage] = useState<'home' | 'essence'>('home');
   const { t } = useLanguage();
 
   // Smooth scroll logic for standard browser behavior
@@ -4657,24 +5283,28 @@ export default function App() {
             transition={{ duration: 1.5 }}
             className="flex flex-col"
           >
-            <Navbar />
+            <Navbar currentPage={currentPage} setCurrentPage={setCurrentPage} />
             
-            {/* Smooth Parallax Scroll Content */}
-            <div className="relative">
-                <Hero />
-                
-                {/* Scroll-linked Organic Fio Condutor (Golden Embroidery thread crossing sections) */}
-                <FioCondutor />
- 
-                <div className="relative overflow-hidden">
+            <AnimatePresence mode="wait">
+              {currentPage === 'home' ? (
+                <motion.div 
+                  key="home"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.8 }}
+                  className="relative"
+                >
+                  <Hero />
+                  <FioCondutor />
+                  
+                  <div className="relative overflow-hidden">
                     <StorySection />
                     <CollectionSection />
-                    <MadeWithTimeSection />
-                    <KnotSection />
-                </div>
-                
-                {/* Visual Interlude */}
-                <div data-background="dark" className="h-[60vh] md:h-[100vh] bg-forest relative overflow-hidden flex items-center justify-center">
+                  </div>
+                  
+                  {/* Visual Interlude */}
+                  <div data-background="dark" className="h-[60vh] md:h-[100vh] bg-forest relative overflow-hidden flex items-center justify-center">
                     <motion.div 
                         initial={{ scale: 1.5, opacity: 0 }}
                         whileInView={{ scale: 1.15, opacity: 1 }}
@@ -4688,21 +5318,77 @@ export default function App() {
                         />
                     </motion.div>
                     <div className="relative z-10 text-center px-6 max-w-4xl mx-auto flex flex-col items-center gap-6 md:gap-8">
-                        <h2 className="text-cream font-serif italic text-3xl sm:text-5xl md:text-6xl lg:text-7xl leading-tight">
+                        <h2 className="text-cream font-serif italic text-[clamp(1.75rem,6.5vw,4.5rem)] leading-tight">
                             {t('interlude.quote')}
                         </h2>
-                        <span className="text-[#C5A059]/80 font-serif italic text-lg md:text-2xl tracking-wide font-light select-none block max-w-xl mx-auto">
+                        <span className="text-[#C5A059]/80 font-serif italic text-[clamp(1.125rem,2.5vw,1.5rem)] tracking-wide font-light select-none block max-w-xl mx-auto">
                             {t('interlude.sub')}
                         </span>
                     </div>
-                </div>
+                  </div>
 
-                <MemoryContinuesSection />
+                  <div className="relative overflow-hidden">
+                    <TestimonialsSection />
+                  </div>
 
-                <InstagramSection />
+                  <MemoryContinuesSection onDiscoverEssence={() => {
+                    setCurrentPage('essence');
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                  }} />
 
-                <ContactSection />
-            </div>
+                  <InstagramSection />
+                  <ContactSection />
+                </motion.div>
+              ) : (
+                <motion.div 
+                  key="essence"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.8 }}
+                  className="relative bg-[#F6F1E5]"
+                >
+                  <EssenceHero onBackToHome={() => {
+                    setCurrentPage('home');
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                  }} />
+                  
+                  <div className="relative overflow-hidden">
+                    <MadeWithTimeSection />
+                    <KnotSection />
+                  </div>
+                  
+                  {/* Interlude at bottom of Essence to invite them back to Collection */}
+                  <div data-background="light" className="py-24 bg-[#F6F1E5] text-center relative border-t border-forest/10">
+                    <div className="max-w-2xl mx-auto px-6 space-y-8">
+                      <span className="text-[10px] uppercase tracking-[0.45em] font-semibold text-forest/35 block font-sans">
+                        {t('nav.exclusive')}
+                      </span>
+                      <h2 className="text-[clamp(1.5rem,5vw,3rem)] font-serif text-forest tracking-tight font-light">
+                        {t('brand.slogan')}
+                      </h2>
+                      <div className="pt-4">
+                        <button
+                          onClick={() => {
+                            setCurrentPage('home');
+                            setTimeout(() => {
+                              const element = document.getElementById('collection');
+                              if (element) {
+                                element.scrollIntoView({ behavior: 'smooth' });
+                              }
+                            }, 100);
+                          }}
+                          className="group inline-flex items-center gap-2.5 px-5 py-2.5 sm:px-7 sm:py-3 md:px-8 md:py-3.5 bg-forest text-cream hover:bg-[#1C2713] rounded-full text-[9px] sm:text-[10px] uppercase tracking-[0.22em] sm:tracking-[0.3em] font-semibold transition-all duration-700 cursor-pointer hover:scale-[1.02] active:scale-[0.98] shadow-sm hover:shadow-md"
+                        >
+                          {t('btn.back_collection')}
+                          <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform duration-500" />
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
             
             <Footer onOpenLegal={(type) => setActiveLegal(type)} onOpenAdmin={() => setShowAdmin(true)} />
 
