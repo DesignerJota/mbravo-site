@@ -5,8 +5,9 @@
   "type": "module",
   "scripts": {
     "dev": "tsx server.ts",
-    "build": "esbuild server.ts --bundle --platform=node --format=cjs --packages=external --sourcemap --outfile=dist/server.cjs",
     "build:client": "vite build",
+    "build:server": "esbuild server.ts --bundle --platform=node --format=cjs --packages=external --sourcemap --outfile=dist/server.cjs",
+    "build": "node build.js",
     "start": "node dist/server.cjs",
     "clean": "rm -rf dist",
     "lint": "tsc --noEmit"
@@ -23,6 +24,7 @@
     "express": "^4.21.2",
     "lucide-react": "^0.546.0",
     "motion": "^12.23.24",
+    "pg": "^8.22.0",
     "react": "^19.0.1",
     "react-dom": "^19.0.1",
     "stripe": "^22.3.0",
@@ -31,6 +33,7 @@
     "vite": "^6.2.3"
   },
   "devDependencies": {
+    "@types/pg": "^8.20.0",
     "autoprefixer": "^10.4.21",
     "tailwindcss": "^4.1.14"
   }
