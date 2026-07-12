@@ -4670,6 +4670,34 @@ const InstagramSection = () => {
             }
         }
     }, [beholdId]);
+
+    // Active MutationObserver to catch and instantly destroy Behold.so branding & attribution links
+    useEffect(() => {
+        if (!beholdId) return;
+
+        const cleanBeholdBranding = () => {
+            const beholdBrand = document.querySelector('[class*="behold-branding"]');
+            const beholdAttribution = document.querySelector('a[href*="behold.so"]');
+            if (beholdBrand) beholdBrand.remove();
+            if (beholdAttribution) beholdAttribution.remove();
+        };
+
+        // Run once initially
+        cleanBeholdBranding();
+
+        const observer = new MutationObserver((mutations) => {
+            mutations.forEach((mutation) => {
+                if (mutation.type === 'childList') {
+                    cleanBeholdBranding();
+                }
+            });
+        });
+
+        const config = { childList: true, subtree: true };
+        observer.observe(document.body, config);
+
+        return () => observer.disconnect();
+    }, [beholdId]);
     
     const posts = [
         {
