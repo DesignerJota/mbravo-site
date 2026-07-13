@@ -2788,6 +2788,25 @@ const ProductCard: React.FC<ProductCardProps> = ({ product: rawProduct, i, isFoc
                                     <p>{t('payment.prod_note_desc')}</p>
                                 </div>
 
+                                <div className="bg-[#FCF8F2] rounded-xl p-5 border border-[#C5A059]/35 text-center space-y-3.5 w-full font-sans shadow-sm">
+                                    <div className="flex justify-center gap-1.5 text-[#C5A059] text-sm">
+                                        <span>★</span><span>★</span><span>★</span><span>★</span><span>★</span>
+                                    </div>
+                                    <p className="font-serif italic text-[13px] text-forest font-light leading-relaxed max-w-sm mx-auto">
+                                        {lang === 'pt' 
+                                            ? 'O seu apoio significa o mundo para o nosso atelier. Partilhe a sua experiência e deixe-nos uma breve crítica de 5 estrelas no Google!' 
+                                            : 'Your support means the world to our atelier. Share your experience and leave us a quick 5-star review on Google!'}
+                                    </p>
+                                    <a
+                                        href="https://g.page/r/Cdo7JGP_Xpc3EBM/review"
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="inline-block px-6 py-2.5 bg-[#243119] text-[#F5F2ED] rounded-full text-[10px] tracking-widest uppercase font-bold hover:bg-[#1a2412] active:bg-[#131b0d] transition-all shadow-sm"
+                                    >
+                                        {lang === 'pt' ? 'Deixar Crítica de 5 Estrelas no Google' : 'Leave 5-Star Review on Google'}
+                                    </a>
+                                </div>
+
                                 {sandboxEmails && (
                                     <div className="w-full bg-[#243119]/5 rounded-2xl p-4 border border-[#243119]/10 text-left space-y-3 font-sans">
                                         <p className="text-[10px] uppercase tracking-wider text-[#A68244] font-bold">{t('sandbox.email_sim')}</p>
