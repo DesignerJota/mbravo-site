@@ -7,7 +7,7 @@
     "dev": "tsx server.ts",
     "build:client": "vite build",
     "build:server": "esbuild server.ts --bundle --platform=node --format=cjs --packages=external --sourcemap --outfile=dist/server.cjs",
-    "build": "vite build && npm run build:server",
+    "build": "npm install --include=optional && vite build && npm run build:server",
     "start": "node dist/server.cjs",
     "clean": "rm -rf dist",
     "lint": "tsc --noEmit"
@@ -39,6 +39,6 @@
   },
   "optionalDependencies": {
     "@tailwindcss/oxide-linux-x64-gnu": "^4.1.14",
-    "@tailwindcss/oxide-linux-x64-musl": "^4.1.14"
+    "@tailwindcss=oxide-linux-x64-musl": "^4.1.14"
   }
 }
