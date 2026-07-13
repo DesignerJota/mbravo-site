@@ -960,8 +960,121 @@ async function initDatabase() {
       );
     `);
     console.log("[DATABASE SUCCESS] PostgreSQL testimonials table initialized successfully.");
+
+    // Pre-seed if empty
+    const checkEmpty = await dbPool.query("SELECT COUNT(*) FROM testimonials");
+    const count = parseInt(checkEmpty.rows[0].count, 10);
+    if (count === 0) {
+      console.log("[DATABASE SEED] Pre-seeding testimonials table with premium brand reviews...");
+      const seeds = [
+        {
+          name: "Maria S.",
+          text: "A mala Daisy é ainda mais bonita ao vivo... O trabalho e o detalhe das flores de crochet são admiráveis, nota-se o amor em cada linha.",
+          product: "Mala Daisy",
+          rating: 5
+        },
+        {
+          name: "Carolina P.",
+          text: "Os coasters dão um toque único à mesa. São super delicados, mas nota-se logo a excelente qualidade do material.",
+          product: "Daisy Coasters",
+          rating: 5
+        },
+        {
+          name: "Emma W.",
+          text: "A mala Granny Square superou todas as minhas expectativas. É lindíssima, super robusta e cabe perfeitamente tudo o que preciso no dia a dia.",
+          product: "Mala Granny Square",
+          rating: 5
+        },
+        {
+          name: "Joana R.",
+          text: "Comprei o biquíni Marea e o caimento é impecável. A minúcia do trabalho manual e o toque do algodão orgânico são indescritíveis.",
+          product: "Marea Bikini Set",
+          rating: 5
+        },
+        {
+          name: "Teresa B.",
+          text: "O cardigan Alma é uma peça intemporal de um conforto absoluto. Recebo elogios sempre que o uso, uma verdadeira obra de arte!",
+          product: "Alma Cardigan",
+          rating: 5
+        }
+      ];
+      for (const s of seeds) {
+        await dbPool.query(
+          `INSERT INTO testimonials (name, text, product, rating) VALUES ($1, $2, $3, $4)`,
+          [s.name, s.text, s.product, s.rating]
+        );
+      }
+      console.log("[DATABASE SEED] Pre-seeded 5 testimonials in PostgreSQL.");
+    }
+
+    // Attempt Google Places API reviews sync if configured
+    await syncGoogleReviews();
   } catch (err) {
     console.error("[DATABASE ERROR] Failed to initialize testimonials table in Supabase. Check credentials.", err);
+  }
+}
+
+// Native Google Places Reviews API synchronization
+async function syncGoogleReviews() {
+  const apiKey = process.env.GOOGLE_PLACES_API_KEY || process.env.GOOGLE_API_KEY;
+  const placeId = process.env.GOOGLE_PLACE_ID;
+
+  if (!apiKey || !placeId) {
+    console.log("[GOOGLE REVIEWS SYNC] Missing GOOGLE_PLACES_API_KEY or GOOGLE_PLACE_ID. Skipping native Google Reviews sync.");
+    return;
+  }
+
+  console.log(`[GOOGLE REVIEWS SYNC] Fetching reviews for Place ID: ${placeId}...`);
+  try {
+    const url = `https://maps.googleapis.com/maps/api/place/details/json?place_id=${placeId}&fields=reviews&key=${apiKey}&language=pt`;
+    const response = await fetch(url);
+    if (!response.ok) {
+      throw new Error(`Google Places API responded with status ${response.status}`);
+    }
+    const data: any = await response.json();
+    
+    if (data.status !== "OK") {
+      throw new Error(`Google Places API error status: ${data.status}. Details: ${data.error_message || "None"}`);
+    }
+
+    const reviews = data.result?.reviews || [];
+    console.log(`[GOOGLE REVIEWS SYNC] Retrieved ${reviews.length} reviews from Google Places.`);
+
+    let insertedCount = 0;
+    for (const r of reviews) {
+      const name = r.author_name || "Cliente Google";
+      const text = r.text || "";
+      const rating = r.rating ? parseInt(r.rating, 10) : 5;
+      const product = "Avaliação Google";
+
+      if (!text.trim()) continue;
+
+      // Check if this testimonial already exists to avoid duplication
+      const checkResult = await dbPool.query(
+        `SELECT id FROM testimonials WHERE name = $1 AND text = $2 AND rating = $3`,
+        [name, text, rating]
+      );
+
+      if (checkResult.rows.length === 0) {
+        await dbPool.query(
+          `INSERT INTO testimonials (name, text, product, rating) VALUES ($1, $2, $3, $4)`,
+          [name, text, product, rating]
+        );
+        insertedCount++;
+      }
+    }
+
+    console.log(`[GOOGLE REVIEWS SYNC] Successfully synchronized ${insertedCount} new reviews into PostgreSQL.`);
+    
+    if (insertedCount > 0) {
+      const updatedResult = await dbPool.query(
+        `SELECT name, text, product, rating, created_at AS "createdAt" FROM testimonials ORDER BY id DESC LIMIT 100`
+      );
+      activeTestimonials = updatedResult.rows;
+      saveTestimonials(activeTestimonials);
+    }
+  } catch (err: any) {
+    console.error("[GOOGLE REVIEWS SYNC ERROR] Failed to fetch or save Google Reviews:", err.message || err);
   }
 }
 
