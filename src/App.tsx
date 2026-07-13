@@ -4946,9 +4946,6 @@ const TestimonialsSection = () => {
     const [activeIndex, setActiveIndex] = useState(0);
     const [showWriteModal, setShowWriteModal] = useState(false);
     const [apiTestimonials, setApiTestimonials] = useState<any[]>([]);
-    
-    // Support for 3rd-party automated widget HTML (e.g. Judge.me / Google Reviews / Elfsight / Trustpilot)
-    const widgetHtml = import.meta.env.VITE_TESTIMONIALS_WIDGET_HTML || "";
 
     // Default translated testimonials
     const defaultTestimonials = [
@@ -4986,40 +4983,15 @@ const TestimonialsSection = () => {
 
     // Fetch persistent reviews globally from live back-end database
     useEffect(() => {
-        if (!widgetHtml) {
-            fetch('/api/testimonials')
-                .then(res => res.json())
-                .then(data => {
-                    if (Array.isArray(data)) {
-                        setApiTestimonials(data);
-                    }
-                })
-                .catch(err => console.error('[TESTIMONIALS FETCH ERROR]', err));
-        }
-    }, [widgetHtml]);
-
-    // Script injection hook for dynamic widgets if the widgetHtml contains scripts
-    useEffect(() => {
-        if (widgetHtml) {
-            // Find any script tags inside the widget HTML and execute them
-            const container = document.getElementById('testimonials-widget-container');
-            if (container) {
-                const scripts = container.getElementsByTagName('script');
-                Array.from(scripts).forEach(oldScript => {
-                    const newScript = document.createElement('script');
-                    Array.from(oldScript.attributes).forEach(attr => {
-                        newScript.setAttribute(attr.name, attr.value);
-                    });
-                    if (oldScript.src) {
-                        newScript.src = oldScript.src;
-                    } else {
-                        newScript.textContent = oldScript.textContent;
-                    }
-                    oldScript.parentNode?.replaceChild(newScript, oldScript);
-                });
-            }
-        }
-    }, [widgetHtml]);
+        fetch('/api/testimonials')
+            .then(res => res.json())
+            .then(data => {
+                if (Array.isArray(data)) {
+                    setApiTestimonials(data);
+                }
+            })
+            .catch(err => console.error('[TESTIMONIALS FETCH ERROR]', err));
+    }, []);
 
     const allTestimonials = [...defaultTestimonials, ...apiTestimonials];
 
@@ -5089,27 +5061,17 @@ const TestimonialsSection = () => {
                     <p className="text-forest/60 font-serif italic text-xs sm:text-sm max-w-xl mx-auto mb-4">
                         {t('testimonials.subtitle')}
                     </p>
-                    {!widgetHtml && (
-                        <button
-                            onClick={() => setShowWriteModal(true)}
-                            className="inline-flex items-center gap-2 px-4 py-1.5 border border-forest/15 hover:border-forest text-forest/70 hover:text-forest text-[9px] uppercase tracking-widest font-semibold rounded-full bg-white/40 hover:bg-white/80 transition-all duration-300 shadow-sm cursor-pointer"
-                        >
-                            <MessageCircle size={11} />
-                            {t('testimonials.write_button')}
-                        </button>
-                    )}
+                    <button
+                        onClick={() => setShowWriteModal(true)}
+                        className="inline-flex items-center gap-2 px-4 py-1.5 border border-forest/15 hover:border-forest text-forest/70 hover:text-forest text-[9px] uppercase tracking-widest font-semibold rounded-full bg-white/40 hover:bg-white/80 transition-all duration-300 shadow-sm cursor-pointer"
+                    >
+                        <MessageCircle size={11} />
+                        {t('testimonials.write_button')}
+                    </button>
                 </div>
 
-                {widgetHtml ? (
-                    /* Render Dynamic Widget Embed (Google Reviews, Judge.me, etc.) */
-                    <div 
-                        id="testimonials-widget-container"
-                        className="max-w-4xl mx-auto rounded-xl bg-white/50 p-4 border border-forest/5 shadow-sm overflow-hidden"
-                        dangerouslySetInnerHTML={{ __html: widgetHtml }}
-                    />
-                ) : (
-                    /* Bespoke Dynamic Carousel with server-persisted database */
-                    <div className="relative max-w-3xl mx-auto px-2 md:px-10">
+                {/* Bespoke Dynamic Carousel with server-persisted database */}
+                <div className="relative max-w-3xl mx-auto px-2 md:px-10">
                         {/* Star icon with elegant glow and outline */}
                         <div className="flex items-center justify-center gap-1 mb-4">
                             {[...Array(allTestimonials[activeIndex]?.rating || 5)].map((_, i) => (
@@ -5181,7 +5143,6 @@ const TestimonialsSection = () => {
                             </button>
                         </div>
                     </div>
-                )}
             </div>
 
             {/* Write Testimonial Luxury Modal */}
