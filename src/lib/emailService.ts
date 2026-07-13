@@ -692,6 +692,22 @@ export function generateShippedEmailHtml(order: OrderData, trackingCode: string)
             <strong>Nota de Entrega:</strong> O tempo estimado para entrega em Portugal Continental é de 1 a 3 dias úteis. Caso se trate de um envio para as Ilhas (Açores e Madeira) ou Internacional, o prazo poderá estender-se até 5 a 10 dias úteis. Acompanhe o estado do envio usando o botão acima.
           </div>
 
+          <!-- GOOGLE REVIEWS REQUEST -->
+          <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #FAF8F5; border: 1px solid rgba(197, 160, 89, 0.25); border-radius: 12px; font-family: 'Georgia', 'Garamond', serif; margin-top: 30px; margin-bottom: 30px; text-align: center;">
+            <tr>
+              <td style="padding: 25px; text-align: center;">
+                <div style="color: #C5A059; font-size: 16px; margin-bottom: 8px; letter-spacing: 0.1em;">★ ★ ★ ★ ★</div>
+                <div style="font-size: 16px; font-style: italic; font-weight: bold; color: #243119; margin-bottom: 10px;">Partilhe a sua experiência M★BRAVO!</div>
+                <div style="font-size: 13px; line-height: 1.6; color: rgba(36, 49, 25, 0.8); margin-bottom: 18px; font-weight: 300;">
+                  Como uma marca artesanal e independente, cada opinião é imensamente valiosa para nós. Se adorou o seu atendimento e a sua nova peça tecida à mão, significaria o mundo para nós se nos pudesse deixar uma breve crítica de 5 estrelas no Google.
+                </div>
+                <a href="https://g.page/r/Cdo7JGP_Xpc3EBM/review" target="_blank" style="display: inline-block; background-color: #243119; color: #F5F2ED; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: 0.15em; text-decoration: none; padding: 12px 24px; border-radius: 50px; transition: all 0.2s ease;">
+                  Deixar Crítica no Google
+                </a>
+              </td>
+            </tr>
+          </table>
+
           <!-- DIVIDER -->
           <div style="height: 1px; background-color: rgba(36, 49, 25, 0.08); margin: 30px 0;"></div>
 
