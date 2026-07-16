@@ -159,7 +159,7 @@ export const translations = {
     "btn.back_collection": "Voltar à Coleção",
     "btn.explore": "Contemplar a Matéria",
     "btn.close": "Fechar",
-    "btn.discover_philosophy": "Conhecer a nossa Essência",
+    "btn.discover_philosophy": "Sentir a Essência",
     
     // Story Section
     "story.tag": "MEMÓRIA CRUA",
@@ -341,9 +341,9 @@ export const translations = {
     
     // Testimonials
     "testimonials.tag": "TESTEMUNHOS",
-    "testimonials.title": "A Nossa Comunidade",
+    "testimonials.title": "Partilhado por Quem nos Escolhe",
     "testimonials.subtitle": "O que dizem aqueles que vestem as nossas histórias.",
-    "testimonials.write_button": "Escrever Testemunho",
+    "testimonials.write_button": "Escrever comentário",
     "testimonials.modal_title": "Deixe o seu Testemunho",
     "testimonials.label_name": "O seu Nome",
     "testimonials.label_text": "O seu Comentário",
@@ -388,7 +388,7 @@ export const translations = {
     "btn.back_collection": "Back to Collection",
     "btn.explore": "Contemplate the Matter",
     "btn.close": "Close",
-    "btn.discover_philosophy": "Discover our Essence",
+    "btn.discover_philosophy": "Feel the Essence",
     
     // Story Section
     "story.tag": "RAW MEMORY",
@@ -570,9 +570,9 @@ export const translations = {
     
     // Testimonials
     "testimonials.tag": "TESTIMONIALS",
-    "testimonials.title": "Our Community",
+    "testimonials.title": "Shared by Those Who Choose Us",
     "testimonials.subtitle": "What those who wear our stories have to say.",
-    "testimonials.write_button": "Write Testimonial",
+    "testimonials.write_button": "Write comment",
     "testimonials.modal_title": "Leave Your Testimonial",
     "testimonials.label_name": "Your Name",
     "testimonials.label_text": "Your Comment",
