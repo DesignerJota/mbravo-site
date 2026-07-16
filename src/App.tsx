@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { motion, AnimatePresence, useScroll, useTransform, useSpring, useVelocity } from 'motion/react';
+import { motion, AnimatePresence, useScroll, useTransform, useSpring, useVelocity, useMotionValue, animate } from 'motion/react';
 import { Menu, X, Instagram, Facebook, ArrowRight, ArrowLeft, ChevronLeft, ChevronRight, Share2, Mail, MessageCircle, Sparkles, Layers, Ban, AlertCircle, Feather, Palette, Heart } from 'lucide-react';
 import { loadStripe } from '@stripe/stripe-js';
 import AdminDashboardModal from './components/AdminDashboardModal';
@@ -122,25 +122,25 @@ const BASE_PRICES: { [key: string]: number | string } = {
     'alma cardigan': 95,
     'm★bravo cardigan': 95,
     'geometric poncho': 75,
-    'cozy mesh poncho': 75,
-    'mesh poncho': 75,
-    'signature granny poncho': 83,
-    'mini alma cardigan': 65,
+    'cozy mesh poncho': 55,
+    'mesh poncho': 55,
+    'signature granny poncho': 70,
+    'mini alma cardigan': 55,
     'granny square bag': 75,
-    'granny square sling bag': 75,
-    'marea bikini set': 75,
+    'granny square sling bag': 45,
+    'marea bikini set': 65,
     'luxury clutch': 45,
     'coral bikini top': 35,
     'crystalline top': 35,
-    'african flower pouch': 40,
-    'mini pouches': 22,
-    'mini shell pouch': 25,
-    'airpods case': 18,
+    'african flower pouch': 35,
+    'mini pouches': 12,
+    'mini shell pouch': 20,
+    'airpods case': 15,
     'booksleeve': 32,
     'stella cushion': 38,
-    'dragonfly bandana': 30,
+    'dragonfly bandana': 28,
     'classic bandana': 25,
-    'scarf hip bandana': 35,
+    'scarf hip bandana': 30,
     'dragonfly headband': 18,
     'placemats': 18,
     'bookmarks': 12,
@@ -482,9 +482,9 @@ Disponível em várias combinações de cores, foi criado para acompanhar os dia
         img: 'https://i.ibb.co/Xk8DF1Y7/Alma-Cardigan.jpg',
         images: [
           'https://i.ibb.co/Xk8DF1Y7/Alma-Cardigan.jpg',
-          'https://i.ibb.co/JFSPgpMd/image-1.jpg',
-          'https://i.ibb.co/tMphf1D6/image.jpg',
-          'https://i.ibb.co/gZwFn5mk/image-3-2.jpg'
+          'https://i.ibb.co/bMHd2XWZ/Alma-Cardigan.png',
+          'https://i.ibb.co/N2jxrrx3/image.png',
+          'https://i.ibb.co/JR9rXrty/image-3.png'
         ],
         description: "Cardigan em crochet feito à mão com granny squares clássicos e um design cozy e intemporal. Uma peça confortável e delicada, perfeita para dias frescos de verão, outono ou para criar um look mais acolhedor e effortless. Disponível em várias combinações de cores e materiais.",
         material: "- Opção 1: 100% algodão (Leve, respirável e ideal para dias mais amenos ou meia-estação)\n- Opção 2: 50% algodão / 50% lã (Mais quente, macio e aconchegante, ideal para dias mais frios)",
@@ -557,7 +557,8 @@ Disponível em várias cores.`,
         img: 'https://i.ibb.co/yckQG5rv/Dragonfly-Headband.png',
         images: [
           'https://i.ibb.co/yckQG5rv/Dragonfly-Headband.png',
-          'https://i.ibb.co/zWwqkHxZ/Dragonfly-Headband-Costas.png'
+          'https://i.ibb.co/zWwqkHxZ/Dragonfly-Headband-Costas.png',
+          'https://i.ibb.co/xSf76VVQ/Dragonfly-Headband-2.png'
         ],
         description: "Headband em crochet com delicado padrão de libelinhas, feita à mão para um toque leve e especial no dia a dia. Confortável, versátil e perfeita para complementar qualquer look com um detalhe handmade e cozy. Disponível em várias cores.",
         material: "- Material: 100% algodão",
@@ -567,11 +568,11 @@ Disponível em várias cores.`,
         id: 'v3c', 
         name: 'Scarf Hip Bandana', 
         price: calculateProductRange('Scarf Hip Bandana'), 
-        img: 'https://i.ibb.co/FqKX8F3t/Scarf-Hip-Bandana-12.png',
+        img: 'https://i.ibb.co/YFjN9D5K/Scarf-Hip-Bandana.png',
         images: [
-          'https://i.ibb.co/FqKX8F3t/Scarf-Hip-Bandana-12.png',
-          'https://i.ibb.co/TBp4xHWs/Scarf-Hip-Bandana-10.png',
-          'https://i.ibb.co/dsXdhvSg/Scarf-Hip-Bandana-13.png',
+          'https://i.ibb.co/YFjN9D5K/Scarf-Hip-Bandana.png',
+          'https://i.ibb.co/vCrXKGMM/Scarf-Hip-Bandana02.png',
+          'https://i.ibb.co/TD45GRqx/Scarf-Hip-Bandana03.png',
           'https://i.ibb.co/yB5QZ0rP/Scarf-Hip-Bandana-20.png'
         ],
         description: `Peça em crochet leve e versátil, cuidadosamente feita à mão.
@@ -1036,35 +1037,114 @@ const FioCondutor = () => {
     // Drops to 0.1/0.08 near dense elements (images, details, grids) and stays visible (0.4/0.45) in negative spaces
     const rawThreadOpacity = useTransform(
         scrollY,
-        [0, 200, 450, 750, 1100, 1450, 1850, 2200, 2550, 2900, 3200],
-        [0, 0.35, 0.45, 0.12, 0.08, 0.15, 0.42, 0.35, 0.12, 0.08, 0]
+        [0, 200, 450, 750, 1100, 1450, 1850, 2200, 2550, 2900, 3200, 3600, 4000, 4400, 4800, 5200, 5600, 6000],
+        [0, 0.35, 0.45, 0.12, 0.08, 0.15, 0.42, 0.35, 0.12, 0.08, 0.25, 0.35, 0.45, 0.35, 0.12, 0.08, 0.15, 0.1]
     );
     const threadOpacity = useSpring(rawThreadOpacity, { stiffness: 60, damping: 22, mass: 0.8 });
 
-    // Map scrollY [0, 3200] to vertical position of the star [40, 2900]
-    const rawStarY = useTransform(scrollY, [0, 3200], [40, 2900], { clamp: true });
+    // Map scrollY [0, 6000] to vertical position of the star [40, 5900]
+    const rawStarY = useTransform(scrollY, [0, 6000], [40, 5900], { clamp: true });
     
-    // Smooth the star's movement with a spring to simulate realistic gravity and inertia
-    const starY = useSpring(rawStarY, { stiffness: 85, damping: 24, mass: 0.4 });
+    // Smooth the star's movement with a spring to simulate realistic gravity and inertia.
+    // On PC (Desktop), we use a highly damped, premium spring with higher inertia and no overshoot to perfectly match the scroll speed without jumping ahead.
+    const starY = useSpring(rawStarY, {
+        stiffness: isMobile ? 85 : 35,
+        damping: isMobile ? 24 : 28,
+        mass: isMobile ? 0.4 : 1.0
+    });
     
-    // 2. Mobile wiggles vs Desktop wiggles:
-    // Centered around 160. Desktop goes up to 240, down to 80. Mobile stays within 145-175 for non-intrusive flow.
-    const desktopPath = "M 160 40 C 160 180, 240 280, 220 380 C 200 480, 80 580, 100 700 C 120 820, 240 920, 210 1040 C 180 1160, 80 1260, 110 1380 C 140 1500, 240 1620, 220 1740 C 200 1860, 80 1960, 100 2080 C 120 2200, 240 2320, 210 2440 C 180 2560, 80 2680, 120 2800 C 140 2880, 170 2940, 160 3000";
-    const mobilePath  = "M 160 40 C 160 180, 175 280, 170 380 C 165 480, 145 580, 150 700 C 155 820, 175 920, 170 1040 C 165 1160, 145 1260, 150 1380 C 155 1500, 175 1620, 170 1740 C 165 1860, 145 1960, 150 2080 C 155 2200, 175 2320, 170 2440 C 165 2560, 145 2680, 152 2800 C 156 2880, 162 2940, 160 3000";
+    // 2. Full-screen sinuous meandering path coordinates (viewBox width: 1440)
+    const starYCoordinates = [
+        40,  200, 380, 540, 700, 870, 1040, 1210, 1380, 1560, 1740, 1910, 2080, 2260, 2440, 2620, 2800, 3000,
+        3160, 3320, 3480, 3640, 3800, 3960, 4120, 4280, 4440, 4600, 4760, 4920, 5080, 5240, 5400, 5560, 5720, 5900
+    ];
 
-    const pathD = isMobile ? mobilePath : desktopPath;
+    const desktopStarXRange = [
+        720, 1030, 1340, 1030, 720, 410, 100, 410, 
+        720, 1030, 1340, 1030, 720, 410, 100, 410, 
+        720, 1030, 1340, 1030, 720, 410, 100, 410, 
+        720, 1030, 1340, 1030, 720, 410, 100, 410,
+        720, 1030, 1340, 720
+    ];
 
-    // Track horizontal alignment perfectly
-    const desktopStarXRange = [160, 185, 220, 150, 100, 165, 210, 145, 110, 170, 220, 150, 100, 165, 210, 145, 120, 160];
-    const mobileStarXRange  = [160, 168, 175, 162, 145, 152, 170, 158, 148, 164, 175, 162, 145, 152, 170, 158, 150, 160];
-    const starXRange = isMobile ? mobileStarXRange : desktopStarXRange;
+    const starXRange = desktopStarXRange;
 
-    // Map horizontal coordinate based on path curves
-    const starX = useTransform(
-        starY,
-        [40,  200, 380, 540, 700, 870, 1040, 1210, 1380, 1560, 1740, 1910, 2080, 2260, 2440, 2620, 2800, 3000],
-        starXRange
-    );
+    // Generate smooth bezier curves dynamically
+    const generateSmoothPath = (xCoords: number[], yCoords: number[]) => {
+        if (xCoords.length === 0 || yCoords.length === 0) return '';
+        let d = `M ${xCoords[0]} ${yCoords[0]}`;
+        for (let i = 0; i < xCoords.length - 1; i++) {
+            const x0 = xCoords[i];
+            const y0 = yCoords[i];
+            const x1 = xCoords[i + 1];
+            const y1 = yCoords[i + 1];
+            const cy0 = y0 + (y1 - y0) / 2;
+            const cy1 = y0 + (y1 - y0) / 2;
+            d += ` C ${x0} ${cy0}, ${x1} ${cy1}, ${x1} ${y1}`;
+        }
+        return d;
+    };
+
+    const pathD = generateSmoothPath(starXRange, starYCoordinates);
+
+    // Calculate bezier point and exact slope/angle for organic rotation
+    const getBezierPointAndAngle = (yVal: number) => {
+        const yCoords = starYCoordinates;
+        const xCoords = starXRange;
+        
+        const minY = yCoords[0];
+        const maxY = yCoords[yCoords.length - 1];
+        const clampedY = Math.max(minY, Math.min(maxY, yVal));
+        
+        let i = 0;
+        for (let j = 0; j < yCoords.length - 1; j++) {
+            if (clampedY >= yCoords[j] && clampedY <= yCoords[j + 1]) {
+                i = j;
+                break;
+            }
+        }
+        
+        const y0 = yCoords[i];
+        const y1 = yCoords[i + 1];
+        const x0 = xCoords[i];
+        const x1 = xCoords[i + 1];
+        const dy = y1 - y0;
+        const dx = x1 - x0;
+        
+        if (dy === 0) return { x: x0, angle: 0 };
+        
+        // Binary search for parameter t (0 to 1) along the bezier segment
+        let tMin = 0;
+        let tMax = 1;
+        let t = 0.5;
+        
+        for (let step = 0; step < 10; step++) {
+            t = (tMin + tMax) / 2;
+            const currentY = y0 + dy * (1.5 * t - 1.5 * t * t + t * t * t);
+            if (currentY < clampedY) {
+                tMin = t;
+            } else {
+                tMax = t;
+            }
+        }
+        
+        // Precise position x and derivative of x with respect to t
+        const x = x0 + dx * (3 * t * t - 2 * t * t * t);
+        const dXdT = 6 * (1 - t) * t * dx;
+        const dYdT = 1.5 * dy * ((1 - t) * (1 - t) + t * t);
+        
+        const slope = dXdT / dYdT;
+        const angleRad = Math.atan(slope);
+        const angleDeg = (angleRad * 180) / Math.PI;
+        
+        return { x, angle: angleDeg };
+    };
+
+    const starX = useTransform(starY, (y) => getBezierPointAndAngle(y).x);
+    const starRotation = useTransform(starY, (y) => getBezierPointAndAngle(y).angle);
+
+    const starLeft = useTransform(starX, (x) => `${(x / 1440) * 100}%`);
+    const starTop = useTransform(starY, (y) => `${(y / 6000) * 100}%`);
 
     // 3. The Breathing Star based on scroll speed / velocity
     const scrollVelocity = useVelocity(scrollY);
@@ -1090,16 +1170,17 @@ const FioCondutor = () => {
     const specularStrokeWidth = isMobile ? 0.12 : 0.25;
 
     return (
-        <div className="absolute top-[75vh] left-1/2 -translate-x-1/2 w-80 h-[3000px] pointer-events-none select-none z-[5] overflow-visible">
+        <div className="absolute top-[75vh] left-0 w-full bottom-0 pointer-events-none select-none z-[5] overflow-x-hidden overflow-y-visible">
             <motion.div 
                 style={{ opacity: threadOpacity }}
                 transition={{ duration: 0.5 }}
                 className="relative w-full h-full flex flex-col items-center justify-start overflow-visible"
             >
                 <svg 
-                    viewBox="0 0 320 3000" 
+                    viewBox="0 0 1440 6000" 
                     fill="none" 
                     className="select-none pointer-events-none overflow-visible w-full h-full"
+                    preserveAspectRatio="none"
                 >
                     <defs>
                         {/* High-quality warm golden daylight gradient with sunset vibe fading entirely at bottom */}
@@ -1197,52 +1278,55 @@ const FioCondutor = () => {
                             strokeDasharray: "80 240"
                         }}
                     />
-
-                    {/* Star Group centered exactly around its bottom indent (0, 0), and positioned dynamically with spring-driven scroll tracking */}
-                    <motion.g 
-                        style={{ 
-                            x: starX, 
-                            y: starY,
-                            opacity: starOpacity
-                        }}
-                    >
-                        {/* Elegant background halo glow that increases size and visible light during scroll activity */}
-                        <motion.circle
-                            r="16"
-                            fill="rgba(197, 160, 89, 0.28)"
-                            filter="url(#subtleThreadGlow)"
-                            style={{
-                                scale: starGlowScale,
-                                opacity: starActivity
-                            }}
-                        />
-
-                        {/* Official M★Bravo Star shape, solid gold - centered such that its bottom indent is at (0, 0) */}
-                        <motion.path 
-                            d="M0 -23 L4.3 -13.3 L14.7 -12.3 L7.3 -5.3 L9 4.7 L0 0 L-9 4.7 L-7.3 -5.3 L-14.7 -12.3 L-4.3 -13.3 Z" 
-                            fill="#C5A059"
-                            animate={{
-                                scale: [1, 1.05, 1],
-                            }}
-                            transition={{
-                                duration: 4,
-                                repeat: Infinity,
-                                ease: "easeInOut"
-                            }}
-                        />
-
-                        {/* Elegant Serif "M" inside the star to correspond 100% to the official brand star */}
-                        <text 
-                            x="0" 
-                            y="-6.5" 
-                            textAnchor="middle" 
-                            fill="#243119" 
-                            style={{ fontSize: '7px', fontFamily: "'Cormorant Garamond', serif", fontWeight: 'bold' }}
-                        >
-                            M
-                        </text>
-                    </motion.g>
                 </svg>
+
+                {/* Star shape, absolutely positioned to bypass preserveAspectRatio="none" stretching and keep aspect-ratio perfect */}
+                <motion.div 
+                    className="absolute z-10 pointer-events-none select-none flex items-center justify-center w-12 h-12"
+                    style={{ 
+                        left: starLeft, 
+                        top: starTop,
+                        rotate: starRotation,
+                        opacity: starOpacity,
+                        x: "-50%",
+                        y: "-50%"
+                    }}
+                >
+                    {/* Elegant background halo glow that increases size and visible light during scroll activity */}
+                    <motion.div
+                        className="absolute w-10 h-10 rounded-full bg-[#C5A059]/25 filter blur-[6px]"
+                        style={{
+                            scale: starGlowScale,
+                            opacity: starActivity
+                        }}
+                    />
+
+                    {/* Official M★Bravo Star shape, solid gold - aspect-ratio preserved perfectly */}
+                    <motion.svg 
+                        width="34"
+                        height="34"
+                        viewBox="0 0 34 34"
+                        className="overflow-visible aspect-square w-[34px] h-[34px] flex-shrink-0"
+                        style={{ width: '34px', height: '34px', minWidth: '34px', minHeight: '34px' }}
+                    >
+                        <g transform="translate(17, 23.5)">
+                            <path 
+                                d="M0 -23 L4.3 -13.3 L14.7 -12.3 L7.3 -5.3 L9 4.7 L0 0 L-9 4.7 L-7.3 -5.3 L-14.7 -12.3 L-4.3 -13.3 Z" 
+                                fill="#C5A059"
+                            />
+                            {/* Elegant Serif "M" inside the star */}
+                            <text 
+                                x="0" 
+                                y="-6.5" 
+                                textAnchor="middle" 
+                                fill="#243119" 
+                                style={{ fontSize: '7.5px', fontFamily: "'Cormorant Garamond', serif", fontWeight: 'bold' }}
+                            >
+                                M
+                            </text>
+                        </g>
+                    </motion.svg>
+                </motion.div>
             </motion.div>
         </div>
     );
@@ -1501,7 +1585,7 @@ const StorySection = () => {
     }, []);
 
     return (
-        <section ref={containerRef} id="sobre" data-background="light" className="py-12 xs:py-16 sm:py-20 md:py-24 lg:py-32 xl:py-36 relative z-10 overflow-hidden select-none px-4 sm:px-6 md:portrait:px-12" style={{ backgroundColor: '#F6F1E5' }}>
+        <section ref={containerRef} id="sobre" data-background="light" className="py-12 xs:py-16 sm:py-20 md:py-24 lg:py-32 xl:py-36 relative overflow-hidden select-none px-6 md:px-8 lg:px-16" style={{ backgroundColor: '#F6F1E5' }}>
             {/* Elements of Fundo Subtis: Handcrafted loose cotton fibers / wavy spinning threads running deep inside the cream canvas, completely backgrounded */}
             <div className="absolute inset-x-0 bottom-0 top-[150px] pointer-events-none z-0 overflow-hidden">
                 {/* Subtle organic textile noise */}
@@ -1596,25 +1680,25 @@ const StorySection = () => {
                         <span className="text-[10px] uppercase tracking-[0.45em] font-bold text-forest/35 block font-sans">
                             {t('story.badge')}
                         </span>
-                        <h2 className="text-[clamp(1.25rem,4.5vw,3rem)] font-serif text-forest tracking-tight leading-tight font-light">
+                        <h2 className="text-3xl md:text-4xl lg:text-5xl font-serif text-forest tracking-tight leading-tight font-light">
                             {t('story.title.part1')}{" "}
                             <span className="italic font-normal text-[#C5A059]">{t('story.title.part2')}</span>
                         </h2>
                     </div>
                     
                     <div className="space-y-8">
-                        <p className="text-forest font-serif italic text-[clamp(1.125rem,2.5vw,1.5rem)] leading-relaxed font-light text-forest/90">
+                        <p className="text-forest font-serif italic text-lg md:text-xl lg:text-2xl leading-relaxed font-light text-forest/90">
                             {t('story.subtitle')} <br />
-                            <span className="text-[clamp(0.75rem,1.8vw,1.125rem)] font-sans not-italic text-forest/70 block mt-3 font-light leading-relaxed">
+                            <span className="text-sm md:text-base font-sans not-italic text-forest/70 block mt-3 font-light leading-relaxed">
                                 {t('story.subtitle2')}
                             </span>
                         </p>
                         
-                        <p className="text-forest font-serif italic text-[clamp(1.125rem,2.5vw,1.5rem)] leading-relaxed font-light text-forest/95">
+                        <p className="text-forest font-serif italic text-lg md:text-xl lg:text-2xl leading-relaxed font-light text-forest/95">
                             {t('story.p1')}
                         </p>
                         
-                        <p className="text-forest/70 text-[clamp(0.75rem,1.8vw,1.125rem)] leading-relaxed font-sans font-light max-w-2xl">
+                        <p className="text-forest/70 text-sm md:text-base leading-relaxed font-sans font-light max-w-2xl">
                             {t('story.p2')}
                         </p>
                     </div>
@@ -1696,23 +1780,18 @@ const StorySection = () => {
 const MadeWithTimeSection = () => {
     const { t } = useLanguage();
     return (
-        <section id="manifesto" data-background="light" className="py-[clamp(3rem,8vw,5.5rem)] bg-[#FCFBF9] relative overflow-hidden select-none border-t border-forest/5 px-6 sm:px-10 lg:px-16">
+        <section id="manifesto" data-background="light" className="py-[clamp(3rem,8vw,5.5rem)] bg-[#FCFBF9] relative overflow-hidden select-none border-t border-forest/5 px-6 md:px-8 lg:px-16">
             <div className="w-full max-w-7xl mx-auto">
                 {/* Header: Large Asymmetrical Editorial Typography */}
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-16 items-baseline mb-12 sm:mb-16 md:mb-16 border-b border-forest/10 pb-8 md:pb-12">
-                    <div className="lg:col-span-7">
+                    <div className="lg:col-span-12">
                         <span className="text-[10px] uppercase tracking-[0.45em] font-semibold text-forest/35 block mb-4 font-sans">
                             {t('manifesto.choice')}
                         </span>
-                        <h2 className="text-[clamp(1.35rem,4.5vw,2.5rem)] font-serif text-forest tracking-tight leading-tight lg:leading-[1.15] font-light">
+                        <h2 className="text-3xl md:text-4xl lg:text-5xl font-serif text-forest tracking-tight leading-tight lg:leading-[1.15] font-light">
                             {t('manifesto.title')} <br />
                             <span className="italic font-normal text-[#C5A059]">{t('manifesto.subtitle')}</span>
                         </h2>
-                    </div>
-                    <div className="lg:col-span-5 lg:pl-8">
-                        <p className="text-forest/70 text-[clamp(0.9rem,1.8vw,1.1rem)] font-light leading-relaxed font-serif italic border-l border-[#C5A059]/40 pl-6 py-2">
-                            "{t('manifesto.quote')}"
-                        </p>
                     </div>
                 </div>
 
@@ -1898,7 +1977,7 @@ const KnotSection = () => {
             ref={containerRef} 
             id="feeling" 
             data-background="dark" 
-            className="py-[clamp(3rem,8vw,5.5rem)] relative overflow-hidden px-6 sm:px-10 lg:px-16" 
+            className="py-[clamp(3rem,8vw,5.5rem)] relative overflow-hidden px-6 md:px-8 lg:px-16" 
             style={{ 
                 backgroundColor: '#243119'
             }}
@@ -1927,7 +2006,7 @@ const KnotSection = () => {
                             whileInView={{ opacity: 1, y: 0 }}
                             viewport={{ once: true }}
                             transition={{ duration: 1 }}
-                            className="text-[clamp(1.5rem,4.5vw,2.5rem)] font-serif text-cream leading-tight tracking-tight font-light"
+                            className="text-3xl md:text-4xl lg:text-5xl font-serif text-cream leading-tight tracking-tight font-light"
                         >
                             {t('feeling.title.part1')} <br />
                             <span className="italic font-normal text-brand-green-light">{t('feeling.title.part2')}</span>
@@ -1940,7 +2019,7 @@ const KnotSection = () => {
                             whileInView={{ opacity: 1, y: 0 }}
                             viewport={{ once: true }}
                             transition={{ duration: 1, delay: 0.2 }}
-                            className="space-y-4 text-cream/75 font-sans font-light text-[clamp(0.8125rem,1.5vw,0.95rem)] leading-relaxed max-w-xl mx-auto lg:mx-0"
+                            className="space-y-4 text-cream/75 font-sans font-light text-sm md:text-base leading-relaxed max-w-xl mx-auto lg:mx-0"
                         >
                             <p>{t('feeling.p1')}</p>
                             <p>{t('feeling.p2')}</p>
@@ -3993,7 +4072,7 @@ const CollectionSection = () => {
     }, [focusedProductId]);
 
     return (
-        <section ref={containerRef} id="collection" data-background="light" className="py-10 xs:py-12 sm:py-16 lg:py-24 xl:py-28 bg-[#F6F1E5] min-h-[85vh] relative overflow-hidden px-4 sm:px-6 lg:px-8">
+        <section ref={containerRef} id="collection" data-background="light" className="py-10 xs:py-12 sm:py-16 lg:py-24 xl:py-28 bg-[#F6F1E5] min-h-[85vh] relative overflow-hidden px-6 md:px-8 lg:px-16">
 
             <motion.div 
                 style={{ x: xTrack, y: yTrack, opacity: opacityTrack, fontFamily: "'Cormorant Garamond', serif" }}
@@ -4022,7 +4101,7 @@ const CollectionSection = () => {
                  <motion.h2 
                     initial={{ opacity: 0, y: 20 }}
                     whileInView={{ opacity: 1, y: 0 }}
-                    className="text-[clamp(1.5rem,5.5vw,3.75rem)] font-light tracking-[0.1em] xs:tracking-[0.15em] sm:tracking-[0.2em] uppercase leading-tight text-center font-serif"
+                    className="text-3xl md:text-4xl lg:text-5xl font-light tracking-[0.1em] xs:tracking-[0.15em] sm:tracking-[0.2em] uppercase leading-tight text-center font-serif"
                   >
                     {selectedCategory ? activeCategory?.name : (
                         <span 
@@ -4074,7 +4153,7 @@ const CollectionSection = () => {
                  )}
             </div>
 
-            <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
                 <AnimatePresence mode="wait">
                     {!selectedCategory ? (
                         <motion.div 
@@ -4104,9 +4183,9 @@ const CollectionSection = () => {
                                         style={{ imageRendering: 'crisp-edges' }}
                                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out antialiased"
                                     />
-                                    <div className="absolute inset-0 bg-gradient-to-t from-forest/90 via-forest/20 to-transparent flex flex-col justify-end p-6 sm:p-8 md:p-12 translate-y-0 md:translate-y-6 md:group-hover:translate-y-0 transition-transform duration-700">
-                                        <h3 className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-serif text-cream mb-2 sm:mb-4">{cat.name}</h3>
-                                        <p className="text-cream/60 text-xs sm:text-sm font-light mb-6 sm:mb-10 max-w-sm opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-700">{cat.items}</p>
+                                    <div className="absolute inset-0 bg-gradient-to-t from-forest/90 via-forest/20 to-transparent flex flex-col justify-end p-6 sm:p-8 md:p-8 lg:p-10 xl:p-12 transition-all duration-500">
+                                        <h3 className="text-lg sm:text-xl md:text-xl lg:text-2xl xl:text-3xl font-serif text-cream mb-2">{cat.name}</h3>
+                                        <p className="text-cream/60 text-xs sm:text-sm font-light mb-2 sm:mb-4 max-w-sm opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-all duration-500 transform md:translate-y-3 md:group-hover:translate-y-0">{cat.items}</p>
                                     </div>
                                 </motion.div>
                             ))}
@@ -4231,7 +4310,7 @@ const ContactSection = () => {
         : "Hello! I saw the M★BRAVO website and would like to know more about your pieces.";
 
     return (
-        <section ref={containerRef} id="contacto" data-background="dark" className="py-[clamp(3rem,8vh,9rem)] bg-forest relative overflow-hidden px-4 sm:px-6 lg:px-8">
+        <section ref={containerRef} id="contacto" data-background="dark" className="py-[clamp(3rem,8vw,9rem)] bg-forest relative overflow-hidden px-6 md:px-8 lg:px-16">
              {/* Large Script Background */}
              <motion.div 
                 style={{ x: xTrack, y: yTrack, opacity: opacityTrack, fontFamily: "'Cormorant Garamond', serif" }}
@@ -4246,8 +4325,8 @@ const ContactSection = () => {
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
                 >
-                    <h2 className="text-[clamp(1.5rem,5.5vw,4.5rem)] font-serif text-cream mb-[clamp(1.5rem,4vw,3rem)] leading-tight">{t('contact.title_1')} <br /><span className="italic">{t('contact.title_2')}</span></h2>
-                    <p className="text-cream/50 text-[clamp(0.875rem,2vw,1.25rem)] font-light mb-[clamp(2rem,5vw,4rem)] leading-relaxed max-w-2xl mx-auto">
+                    <h2 className="text-3xl md:text-4xl lg:text-5xl font-serif text-cream mb-[clamp(1.5rem,4vw,3rem)] leading-tight">{t('contact.title_1')} <br /><span className="italic">{t('contact.title_2')}</span></h2>
+                    <p className="text-cream/50 text-lg md:text-xl lg:text-2xl font-light mb-[clamp(2rem,5vw,4rem)] leading-relaxed max-w-2xl mx-auto">
                         {t('contact.subtitle')}
                     </p>
                     
@@ -4615,57 +4694,67 @@ const Footer = ({ onOpenLegal, onOpenAdmin }: { onOpenLegal: (type: 'envios' | '
 const MemoryContinuesSection = ({ onDiscoverEssence }: { onDiscoverEssence: () => void }) => {
     const { t } = useLanguage();
     return (
-        <section id="memoria" data-background="light" className="py-[clamp(3rem,8vw,5.5rem)] bg-[#F6F1E5] relative overflow-hidden select-none border-b border-forest/5 px-6 sm:px-10 lg:px-16">
-            <div className="w-full max-w-7xl mx-auto relative z-10">
-                <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16 items-start">
-                    
-                    {/* Left Column: Title and Call to Action */}
-                    <div className="lg:col-span-5 lg:sticky lg:top-28 text-center lg:text-left space-y-6">
-                        <div className="space-y-3">
-                            <span className="text-[10px] uppercase tracking-[0.45em] font-semibold text-forest/35 block font-sans">
-                                {t('memory.tag')}
-                            </span>
-                            <div className="h-[1px] w-12 bg-forest/10 mx-auto lg:mx-0" />
-                        </div>
+        <section id="memoria" data-background="dark" className="py-24 md:py-32 bg-forest text-cream relative overflow-hidden select-none border-b border-forest/5 px-6 md:px-8 lg:px-16">
+            <div className="w-full max-w-3xl mx-auto relative z-10 text-center">
+                
+                {/* Header Badge */}
+                <div className="space-y-4 mb-10 md:mb-12">
+                    <span className="text-[10px] uppercase tracking-[0.45em] font-semibold text-cream/40 block font-sans">
+                        {t('memory.tag')}
+                    </span>
+                    <div className="h-[1px] w-12 bg-cream/20 mx-auto" />
+                </div>
 
-                        <div className="space-y-4">
-                            <h2 className="text-[clamp(1.35rem,3.5vw,2rem)] font-serif text-forest tracking-tight leading-tight font-light">
-                                {t('memory.title')}
-                            </h2>
-                            
-                            <p className="text-forest/70 font-serif italic text-[clamp(0.95rem,1.8vw,1.125rem)] leading-relaxed font-light max-w-xl mx-auto lg:mx-0">
-                                {t('memory.subtitle')}
-                            </p>
-                        </div>
-
-                        <div className="pt-4">
-                            <button
-                                onClick={onDiscoverEssence}
-                                className="group inline-flex items-center gap-2.5 px-5 py-2.5 sm:px-7 sm:py-3 md:px-8 md:py-3.5 border border-forest/20 text-forest hover:bg-forest hover:text-cream rounded-full text-[9px] sm:text-[10px] uppercase tracking-[0.22em] sm:tracking-[0.3em] font-semibold transition-all duration-700 cursor-pointer hover:scale-[1.02] active:scale-[0.98] shadow-sm hover:shadow-md"
-                            >
-                                {t('btn.discover_philosophy')}
-                                <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform duration-500" />
-                            </button>
-                        </div>
+                {/* Centered spacious elements */}
+                <div className="space-y-12 md:space-y-16">
+                    {/* Title & Subtitle */}
+                    <div className="space-y-6">
+                        <h2 className="text-3xl md:text-4xl lg:text-5xl font-serif text-cream tracking-tight leading-tight font-light max-w-2xl mx-auto">
+                            {t('memory.title')}
+                        </h2>
+                        
+                        <p className="text-cream/80 font-serif italic text-lg md:text-xl lg:text-2xl leading-relaxed font-light max-w-2xl mx-auto">
+                            {t('memory.subtitle')}
+                        </p>
                     </div>
 
-                    {/* Right Column: Biographical Narrative & Quote */}
-                    <div className="lg:col-span-7 lg:border-l lg:border-forest/10 lg:pl-12 text-center lg:text-left space-y-8">
-                        <div className="space-y-6">
-                            <p className="text-[#C5A059] font-serif italic text-[clamp(1rem,1.8vw,1.2rem)] font-normal tracking-wide">
-                                {t('memory.mbravo_born')}
-                            </p>
-                            
-                            <p className="text-forest/65 text-[clamp(0.8125rem,1.5vw,0.875rem)] leading-relaxed font-sans font-light whitespace-pre-line">
-                                {t('memory.desc')}
-                            </p>
-                        </div>
+                    {/* Mbravo Born & Description */}
+                    <div className="space-y-6 max-w-2xl mx-auto">
+                        <p className="text-[#C5A059] font-serif italic text-lg md:text-xl lg:text-2xl font-normal tracking-wide leading-relaxed">
+                            {t('memory.mbravo_born')}
+                        </p>
+                        
+                        <p className="text-cream/70 text-sm md:text-base leading-relaxed font-sans font-light whitespace-pre-line">
+                            {t('memory.desc')}
+                        </p>
+                    </div>
 
-                        <div className="pt-8 border-t border-forest/10 space-y-4">
-                            <p className="text-forest font-serif italic text-[clamp(0.875rem,1.8vw,1rem)] font-light leading-relaxed text-forest/80 max-w-xl mx-auto lg:mx-0">
-                                {t('memory.quote')}
-                            </p>
-                        </div>
+                    {/* Final Quote */}
+                    <div className="pt-8 border-t border-cream/10 max-w-xl mx-auto">
+                        <p className="font-serif italic text-sm md:text-base font-light leading-relaxed text-cream/90">
+                            {t('memory.quote')}
+                        </p>
+                    </div>
+
+                    {/* Subtle Centered CTA Pill Button with premium golden glow and micro-rotating/gliding gold star */}
+                    <div className="pt-4 flex justify-center">
+                        <button
+                            onClick={onDiscoverEssence}
+                            className="group relative inline-flex items-center gap-2.5 px-4 py-2 xs:px-5 xs:py-2.5 sm:px-6 sm:py-3 md:px-8 md:py-3.5 border-[0.5px] border-[#C5A059]/30 hover:border-[#C5A059] rounded-full text-cream text-[8px] sm:text-[10px] md:text-[11px] uppercase tracking-[0.3em] font-light transition-all duration-700 cursor-pointer bg-transparent overflow-hidden hover:scale-[1.01] active:scale-[0.98] hover:shadow-[0_0_25px_rgba(197,160,89,0.15)]"
+                        >
+                            {/* Premium internal delicate golden glow/shimmer sweep effect */}
+                            <span className="absolute inset-0 bg-gradient-to-r from-[#C5A059]/0 via-[#C5A059]/12 to-[#C5A059]/0 opacity-0 group-hover:opacity-100 transition-opacity duration-1000 rounded-full blur-[2px]" />
+                            <span className="absolute inset-0 bg-[#C5A059]/5 opacity-0 group-hover:opacity-100 transition-opacity duration-700 rounded-full" />
+                            <span className="absolute inset-0 bg-gradient-to-r from-transparent via-[#C5A059]/15 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ease-out" />
+                            
+                            <span className="relative z-10">{t('btn.discover_philosophy')}</span>
+                            <svg 
+                                viewBox="0 0 24 24" 
+                                className="relative z-10 w-3.5 h-3.5 sm:w-4 sm:h-4 md:w-[17px] md:h-[17px] text-[#C5A059] fill-[#C5A059]/25 stroke-[#C5A059] stroke-[0.8] transition-all duration-700 ease-out group-hover:rotate-[150deg] group-hover:translate-x-2.5"
+                            >
+                                <path d="M12 1.5l2.9 6.2 6.6 1-4.8 4.9 1.1 6.9-5.8-3.2-5.8 3.2 1.1-6.9-4.8-4.9 6.6-1z" />
+                            </svg>
+                        </button>
                     </div>
 
                 </div>
@@ -4690,33 +4779,7 @@ const InstagramSection = () => {
         }
     }, [beholdId]);
 
-    // Active MutationObserver to catch and instantly destroy Behold.so branding & attribution links
-    useEffect(() => {
-        if (!beholdId) return;
 
-        const cleanBeholdBranding = () => {
-            const beholdBrand = document.querySelector('[class*="behold-branding"]');
-            const beholdAttribution = document.querySelector('a[href*="behold.so"]');
-            if (beholdBrand) beholdBrand.remove();
-            if (beholdAttribution) beholdAttribution.remove();
-        };
-
-        // Run once initially
-        cleanBeholdBranding();
-
-        const observer = new MutationObserver((mutations) => {
-            mutations.forEach((mutation) => {
-                if (mutation.type === 'childList') {
-                    cleanBeholdBranding();
-                }
-            });
-        });
-
-        const config = { childList: true, subtree: true };
-        observer.observe(document.body, config);
-
-        return () => observer.disconnect();
-    }, [beholdId]);
     
     const posts = [
         {
@@ -4724,48 +4787,54 @@ const InstagramSection = () => {
             img: 'https://i.ibb.co/mCmVm2rL/mockup-coosters-luxury-1.png',
             alt: 'Daisy Coasters M★BRAVO',
             likes: '48',
-            comments: '3'
+            comments: '3',
+            className: "col-span-1 md:col-span-1 lg:col-span-2 aspect-[4/5] rotate-[1.5deg] mt-1 sm:mt-2 lg:-mt-4"
         },
         {
             id: 2,
             img: 'https://i.ibb.co/NnCJyRTF/African-Flower-Pouch-10-1.png',
             alt: 'African Flower Pouch M★BRAVO',
             likes: '64',
-            comments: '8'
+            comments: '8',
+            className: "col-span-1 md:col-span-1 lg:col-span-1 aspect-[1/1] rotate-[-2deg] -mt-3 sm:-mt-5 lg:mt-6 lg:translate-x-2"
         },
         {
             id: 3,
             img: 'https://i.ibb.co/zWNCP5Nx/Stella-Cushion-7-1.png',
             alt: 'Stella Cushion M★BRAVO',
             likes: '72',
-            comments: '5'
+            comments: '5',
+            className: "col-span-1 md:col-span-1 lg:col-span-2 aspect-[3/4] rotate-[1deg] mt-4 sm:mt-6 lg:-mt-10 lg:-ml-2"
         },
         {
             id: 4,
             img: 'https://i.ibb.co/wNdC8NNG/Granny-square-sling-bag-20.png',
             alt: 'Granny Square Sling Bag M★BRAVO',
             likes: '59',
-            comments: '6'
+            comments: '6',
+            className: "col-span-1 md:col-span-1 lg:col-span-1 aspect-[1/1] rotate-[-3deg] -mt-2 sm:-mt-4 lg:mt-4 lg:-ml-6"
         },
         {
             id: 5,
             img: 'https://i.ibb.co/kVZvr34t/Sunflower-coasters-5.png',
             alt: 'Sunflower Coasters M★BRAVO',
             likes: '41',
-            comments: '2'
+            comments: '2',
+            className: "col-span-1 md:col-span-1 lg:col-span-1 aspect-[4/3] rotate-[2.5deg] mt-3 sm:mt-5 lg:mt-10 lg:-ml-4"
         },
         {
             id: 6,
             img: 'https://i.ibb.co/VY1dx3nt/Mini-shell-Pouch.png',
             alt: 'Mini Shell Pouch M★BRAVO',
             likes: '53',
-            comments: '4'
+            comments: '4',
+            className: "col-span-1 md:col-span-1 lg:col-span-2 aspect-[4/5] rotate-[-1.5deg] -mt-4 sm:-mt-6 lg:-mt-6 lg:-ml-2"
         }
     ];
 
     return (
-        <section id="instagram-feed" className="py-12 xs:py-16 sm:py-20 md:py-24 px-4 bg-[#F6F1E5] border-t border-forest/5 relative overflow-hidden">
-            <div className="w-full max-w-7xl mx-auto">
+        <section id="instagram-feed" className="py-6 sm:py-10 md:py-12 px-6 md:px-8 lg:px-16 bg-[#F6F1E5] border-t border-forest/5 relative overflow-hidden">
+            <div className="w-full max-w-7xl mx-auto relative z-10">
                 <div className="text-center space-y-4 mb-8 sm:mb-12">
                     <span className="text-[10px] uppercase tracking-[0.45em] font-semibold text-forest/35 block font-sans">
                         {t('instagram.feed.title')}
@@ -4774,49 +4843,55 @@ const InstagramSection = () => {
                         href="https://instagram.com/mbravobycarolina/" 
                         target="_blank" 
                         rel="noopener noreferrer"
-                        className="inline-block text-[clamp(1.25rem,4vw,1.875rem)] font-serif text-[#C5A059] hover:text-[#B38E47] transition-colors duration-300 font-light select-none tracking-tight"
+                        className="inline-block text-lg md:text-xl lg:text-2xl font-serif text-[#C5A059] hover:text-[#B38E47] transition-colors duration-300 font-light select-none tracking-tight"
                     >
                         {t('instagram.feed.handle')}
                     </a>
-                    <div className="h-[1px] w-12 bg-forest/10 mx-auto mt-4" />
                 </div>
 
                 {beholdId ? (
                     /* Dynamic Behold.so Feed */
-                    <div className="w-full overflow-hidden rounded-xl bg-white/50 p-4 border border-forest/5 shadow-sm">
+                    <div className="w-full">
                         <div data-behold-id={beholdId}></div>
                     </div>
                 ) : (
-                    /* Elegant Fallback Grid */
-                    <div className="flex overflow-x-auto pb-4 gap-4 snap-x snap-mandatory -mx-4 px-4 sm:-mx-6 sm:px-6 lg:mx-0 lg:px-0 lg:grid lg:grid-cols-6 lg:overflow-x-visible lg:pb-0 lg:snap-none scrollbar-none [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+                    /* Elegant Fallback Grid - Asymmetrical studio moodboard grid responsive on all devices */
+                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-9 gap-4 sm:gap-6 lg:gap-6 items-start">
                         {posts.map((post, idx) => (
                             <motion.a
                                 key={post.id}
                                 href="https://instagram.com/mbravobycarolina/"
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                initial={{ opacity: 0, y: 20 }}
+                                initial={{ opacity: 0, y: 30 }}
                                 whileInView={{ opacity: 1, y: 0 }}
                                 viewport={{ once: true }}
-                                transition={{ duration: 0.8, delay: idx * 0.1, ease: [0.16, 1, 0.3, 1] }}
-                                className="shrink-0 w-[68vw] sm:w-[40vw] md:w-[28vw] lg:w-auto aspect-square snap-align-start group block relative overflow-hidden bg-forest/5 rounded-lg shadow-sm hover:shadow-md border border-forest/5 transition-all duration-300"
+                                transition={{ duration: 1.2, delay: idx * 0.1, ease: [0.16, 1, 0.3, 1] }}
+                                className={`${post.className} group block relative bg-white p-2.5 pb-8 sm:pb-10 border border-forest/10 rounded-sm shadow-md hover:shadow-xl transition-all duration-500 ease-out`}
                             >
-                                <img 
-                                    src={post.img} 
-                                    alt={post.alt}
-                                    className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
-                                    style={{ imageRendering: 'crisp-edges' }}
-                                />
-                                {/* Overlay on Hover */}
-                                <div className="absolute inset-0 bg-forest/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col items-center justify-center gap-2 text-cream z-10 p-2 text-center">
-                                    <div className="flex items-center gap-1.5 text-sm font-sans font-medium">
-                                        <Heart size={16} fill="currentColor" className="text-cream" />
-                                        <span>{post.likes}</span>
+                                <div className="w-full h-full overflow-hidden relative aspect-square bg-forest/5 rounded-sm">
+                                    <img 
+                                        src={post.img} 
+                                        alt={post.alt}
+                                        className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+                                        style={{ imageRendering: 'crisp-edges' }}
+                                    />
+                                    {/* Overlay on Hover */}
+                                    <div className="absolute inset-0 bg-forest/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col items-center justify-center gap-2 text-cream z-10 p-2 text-center">
+                                        <div className="flex items-center gap-1.5 text-sm font-sans font-medium">
+                                            <Heart size={16} fill="currentColor" className="text-cream" />
+                                            <span>{post.likes}</span>
+                                        </div>
+                                        <div className="flex items-center gap-1.5 text-xs font-sans font-medium opacity-90 mt-1">
+                                            <Instagram size={14} className="text-cream" />
+                                            <span className="text-[9px] uppercase tracking-wider font-semibold">{t('instagram.feed.view_profile')}</span>
+                                        </div>
                                     </div>
-                                    <div className="flex items-center gap-1.5 text-xs font-sans font-medium opacity-90 mt-1">
-                                        <Instagram size={14} className="text-cream" />
-                                        <span className="text-[9px] uppercase tracking-wider font-semibold">{t('instagram.feed.view_profile')}</span>
-                                    </div>
+                                </div>
+                                {/* Editorial specimen-like tag label underneath in the white area */}
+                                <div className="mt-3.5 text-left flex items-center justify-between border-t border-forest/5 pt-2 select-none pointer-events-none">
+                                    <span className="font-mono text-[8px] text-forest/45 tracking-widest uppercase">M★B_SPEC_0{post.id}</span>
+                                    <span className="font-serif italic text-[10px] text-forest/60">{post.alt.split(' ')[0]}</span>
                                 </div>
                             </motion.a>
                         ))}
@@ -4829,8 +4904,101 @@ const InstagramSection = () => {
 
 const EssenceHero = ({ onBackToHome }: { onBackToHome: () => void }) => {
     const { t } = useLanguage();
+    const containerRef = useRef<HTMLDivElement>(null);
+    
+    // We use scrollYProgress bound to the component viewport itself for gentle parallax decorative items
+    const { scrollYProgress } = useScroll({
+        target: containerRef,
+        offset: ["start start", "end start"]
+    });
+    
+    // Parallax values for floating background crochet needle and loop
+    const needleY = useTransform(scrollYProgress, [0, 1], [0, -100]);
+    const loopY = useTransform(scrollYProgress, [0, 1], [0, 120]);
+    const loopRotate = useTransform(scrollYProgress, [0, 1], [0, 45]);
+
+    // Automatic continuous animation progress (0 to 1 loop) for perfectly synchronized seamless flow
+    const animProgress = useMotionValue(0);
+
+    useEffect(() => {
+        const controls = animate(animProgress, 1, {
+            duration: 8, // slow, luxury brand tempo
+            ease: "easeInOut",
+            repeat: Infinity,
+            repeatType: "loop"
+        });
+        return () => controls.stop();
+    }, [animProgress]);
+
+    // Animated thread weaving along photo path: coordinates & rotations synchronized on animProgress
+    const threadX = useTransform(animProgress, [0, 0.2, 0.4, 0.6, 0.8], [-50, 140, 330, 215, 60], { clamp: true });
+    const threadY = useTransform(animProgress, [0, 0.2, 0.4, 0.6, 0.8], [60, 30, 110, 220, 320], { clamp: true });
+    const threadRotate = useTransform(animProgress, [0, 0.2, 0.4, 0.6, 0.8], [-15, 10, 35, 120, 180], { clamp: true });
+
+    // Thread path length (drawing dynamically as automatic animation progresses)
+    const backPathLength = useTransform(animProgress, [0, 0.4], [0, 1], { clamp: true });
+    const backPathLengthAccent = useTransform(animProgress, [0.05, 0.45], [0, 1], { clamp: true });
+
+    const frontPathLength = useTransform(animProgress, [0.4, 0.8], [0, 1], { clamp: true });
+    const frontPathLengthAccent = useTransform(animProgress, [0.45, 0.85], [0, 1], { clamp: true });
+
+    // Opacity transitions for needle to weave UNDER and then OVER cleanly
+    const needleOpacityBack = useTransform(animProgress, [0, 0.38, 0.4], [1, 1, 0], { clamp: true });
+    const needleOpacityFront = useTransform(animProgress, [0.39, 0.41, 0.8, 0.9], [0, 1, 1, 0], { clamp: true });
+
+    // Thread paths fade out smoothly at the end of cycle for a seamless, continuous loop
+    const pathOpacity = useTransform(animProgress, [0, 0.85, 0.95, 1.0], [1, 1, 0, 0], { clamp: true });
+
     return (
-        <section data-background="light" className="relative bg-[#FCFBF9] pt-24 xs:pt-28 sm:pt-32 pb-10 sm:pb-14 px-4 sm:px-6 overflow-hidden border-b border-forest/5 select-none">
+        <section 
+            ref={containerRef}
+            data-background="dark" 
+            className="relative bg-forest pt-24 xs:pt-28 sm:pt-32 pb-10 sm:pb-14 px-6 md:px-8 lg:px-16 overflow-hidden border-b border-forest/5 select-none text-cream"
+        >
+            {/* Soft, giant, organic vector curves in the background mimicking elegant flowing wool threads */}
+            <div className="absolute inset-0 pointer-events-none z-0 overflow-hidden">
+                <svg className="w-full h-full opacity-40" viewBox="0 0 1440 800" fill="none" preserveAspectRatio="none">
+                    <path d="M -100,200 C 300,50 600,650 1000,150 C 1200,50 1400,550 1600,200" stroke="#C5A059" strokeWidth="0.75" strokeLinecap="round" fill="none" opacity="0.1" />
+                    <path d="M 200,700 C 400,300 700,600 1100,200 C 1300,100 1500,500 1700,300" stroke="#C5A059" strokeWidth="0.5" strokeLinecap="round" fill="none" opacity="0.08" />
+                    <path d="M -50,400 C 300,600 850,200 1200,450 C 1400,550 1500,250 1600,350" stroke="#C5A059" strokeWidth="1.2" strokeLinecap="round" strokeDasharray="3 6" fill="none" opacity="0.08" />
+                </svg>
+            </div>
+
+            {/* Shared Gradient, Filters & Masks for high-end 3D realism and performance */}
+            <svg className="absolute w-0 h-0 overflow-hidden pointer-events-none" aria-hidden="true" style={{ position: 'absolute', width: 0, height: 0, overflow: 'hidden' }}>
+                <defs>
+                    <linearGradient id="needle-gold-matte" x1="0" y1="0" x2="1" y2="1">
+                        <stop offset="0%" stopColor="#FFF1D6" />
+                        <stop offset="35%" stopColor="#D5B26F" />
+                        <stop offset="70%" stopColor="#A8813C" />
+                        <stop offset="100%" stopColor="#73541A" />
+                    </linearGradient>
+                    <filter id="needle-shadow" x="-50%" y="-50%" width="200%" height="200%">
+                        <feDropShadow dx="2" dy="4" stdDeviation="3" floodColor="#1C2E24" floodOpacity="0.25" />
+                    </filter>
+                    <clipPath id="yarn-mask" clipPathUnits="objectBoundingBox">
+                        <path d="M 0.22, 0.08 C 0.42, -0.04, 0.72, -0.01, 0.88, 0.12 C 1.02, 0.25, 1.03, 0.52, 0.94, 0.74 C 0.86, 0.92, 0.64, 1.01, 0.42, 0.98 C 0.20, 0.96, 0.04, 0.80, 0.01, 0.58 C -0.02, 0.38, 0.04, 0.18, 0.22, 0.08 Z" />
+                    </clipPath>
+                </defs>
+            </svg>
+
+            {/* Parallax Floating Crochet Needle with Matte Gold material gradient & 3D shadow depth */}
+            <motion.div 
+                style={{ y: needleY }}
+                className="absolute left-[8%] top-[25%] pointer-events-none z-[1] hidden lg:block opacity-90"
+            >
+                <svg width="60" height="200" viewBox="0 0 60 200" fill="none" className="overflow-visible" style={{ filter: 'drop-shadow(3px 5px 6px rgba(28,46,36,0.18))' }}>
+                    {/* A beautifully styled vertical crochet hook pointing upwards */}
+                    <path 
+                        d="M 30,180 L 30,115 C 27.5,113 27.5,107 30,105 L 30,36 C 30,33 29.5,31 28.8,29 C 28,27 29,25.5 31,25 C 32.5,24.5 33.8,26 33,28 C 32.4,29.5 31.2,30 31,31 L 31,32 C 31,33.5 32,34 34,34 C 34,34 30,36 30,36" 
+                        stroke="url(#needle-gold-matte)" 
+                        strokeWidth="1.8" 
+                        strokeLinecap="round" 
+                        fill="none" 
+                    />
+                </svg>
+            </motion.div>
+
             {/* Elegant Background organic line representing the thread (Fio) with movement */}
             <div className="absolute inset-0 pointer-events-none z-0">
                 <svg className="w-full h-full opacity-[0.12]" viewBox="0 0 1440 600" fill="none" preserveAspectRatio="none">
@@ -4856,31 +5024,31 @@ const EssenceHero = ({ onBackToHome }: { onBackToHome: () => void }) => {
             </div>
 
             <div className="relative z-10 max-w-6xl mx-auto flex flex-col space-y-8">
-                {/* Back Link positioned elegantly at the top left */}
+                {/* Back Link positioned elegantly at the top left - custom ultra-fine brand needle arrow */}
                 <motion.div
                     initial={{ opacity: 0, y: -10 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.8 }}
-                    className="self-start"
+                    className="self-start relative z-20"
                 >
                     <button 
                         onClick={onBackToHome}
-                        className="group inline-flex items-center gap-2 px-4 py-1.5 border border-forest/10 hover:border-forest/30 text-forest/60 hover:text-forest rounded-full text-[9px] uppercase tracking-[0.3em] font-semibold transition-all duration-300 cursor-pointer bg-white/60 backdrop-blur-sm"
+                        className="group inline-flex items-center gap-2 px-5 py-2 border-[0.5px] border-cream/30 hover:border-[#C5A059] text-cream/80 hover:text-cream rounded-full text-[9px] uppercase tracking-[0.35em] font-light transition-all duration-500 cursor-pointer bg-transparent hover:bg-[#C5A059]/5 hover:scale-[1.01] active:scale-[0.98]"
                     >
-                        <ArrowLeft size={10} className="group-hover:-translate-x-1 transition-transform duration-300 text-forest/40 group-hover:text-forest" />
-                        {t('nav.home')}
+                        <ArrowLeft size={10} className="stroke-[1.2] group-hover:-translate-x-1 transition-transform duration-500 text-[#C5A059]" />
+                        <span>{t('nav.home')}</span>
                     </button>
                 </motion.div>
-
+ 
                 {/* Main Content Layout: Grid for PC / Tablet, Flex/Column for Mobile */}
                 <div className="grid grid-cols-1 md:grid-cols-12 gap-8 md:gap-12 items-center">
                     {/* Left Column: Copy & Text */}
                     <div className="md:col-span-7 text-center md:text-left space-y-4 md:space-y-6">
                         <motion.span 
                             initial={{ opacity: 0 }}
-                            animate={{ opacity: 0.5 }}
+                            animate={{ opacity: 0.6 }}
                             transition={{ duration: 1.2, delay: 0.2 }}
-                            className="text-[9px] uppercase tracking-[0.6em] font-bold text-forest block font-sans"
+                            className="text-[9px] uppercase tracking-[0.6em] font-bold text-[#C5A059] block font-sans"
                         >
                             {t('nav.philosophy')}
                         </motion.span>
@@ -4889,50 +5057,107 @@ const EssenceHero = ({ onBackToHome }: { onBackToHome: () => void }) => {
                             initial={{ opacity: 0, y: 15 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ duration: 1.2, delay: 0.3, ease: [0.16, 1, 0.3, 1] }}
-                            className="text-[clamp(1.5rem,4vw,3.25rem)] font-serif text-forest leading-tight font-light tracking-tight select-text"
+                            className="text-[clamp(1.5rem,4vw,3.25rem)] font-serif text-[#FCFBF9] leading-tight font-light tracking-tight select-text"
                         >
                             {t('brand.slogan')}
                         </motion.h1>
-                        
-                        <motion.div 
-                            initial={{ width: 0 }}
-                            animate={{ width: 48 }}
-                            transition={{ duration: 1.2, delay: 0.5 }}
-                            className="h-[1px] bg-[#C5A059] mx-auto md:mx-0 my-4 md:my-6" 
-                        />
-                        
-                        <motion.p 
-                            initial={{ opacity: 0, y: 10 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ duration: 1.2, delay: 0.6 }}
-                            className="text-forest/70 font-serif italic text-sm sm:text-base md:text-lg max-w-xl mx-auto md:mx-0 font-light leading-relaxed select-text"
-                        >
-                            "{t('manifesto.quote')}"
-                        </motion.p>
                     </div>
 
-                    {/* Right Column: Branded Cosy Crochet Image with Gold Thread Detail */}
+                    {/* Right Column: Branded Cosy Crochet Image integrated with organic mask and woven thread */}
                     <motion.div 
                         initial={{ opacity: 0, scale: 0.95 }}
                         animate={{ opacity: 1, scale: 1 }}
                         transition={{ duration: 1.4, delay: 0.4 }}
-                        className="md:col-span-5 flex justify-center"
+                        className="md:col-span-5 flex justify-center relative"
                     >
-                        <div className="relative group/heroimg max-w-xs sm:max-w-sm md:max-w-full w-full aspect-[4/3] rounded-2xl overflow-hidden shadow-xl border border-forest/10 bg-white">
-                            {/* Signature Poncho brand image */}
-                            <img 
-                                src="https://i.ibb.co/3907byLt/IMG-2738-2.jpg" 
-                                alt="Signature Granny Poncho" 
-                                className="w-full h-full object-cover group-hover/heroimg:scale-105 transition-transform duration-700 ease-out"
-                            />
+                        {/* Interactive container for mask & 3D weaving thread */}
+                        <div className="relative group/heroimg max-w-xs sm:max-w-sm md:max-w-full w-full aspect-[4/3]">
                             
-                            {/* Golden overlay thread animation */}
-                            <div className="absolute inset-0 border border-[#C5A059]/20 rounded-2xl pointer-events-none m-3 transition-all duration-500 group-hover/heroimg:m-2" />
-                            
-                            {/* Soft glowing ambient brand badge */}
-                            <div className="absolute bottom-4 right-4 bg-forest/90 backdrop-blur-md px-3 py-1 text-[8px] tracking-[0.3em] text-cream uppercase rounded-full font-bold shadow-md">
-                                ARTISAN MADE
+                            {/* Animated Golden Thread (Fio) winding BEHIND the image with beautiful 3D drop shadow */}
+                            <svg className="absolute inset-0 pointer-events-none z-0 overflow-visible" viewBox="0 0 400 300" fill="none" style={{ filter: 'drop-shadow(2px 3px 4px rgba(28,46,36,0.15))' }}>
+                                <motion.path 
+                                    d="M -50,60 C 100,-10 250,40 330,110" 
+                                    stroke="#C5A059" 
+                                    strokeWidth="1.8" 
+                                    strokeLinecap="round" 
+                                    style={{ pathLength: backPathLength, opacity: pathOpacity }}
+                                />
+                                <motion.path 
+                                    d="M -50,65 C 100,-5 250,45 330,115" 
+                                    stroke="#C5A059" 
+                                    strokeWidth="0.6" 
+                                    strokeOpacity="0.4"
+                                    strokeLinecap="round" 
+                                    style={{ pathLength: backPathLengthAccent, opacity: pathOpacity }}
+                                />
+                                
+                                {/* 3D crochet needle leading the thread - active in the behind-layer stitch phase */}
+                                <motion.g 
+                                    style={{ x: threadX, y: threadY, rotate: threadRotate, opacity: needleOpacityBack }}
+                                    className="overflow-visible"
+                                >
+                                    <g filter="url(#needle-shadow)">
+                                        <path 
+                                            d="M -65,0 L -32,0 C -30,-2.5 -26,-2.5 -24,0 L -6,0 C -3,0 -1,-0.5 1,-1.2 C 3,-2 4.5,-1 5,1 C 5.5,2.5 4,3.8 2,3 C 0.5,2.4 0,1.2 -1,1 L -2,1 C -3.5,1 -4,0 -6,0" 
+                                            stroke="url(#needle-gold-matte)" 
+                                            strokeWidth="1.5" 
+                                            strokeLinecap="round" 
+                                            fill="none" 
+                                        />
+                                    </g>
+                                </motion.g>
+                            </svg>
+
+                            {/* Outer wrapper applying a gorgeous 3D soft diffused drop-shadow that follows the organic clipped mask shape */}
+                            <div className="w-full h-full relative z-10" style={{ filter: 'drop-shadow(0px 22px 40px rgba(36,49,21,0.16))' }}>
+                                {/* Masked Image Container */}
+                                <div 
+                                    className="w-full h-full relative bg-[#FCFBF9]"
+                                    style={{ clipPath: 'url(#yarn-mask)' }}
+                                >
+                                    {/* Signature Poncho brand image */}
+                                    <img 
+                                        src="https://i.ibb.co/3907byLt/IMG-2738-2.jpg" 
+                                        alt="Signature Granny Poncho" 
+                                        className="w-full h-full object-cover group-hover/heroimg:scale-105 transition-transform duration-700 ease-out"
+                                    />
+                                </div>
                             </div>
+
+                            {/* Animated Golden Thread (Fio) winding IN FRONT OF the image with deep 3D physical drop shadow */}
+                            <svg className="absolute inset-0 pointer-events-none z-20 overflow-visible" viewBox="0 0 400 300" fill="none" style={{ filter: 'drop-shadow(2px 4px 6px rgba(28,46,36,0.22))' }}>
+                                <motion.path 
+                                    d="M 330,110 C 370,145 340,210 230,230 C 130,250 100,210 60,320" 
+                                    stroke="#C5A059" 
+                                    strokeWidth="1.8" 
+                                    strokeLinecap="round" 
+                                    style={{ pathLength: frontPathLength, opacity: pathOpacity }}
+                                />
+                                <motion.path 
+                                    d="M 330,115 C 370,150 340,215 230,235 C 130,255 100,215 60,325" 
+                                    stroke="#C5A059" 
+                                    strokeWidth="0.6" 
+                                    strokeOpacity="0.4"
+                                    strokeLinecap="round" 
+                                    style={{ pathLength: frontPathLengthAccent, opacity: pathOpacity }}
+                                />
+                                
+                                {/* 3D crochet needle leading the thread - active in the front-layer stitch phase */}
+                                <motion.g 
+                                    style={{ x: threadX, y: threadY, rotate: threadRotate, opacity: needleOpacityFront }}
+                                    className="overflow-visible"
+                                >
+                                    <g filter="url(#needle-shadow)">
+                                        <path 
+                                            d="M -65,0 L -32,0 C -30,-2.5 -26,-2.5 -24,0 L -6,0 C -3,0 -1,-0.5 1,-1.2 C 3,-2 4.5,-1 5,1 C 5.5,2.5 4,3.8 2,3 C 0.5,2.4 0,1.2 -1,1 L -2,1 C -3.5,1 -4,0 -6,0" 
+                                            stroke="url(#needle-gold-matte)" 
+                                            strokeWidth="1.5" 
+                                            strokeLinecap="round" 
+                                            fill="none" 
+                                        />
+                                    </g>
+                                </motion.g>
+                            </svg>
                         </div>
                     </motion.div>
                 </div>
@@ -4943,9 +5168,8 @@ const EssenceHero = ({ onBackToHome }: { onBackToHome: () => void }) => {
 
 const TestimonialsSection = () => {
     const { lang, t } = useLanguage();
-    const [activeIndex, setActiveIndex] = useState(0);
-    const [showWriteModal, setShowWriteModal] = useState(false);
     const [apiTestimonials, setApiTestimonials] = useState<any[]>([]);
+    const [activeIndex, setActiveIndex] = useState(0);
 
     // Default translated testimonials
     const defaultTestimonials = [
@@ -4983,282 +5207,162 @@ const TestimonialsSection = () => {
 
     // Fetch persistent reviews globally from live back-end database
     useEffect(() => {
-        fetch('/api/testimonials')
-            .then(res => res.json())
+        fetch(`${API_BASE_URL}/api/testimonials`)
+            .then(res => {
+                if (!res.ok) {
+                    throw new Error(`Server responded with status ${res.status}`);
+                }
+                return res.json();
+            })
             .then(data => {
                 if (Array.isArray(data)) {
                     setApiTestimonials(data);
                 }
             })
-            .catch(err => console.error('[TESTIMONIALS FETCH ERROR]', err));
+            .catch(err => {
+                console.warn('[TESTIMONIALS FETCH ERROR] Fallback to default local testimonials.', err);
+            });
     }, []);
 
     const allTestimonials = [...defaultTestimonials, ...apiTestimonials];
 
-    // Form states
-    const [newReview, setNewReview] = useState({
-        name: '',
-        text: '',
-        product: '',
-        rating: 5
-    });
-    const [successMessage, setSuccessMessage] = useState(false);
-    const [isSubmitting, setIsSubmitting] = useState(false);
-
-    const next = () => {
+    const nextTestimonial = () => {
         setActiveIndex((prev) => (prev + 1) % allTestimonials.length);
     };
 
-    const prev = () => {
+    const prevTestimonial = () => {
         setActiveIndex((prev) => (prev - 1 + allTestimonials.length) % allTestimonials.length);
     };
 
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-        if (!newReview.name || !newReview.text) return;
-        
-        setIsSubmitting(true);
-        try {
-            const res = await fetch('/api/testimonials', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(newReview)
-            });
-            const data = await res.json();
-            
-            if (data.success && data.testimonial) {
-                setApiTestimonials(prevReviews => [data.testimonial, ...prevReviews]);
-                setNewReview({ name: '', text: '', product: '', rating: 5 });
-                setSuccessMessage(true);
-                // Highlight the new review
-                setActiveIndex(defaultTestimonials.length);
-                setTimeout(() => {
-                    setSuccessMessage(false);
-                    setShowWriteModal(false);
-                }, 3000);
-            }
-        } catch (err) {
-            console.error('[TESTIMONIALS POST ERROR]', err);
-        } finally {
-            setIsSubmitting(false);
-        }
-    };
-
     return (
-        <section id="testimonials" data-background="light" className="py-8 sm:py-12 md:py-14 bg-[#F6F1E5] relative overflow-hidden select-none border-t border-forest/5">
-            {/* Elegant design detail */}
-            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1px] h-10 bg-forest/10" />
+        <section id="testimonials" data-background="light" className="py-6 sm:py-8 md:py-10 bg-[#F6F1E5] relative overflow-hidden select-none border-t border-b border-forest/5">
             
             <div className="w-full max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
                 {/* Header */}
-                <div className="text-center mb-6 sm:mb-8">
-                    <span className="text-[10px] uppercase tracking-[0.45em] font-semibold text-forest/35 block mb-2 font-sans">
-                        {t('testimonials.tag')}
-                    </span>
-                    <h2 className="text-[clamp(1.25rem,4vw,2.25rem)] font-serif text-forest tracking-tight leading-tight font-light mb-2">
+                <div className="text-center mb-5 sm:mb-6">
+                    <h2 className="text-[clamp(1.25rem,3.5vw,1.85rem)] font-serif text-forest tracking-tight leading-tight font-light mb-1.5">
                         {t('testimonials.title')}
                     </h2>
-                    <p className="text-forest/60 font-serif italic text-xs sm:text-sm max-w-xl mx-auto mb-4">
+                    <p className="text-forest/60 font-serif italic text-xs sm:text-[13px] max-w-xl mx-auto mb-3">
                         {t('testimonials.subtitle')}
                     </p>
-                    <button
-                        onClick={() => setShowWriteModal(true)}
-                        className="inline-flex items-center gap-2 px-4 py-1.5 border border-forest/15 hover:border-forest text-forest/70 hover:text-forest text-[9px] uppercase tracking-widest font-semibold rounded-full bg-white/40 hover:bg-white/80 transition-all duration-300 shadow-sm cursor-pointer"
+                    <a
+                        href={`${API_BASE_URL}/api/write-review`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-2 px-4 py-1.5 border border-forest/15 hover:border-[#C5A059] text-forest/75 hover:text-forest text-[9px] uppercase tracking-widest font-semibold rounded-full bg-cream/30 hover:bg-cream/70 transition-all duration-300 shadow-sm cursor-pointer"
                     >
                         <MessageCircle size={11} />
                         {t('testimonials.write_button')}
-                    </button>
+                    </a>
                 </div>
 
-                {/* Bespoke Dynamic Carousel with server-persisted database */}
-                <div className="relative max-w-3xl mx-auto px-2 md:px-10">
-                        {/* Star icon with elegant glow and outline */}
-                        <div className="flex items-center justify-center gap-1 mb-4">
-                            {[...Array(allTestimonials[activeIndex]?.rating || 5)].map((_, i) => (
-                                <svg key={i} className="w-3.5 h-3.5 text-[#C5A059]" fill="currentColor" viewBox="0 0 20 20">
-                                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                                </svg>
+                {/* Poetic single testimonial layout - minimalist, centered and floating */}
+                <div className="relative max-w-lg sm:max-w-xl mx-auto px-4 py-0.5">
+                    <div className="relative min-h-[145px] sm:min-h-[155px] flex items-center justify-center">
+                        <AnimatePresence mode="wait">
+                            <motion.div
+                                key={activeIndex}
+                                initial={{ opacity: 0, x: 20 }}
+                                animate={{ opacity: 1, x: 0 }}
+                                exit={{ opacity: 0, x: -20 }}
+                                transition={{ duration: 0.4, ease: "easeInOut" }}
+                                className="w-full bg-transparent relative flex flex-col items-center justify-center text-center py-2"
+                            >
+                                {/* Stars & Google credibility icon aligned perfectly together */}
+                                <div className="flex items-center gap-2 justify-center mb-2">
+                                    <div className="flex items-center gap-0.5">
+                                        {[...Array(allTestimonials[activeIndex]?.rating || 5)].map((_, i) => (
+                                            <svg key={i} className="w-3 h-3 text-[#C5A059]" fill="currentColor" viewBox="0 0 20 20">
+                                                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                                            </svg>
+                                        ))}
+                                    </div>
+                                    <span className="w-px h-2.5 bg-[#C5A059]/30 block self-center" />
+                                    <span className="text-[#C5A059] opacity-95 transition-opacity duration-300" title="Google Verified Review">
+                                        <svg className="w-2.5 h-2.5" viewBox="0 0 24 24" fill="currentColor">
+                                            <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
+                                            <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
+                                            <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z" />
+                                            <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z" />
+                                        </svg>
+                                    </span>
+                                </div>
+
+                                {/* Tight, delicate, and compact 1px gold border around ONLY the comment text */}
+                                <div className="border border-[#C5A059]/20 rounded-xl px-4 py-1.5 w-[90%] md:w-full max-w-sm sm:max-w-md md:max-w-xl min-h-[44px] sm:min-h-[48px] flex items-center justify-center mx-auto bg-transparent relative shadow-[0_1px_6px_rgba(197,160,89,0.01)]">
+                                    <blockquote className="text-forest/85 text-xs sm:text-[13px] font-serif italic leading-relaxed select-text line-clamp-2 text-center px-1">
+                                        "{allTestimonials[activeIndex]?.text}"
+                                    </blockquote>
+                                </div>
+
+                                {/* Author info */}
+                                <div className="mt-2.5 flex flex-col items-center justify-center">
+                                    <cite className="not-italic text-[8px] sm:text-[9px] font-semibold uppercase tracking-[0.2em] text-forest font-sans">
+                                        {allTestimonials[activeIndex]?.name}
+                                    </cite>
+                                    {allTestimonials[activeIndex]?.product && (
+                                        <span className="text-[7.5px] uppercase tracking-[0.15em] text-[#C5A059] block font-mono mt-0.5">
+                                            {allTestimonials[activeIndex]?.product}
+                                        </span>
+                                    )}
+                                </div>
+                            </motion.div>
+                        </AnimatePresence>
+
+                        {/* Navigation Arrows for large screens */}
+                        <div className="absolute top-1/2 -translate-y-1/2 -left-12 hidden md:block">
+                            <button
+                                onClick={prevTestimonial}
+                                className="w-8 h-8 border border-forest/10 rounded-full flex items-center justify-center text-forest/55 hover:text-forest hover:border-forest hover:bg-forest/5 transition-all cursor-pointer"
+                                aria-label="Previous testimonial"
+                            >
+                                <ChevronLeft size={14} />
+                            </button>
+                        </div>
+                        <div className="absolute top-1/2 -translate-y-1/2 -right-12 hidden md:block">
+                            <button
+                                onClick={nextTestimonial}
+                                className="w-8 h-8 border border-forest/10 rounded-full flex items-center justify-center text-forest/55 hover:text-forest hover:border-forest hover:bg-forest/5 transition-all cursor-pointer"
+                                aria-label="Next testimonial"
+                            >
+                                <ChevronRight size={14} />
+                            </button>
+                        </div>
+                    </div>
+
+                    {/* Navigation controls & Dots under the card */}
+                    <div className="flex items-center justify-center gap-6 mt-2.5">
+                        <button
+                            onClick={prevTestimonial}
+                            className="md:hidden w-8 h-8 border border-forest/10 rounded-full flex items-center justify-center text-forest/55 hover:text-forest hover:border-forest hover:bg-forest/5 transition-all cursor-pointer"
+                            aria-label="Previous testimonial"
+                        >
+                            <ChevronLeft size={12} />
+                        </button>
+
+                        <div className="flex items-center gap-1.5">
+                            {allTestimonials.map((_, i) => (
+                                <button
+                                    key={i}
+                                    onClick={() => setActiveIndex(i)}
+                                    className={`h-1 rounded-full transition-all duration-300 ${i === activeIndex ? 'w-4 bg-[#C5A059]' : 'w-1.5 bg-forest/15 hover:bg-forest/30'}`}
+                                    aria-label={`Go to testimonial ${i + 1}`}
+                                />
                             ))}
                         </div>
 
-                        {/* Standardized smaller height container to avoid scrolling */}
-                        <div className="overflow-hidden min-h-[90px] sm:min-h-[80px] flex items-center justify-center">
-                            <AnimatePresence mode="wait">
-                                <motion.div
-                                    key={activeIndex}
-                                    initial={{ opacity: 0, y: 10 }}
-                                    animate={{ opacity: 1, y: 0 }}
-                                    exit={{ opacity: 0, y: -10 }}
-                                    transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-                                    className="text-center space-y-3 max-w-xl mx-auto"
-                                >
-                                    <blockquote className="text-forest/85 text-xs sm:text-sm md:text-base font-serif italic leading-relaxed font-light select-text">
-                                        "{allTestimonials[activeIndex]?.text}"
-                                    </blockquote>
-                                    
-                                    <div className="space-y-0.5">
-                                        <cite className="not-italic text-[9px] sm:text-[10px] font-semibold uppercase tracking-[0.25em] text-forest block font-sans">
-                                            {allTestimonials[activeIndex]?.name}
-                                        </cite>
-                                        {allTestimonials[activeIndex]?.product && (
-                                            <span className="text-[8px] sm:text-[9px] uppercase tracking-[0.15em] text-[#C5A059] block font-mono">
-                                                {allTestimonials[activeIndex]?.product}
-                                            </span>
-                                        )}
-                                    </div>
-                                </motion.div>
-                            </AnimatePresence>
-                        </div>
-
-                        {/* Left/Right controls - tighter layout */}
-                        <div className="flex items-center justify-center gap-4 mt-6">
-                            <button
-                                onClick={prev}
-                                className="w-8 h-8 rounded-full border border-forest/10 hover:border-forest text-forest hover:bg-forest hover:text-cream flex items-center justify-center transition-all duration-300 cursor-pointer group bg-white/20"
-                                aria-label="Previous feedback"
-                            >
-                                <ChevronLeft size={14} className="group-hover:-translate-x-0.5 transition-transform duration-300" />
-                            </button>
-                            
-                            {/* Pagination indicators */}
-                            <div className="flex gap-1.5 flex-wrap justify-center max-w-[150px] sm:max-w-full">
-                                {allTestimonials.map((_, idx) => (
-                                    <button
-                                        key={idx}
-                                        onClick={() => setActiveIndex(idx)}
-                                        className={`h-1 rounded-full transition-all duration-500 cursor-pointer ${
-                                            activeIndex === idx ? 'w-4 bg-[#C5A059]' : 'w-1 bg-forest/10 hover:bg-forest/30'
-                                        }`}
-                                        aria-label={`Go to feedback ${idx + 1}`}
-                                    />
-                                ))}
-                            </div>
-
-                            <button
-                                onClick={next}
-                                className="w-8 h-8 rounded-full border border-forest/10 hover:border-forest text-forest hover:bg-forest hover:text-cream flex items-center justify-center transition-all duration-300 cursor-pointer group bg-white/20"
-                                aria-label="Next feedback"
-                            >
-                                <ChevronRight size={14} className="group-hover:translate-x-0.5 transition-transform duration-300" />
-                            </button>
-                        </div>
+                        <button
+                            onClick={nextTestimonial}
+                            className="md:hidden w-8 h-8 border border-forest/10 rounded-full flex items-center justify-center text-forest/55 hover:text-forest hover:border-forest hover:bg-forest/5 transition-all cursor-pointer"
+                            aria-label="Next testimonial"
+                        >
+                            <ChevronRight size={12} />
+                        </button>
                     </div>
+                </div>
             </div>
 
-            {/* Write Testimonial Luxury Modal */}
-            <AnimatePresence>
-                {showWriteModal && (
-                    <div className="fixed inset-0 z-[200] flex items-center justify-center p-4">
-                        <motion.div
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            exit={{ opacity: 0 }}
-                            onClick={() => setShowWriteModal(false)}
-                            className="absolute inset-0 bg-forest/40 backdrop-blur-md"
-                        />
-
-                        <motion.div
-                            initial={{ scale: 0.95, y: 15, opacity: 0 }}
-                            animate={{ scale: 1, y: 0, opacity: 1 }}
-                            exit={{ scale: 0.95, y: 15, opacity: 0 }}
-                            transition={{ type: "spring", duration: 0.5 }}
-                            className="relative bg-white w-full max-w-md rounded-2xl p-6 shadow-xl border border-forest/10 overflow-hidden text-forest text-left"
-                        >
-                            <button
-                                onClick={() => setShowWriteModal(false)}
-                                className="absolute top-4 right-4 text-forest/40 hover:text-forest p-1 rounded-full hover:bg-forest/5 transition-all"
-                            >
-                                <X size={16} />
-                            </button>
-
-                            <h3 className="font-serif text-lg font-normal mb-1">{t('testimonials.modal_title')}</h3>
-                            <p className="text-forest/50 text-[10px] uppercase tracking-wider mb-4 font-sans">M★BRAVO Guestbook</p>
-
-                            {successMessage ? (
-                                <motion.div
-                                    initial={{ opacity: 0 }}
-                                    animate={{ opacity: 1 }}
-                                    className="py-8 text-center space-y-3"
-                                >
-                                    <div className="w-12 h-12 bg-forest/5 text-forest rounded-full flex items-center justify-center mx-auto">
-                                        <Heart size={20} className="fill-current text-[#C5A059]" />
-                                    </div>
-                                    <p className="text-sm font-medium font-sans text-forest/90">
-                                        {t('testimonials.success_message')}
-                                    </p>
-                                </motion.div>
-                            ) : (
-                                <form onSubmit={handleSubmit} className="space-y-4 font-sans text-xs">
-                                    <div className="space-y-1">
-                                        <label className="font-semibold text-forest/70">{t('testimonials.label_name')} *</label>
-                                        <input
-                                            required
-                                            type="text"
-                                            value={newReview.name}
-                                            onChange={(e) => setNewReview({ ...newReview, name: e.target.value })}
-                                            className="w-full bg-forest/[0.02] border border-forest/10 rounded-xl px-3 py-2 text-forest focus:border-[#C5A059] focus:outline-none transition-all"
-                                            placeholder="ex: Joana Santos"
-                                        />
-                                    </div>
-
-                                    <div className="space-y-1">
-                                        <label className="font-semibold text-forest/70">{t('testimonials.label_product')}</label>
-                                        <input
-                                            type="text"
-                                            value={newReview.product}
-                                            onChange={(e) => setNewReview({ ...newReview, product: e.target.value })}
-                                            className="w-full bg-forest/[0.02] border border-forest/10 rounded-xl px-3 py-2 text-forest focus:border-[#C5A059] focus:outline-none transition-all"
-                                            placeholder="ex: Mala Daisy"
-                                        />
-                                    </div>
-
-                                    <div className="space-y-1">
-                                        <label className="font-semibold text-forest/70">{t('testimonials.label_text')} *</label>
-                                        <textarea
-                                            required
-                                            rows={3}
-                                            value={newReview.text}
-                                            onChange={(e) => setNewReview({ ...newReview, text: e.target.value })}
-                                            className="w-full bg-forest/[0.02] border border-forest/10 rounded-xl px-3 py-2 text-forest focus:border-[#C5A059] focus:outline-none transition-all resize-none"
-                                            placeholder="Partilhe a sua experiência..."
-                                        />
-                                    </div>
-
-                                    <div className="space-y-1">
-                                        <label className="font-semibold text-forest/70">Rating</label>
-                                        <div className="flex gap-2">
-                                            {[1, 2, 3, 4, 5].map((star) => (
-                                                <button
-                                                    key={star}
-                                                    type="button"
-                                                    onClick={() => setNewReview({ ...newReview, rating: star })}
-                                                    className="p-1 hover:scale-110 transition-transform"
-                                                >
-                                                    <svg
-                                                        className={`w-5 h-5 ${star <= newReview.rating ? 'text-[#C5A059]' : 'text-forest/10'}`}
-                                                        fill="currentColor"
-                                                        viewBox="0 0 20 20"
-                                                    >
-                                                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                                                    </svg>
-                                                </button>
-                                            ))}
-                                        </div>
-                                    </div>
-
-                                    <button
-                                        type="submit"
-                                        disabled={isSubmitting}
-                                        className="w-full bg-[#343E2C] text-cream hover:bg-[#1C2713] disabled:opacity-50 transition-all py-3 rounded-full font-bold uppercase tracking-widest text-[9px]"
-                                    >
-                                        {isSubmitting ? '...' : t('testimonials.submit_button')}
-                                    </button>
-                                </form>
-                            )}
-                        </motion.div>
-                    </div>
-                )}
-            </AnimatePresence>
         </section>
     );
 };
@@ -5354,7 +5458,7 @@ export default function App() {
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
                   transition={{ duration: 0.8 }}
-                  className="relative bg-[#F6F1E5]"
+                  className="relative bg-[#FCFBF9]"
                 >
                   <EssenceHero onBackToHome={() => {
                     setCurrentPage('home');
@@ -5367,7 +5471,7 @@ export default function App() {
                   </div>
                   
                   {/* Interlude at bottom of Essence to invite them back to Collection */}
-                  <div data-background="light" className="py-24 bg-[#F6F1E5] text-center relative border-t border-forest/10">
+                  <div data-background="light" className="py-24 bg-[#FCFBF9] text-center relative border-t border-forest/10">
                     <div className="max-w-2xl mx-auto px-6 space-y-8">
                       <span className="text-[10px] uppercase tracking-[0.45em] font-semibold text-forest/35 block font-sans">
                         {t('nav.exclusive')}
