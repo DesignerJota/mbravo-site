@@ -1163,6 +1163,16 @@ app.post("/api/testimonials", async (req, res) => {
   }
 });
 
+// Redirect user directly to Google Place review page
+app.get("/api/write-review", (req, res) => {
+  const placeId = process.env.GOOGLE_PLACE_ID;
+  if (placeId) {
+    return res.redirect(`https://search.google.com/local/writereview?placeid=${placeId}`);
+  }
+  // Fallback to searching Google or a placeholder if no Place ID is configured
+  return res.redirect("https://search.google.com/local/writereview?placeid=ChIJ688-y7lzKkoRP7G9C9XOf8c");
+});
+
 
 // Configure Vite middleware in development or serve production build
 async function startServer() {
