@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence, useScroll, useTransform, useSpring, useVelocity, useMotionValue, animate } from 'motion/react';
-import { Menu, X, Instagram, Facebook, ArrowRight, ArrowLeft, ChevronLeft, ChevronRight, Share2, Mail, MessageCircle, Sparkles, Layers, Ban, AlertCircle, Feather, Palette, Heart } from 'lucide-react';
+import { Menu, X, Instagram, Facebook, ArrowRight, ArrowLeft, ChevronLeft, ChevronRight, Share2, Mail, MessageCircle, Sparkles, Feather, Palette, Heart } from 'lucide-react';
 import { loadStripe } from '@stripe/stripe-js';
+import Lenis from 'lenis';
 import AdminDashboardModal from './components/AdminDashboardModal';
 import { 
   useLanguage, 
@@ -111,7 +112,7 @@ const NAV_LINKS = [
   { name: 'Contactos', href: '#contacto' },
 ];
 
-const CONTACT_EMAIL = "handmade.mbravo@gmail.com";
+const CONTACT_EMAIL = "encomendas@mbravobycarolina.com";
 const EMAIL_SUBJECT = "Pedido de Informações - M★BRAVO";
 const MAILTO_LINK = `mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(EMAIL_SUBJECT)}`;
 
@@ -1294,7 +1295,7 @@ const FioCondutor = () => {
                 >
                     {/* Elegant background halo glow that increases size and visible light during scroll activity */}
                     <motion.div
-                        className="absolute w-10 h-10 rounded-full bg-[#C5A059]/25 filter blur-[6px]"
+                        className="absolute w-10 h-10 rounded-full bg-[#C5A059]/25 filter blur-[6px] will-change-transform transform-gpu"
                         style={{
                             scale: starGlowScale,
                             opacity: starActivity
@@ -4063,11 +4064,14 @@ const CollectionSection = () => {
     useEffect(() => {
         if (focusedProductId) {
             document.body.style.overflow = 'hidden';
+            (window as any).lenis?.stop();
         } else {
             document.body.style.overflow = '';
+            (window as any).lenis?.start();
         }
         return () => {
             document.body.style.overflow = '';
+            (window as any).lenis?.start();
         };
     }, [focusedProductId]);
 
@@ -4953,7 +4957,7 @@ const EssenceHero = ({ onBackToHome }: { onBackToHome: () => void }) => {
         <section 
             ref={containerRef}
             data-background="dark" 
-            className="relative bg-forest pt-24 xs:pt-28 sm:pt-32 pb-10 sm:pb-14 px-6 md:px-8 lg:px-16 overflow-hidden border-b border-forest/5 select-none text-cream"
+            className="relative bg-forest pt-20 xs:pt-24 sm:pt-28 pb-10 sm:pb-14 px-6 md:px-8 lg:px-16 overflow-hidden border-b border-forest/5 select-none text-cream"
         >
             {/* Soft, giant, organic vector curves in the background mimicking elegant flowing wool threads */}
             <div className="absolute inset-0 pointer-events-none z-0 overflow-hidden">
@@ -5061,6 +5065,15 @@ const EssenceHero = ({ onBackToHome }: { onBackToHome: () => void }) => {
                         >
                             {t('brand.slogan')}
                         </motion.h1>
+
+                        <motion.p
+                            initial={{ opacity: 0, y: 15 }}
+                            animate={{ opacity: 0.8, y: 0 }}
+                            transition={{ duration: 1.2, delay: 0.45, ease: [0.16, 1, 0.3, 1] }}
+                            className="text-[clamp(0.95rem,2vw,1.35rem)] font-serif italic text-[#D4C3A3] font-light max-w-xl mx-auto md:mx-0 leading-relaxed"
+                        >
+                            "{t('manifesto.quote')}"
+                        </motion.p>
                     </div>
 
                     {/* Right Column: Branded Cosy Crochet Image integrated with organic mask and woven thread */}
@@ -5376,9 +5389,31 @@ export default function App() {
   const [currentPage, setCurrentPage] = useState<'home' | 'essence'>('home');
   const { t } = useLanguage();
 
-  // Smooth scroll logic for standard browser behavior
+  // Smooth scroll logic for standard browser behavior using Lenis
   useEffect(() => {
     window.scrollTo(0, 0);
+
+    const lenis = new Lenis({
+      duration: 1.2,
+      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+      gestureOrientation: 'vertical',
+    });
+
+    (window as any).lenis = lenis;
+
+    let rafId: number;
+    function raf(time: number) {
+      lenis.raf(time);
+      rafId = requestAnimationFrame(raf);
+    }
+
+    rafId = requestAnimationFrame(raf);
+
+    return () => {
+      cancelAnimationFrame(rafId);
+      lenis.destroy();
+      (window as any).lenis = undefined;
+    };
   }, []);
 
   return (
