@@ -1,6 +1,9 @@
 import fs from 'fs';
 import path from 'path';
 
+const FROM_EMAIL = process.env.FROM_EMAIL || 'encomendas@mbravobycarolina.com';
+const NOTIFICATION_EMAIL = process.env.NOTIFICATION_EMAIL || 'handmade.mbravo@gmail.com';
+
 export interface OrderData {
   orderId: string;
   productName: string;
@@ -159,7 +162,7 @@ export function generateCustomerEmailHtml(order: OrderData): string {
           <!-- FOOTER -->
           <div style="text-align: center; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 10px; text-transform: uppercase; letter-spacing: 0.15em; color: rgba(36, 49, 25, 0.4); line-height: 1.8;">
             M★BRAVO ATELIER &bull; PORTUGAL<br>
-            <a href="mailto:handmade.mbravo@gmail.com" style="color: #C5A059; text-decoration: none;">handmade.mbravo@gmail.com</a><br>
+            <a href="mailto:${FROM_EMAIL}" style="color: #C5A059; text-decoration: none;">${FROM_EMAIL}</a><br>
             <span style="font-size: 8px; margin-top: 15px; display: block; color: rgba(36, 49, 25, 0.25); text-transform: none; letter-spacing: normal;">Esta é uma mensagem automática de confirmação de transação em Sandbox de Testes.</span>
           </div>
         </td>
@@ -374,7 +377,7 @@ export function sendTransactionEmails(order: OrderData): { customerEmailUrl: str
       console.log(`[M.BRAVO EMAIL SYSTEM] Skipping customer email dispatch because customer email address is absent or invalid.`);
     }
 
-    const adminEmail = 'handmade@mbravobycarolina.com';
+    const adminEmail = NOTIFICATION_EMAIL;
     sendViaSendGrid(process.env.SENDGRID_API_KEY!, adminEmail, `[NOVO PEDIDO] ${order.orderId} - Prioridade Atelier`, adminHtml)
       .then(() => console.log(`[M.BRAVO EMAIL SYSTEM] Admin notification email sent successfully via SendGrid.`))
       .catch(err => {
@@ -480,7 +483,7 @@ export function generateMultibancoEmailHtml(order: OrderData, multibancoRef: { e
           <!-- FOOTER -->
           <div style="text-align: center; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 10px; text-transform: uppercase; letter-spacing: 0.15em; color: rgba(36, 49, 25, 0.4); line-height: 1.8;">
             M★BRAVO ATELIER &bull; PORTUGAL<br>
-            <a href="mailto:handmade.mbravo@gmail.com" style="color: #C5A059; text-decoration: none;">handmade.mbravo@gmail.com</a><br>
+            <a href="mailto:${FROM_EMAIL}" style="color: #C5A059; text-decoration: none;">${FROM_EMAIL}</a><br>
             <span style="font-size: 8px; margin-top: 15px; display: block; color: rgba(36, 49, 25, 0.25); text-transform: none; letter-spacing: normal;">Esta é uma mensagem de instruções de pagamento automático para encomenda em processamento.</span>
           </div>
         </td>
@@ -714,7 +717,7 @@ export function generateShippedEmailHtml(order: OrderData, trackingCode: string)
           <!-- FOOTER -->
           <div style="text-align: center; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 10px; text-transform: uppercase; letter-spacing: 0.15em; color: rgba(36, 49, 25, 0.4); line-height: 1.8;">
             M★BRAVO ATELIER &bull; PORTUGAL<br>
-            <a href="mailto:handmade.mbravo@gmail.com" style="color: #C5A059; text-decoration: none;">handmade.mbravo@gmail.com</a><br>
+            <a href="mailto:${FROM_EMAIL}" style="color: #C5A059; text-decoration: none;">${FROM_EMAIL}</a><br>
             <span style="font-size: 8px; margin-top: 15px; display: block; color: rgba(36, 49, 25, 0.25); text-transform: none; letter-spacing: normal;">Esta é uma mensagem automática de aviso de expedição em Sandbox de Testes.</span>
           </div>
         </td>
