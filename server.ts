@@ -935,19 +935,23 @@ app.post("/api/admin/orders/create", verifyAdmin, (req, res) => {
 });
 
 
-// Supabase PostgreSQL Connection Pool & Initialization
-const connectionString = process.env.DATABASE_URL || "postgresql://postgres:DesignerJota83$$@db.trmsteycllxspudgpxsu.supabase.co:5432/postgres";
+// PostgreSQL Connection Pool & Initialization via Environment Variables
+const connectionString = process.env.DATABASE_URL;
 
-const dbPool = new pg.Pool({
+const dbPool = connectionString ? new pg.Pool({
   connectionString,
   ssl: {
     rejectUnauthorized: false
   },
   connectionTimeoutMillis: 5000 // fail fast if wrong credentials or unreachable
-});
+}) : null;
 
 // Create table if not exists on startup
 async function initDatabase() {
+  if (!dbPool) {
+    console.log("[DATABASE INFO] DATABASE_URL is not set. Operating in local JSON fallback mode.");
+    return;
+  }
   try {
     await dbPool.query(`
       CREATE TABLE IF NOT EXISTS testimonials (
@@ -1010,7 +1014,7 @@ async function initDatabase() {
     // Attempt Google Places API reviews sync if configured
     await syncGoogleReviews();
   } catch (err) {
-    console.error("[DATABASE ERROR] Failed to initialize testimonials table in Supabase. Check credentials.", err);
+    console.error("[DATABASE ERROR] Failed to initialize testimonials table. Check credentials.", err);
   }
 }
 
@@ -1021,6 +1025,11 @@ async function syncGoogleReviews() {
 
   if (!apiKey || !placeId) {
     console.log("[GOOGLE REVIEWS SYNC] Missing GOOGLE_PLACES_API_KEY or GOOGLE_PLACE_ID. Skipping native Google Reviews sync.");
+    return;
+  }
+
+  if (!dbPool) {
+    console.log("[GOOGLE REVIEWS SYNC] DATABASE_URL is not set. Skipping sync to PostgreSQL.");
     return;
   }
 
@@ -1120,6 +1129,9 @@ let activeTestimonials = loadTestimonials();
 // Testimonials Endpoints with Direct database sync + fallback
 app.get("/api/testimonials", async (req, res) => {
   try {
+    if (!dbPool) {
+      throw new Error("DATABASE_URL is not set.");
+    }
     const result = await dbPool.query(
       `SELECT name, text, product, rating, created_at AS "createdAt" FROM testimonials ORDER BY id DESC LIMIT 100`
     );
@@ -1140,6 +1152,9 @@ app.post("/api/testimonials", async (req, res) => {
     const cleanProduct = product || "";
 
     try {
+      if (!dbPool) {
+        throw new Error("DATABASE_URL is not set.");
+      }
       const result = await dbPool.query(
         `INSERT INTO testimonials (name, text, product, rating) VALUES ($1, $2, $3, $4) RETURNING name, text, product, rating, created_at AS "createdAt"`,
         [name, text, cleanProduct, cleanRating]
