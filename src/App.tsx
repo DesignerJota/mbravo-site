@@ -958,38 +958,51 @@ const Navbar = ({ currentPage, setCurrentPage }: { currentPage: 'home' | 'essenc
             initial={{ opacity: 0, backdropFilter: "blur(0px)" }}
             animate={{ opacity: 1, backdropFilter: "blur(20px)" }}
             exit={{ opacity: 0, backdropFilter: "blur(0px)" }}
-            className="fixed inset-0 z-[60] bg-forest/95 flex flex-col items-center justify-center gap-12"
+            className="fixed inset-0 z-[60] bg-forest/95 flex flex-col items-center justify-center p-8 space-y-8 sm:space-y-10"
           >
              <button 
-                className="absolute top-8 right-6 text-cream"
+                className="absolute top-6 right-6 text-cream/70 hover:text-cream transition-colors duration-300 p-2"
                 onClick={() => setMobileMenuOpen(false)}
              >
-                <X size={32} />
+                <X size={24} />
              </button>
-             {NAV_LINKS_LIST.map((link, i) => {
-              const displayName = t(link.key);
-              return (
-                <motion.a
-                  key={link.name}
-                  href={link.href}
-                  onClick={(e) => handleLinkClick(e, link.href)}
-                  initial={{ opacity: 0, scale: 0.8 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ delay: i * 0.05 }}
-                  className="text-5xl font-serif text-cream hover:text-brand-green-light hover:italic transition-all duration-500"
-                >
-                  {displayName}
-                </motion.a>
-              );
-             })}
+             
+             {/* Centered navigation links with balanced vertical gap */}
+             <div className="flex flex-col items-center justify-center space-y-4 sm:space-y-5">
+               {NAV_LINKS_LIST.map((link, i) => {
+                const displayName = t(link.key);
+                return (
+                  <motion.a
+                    key={link.name}
+                    href={link.href}
+                    onClick={(e) => handleLinkClick(e, link.href)}
+                    initial={{ opacity: 0, y: 15 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    transition={{ 
+                      duration: 0.6,
+                      delay: i * 0.08,
+                      ease: [0.16, 1, 0.3, 1]
+                    }}
+                    className="text-2xl sm:text-3xl md:text-4xl font-serif text-cream hover:text-brand-green-light hover:italic transition-all duration-500 tracking-wide text-center"
+                  >
+                    {displayName}
+                  </motion.a>
+                );
+               })}
+             </div>
 
-            {/* Mobile Language Selector */}
-            <motion.div 
+             {/* Mobile Language Selector with proportional sizing and elegant stagger */}
+             <motion.div 
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: NAV_LINKS_LIST.length * 0.05 + 0.1 }}
-                className="mt-6 flex items-center text-sm uppercase tracking-[0.3em] font-medium text-cream"
-            >
+                transition={{ 
+                  duration: 0.6,
+                  delay: NAV_LINKS_LIST.length * 0.08 + 0.1,
+                  ease: [0.16, 1, 0.3, 1]
+                }}
+                className="flex items-center text-xs uppercase tracking-[0.25em] font-medium text-cream"
+             >
                 <button 
                   onClick={() => handleLanguageChange('PT')} 
                   className={`transition-all duration-500 cursor-pointer ${lang === 'PT' ? 'font-bold text-cream' : 'text-cream/40 hover:text-cream/80'}`}
@@ -1003,16 +1016,26 @@ const Navbar = ({ currentPage, setCurrentPage }: { currentPage: 'home' | 'essenc
                 >
                   EN
                 </button>
-            </motion.div>
+             </motion.div>
 
-                <div className="mt-12 flex gap-10">
-                    <a href="https://instagram.com/mbravobycarolina/" target="_blank" rel="noopener noreferrer">
-                        <Instagram className="text-cream/30 hover:text-cream transition-colors" size={24} />
-                    </a>
-                    <a href={MAILTO_LINK}>
-                        <Mail className="text-cream/30 hover:text-cream transition-colors" size={24} />
-                    </a>
-                </div>
+             {/* Delicate footer icons matching the refined proportions */}
+             <motion.div 
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ 
+                  duration: 0.6,
+                  delay: NAV_LINKS_LIST.length * 0.08 + 0.2,
+                  ease: [0.16, 1, 0.3, 1]
+                }}
+                className="flex gap-8"
+             >
+                 <a href="https://instagram.com/mbravobycarolina/" target="_blank" rel="noopener noreferrer" className="p-2">
+                     <Instagram className="text-cream/40 hover:text-cream transition-colors duration-300" size={20} />
+                 </a>
+                 <a href={MAILTO_LINK} className="p-2">
+                     <Mail className="text-cream/40 hover:text-cream transition-colors duration-300" size={20} />
+                 </a>
+             </motion.div>
           </motion.div>
         )}
       </AnimatePresence>
@@ -1485,7 +1508,7 @@ const Hero = () => {
                                 style={{ 
                                     filter: "drop-shadow(0 24px 54px rgba(18,26,13,0.95)) drop-shadow(0 4px 20px rgba(197,160,89,0.18))"
                                 }}
-                                className="h-16 xs:h-24 sm:h-[9.5rem] md:h-[11.8rem] lg:h-[14.4rem] xl:h-[17.5rem] mb-[5px] sm:mb-[7px] md:mb-[9.5px] lg:mb-[11.5px] -mt-3 md:-mt-5 origin-center select-none"
+                                className="h-28 xs:h-36 sm:h-[11rem] md:h-[12.5rem] lg:h-[14.4rem] xl:h-[17.5rem] mb-[5px] sm:mb-[7px] md:mb-[9.5px] lg:mb-[11.5px] -mt-3 md:-mt-5 origin-center select-none"
                             >
                                 <Logo light className="h-full" />
                             </motion.div>
@@ -4336,11 +4359,11 @@ const ContactSection = () => {
                     
                     <div className="flex flex-col items-center gap-[clamp(1rem,3vw,3rem)]">
                         <a 
-                            href={MAILTO_LINK}
+                            href="mailto:handmade.mbravo@gmail.com?subject=Pedido de Informações - M★BRAVO"
                             className="group flex items-center gap-[clamp(0.5rem,1.5vw,1rem)] text-[clamp(0.9rem,4vw,2.25rem)] font-serif text-cream hover:text-brand-green-light transition-all border-b border-cream/20 pb-[clamp(0.5rem,1.2vw,1rem)] break-all"
                         >
                             <Mail className="w-[clamp(1.25rem,4vw,2rem)] h-[clamp(1.25rem,4vw,2rem)] opacity-40 group-hover:opacity-100 transition-opacity flex-shrink-0" />
-                            {CONTACT_EMAIL}
+                            handmade.mbravo@gmail.com
                         </a>
 
                         <a 
