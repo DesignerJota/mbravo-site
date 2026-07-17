@@ -44,13 +44,6 @@ html {
   scrollbar-width: none;
 }
 
-/* Parallax Utilities */
-.parallax-bg {
-  background-attachment: fixed;
-  background-position: center;
-  background-repeat: no-repeat;
-  background-size: cover;
-}
 
 /* Smooth SVG transition effects for logo and texts */
 .transition-svg,
