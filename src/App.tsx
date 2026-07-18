@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import { motion, AnimatePresence, useScroll, useTransform, useSpring, useVelocity, useMotionValue, animate } from 'motion/react';
-import { Menu, X, Instagram, Facebook, ArrowRight, ArrowLeft, ChevronLeft, ChevronRight, Share2, Mail, MessageCircle, Sparkles, Feather, Palette, Heart } from 'lucide-react';
+import { Menu, X, Instagram, Facebook, ArrowRight, ArrowLeft, ChevronLeft, ChevronRight, Share2, Mail, MessageCircle, Sparkles, Feather, Palette, Heart, Maximize2 } from 'lucide-react';
 import { loadStripe } from '@stripe/stripe-js';
 import Lenis from 'lenis';
 import AdminDashboardModal from './components/AdminDashboardModal';
@@ -752,6 +753,21 @@ const Navbar = ({ currentPage, setCurrentPage }: { currentPage: 'home' | 'essenc
     const { lang: activeLang, t } = useLanguage();
     const lang = activeLang.toUpperCase() as 'PT' | 'EN';
 
+    useEffect(() => {
+        if (mobileMenuOpen) {
+            document.body.style.overflow = 'hidden';
+            (window as any).lenis?.stop();
+            window.dispatchEvent(new CustomEvent('mbravo-mobile-menu-open'));
+        } else {
+            document.body.style.overflow = '';
+            (window as any).lenis?.start();
+        }
+        return () => {
+            document.body.style.overflow = '';
+            (window as any).lenis?.start();
+        };
+    }, [mobileMenuOpen]);
+
     const handleLanguageChange = (newLang: 'PT' | 'EN') => {
         localStorage.setItem('mbravo_lang', newLang);
         window.dispatchEvent(new CustomEvent('mbravo-lang-change', { detail: newLang }));
@@ -766,30 +782,33 @@ const Navbar = ({ currentPage, setCurrentPage }: { currentPage: 'home' | 'essenc
 
     const handleLinkClick = (e: React.MouseEvent, href: string) => {
         setMobileMenuOpen(false);
+        const activePath = window.location.pathname;
         if (href === 'essence') {
             e.preventDefault();
-            setCurrentPage('essence');
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+            navigateTo('/essencia');
         } else {
-            if (currentPage !== 'home') {
+            if (activePath !== '/' && activePath !== '/home') {
                 e.preventDefault();
-                setCurrentPage('home');
-                setTimeout(() => {
-                    const element = document.getElementById(href.replace('#', ''));
-                    if (element) {
-                        element.scrollIntoView({ behavior: 'smooth' });
-                    }
-                }, 100);
+                navigateTo('/' + href);
+            } else {
+                const element = document.getElementById(href.replace('#', ''));
+                if (element) {
+                    e.preventDefault();
+                    (window as any).lenis?.scrollTo(element, { duration: 1.2 });
+                }
             }
         }
     };
 
     useEffect(() => {
         // Set initial color state based on page type
-        if (currentPage === 'essence') {
-            setIsDarkBg(false); // EssenceHero has data-background="light"
+        const activePath = window.location.pathname;
+        if (activePath === '/essencia') {
+            setIsDarkBg(false);
+        } else if (activePath === '/' || activePath === '/home') {
+            setIsDarkBg(true);
         } else {
-            setIsDarkBg(true);  // Hero has data-background="dark"
+            setIsDarkBg(false); // Default for Category, Product detail, Admin
         }
 
         const handleScroll = () => {
@@ -826,7 +845,8 @@ const Navbar = ({ currentPage, setCurrentPage }: { currentPage: 'home' | 'essenc
                 }
             });
             if (!detected) {
-                setIsDarkBg(currentPage === 'home');
+                const p = window.location.pathname;
+                setIsDarkBg(p === '/' || p === '/home');
             }
         };
 
@@ -871,11 +891,10 @@ const Navbar = ({ currentPage, setCurrentPage }: { currentPage: 'home' | 'essenc
       <div className="max-w-7xl mx-auto px-6 flex justify-between items-center">
         {/* Logo with entry animation and Smart Invert */}
         <motion.a 
-            href="#" 
+            href="/" 
             onClick={(e) => {
                 e.preventDefault();
-                setCurrentPage('home');
-                window.scrollTo({ top: 0, behavior: 'smooth' });
+                navigateTo('/');
             }}
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -941,14 +960,16 @@ const Navbar = ({ currentPage, setCurrentPage }: { currentPage: 'home' | 'essenc
         </div>
 
         {/* Mobile Toggle */}
-        <motion.button 
-          initial={{ opacity: 0, x: 20 }}
-          animate={{ opacity: 1, x: 0 }}
-          className={`md:hidden transition-colors duration-200 ${textColor}`}
-          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-        >
-          {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
-        </motion.button>
+        {!mobileMenuOpen && (
+          <motion.button 
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            className={`md:hidden transition-colors duration-200 ${textColor}`}
+            onClick={() => setMobileMenuOpen(true)}
+          >
+            <Menu size={24} />
+          </motion.button>
+        )}
       </div>
 
       {/* Mobile Menu Overlay - Refined with Forest theme */}
@@ -958,13 +979,14 @@ const Navbar = ({ currentPage, setCurrentPage }: { currentPage: 'home' | 'essenc
             initial={{ opacity: 0, backdropFilter: "blur(0px)" }}
             animate={{ opacity: 1, backdropFilter: "blur(20px)" }}
             exit={{ opacity: 0, backdropFilter: "blur(0px)" }}
-            className="fixed inset-0 z-[60] bg-forest/95 flex flex-col items-center justify-center p-8 space-y-8 sm:space-y-10"
+            className="fixed inset-0 z-[999] bg-forest flex flex-col items-center justify-center p-8 space-y-8 sm:space-y-10"
           >
              <button 
-                className="absolute top-6 right-6 text-cream/70 hover:text-cream transition-colors duration-300 p-2"
+                className="absolute top-8 right-8 text-cream hover:text-brand-green-light transition-all duration-300 p-3 bg-white/5 hover:bg-white/10 rounded-full border border-white/10 flex items-center justify-center cursor-pointer shadow-lg"
                 onClick={() => setMobileMenuOpen(false)}
+                aria-label="Fechar Menu"
              >
-                <X size={24} />
+                <X size={28} />
              </button>
              
              {/* Centered navigation links with balanced vertical gap */}
@@ -1194,16 +1216,16 @@ const FioCondutor = () => {
     const specularStrokeWidth = isMobile ? 0.12 : 0.25;
 
     return (
-        <div className="absolute top-[75vh] left-0 w-full bottom-0 pointer-events-none select-none z-[5] overflow-x-hidden overflow-y-visible">
+        <div className="absolute top-[75vh] left-0 w-full bottom-0 pointer-events-none select-none z-[5] overflow-x-hidden overflow-y-hidden">
             <motion.div 
                 style={{ opacity: threadOpacity }}
                 transition={{ duration: 0.5 }}
-                className="relative w-full h-full flex flex-col items-center justify-start overflow-visible"
+                className="relative w-full h-full flex flex-col items-center justify-start overflow-hidden"
             >
                 <svg 
                     viewBox="0 0 1440 6000" 
                     fill="none" 
-                    className="select-none pointer-events-none overflow-visible w-full h-full"
+                    className="select-none pointer-events-none overflow-hidden w-full h-full"
                     preserveAspectRatio="none"
                 >
                     <defs>
@@ -1520,7 +1542,7 @@ const Hero = () => {
                                     textShadow: "0 15px 40px rgba(18, 26, 13, 0.95), 0 4px 12px rgba(18, 26, 13, 0.7)",
                                     letterSpacing: "-0.012em"
                                 }}
-                                className="italic text-[clamp(0.85rem,4.5vw,2.85rem)] leading-tight font-normal mb-4 md:mb-5 antialiased selection:bg-[#C5A059]/30 flex flex-nowrap justify-center gap-x-[0.22em] md:gap-x-[0.25em] max-w-none w-full whitespace-nowrap"
+                                className="italic text-[clamp(1.1rem,4.5vw,2.85rem)] leading-relaxed font-normal mb-4 md:mb-5 antialiased selection:bg-[#C5A059]/30 flex flex-wrap justify-center gap-x-[0.22em] md:gap-x-[0.25em] max-w-none w-full"
                             >
                                 {titleWords.map((word, i) => {
                                     // Highlight the core brand word "memória." or "memory." in the signature gold color for stunning luxury contrast
@@ -1609,7 +1631,7 @@ const StorySection = () => {
     }, []);
 
     return (
-        <section ref={containerRef} id="sobre" data-background="light" className="py-12 xs:py-16 sm:py-20 md:py-24 lg:py-32 xl:py-36 relative overflow-hidden select-none px-6 md:px-8 lg:px-16" style={{ backgroundColor: '#F6F1E5' }}>
+        <section ref={containerRef} id="sobre" data-background="light" className="pt-12 xs:pt-16 sm:pt-20 md:pt-24 lg:pt-32 xl:pt-36 pb-0 relative overflow-hidden select-none px-6 md:px-8 lg:px-16" style={{ backgroundColor: '#F6F1E5' }}>
             {/* Elements of Fundo Subtis: Handcrafted loose cotton fibers / wavy spinning threads running deep inside the cream canvas, completely backgrounded */}
             <div className="absolute inset-x-0 bottom-0 top-[150px] pointer-events-none z-0 overflow-hidden">
                 {/* Subtle organic textile noise */}
@@ -1804,7 +1826,7 @@ const StorySection = () => {
 const MadeWithTimeSection = () => {
     const { t } = useLanguage();
     return (
-        <section id="manifesto" data-background="light" className="py-[clamp(3rem,8vw,5.5rem)] bg-[#FCFBF9] relative overflow-hidden select-none border-t border-forest/5 px-6 md:px-8 lg:px-16">
+        <section id="manifesto" data-background="light" className="py-[clamp(3rem,8vw,5.5rem)] bg-[#FCFBF9] relative overflow-hidden select-none px-6 md:px-8 lg:px-16">
             <div className="w-full max-w-7xl mx-auto">
                 {/* Header: Large Asymmetrical Editorial Typography */}
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-16 items-baseline mb-12 sm:mb-16 md:mb-16 border-b border-forest/10 pb-8 md:pb-12">
@@ -2549,8 +2571,6 @@ const ProductCard: React.FC<ProductCardProps> = ({ product: rawProduct, i, isFoc
         onFocus(isFocused ? null : product.id);
     };
 
-    const [isZoomed, setIsZoomed] = useState(false);
-
     if (!isFocused) {
         return (
             <motion.div 
@@ -2609,11 +2629,11 @@ const ProductCard: React.FC<ProductCardProps> = ({ product: rawProduct, i, isFoc
 
     return (
         <>
-        <div className="w-full h-[100dvh] md:max-w-3xl md:h-[90vh] lg:max-w-6xl lg:h-[88vh] bg-[#FCFBF9] rounded-none md:rounded-[2rem] lg:rounded-[2.5rem] flex flex-col lg:flex-row shadow-2xl relative overflow-y-auto lg:overflow-hidden text-forest select-none">
+        <div data-lenis-prevent className="w-full h-auto lg:h-[88vh] lg:max-w-6xl bg-[#FCFBF9] rounded-none md:rounded-[2rem] lg:rounded-[2.5rem] flex flex-col lg:flex-row shadow-2xl relative overflow-visible lg:overflow-hidden text-forest select-none">
             {/* a) Área de Visualização */}
             <div 
-                className="w-full lg:w-[62%] h-[52vh] md:h-[56vh] lg:h-full shrink-0 border-b lg:border-b-0 lg:border-r border-forest/10 p-1 sm:p-2 lg:p-4 flex flex-col items-center justify-center overflow-hidden bg-[#F5F2ED] relative transition-colors duration-500"
-                style={{ touchAction: 'none' }}
+                className="w-full lg:w-[62%] h-[52vh] sm:h-[56vh] lg:h-full shrink-0 border-b lg:border-b-0 lg:border-r border-forest/10 p-1 sm:p-2 lg:p-4 flex flex-col items-center justify-center overflow-hidden bg-[#F5F2ED] relative transition-colors duration-500"
+                style={{ touchAction: 'pan-y' }}
             >
                 {/* Floating label in top-left corner */}
                 <div className="absolute top-6 left-6 z-20 pointer-events-none hidden lg:block">
@@ -2622,13 +2642,15 @@ const ProductCard: React.FC<ProductCardProps> = ({ product: rawProduct, i, isFoc
                     </span>
                 </div>
 
-                {/* High-End Floating Close Button for Mobile/Tablet */}
+                {/* Custom Elegant Zoom Button */}
                 <button 
-                    onClick={handleToggle}
-                    className="fixed top-4 right-4 z-[150] lg:hidden p-3 rounded-full bg-forest text-cream backdrop-blur-md transition-all border border-forest/10 cursor-pointer flex items-center justify-center shadow-lg"
-                    title="Fechar Detalhes"
+                    onClick={() => {
+                        window.dispatchEvent(new CustomEvent('mbravo-zoom-image', { detail: currentImg }));
+                    }}
+                    className="absolute top-6 right-6 z-20 p-2.5 sm:p-3 rounded-full bg-[#FCFBF9]/80 text-forest hover:bg-forest hover:text-cream backdrop-blur-md shadow-md border border-forest/10 cursor-pointer flex items-center justify-center hover:scale-105 active:scale-95 transition-all duration-300"
+                    title={lang === 'pt' ? 'Ampliar Imagem' : 'Zoom Image'}
                 >
-                    <X size={18} />
+                    <Maximize2 size={16} />
                 </button>
 
                 {/* Main Proportional Visual Frame with layoutId */}
@@ -2669,7 +2691,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product: rawProduct, i, isFoc
                             }}
                             className="max-w-full max-h-full object-contain cursor-grab active:cursor-grabbing select-none rounded-[1rem] sm:rounded-[1.5rem] transition-transform duration-300 hover:scale-[1.01] antialiased filter-none opacity-100"
                             onClick={() => {
-                                setIsZoomed(true);
+                                window.dispatchEvent(new CustomEvent('mbravo-zoom-image', { detail: currentImg }));
                             }}
                         />
                     </AnimatePresence>
@@ -2754,9 +2776,9 @@ const ProductCard: React.FC<ProductCardProps> = ({ product: rawProduct, i, isFoc
             </div>
 
             {/* b) Área de Informação (Details / Sidebar and custom features) */}
-            <div className="w-full lg:w-[38%] h-auto lg:h-full bg-[#FCFBF9] flex flex-col pl-5 pr-5 py-6 lg:py-8 text-forest relative box-border">
+            <div className="w-full lg:w-[38%] h-auto lg:h-full bg-[#FCFBF9] flex flex-col px-5 py-6 lg:py-8 text-forest relative box-border lg:overflow-hidden">
                 {isCheckingOut ? (
-                    <div className="flex-1 flex flex-col h-full bg-[#FCFBF9] text-forest select-text p-1 animate-fadeIn overflow-y-auto max-h-full">
+                    <div data-lenis-prevent className="flex-1 flex flex-col lg:h-full bg-[#FCFBF9] text-forest select-text p-1 animate-fadeIn lg:overflow-y-auto overflow-y-visible max-h-full h-auto scrollbar-thin scrollbar-thumb-forest/10">
                         {/* Header with Back button */}
                         <div className="flex justify-between items-center border-b border-forest/10 pb-4 mb-4">
                             <button 
@@ -2774,9 +2796,18 @@ const ProductCard: React.FC<ProductCardProps> = ({ product: rawProduct, i, isFoc
                                 <ChevronLeft size={16} />
                                 {paymentCompleted ? t('btn.back_collection') : (lang === 'pt' ? 'Voltar' : 'Back')}
                             </button>
-                            <span className="text-[9px] font-mono uppercase tracking-[0.2em] text-forest/30">
-                                {paymentCompleted ? (lang === 'pt' ? 'Pedido Concluído' : 'Order Completed') : (lang === 'pt' ? 'Checkout Seguro' : 'Secure Checkout')}
-                            </span>
+                            <div className="flex items-center gap-2">
+                                <span className="text-[9px] font-mono uppercase tracking-[0.2em] text-forest/30">
+                                    {paymentCompleted ? (lang === 'pt' ? 'Pedido Concluído' : 'Order Completed') : (lang === 'pt' ? 'Checkout Seguro' : 'Secure Checkout')}
+                                </span>
+                                <button 
+                                    onClick={handleToggle}
+                                    className="p-1.5 rounded-full bg-forest/5 text-forest hover:bg-forest hover:text-cream transition-all border border-forest/10 shadow-sm cursor-pointer ml-1"
+                                    title="Fechar"
+                                >
+                                    <X size={12} />
+                                </button>
+                            </div>
                         </div>
 
                         {paymentCompleted ? (
@@ -2969,7 +3000,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product: rawProduct, i, isFoc
                             </div>
                         ) : (
                             /* Checkout Form and Gateway selection */
-                            <div className="space-y-6 pb-20 lg:pb-6 text-left flex-grow flex flex-col justify-between">
+                            <div className="space-y-6 pb-12 lg:pb-6 text-left flex-grow flex flex-col justify-between">
                                 <div className="space-y-6">
                                     {/* Product Summary Mini Card */}
                                     <div className="bg-forest/5 rounded-2xl p-4 border border-forest/5 flex justify-between items-center gap-4">
@@ -3541,12 +3572,12 @@ const ProductCard: React.FC<ProductCardProps> = ({ product: rawProduct, i, isFoc
                         )}
                     </div>
                 ) : (
-                    <div className="flex-1 overflow-y-visible lg:overflow-y-auto space-y-5 pr-1 select-text pb-32 lg:pb-4 scrollbar-thin scrollbar-thumb-forest/10 scrollbar-track-transparent">
+                    <div data-lenis-prevent className="flex-1 overflow-y-visible lg:overflow-y-auto space-y-5 pr-1 select-text pb-32 lg:pb-4 scrollbar-thin scrollbar-thumb-forest/10 scrollbar-track-transparent">
                         
                         {/* Title & Navigation/Close Controls */}
                         <div className="flex justify-between items-start gap-4">
                             <div>
-                                <span className="text-[9px] uppercase tracking-[0.4em] text-[#C5A059] block mb-1 font-sans font-semibold">EXCLUSIVO M★BRAVO</span>
+                                <span className="text-[9px] uppercase tracking-[0.4em] text-[#C5A059] block mb-1 font-sans font-semibold">EDIÇÃO EXCLUSIVA M★BRAVO</span>
                                 <h3 className="text-3xl lg:text-3.5xl font-serif font-light text-forest leading-tight tracking-[0.05em] mb-1">{product.name}</h3>
                             </div>
                             <div className="flex items-center gap-2 flex-shrink-0 z-30">
@@ -3977,50 +4008,6 @@ const ProductCard: React.FC<ProductCardProps> = ({ product: rawProduct, i, isFoc
                 </div>
             )}
         </div>
-
-        {/* HIGH-END INTERACTIVE REAL FULL-SCREEN ZOOM MODAL */}
-        <AnimatePresence>
-            {isZoomed && (
-                <motion.div 
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    transition={{ duration: 0.25 }}
-                    onClick={() => setIsZoomed(false)}
-                    className="fixed inset-0 z-[1000] flex flex-col items-center justify-center bg-black/95 p-4 sm:p-6 lg:p-12 cursor-zoom-out select-none backdrop-blur-md"
-                >
-                    {/* Floating Close Button */}
-                    <button 
-                        onClick={(e) => {
-                            e.stopPropagation();
-                            setIsZoomed(false);
-                        }}
-                        className="absolute top-6 right-6 z-[1010] p-4 rounded-full bg-white/10 hover:bg-white/20 text-white backdrop-blur-md transition-all border border-white/10 hover:scale-105 active:scale-95 cursor-pointer flex items-center justify-center shadow-2xl"
-                        title="Fechar Zoom"
-                    >
-                        <X size={24} />
-                    </button>
-
-                    {/* Interactive Large Image with scale transition */}
-                    <div className="relative w-full h-full max-w-5xl max-h-[85vh] flex items-center justify-center">
-                        <motion.img 
-                            initial={{ scale: 0.95, opacity: 0 }}
-                            animate={{ scale: 1, opacity: 1 }}
-                            exit={{ scale: 0.95, opacity: 0 }}
-                            transition={{ duration: 0.25, ease: "easeOut" }}
-                            src={currentImg} 
-                            alt={`${product.name} Zoom`}
-                            className="max-w-full max-h-full object-contain rounded-2xl shadow-2xl pointer-events-none"
-                        />
-                    </div>
-
-                    {/* Informative minimal note */}
-                    <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-10 text-white/50 text-[10px] uppercase tracking-widest font-sans font-light">
-                        Toca em qualquer lado para fechar
-                    </div>
-                </motion.div>
-            )}
-        </AnimatePresence>
         </>
     );
 };
@@ -4036,10 +4023,7 @@ const CarouselItem: React.FC<{ children: React.ReactNode }> = ({ children }) => 
 };
 
 const CollectionSection = () => {
-    const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
-    const [focusedProductId, setFocusedProductId] = useState<string | null>(null);
     const containerRef = useRef(null);
-    const carouselRef = useRef<HTMLDivElement>(null);
     const { lang, t } = useLanguage();
 
     const { scrollYProgress } = useScroll({
@@ -4058,48 +4042,9 @@ const CollectionSection = () => {
     const opacityTrack = useTransform(smoothProgress, [0, 0.2, 0.8, 1], [0, 0.04, 0.04, 0]);
 
     const translatedCategoriesList = SHOP_CATEGORIES.map(cat => translateCategory(cat, lang));
-    const activeCategory = translatedCategoriesList.find(c => c.id === selectedCategory);
-
-    const handlePrevProduct = () => {
-        if (!activeCategory || !focusedProductId) return;
-        const index = activeCategory.products.findIndex(p => p.id === focusedProductId);
-        if (index !== -1) {
-            const prevIndex = index === 0 ? activeCategory.products.length - 1 : index - 1;
-            setFocusedProductId(activeCategory.products[prevIndex].id);
-        }
-    };
-
-    const handleNextProduct = () => {
-        if (!activeCategory || !focusedProductId) return;
-        const index = activeCategory.products.findIndex(p => p.id === focusedProductId);
-        if (index !== -1) {
-            const nextIndex = index === activeCategory.products.length - 1 ? 0 : index + 1;
-            setFocusedProductId(activeCategory.products[nextIndex].id);
-        }
-    };
-
-    // Reset focused product when changing category
-    useEffect(() => {
-        setFocusedProductId(null);
-    }, [selectedCategory]);
-
-    // Lock body scroll when a product focus modal is open
-    useEffect(() => {
-        if (focusedProductId) {
-            document.body.style.overflow = 'hidden';
-            (window as any).lenis?.stop();
-        } else {
-            document.body.style.overflow = '';
-            (window as any).lenis?.start();
-        }
-        return () => {
-            document.body.style.overflow = '';
-            (window as any).lenis?.start();
-        };
-    }, [focusedProductId]);
 
     return (
-        <section ref={containerRef} id="collection" data-background="light" className="py-10 xs:py-12 sm:py-16 lg:py-24 xl:py-28 bg-[#F6F1E5] min-h-[85vh] relative overflow-hidden px-6 md:px-8 lg:px-16">
+        <section ref={containerRef} id="collection" data-background="light" className="pt-10 xs:pt-12 sm:pt-16 lg:pt-20 xl:pt-24 pb-10 xs:pb-12 sm:pb-16 lg:pb-24 xl:pb-28 bg-[#F6F1E5] min-h-[80vh] relative overflow-hidden px-6 md:px-8 lg:px-16">
 
             <motion.div 
                 style={{ x: xTrack, y: yTrack, opacity: opacityTrack, fontFamily: "'Cormorant Garamond', serif" }}
@@ -4130,7 +4075,6 @@ const CollectionSection = () => {
                     whileInView={{ opacity: 1, y: 0 }}
                     className="text-3xl md:text-4xl lg:text-5xl font-light tracking-[0.1em] xs:tracking-[0.15em] sm:tracking-[0.2em] uppercase leading-tight text-center font-serif"
                   >
-                    {selectedCategory ? activeCategory?.name : (
                         <span 
                             className="inline-flex items-center gap-1 justify-center"
                             style={{
@@ -4153,162 +4097,46 @@ const CollectionSection = () => {
                              </span>
                             BRAVO
                         </span>
-                    )}
                  </motion.h2>
                  
-                 {!selectedCategory && (
-                     <motion.p
-                         initial={{ opacity: 0, y: 10 }}
-                         whileInView={{ opacity: 1, y: 0 }}
-                         transition={{ duration: 1, delay: 0.2 }}
-                         className="text-forest/60 text-lg md:text-xl font-serif font-light italic mt-6"
-                     >
-                         {t('collection.subtitle')}
-                     </motion.p>
-                 )}
-
-                 {selectedCategory && (
-                    <motion.button 
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        onClick={() => setSelectedCategory(null)}
-                        className="mt-12 group flex items-center gap-4 mx-auto text-[10px] uppercase tracking-[0.4em] font-bold text-forest/40 hover:text-forest transition-colors"
-                    >
-                        <ChevronLeft size={16} className="group-hover:-translate-x-2 transition-transform" />
-                        {t('btn.back_collection')}
-                    </motion.button>
-                 )}
+                 <motion.p
+                     initial={{ opacity: 0, y: 10 }}
+                     whileInView={{ opacity: 1, y: 0 }}
+                     transition={{ duration: 1, delay: 0.2 }}
+                     className="text-forest/60 text-lg md:text-xl font-serif font-light italic mt-6"
+                 >
+                     {t('collection.subtitle')}
+                 </motion.p>
             </div>
 
             <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-                <AnimatePresence mode="wait">
-                    {!selectedCategory ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-16 lg:gap-24">
+                    {translatedCategoriesList.map((cat, i) => (
                         <motion.div 
-                            key="overview"
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            exit={{ opacity: 0 }}
-                            transition={{ duration: 0.2, ease: "linear" }}
-                            className="grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-16 lg:gap-24"
+                            key={cat.id}
+                            initial={{ opacity: 0, y: 30 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            viewport={{ once: true }}
+                            transition={{ delay: i * 0.1 }}
+                            className="group relative aspect-[4/3] rounded-[3rem] overflow-hidden bg-forest/5 cursor-pointer max-w-2xl mx-auto w-full shadow-md hover:shadow-xl transition-all duration-500"
+                            style={{ willChange: 'transform' }}
+                            onClick={() => navigateTo(getCategoryUrl(cat))}
                         >
-                            {translatedCategoriesList.map((cat, i) => (
-                                <motion.div 
-                                    key={cat.id}
-                                    initial={{ opacity: 0, y: 30 }}
-                                    whileInView={{ opacity: 1, y: 0 }}
-                                    viewport={{ once: true }}
-                                    transition={{ delay: i * 0.1 }}
-                                    className="group relative aspect-[4/3] rounded-[3rem] overflow-hidden bg-forest/5 cursor-pointer max-w-2xl mx-auto w-full"
-                                    style={{ willChange: 'transform' }}
-                                    onClick={() => setSelectedCategory(cat.id)}
-                                >
-                                    <img 
-                                        src={cat.img} 
-                                        alt={cat.name} 
-                                        loading="eager"
-                                        decoding="sync"
-                                        style={{ imageRendering: 'crisp-edges' }}
-                                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out antialiased"
-                                    />
-                                    <div className="absolute inset-0 bg-gradient-to-t from-forest/90 via-forest/20 to-transparent flex flex-col justify-end p-6 sm:p-8 md:p-8 lg:p-10 xl:p-12 transition-all duration-500">
-                                        <h3 className="text-lg sm:text-xl md:text-xl lg:text-2xl xl:text-3xl font-serif text-cream mb-2">{cat.name}</h3>
-                                        <p className="text-cream/60 text-xs sm:text-sm font-light mb-2 sm:mb-4 max-w-sm opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-all duration-500 transform md:translate-y-3 md:group-hover:translate-y-0">{cat.items}</p>
-                                    </div>
-                                </motion.div>
-                            ))}
-                        </motion.div>
-                    ) : (
-                        <motion.div 
-                            key="detail"
-                            layout
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            exit={{ opacity: 0 }}
-                            transition={{ duration: 0.2, ease: "linear" }}
-                            className="relative"
-                        >
-                            {/* Carousel Container - ALWAYS rendered to keep scroll and heights */}
-                            <div className={`transition-all duration-500 ${focusedProductId ? "opacity-30 pointer-events-none scale-[0.98] blur-[2px]" : "opacity-100"}`}>
-                                <div className="relative group/carousel px-4">
-                                    {/* Horizontal Product Carousel - High-End eCommerce Layout */}
-                                    <div 
-                                        ref={carouselRef}
-                                        className="relative w-full overflow-x-auto pb-12 pt-4 snap-x snap-mandatory no-scrollbar flex scroll-smooth"
-                                    >
-                                        {activeCategory?.products.map((product, i) => (
-                                            <CarouselItem key={product.id}>
-                                                <ProductCard 
-                                                    product={product} 
-                                                    i={i} 
-                                                    isFocused={false}
-                                                    isSubdued={focusedProductId !== null && focusedProductId !== product.id}
-                                                    onFocus={setFocusedProductId}
-                                                />
-                                            </CarouselItem>
-                                        ))}
-                                    </div>
-
-                                    {/* Minimalist Navigation Controls */}
-                                    <div className="hidden md:flex absolute top-1/2 -left-4 -right-4 -translate-y-1/2 items-center justify-between pointer-events-none px-4">
-                                        <button 
-                                            onClick={() => carouselRef.current?.scrollBy({ left: -carouselRef.current.offsetWidth, behavior: 'smooth' })}
-                                            className="w-12 h-12 bg-white/80 backdrop-blur-sm rounded-full flex items-center justify-center shadow-lg pointer-events-auto hover:bg-forest hover:text-cream transition-all -translate-x-2"
-                                        >
-                                            <ChevronLeft size={24} />
-                                        </button>
-                                        <button 
-                                            onClick={() => carouselRef.current?.scrollBy({ left: carouselRef.current.offsetWidth, behavior: 'smooth' })}
-                                            className="w-12 h-12 bg-white/80 backdrop-blur-sm rounded-full flex items-center justify-center shadow-lg pointer-events-auto hover:bg-forest hover:text-cream transition-all translate-x-2"
-                                        >
-                                            <ChevronRight size={24} />
-                                        </button>
-                                    </div>
-
-                                    {/* Discrete Pagination Dots */}
-                                    <div className="flex justify-center gap-2 mt-4">
-                                        {activeCategory?.products.map((_, idx) => (
-                                            <div 
-                                                key={idx}
-                                                className="h-1 rounded-full bg-forest/20 w-8"
-                                            />
-                                        ))}
-                                    </div>
-                                </div>
+                            <img 
+                                src={cat.img} 
+                                alt={cat.name} 
+                                loading="eager"
+                                decoding="sync"
+                                style={{ imageRendering: 'crisp-edges' }}
+                                className="w-full h-full object-cover group-hover:scale-102 transition-transform duration-700 ease-out antialiased"
+                            />
+                            <div className="absolute inset-0 bg-gradient-to-t from-forest/90 via-forest/20 to-transparent flex flex-col justify-end p-6 sm:p-8 md:p-8 lg:p-10 xl:p-12 transition-all duration-500">
+                                <h3 className="text-lg sm:text-xl md:text-xl lg:text-2xl xl:text-3xl font-serif text-cream mb-2 uppercase tracking-wide">{cat.name}</h3>
+                                <p className="text-cream/60 text-xs sm:text-sm font-light mb-2 sm:mb-4 max-w-sm opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-all duration-500 transform md:translate-y-3 md:group-hover:translate-y-0">{cat.items}</p>
                             </div>
-
-                            {/* Focused Product Modal */}
-                            <AnimatePresence>
-                                {focusedProductId && (
-                                    <motion.div 
-                                        initial={{ opacity: 0 }}
-                                        animate={{ opacity: 1 }}
-                                        exit={{ opacity: 0 }}
-                                        transition={{ duration: 0.3 }}
-                                        className="fixed inset-0 z-[120] flex items-center justify-center p-0 md:p-6 lg:p-12 bg-forest/60 backdrop-blur-lg overflow-hidden h-[100dvh]"
-                                    >
-                                        {/* Clickable Backdrop inside */}
-                                        <div 
-                                            className="fixed inset-0 -z-10 cursor-pointer h-[100dvh]" 
-                                            onClick={() => setFocusedProductId(null)} 
-                                        />
-                                        
-                                        <div className="relative w-full h-[100dvh] md:h-auto max-w-6xl z-10 flex items-center justify-center">
-                                            <ProductCard 
-                                                product={activeCategory?.products.find(p => p.id === focusedProductId)} 
-                                                i={0} 
-                                                isFocused={true}
-                                                isSubdued={false}
-                                                onFocus={setFocusedProductId}
-                                                onPrevProduct={handlePrevProduct}
-                                                onNextProduct={handleNextProduct}
-                                            />
-                                        </div>
-                                    </motion.div>
-                                )}
-                            </AnimatePresence>
                         </motion.div>
-                    )}
-                </AnimatePresence>
+                    ))}
+                </div>
             </div>
         </section>
     );
@@ -4405,8 +4233,10 @@ const LegalModal = ({ type, onClose }: LegalModalProps) => {
     useEffect(() => {
         // Prevent body scroll when modal is open
         document.body.style.overflow = 'hidden';
+        (window as any).lenis?.stop();
         return () => {
             document.body.style.overflow = '';
+            (window as any).lenis?.start();
         };
     }, []);
 
@@ -4641,7 +4471,7 @@ const LegalModal = ({ type, onClose }: LegalModalProps) => {
                 </div>
 
                 {/* Body */}
-                <div className="px-6 md:px-10 py-6 md:py-8 overflow-y-auto scrollbar-thin scrollbar-thumb-forest/10">
+                <div data-lenis-prevent className="px-6 md:px-10 py-6 md:py-8 overflow-y-auto scrollbar-thin scrollbar-thumb-forest/10">
                     {current.body}
                 </div>
 
@@ -5403,6 +5233,1528 @@ const TestimonialsSection = () => {
     );
 };
 
+// ==========================================
+// --- ROBUST ROUTER HELPERS & PAGES ---
+// ==========================================
+
+// --- Slugify Helper ---
+export function slugify(text: string): string {
+    return text
+        .toLowerCase()
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/(^-|-$)+/g, '');
+}
+
+// --- Navigation Helpers ---
+export function navigateTo(path: string) {
+    window.history.pushState(null, '', path);
+    const event = new CustomEvent('mbravo-navigate', { detail: path });
+    window.dispatchEvent(event);
+}
+
+export function getProductUrl(product: any): string {
+    return `/produtos/${slugify(product.name)}`;
+}
+
+export function getCategoryUrl(category: any): string {
+    return `/colecoes/${category.id}`;
+}
+
+export function findCategoryBySlugOrId(slugOrId: string) {
+    if (!slugOrId) return null;
+    const clean = slugOrId.toLowerCase();
+    return SHOP_CATEGORIES.find(cat => cat.id.toLowerCase() === clean || slugify(cat.name) === clean);
+}
+
+export function findProductBySlugOrId(slugOrId: string) {
+    if (!slugOrId) return null;
+    const clean = slugOrId.toLowerCase();
+    for (const cat of SHOP_CATEGORIES) {
+        for (const prod of cat.products) {
+            if (prod.id.toLowerCase() === clean || slugify(prod.name) === clean) {
+                return { product: prod, category: cat };
+            }
+        }
+    }
+    return null;
+}
+
+// --- Category Page Component ---
+const CategoryPage = ({ pathname }: { pathname: string }) => {
+    const { lang, t } = useLanguage();
+    const categoryId = pathname.split('/colecoes/')[1]?.split('#')[0];
+    const category = findCategoryBySlugOrId(categoryId);
+
+    if (!category) {
+        return (
+            <div className="max-w-4xl mx-auto px-6 text-center py-24 text-forest min-h-[60vh] flex flex-col items-center justify-center gap-4">
+                <h2 className="text-2xl font-serif">{lang === 'pt' ? 'Coleção não encontrada' : 'Collection not found'}</h2>
+                <button onClick={() => navigateTo('/')} className="px-6 py-2.5 bg-forest text-cream rounded-full uppercase tracking-widest text-[10px] font-bold cursor-pointer transition-all hover:bg-[#1C2713]">
+                    {lang === 'pt' ? 'Voltar ao Início' : 'Back to Home'}
+                </button>
+            </div>
+        );
+    }
+
+    const translatedCategory = translateCategory(category, lang);
+
+    return (
+        <div className="w-full max-w-7xl mx-auto px-6 md:px-8 lg:px-16 text-forest">
+            {/* Breadcrumbs */}
+            <div className="text-[10px] uppercase tracking-[0.3em] text-forest/40 mb-10 font-sans flex items-center gap-2">
+                <span className="cursor-pointer hover:text-forest transition-colors" onClick={() => navigateTo('/')}>M★BRAVO</span>
+                <span>/</span>
+                <span className="text-forest/80 font-semibold">{translatedCategory.name}</span>
+            </div>
+
+            {/* Category Hero Header */}
+            <div className="relative rounded-[2rem] md:rounded-[3rem] overflow-hidden aspect-[16/10] md:aspect-[21/9] mb-16 shadow-lg bg-forest/5 flex items-end">
+                <img 
+                    src={translatedCategory.img} 
+                    alt={translatedCategory.name} 
+                    className="absolute inset-0 w-full h-full object-cover brightness-[0.7] grayscale-[0.1]"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-forest/85 via-forest/10 to-transparent pointer-events-none" />
+                <div className="relative z-10 p-8 sm:p-12 md:p-16 text-cream max-w-2xl text-left">
+                    <span className="text-[9px] sm:text-[10px] uppercase tracking-[0.45em] font-bold text-[#C5A059] block mb-3 font-sans">
+                        {t('collection.tag')}
+                    </span>
+                    <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-light tracking-wide font-serif mb-4 uppercase">{translatedCategory.name}</h1>
+                    <p className="text-cream/80 font-serif italic text-sm sm:text-base md:text-lg font-light leading-relaxed">
+                        {translatedCategory.items} — {t('collection.subtitle')}
+                    </p>
+                </div>
+            </div>
+
+            {/* Products Grid */}
+            <div className="mb-20">
+                <div className="flex items-center justify-between border-b border-forest/10 pb-6 mb-12">
+                    <h2 className="font-serif italic text-xl sm:text-2xl font-light">
+                        {translatedCategory.products.length} {translatedCategory.products.length === 1 ? (lang === 'pt' ? 'peça única' : 'unique piece') : (lang === 'pt' ? 'peças únicas' : 'unique pieces')}
+                    </h2>
+                    <button onClick={() => navigateTo('/')} className="text-[10px] uppercase tracking-[0.3em] font-bold text-forest/50 hover:text-forest flex items-center gap-2 transition-colors cursor-pointer">
+                        <ChevronLeft size={14} /> {lang === 'pt' ? 'Voltar ao Início' : 'Back to Home'}
+                    </button>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-8 sm:gap-10 lg:gap-12">
+                    {translatedCategory.products.map((product, i) => (
+                        <div key={product.id} className="h-full">
+                            <ProductCard 
+                                product={product} 
+                                i={i} 
+                                isFocused={false}
+                                isSubdued={false}
+                                onFocus={() => navigateTo(getProductUrl(product))}
+                            />
+                        </div>
+                    ))}
+                </div>
+            </div>
+        </div>
+    );
+};
+
+// --- Product Detail Page Component ---
+const ProductDetailPage = ({ pathname }: { pathname: string }) => {
+    const { lang, t } = useLanguage();
+    const productPath = pathname.split('/produtos/')[1]?.split('#')[0];
+    const match = findProductBySlugOrId(productPath);
+
+    if (!match) {
+        return (
+            <div className="max-w-4xl mx-auto px-6 text-center py-24 text-forest min-h-[60vh] flex flex-col items-center justify-center gap-4">
+                <h2 className="text-2xl font-serif">{lang === 'pt' ? 'Peça não encontrada' : 'Product not found'}</h2>
+                <button onClick={() => navigateTo('/')} className="px-6 py-2.5 bg-forest text-cream rounded-full uppercase tracking-widest text-[10px] font-bold cursor-pointer transition-all hover:bg-[#1C2713]">
+                    {lang === 'pt' ? 'Voltar ao Início' : 'Back to Home'}
+                </button>
+            </div>
+        );
+    }
+
+    const { product, category } = match;
+    const translatedCategory = translateCategory(category, lang);
+    const productTranslated = translateProduct(product, lang);
+    const productImages = productTranslated.images || [productTranslated.img];
+
+    const [activeImgIndex, setActiveImgIndex] = useState(0);
+    const currentImg = productImages[activeImgIndex];
+
+    const n = productTranslated.name.toLowerCase();
+    const isVestuario = n.includes('bikini') || n.includes('top') || n.includes('cardigan') || n.includes('poncho') || n.includes('belt') || n.includes('bandana') || n.includes('headband');
+    const isBag = n.includes('bag') || n.includes('pouch') || n.includes('booksleeve') || n.includes('clutch');
+    const isHomeSet = n.includes('coasters') || n.includes('placemats');
+    const isCoaster = n.includes('coasters');
+    const hasSize = isVestuario && 
+                    !n.includes('dragonfly bandana') && 
+                    !n.includes('classic bandana') && 
+                    !n.includes('dragonfly headband');
+    const hasQuantity = isHomeSet;
+    const rawPrice = getApprovedPrice(productTranslated.name);
+    const isAfricanFlowerPouch = productTranslated.name.toLowerCase().includes('african flower pouch');
+    const isMiniPouches = productTranslated.name.toLowerCase().includes('mini pouches');
+    const isClassicCoasters = productTranslated.name.toLowerCase().includes('classic coasters');
+    const isDualColor = isAfricanFlowerPouch || 
+                        productTranslated.name.toLowerCase().includes('marea bikini set') ||
+                        productTranslated.name.toLowerCase().includes('coral bikini top') ||
+                        productTranslated.name.toLowerCase().includes('signature granny poncho') ||
+                        productTranslated.name.toLowerCase().includes('cardigan') ||
+                        isClassicCoasters;
+    const initialColor = isDualColor 
+        ? 'Azul Água & Branco' 
+        : 'Verde Musgo';
+    const defaultSize = productTranslated.sizes ? productTranslated.sizes[0] : 'M';
+
+    const [selections, setSelections] = useState({
+        tamanho: defaultSize,
+        cor: initialColor,
+        corFio: isMiniPouches ? 'Branco Creme' : '',
+        quantidade: productTranslated.name.toLowerCase().includes('coasters') ? '4und.' : '2und.',
+        fecho: '',
+        forro: '',
+        detalhe: ''
+    });
+
+    const [isCheckingOut, setIsCheckingOut] = useState(false);
+    const [paymentMethod, setPaymentMethod] = useState<'mbway' | 'multibanco' | 'card' | 'wallet'>('mbway');
+    const [checkoutForm, setCheckoutForm] = useState({
+        nome: '',
+        email: '',
+        telefone: '',
+        morada: '',
+        codigoPostal: '',
+        cidade: '',
+        nif: '',
+        mbwayPhone: '',
+        cardNumber: '',
+        cardName: '',
+        cardExpiry: '',
+        cardCvv: ''
+    });
+    const [isPaying, setIsPaying] = useState(false);
+    const [paymentCompleted, setPaymentCompleted] = useState(false);
+    const [multibancoRef, setMultibancoRef] = useState<{ entidade: string, referencia: string } | null>(null);
+    const [orderId, setOrderId] = useState('');
+    const [checkoutError, setCheckoutError] = useState<string | null>(null);
+    const [sandboxEmails, setSandboxEmails] = useState<{ customerEmailUrl: string, adminEmailUrl: string, shippedEmailUrl?: string } | null>(null);
+    const [isShipping, setIsShipping] = useState(false);
+    const [canUseWallet, setCanUseWallet] = useState(false);
+    const prButtonRef = useRef<any>(null);
+
+    const [openAccordion, setOpenAccordion] = useState<'details' | 'care' | 'shipping' | null>('details');
+
+    // Reset page states when product selection shifts
+    useEffect(() => {
+        setSelections({
+            tamanho: productTranslated.sizes ? productTranslated.sizes[0] : 'M',
+            cor: initialColor,
+            corFio: isMiniPouches ? 'Branco Creme' : '',
+            quantidade: productTranslated.name.toLowerCase().includes('coasters') ? '4und.' : '2und.',
+            fecho: '',
+            forro: '',
+            detalhe: ''
+        });
+        setIsCheckingOut(false);
+        setPaymentCompleted(false);
+        setMultibancoRef(null);
+        setCheckoutError(null);
+        setSandboxEmails(null);
+        setActiveImgIndex(0);
+        setCheckoutForm({
+            nome: '',
+            email: '',
+            telefone: '',
+            morada: '',
+            codigoPostal: '',
+            cidade: '',
+            nif: '',
+            mbwayPhone: '',
+            cardNumber: '',
+            cardName: '',
+            cardExpiry: '',
+            cardCvv: ''
+        });
+    }, [product.id, lang]);
+
+    const handleShipOrder = async () => {
+        if (!orderId) return;
+        setIsShipping(true);
+        try {
+            const res = await fetch(`${API_BASE_URL}/api/payment/ship-order`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ orderId, trackingCode: "DA" + Math.floor(100000000 + Math.random() * 900000000) + "PT" })
+            });
+            const data = await res.json();
+            if (data.success && data.shippedEmailUrl) {
+                setSandboxEmails(prev => prev ? { ...prev, shippedEmailUrl: data.shippedEmailUrl } : null);
+            }
+        } catch (err) {
+            console.error("Error shipping order simulation:", err);
+        } finally {
+            setIsShipping(false);
+        }
+    };
+
+    const selectedSize = hasSize ? selections.tamanho : 'Não aplicável';
+    const selectedColor = (isCoaster && !isClassicCoasters) ? 'Padrão' : selections.cor;
+    const quantity = hasQuantity ? selections.quantidade : '1';
+
+    const qtyMultiplier = hasQuantity ? (parseInt(selections.quantidade) || 1) : 1;
+    const calculatedPriceNum = typeof rawPrice === 'number' ? rawPrice * qtyMultiplier : 50;
+    const totalPrice = `${calculatedPriceNum}`;
+    const amountInCents = Math.round(calculatedPriceNum * 100);
+
+    const calculatePriceText = () => {
+        const price = getApprovedPrice(productTranslated.name);
+        if (typeof price === 'string') {
+            return price;
+        }
+        const total = price * qtyMultiplier;
+        return `${total}€`;
+    };
+    const currentPrice = calculatePriceText();
+
+    const isLiveMode = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY?.startsWith('pk_live') || false;
+
+    // Direct Webhook Wallet Effect
+    useEffect(() => {
+        let active = true;
+        if (!isCheckingOut) return;
+
+        const initStripeWallet = async () => {
+            const stripePubKey = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY || "";
+            if (!stripePubKey) return;
+
+            try {
+                const stripe = await loadStripe(stripePubKey);
+                if (!stripe || !active) return;
+
+                const paymentRequest = stripe.paymentRequest({
+                    country: 'PT',
+                    currency: 'eur',
+                    total: {
+                        label: `M.BRAVO - ${productTranslated.name.substring(0, 25)}`,
+                        amount: amountInCents,
+                    },
+                    requestPayerName: true,
+                    requestPayerEmail: true,
+                    requestPayerPhone: true,
+                    requestShipping: false,
+                });
+
+                const result = await paymentRequest.canMakePayment();
+                if (result && active) {
+                    setCanUseWallet(true);
+
+                    if (paymentMethod === 'wallet') {
+                        setTimeout(() => {
+                            if (!active) return;
+                            const container = document.getElementById('payment-request-button-page');
+                            if (container) {
+                                container.innerHTML = '';
+                                const elements = stripe.elements();
+                                const prButton = elements.create('paymentRequestButton', {
+                                    paymentRequest,
+                                    style: {
+                                        paymentRequestButton: {
+                                            theme: 'dark',
+                                            height: '44px',
+                                        },
+                                    },
+                                });
+                                prButton.mount('#payment-request-button-page');
+                                prButtonRef.current = prButton;
+                            }
+                        }, 150);
+                    }
+                } else {
+                    setCanUseWallet(false);
+                }
+
+                paymentRequest.on('paymentmethod', async (ev) => {
+                    const buyerName = ev.payerName || checkoutForm.nome || "Cliente Carteira Digital";
+                    const buyerEmail = ev.payerEmail || checkoutForm.email || "encomendas@mbravobycarolina.com";
+                    const buyerPhone = ev.payerPhone || checkoutForm.telefone || "";
+
+                    setCheckoutForm(prev => ({
+                        ...prev,
+                        nome: buyerName,
+                        email: buyerEmail,
+                        telefone: buyerPhone
+                    }));
+
+                    setIsPaying(true);
+                    setCheckoutError(null);
+
+                    try {
+                        const response = await fetch(`${API_BASE_URL}/api/payment/create-intent`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                product: {
+                                    id: productTranslated.id,
+                                    name: productTranslated.name,
+                                    price: currentPrice
+                                },
+                                selections,
+                                checkoutForm: {
+                                    ...checkoutForm,
+                                    nome: buyerName,
+                                    email: buyerEmail,
+                                    telefone: buyerPhone,
+                                },
+                                paymentMethod: 'wallet',
+                                amountInCents
+                            })
+                        });
+
+                        const data = await response.json();
+                        if (!response.ok || data.error) {
+                            throw new Error(data.error || "Falha ao processar com o servidor.");
+                        }
+
+                        setOrderId(data.orderId);
+
+                        const { paymentIntent, error: confirmError } = await stripe.confirmCardPayment(
+                            data.stripeClientSecret,
+                            { payment_method: ev.paymentMethod.id },
+                            { handleActions: false }
+                        );
+
+                        if (confirmError) {
+                            ev.complete('fail');
+                            throw new Error(confirmError.message);
+                        }
+
+                        if (paymentIntent && paymentIntent.status === 'succeeded') {
+                            ev.complete('success');
+                            const confirmRes = await fetch(`${API_BASE_URL}/api/payment/webhook`, {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({
+                                    orderId: data.orderId,
+                                    event: 'payment_intent.succeeded'
+                                })
+                            });
+
+                            const confirmData = await confirmRes.json();
+                            setIsPaying(false);
+                            setPaymentCompleted(true);
+                            if (confirmData.emailLinks) {
+                                setSandboxEmails(confirmData.emailLinks);
+                            }
+                        } else {
+                            ev.complete('fail');
+                            throw new Error("Transação incompleta.");
+                        }
+                    } catch (err: any) {
+                        setCheckoutError(err.message || "Erro no processamento da carteira digital.");
+                        setIsPaying(false);
+                    }
+                });
+            } catch (err) {
+                console.error(err);
+            }
+        };
+
+        initStripeWallet();
+
+        return () => {
+            active = false;
+            if (prButtonRef.current) {
+                try {
+                    prButtonRef.current.unmount();
+                } catch (e) {}
+            }
+        };
+    }, [isCheckingOut, paymentMethod, amountInCents, lang]);
+
+    const sizes = productTranslated.sizes || (productTranslated.name.toLowerCase().includes('marea bikini') || productTranslated.name.toLowerCase().includes('coral bikini top')
+        ? ['XS', 'S', 'M', 'L'] 
+        : ['S', 'M', 'L']);
+    const quantities = isCoaster
+        ? ['1und.', '2und.', '4und.', '6und.', '8und.']
+        : ['2und.', '4und.', '6und.', '8und.'];
+
+    const colors = isDualColor ? [
+        { name: 'Azul Água & Branco', bg: 'linear-gradient(45deg, #A6BCAE 50%, #FFFFFF 50%)' },
+        { name: 'Amarelo & Branco', bg: 'linear-gradient(45deg, #F4D03F 50%, #FFFFFF 50%)' },
+        { name: 'Rosa & Branco', bg: 'linear-gradient(45deg, #FADADD 50%, #FFFFFF 50%)' },
+        { name: 'Verde & Branco', bg: 'linear-gradient(45deg, #243119 50%, #FFFFFF 50%)' },
+        { name: 'Vermelho & Branco', bg: 'linear-gradient(45deg, #C0392B 50%, #FFFFFF 50%)' }
+    ] : isMiniPouches ? [
+        { name: 'Verde Musgo', hex: '#2E3B26' },
+        { name: 'Azul Noite', hex: '#1C2D37' },
+        { name: 'Amarelo Baunilha', hex: '#F2E3A9' },
+        { name: 'Terracota', hex: '#A85B40' },
+        { name: 'Branco Creme', hex: '#F5F2ED' },
+        { name: 'Rosa Quartzo Subtil', hex: '#EADAD6' }
+    ] : [
+        { name: 'Verde Musgo', hex: '#243119' },
+        { name: 'Hortelã-Pimenta', hex: '#789D8A' },
+        { name: 'Petróleo', hex: '#005F6B' },
+        { name: 'Azul Glaciar', hex: '#A2C2D1' },
+        { name: 'Sorvete Limão', hex: '#F4D03F' },
+        { name: 'Creme', hex: '#FDFBF7' },
+        { name: 'Bege Claro', hex: '#E1D5C9' },
+        { name: 'Rosa Ternura', hex: '#FADADD' },
+        { name: 'Castanho', hex: '#5D4037' },
+        { name: 'Branco', hex: '#FFFFFF' }
+    ];
+
+    const yarnColors = isMiniPouches ? [
+        { name: 'Verde Musgo', hex: '#2E3B26' },
+        { name: 'Azul Noite', hex: '#1C2D37' },
+        { name: 'Amarelo Baunilha', hex: '#F2E3A9' },
+        { name: 'Terracota', hex: '#A85B40' },
+        { name: 'Branco Creme', hex: '#F5F2ED' },
+        { name: 'Rosa Quartzo Subtil', hex: '#EADAD6' }
+    ] : [
+        { name: 'Algodão Cru', hex: '#EFECE6' },
+        { name: 'Cacau Escuro', hex: '#4A3728' },
+        { name: 'Oliva Suave', hex: '#556B2F' }
+    ];
+
+    const isSafran = isVestuario || productTranslated.id.startsWith('v') || productTranslated.id.startsWith('p');
+    
+    const materialText = productTranslated.material || (lang === 'pt' 
+        ? (isSafran 
+            ? "Produzido em 100% Algodão Egípcio Safran. Um fio nobre, fino e delicado, com um brilho suave e toque refrescante. Garante conforto térmico e elegância no caimento."
+            : "Produzido em 100% Algodão. Um fio de fibra grossa e penteada que confere estrutura e alta resistência. Ideal para suportar o uso diário mantendo a forma original.")
+        : (isSafran
+            ? "Produced in 100% Safran Egyptian Cotton. A noble, fine, and delicate yarn with a subtle sheen and refreshing touch. Guarantees thermal comfort and elegant drape."
+            : "Produced in 100% Cotton. A thick, combed fiber yarn that provides structure and high durability. Ideal for daily use while maintaining its original shape."));
+
+    const careText = productTranslated.care || (lang === 'pt'
+        ? (isSafran
+            ? "Lavar em ciclo delicado ou à mão (30ºC). Não usar amaciador e não deixar de molho. Secar à sombra e sempre na horizontal para evitar que a peça estique."
+            : "Lavável à máquina (40ºC). Não usar lixívia. Secar na horizontal para manter a estrutura da peça.")
+        : (isSafran
+            ? "Wash on delicate cycle or by hand (30ºC). Do not use softener and do not soak. Dry in shade and always flat to prevent stretching."
+            : "Machine washable (40ºC). Do not bleach. Dry flat to maintain the structure of the piece."));
+
+    const messageText = lang === 'pt'
+        ? `Olá Carolina! Quero encomendar uma peça M★BRAVO.\n\nProduto: ${productTranslated.name}\nTamanho: ${selectedSize}\n${(isCoaster && !isClassicCoasters) ? '' : (isMiniPouches ? `Cor do Saquinho: ${selectedColor}\nCor do Fio: ${selections.corFio}\n` : `Cor: ${selectedColor}\n`)}Quantidade: ${quantity}\n\nValor Total: ${currentPrice}\n\nFico a aguardar os detalhes para combinarmos o envio e o pagamento. Obrigada!`
+        : `Hello Carolina! I would like to order an M★BRAVO piece.\n\nProduct: ${productTranslated.name}\nSize: ${translateSize(selectedSize, lang)}\n${(isCoaster && !isClassicCoasters) ? '' : (isMiniPouches ? `Pouch Color: ${selectedColor}\nYarn Color: ${translateColor(selections.corFio, lang)}\n` : `Color: ${translateColor(selectedColor, lang)}\n`)}Quantity: ${translateQuantity(quantity, lang)}\n\nTotal Price: ${currentPrice}\n\nI look forward to details on shipping and payment. Thank you!`;
+
+    const whatsappUrl = `https://wa.me/351912828182?text=${encodeURIComponent(messageText)}`;
+
+    return (
+        <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 md:px-8 lg:px-16 text-forest">
+            {/* Breadcrumbs */}
+            <div className="text-[10px] uppercase tracking-[0.3em] text-forest/40 mb-8 font-sans flex flex-wrap items-center gap-2 px-2 sm:px-0">
+                <span className="cursor-pointer hover:text-forest transition-colors" onClick={() => navigateTo('/')}>M★BRAVO</span>
+                <span>/</span>
+                <span className="cursor-pointer hover:text-forest transition-colors" onClick={() => navigateTo(getCategoryUrl(category))}>{translatedCategory.name}</span>
+                <span>/</span>
+                <span className="text-forest/80 font-semibold">{productTranslated.name}</span>
+            </div>
+
+            {/* Main Side-by-Side E-Commerce Product Layout */}
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-14 mb-20">
+                
+                {/* LEFT COLUMN: Premium High-Performance Interactive Image Gallery */}
+                <div className="lg:col-span-7 flex flex-col gap-4">
+                    {/* Main Active Picture Frame */}
+                    <div className="relative aspect-[4/5] bg-[#F5F2ED] rounded-2xl overflow-hidden border border-forest/5 shadow-sm group">
+                        <img 
+                            src={currentImg} 
+                            alt={productTranslated.name} 
+                            loading="eager"
+                            decoding="sync"
+                            className="w-full h-full object-cover transition-transform duration-500 hover:scale-[1.02] cursor-zoom-in"
+                            onClick={() => {
+                                window.dispatchEvent(new CustomEvent('mbravo-zoom-image', { detail: currentImg }));
+                            }}
+                        />
+                        {/* Custom Elegant Zoom Button */}
+                        <button 
+                            onClick={() => {
+                                window.dispatchEvent(new CustomEvent('mbravo-zoom-image', { detail: currentImg }));
+                            }}
+                            className="absolute top-4 right-4 z-10 p-3 rounded-full bg-[#FCFBF9]/80 text-forest hover:bg-forest hover:text-cream backdrop-blur-md shadow-md border border-forest/10 cursor-pointer flex items-center justify-center transition-all duration-300"
+                            title={lang === 'pt' ? 'Ampliar Imagem' : 'Zoom Image'}
+                        >
+                            <Maximize2 size={15} />
+                        </button>
+                        
+                        {/* Mobile Swipe / Arrow navigation */}
+                        {productImages.length > 1 && (
+                            <>
+                                <button
+                                    onClick={() => {
+                                        setActiveImgIndex((prev) => (prev === 0 ? productImages.length - 1 : prev - 1));
+                                    }}
+                                    className="absolute left-4 top-1/2 -translate-y-1/2 p-2 rounded-full bg-white/70 text-forest hover:bg-forest hover:text-cream transition-all border border-forest/5 flex items-center justify-center shadow"
+                                >
+                                    <ChevronLeft size={18} />
+                                </button>
+                                <button
+                                    onClick={() => {
+                                        setActiveImgIndex((prev) => (prev === productImages.length - 1 ? 0 : prev + 1));
+                                    }}
+                                    className="absolute right-4 top-1/2 -translate-y-1/2 p-2 rounded-full bg-white/70 text-forest hover:bg-forest hover:text-cream transition-all border border-forest/5 flex items-center justify-center shadow"
+                                >
+                                    <ChevronRight size={18} />
+                                </button>
+                            </>
+                        )}
+                    </div>
+
+                    {/* Proportional Thumbnail Swatches Strip */}
+                    {productImages.length > 1 && (
+                        <div className="flex gap-2.5 overflow-x-auto no-scrollbar py-1">
+                            {productImages.map((imgUrl, idx) => (
+                                <button
+                                    key={idx}
+                                    onClick={() => setActiveImgIndex(idx)}
+                                    className={`relative w-20 h-24 rounded-lg overflow-hidden border transition-all shrink-0 ${
+                                        idx === activeImgIndex 
+                                            ? 'border-forest ring-1 ring-forest/20' 
+                                            : 'border-transparent opacity-60 hover:opacity-100'
+                                    }`}
+                                >
+                                    <img 
+                                        src={imgUrl} 
+                                        alt="" 
+                                        loading="lazy"
+                                        className="w-full h-full object-cover" 
+                                    />
+                                </button>
+                            ))}
+                        </div>
+                    )}
+                </div>
+
+                {/* RIGHT COLUMN: Highly Responsive Interactive E-Commerce Operations & Checkout Sidebar */}
+                <div className="lg:col-span-5 flex flex-col justify-between">
+                    <div className="space-y-6">
+                        {/* Product Header */}
+                        <div>
+                            <span className="text-[9px] uppercase tracking-[0.35em] text-[#C5A059] font-bold block mb-1">
+                                {lang === 'pt' ? 'EDIÇÃO EXCLUSIVA M★BRAVO' : 'EDIÇÃO EXCLUSIVA M★BRAVO'}
+                            </span>
+                            <h1 className="font-serif italic text-3xl sm:text-4xl lg:text-4.5xl font-light text-forest tracking-wide leading-tight mb-2">
+                                {productTranslated.name}
+                            </h1>
+                            <p className="text-forest/50 text-[9px] uppercase tracking-[0.3em] font-semibold font-sans mb-4">
+                                HANDMADE WITH LOVE IN PORTUGAL
+                            </p>
+                            <div className="flex items-baseline gap-3">
+                                <span className="font-serif text-2xl lg:text-3xl text-forest font-normal">{currentPrice}</span>
+                                <span className="text-[10px] text-emerald-700/80 uppercase tracking-widest font-bold bg-emerald-50 px-2 py-0.5 rounded border border-emerald-100">
+                                    {lang === 'pt' ? 'Disponível' : 'Available'}
+                                </span>
+                            </div>
+                        </div>
+
+                        {/* Product Pitch/Description */}
+                        <p className="text-xs text-forest/75 font-sans font-light leading-relaxed">
+                            {productTranslated.description || productTranslated.desc}
+                        </p>
+
+                        <hr className="border-forest/10" />
+
+                        {/* Interactive Selections Flow */}
+                        {!isCheckingOut && (
+                            <div className="space-y-5">
+                                {/* Size Customizer */}
+                                {hasSize && (
+                                    <div className="space-y-2">
+                                        <div className="flex justify-between items-center text-[10px] uppercase tracking-wider text-forest/55">
+                                            <span>{lang === 'pt' ? 'Tamanho' : 'Size'}</span>
+                                            <span className="font-bold text-forest">{translateSize(selections.tamanho, lang)}</span>
+                                        </div>
+                                        <div className="flex gap-2">
+                                            {sizes.map((size) => (
+                                                <button
+                                                    key={size}
+                                                    onClick={() => setSelections(prev => ({ ...prev, tamanho: size }))}
+                                                    className={`h-9 px-4 rounded-full border text-xs font-medium tracking-wide transition-all ${
+                                                        selections.tamanho === size 
+                                                            ? 'bg-forest text-cream border-forest shadow-sm' 
+                                                            : 'bg-[#FCFBF9] text-forest/70 border-forest/10 hover:border-forest/30'
+                                                    }`}
+                                                >
+                                                    {size}
+                                                </button>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
+
+                                {/* Color Swatch Customizer */}
+                                {(!isCoaster || isClassicCoasters) && (
+                                    <div className="space-y-2">
+                                        <div className="flex justify-between items-center text-[10px] uppercase tracking-wider text-forest/55">
+                                            <span>{lang === 'pt' ? 'Cor Principal' : 'Main Color'}</span>
+                                            <span className="font-bold text-forest">{translateColor(selections.cor, lang)}</span>
+                                        </div>
+                                        <div className="flex flex-wrap gap-2.5">
+                                            {colors.map((c) => (
+                                                <button
+                                                    key={c.name}
+                                                    onClick={() => setSelections(prev => ({ ...prev, cor: c.name }))}
+                                                    className={`relative w-8 h-8 rounded-full border transition-all ${
+                                                        selections.cor === c.name 
+                                                            ? 'ring-2 ring-forest scale-105 border-white' 
+                                                            : 'border-forest/15 hover:scale-105'
+                                                    }`}
+                                                    title={translateColor(c.name, lang)}
+                                                    style={{ background: (c as any).bg || (c as any).hex }}
+                                                />
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
+
+                                {/* Yarn Color Swatch (for mini pouches only) */}
+                                {isMiniPouches && (
+                                    <div className="space-y-2">
+                                        <div className="flex justify-between items-center text-[10px] uppercase tracking-wider text-forest/55">
+                                            <span>{lang === 'pt' ? 'Cor do Fio' : 'Yarn Color'}</span>
+                                            <span className="font-bold text-forest">{translateColor(selections.corFio, lang)}</span>
+                                        </div>
+                                        <div className="flex flex-wrap gap-2.5">
+                                            {yarnColors.map((c) => (
+                                                <button
+                                                    key={c.name}
+                                                    onClick={() => setSelections(prev => ({ ...prev, corFio: c.name }))}
+                                                    className={`relative w-8 h-8 rounded-full border transition-all ${
+                                                        selections.corFio === c.name 
+                                                            ? 'ring-2 ring-forest scale-105 border-white' 
+                                                            : 'border-forest/15 hover:scale-105'
+                                                    }`}
+                                                    title={translateColor(c.name, lang)}
+                                                    style={{ background: (c as any).bg || (c as any).hex }}
+                                                />
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
+
+                                {/* Quantity Swatch (for coasters sets only) */}
+                                {hasQuantity && (
+                                    <div className="space-y-2">
+                                        <div className="flex justify-between items-center text-[10px] uppercase tracking-wider text-forest/55">
+                                            <span>{lang === 'pt' ? 'Conjunto de Unidades' : 'Units Set'}</span>
+                                            <span className="font-bold text-forest">{translateQuantity(selections.quantidade, lang)}</span>
+                                        </div>
+                                        <div className="flex gap-2">
+                                            {quantities.map((qty) => (
+                                                <button
+                                                    key={qty}
+                                                    onClick={() => setSelections(prev => ({ ...prev, quantidade: qty }))}
+                                                    className={`h-9 px-4 rounded-full border text-xs font-medium tracking-wide transition-all ${
+                                                        selections.quantidade === qty 
+                                                            ? 'bg-forest text-cream border-forest shadow-sm' 
+                                                            : 'bg-[#FCFBF9] text-forest/70 border-forest/10 hover:border-forest/30'
+                                                    }`}
+                                                >
+                                                    {translateQuantity(qty, lang)}
+                                                </button>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+                        )}
+
+                        {/* Direct Checkout Form / Gateways Block */}
+                        {isCheckingOut && (
+                            <div className="bg-[#FCFBF9] border border-forest/10 rounded-2xl p-5 space-y-5 animate-fadeIn">
+                                {/* Success screen */}
+                                {paymentCompleted ? (
+                                    <div className="flex flex-col items-center text-center py-6 space-y-6">
+                                        <div className="w-14 h-14 rounded-full bg-forest/5 flex items-center justify-center border border-forest/15">
+                                            <LogoIcon className="h-8 w-8 text-forest" />
+                                        </div>
+                                        
+                                        <h4 className="font-serif italic text-2xl font-light text-forest">
+                                            {t('payment.success_title')}
+                                        </h4>
+                                        
+                                        <p className="text-xs text-forest/70 font-sans font-light leading-relaxed max-w-sm">
+                                            {lang === 'pt' ? (
+                                                <>Agradecemos a sua encomenda, <strong>{checkoutForm.nome || 'Cliente'}</strong>. Enviámos um e-mail de confirmação para <strong>{checkoutForm.email}</strong> com os detalhes do envio.</>
+                                            ) : (
+                                                <>Thank you for your order, <strong>{checkoutForm.nome || 'Customer'}</strong>. We have sent a confirmation email to <strong>{checkoutForm.email}</strong> with the shipping details.</>
+                                            )}
+                                        </p>
+
+                                        <div className="bg-forest/5 rounded-2xl p-4 border border-forest/10 w-full text-left space-y-2.5 font-sans text-[11px]">
+                                            <div className="flex justify-between border-b border-forest/5 pb-1">
+                                                <span className="text-forest/40 uppercase tracking-wider text-[9px]">{lang === 'pt' ? 'ID Pedido' : 'Order ID'}</span>
+                                                <span className="font-semibold text-forest">{orderId}</span>
+                                            </div>
+                                            <div className="flex justify-between border-b border-forest/5 pb-1">
+                                                <span className="text-forest/40 uppercase tracking-wider text-[9px]">{lang === 'pt' ? 'Artigo' : 'Item'}</span>
+                                                <span className="font-semibold text-forest">{productTranslated.name}</span>
+                                            </div>
+                                            <div className="flex justify-between border-b border-forest/5 pb-1">
+                                                <span className="text-forest/40 uppercase tracking-wider text-[9px]">{lang === 'pt' ? 'Configuração' : 'Configuration'}</span>
+                                                <span className="font-semibold text-forest text-right">
+                                                    {(!isCoaster || isClassicCoasters) && `${translateColor(selections.cor, lang)} `}{isMiniPouches && `| ${lang === 'pt' ? 'Fio: ' : 'Yarn: '}${translateColor(selections.corFio, lang)} `}{hasSize && `| ${translateSize(selections.tamanho, lang)}`} {hasQuantity && `| ${translateQuantity(selections.quantidade, lang)}`}
+                                                </span>
+                                            </div>
+                                            <div className="flex justify-between border-b border-forest/5 pb-1">
+                                                <span className="text-forest/40 uppercase tracking-wider text-[9px]">{lang === 'pt' ? 'Método Pagamento' : 'Payment Method'}</span>
+                                                <span className="font-semibold text-forest uppercase">
+                                                    {paymentMethod === 'mbway' ? 'MB WAY' : paymentMethod === 'multibanco' ? (lang === 'pt' ? 'Referência Multibanco' : 'Multibanco Reference') : (lang === 'pt' ? 'Cartão de Crédito' : 'Credit Card')}
+                                                </span>
+                                            </div>
+                                            <div className="flex justify-between pt-1 font-bold">
+                                                <span className="text-[#A68244] uppercase tracking-wider text-[9px]">
+                                                    {paymentMethod === 'multibanco' 
+                                                        ? (lang === 'pt' ? 'Total a Pagar' : 'Total to Pay')
+                                                        : (lang === 'pt' ? 'Total Pago' : 'Total Paid')}
+                                                </span>
+                                                <span className="text-sm font-serif text-forest">{currentPrice}</span>
+                                            </div>
+                                        </div>
+
+                                        {paymentMethod === 'multibanco' && multibancoRef && (
+                                            <div className="bg-amber-50/40 rounded-xl p-4 border border-[#C5A059]/30 text-left space-y-2 w-full font-sans animate-fadeIn">
+                                                <span className="text-[9px] uppercase tracking-wider text-[#A68244] font-mono font-bold block mb-1">
+                                                    {lang === 'pt' ? 'DADOS PARA PAGAMENTO MULTIBANCO' : 'MULTIBANCO PAYMENT DETAILS'}
+                                                </span>
+                                                <div className="space-y-1.5 text-xs text-forest">
+                                                    <div className="flex justify-between border-b border-forest/5 pb-1">
+                                                        <span className="text-forest/40 text-[9px] uppercase tracking-wider">{lang === 'pt' ? 'Entidade' : 'Entity'}</span>
+                                                        <span className="font-mono font-bold">{multibancoRef.entidade}</span>
+                                                    </div>
+                                                    <div className="flex justify-between border-b border-forest/5 pb-1">
+                                                        <span className="text-forest/40 text-[9px] uppercase tracking-wider">{lang === 'pt' ? 'Referência' : 'Reference'}</span>
+                                                        <span className="font-mono font-bold">{multibancoRef.referencia}</span>
+                                                    </div>
+                                                    <div className="flex justify-between pb-1">
+                                                        <span className="text-forest/40 text-[9px] uppercase tracking-wider">{lang === 'pt' ? 'Montante' : 'Amount'}</span>
+                                                        <span className="font-mono font-bold">{currentPrice}</span>
+                                                    </div>
+                                                </div>
+                                                <p className="text-[10px] text-forest/50 leading-relaxed text-center pt-1">
+                                                    {lang === 'pt' 
+                                                        ? 'Efetue o pagamento através do seu Homebanking ou numa caixa ATM. Receberá um e-mail assim que o pagamento for confirmado.'
+                                                        : 'Make the payment via your Homebanking or at an ATM. You will receive an email as soon as the payment is confirmed.'}
+                                                </p>
+                                                {!isLiveMode && (
+                                                    <button
+                                                        onClick={async () => {
+                                                            try {
+                                                                setIsPaying(true);
+                                                                const res = await fetch(`${API_BASE_URL}/api/payment/webhook`, {
+                                                                    method: 'POST',
+                                                                    headers: { 'Content-Type': 'application/json' },
+                                                                    body: JSON.stringify({
+                                                                        orderId,
+                                                                        event: 'payment_intent.succeeded'
+                                                                    })
+                                                                });
+                                                                const statusData = await res.json();
+                                                                if (statusData.status === 'paid') {
+                                                                    setIsPaying(false);
+                                                                    if (statusData.emailLinks) {
+                                                                        setSandboxEmails(statusData.emailLinks);
+                                                                    }
+                                                                }
+                                                            } catch (err: any) {
+                                                                setIsPaying(false);
+                                                                console.error("Erro ao simular webhook:", err);
+                                                            }
+                                                        }}
+                                                        className="mt-2 w-full py-2 bg-forest text-cream font-mono text-[9px] tracking-wider rounded-lg font-bold uppercase cursor-pointer hover:bg-forest/95 transition-all text-center border-none focus:outline-none"
+                                                    >
+                                                        {isPaying ? 'A Processar...' : (lang === 'pt' ? 'Simular Pagamento (Sandbox Webhook)' : 'Simulate Payment (Sandbox Webhook)')}
+                                                    </button>
+                                                )}
+                                            </div>
+                                        )}
+
+                                        <div className="bg-amber-50/50 rounded-xl p-3.5 border border-[#C5A059]/20 text-left text-[11px] text-forest/80 leading-relaxed font-sans">
+                                            <p className="font-semibold text-[#A68244] mb-1">{t('payment.prod_note_title')}</p>
+                                            <p>{t('payment.prod_note_desc')}</p>
+                                        </div>
+
+                                        {sandboxEmails && (
+                                            <div className="w-full bg-[#243119]/5 rounded-2xl p-4 border border-[#243119]/10 text-left space-y-3 font-sans">
+                                                <p className="text-[10px] uppercase tracking-wider text-[#A68244] font-bold">{t('sandbox.email_sim')}</p>
+                                                <p className="text-[11px] text-forest/70 leading-relaxed">{t('sandbox.email_desc')}</p>
+                                                <div className="flex flex-col gap-2 pt-1">
+                                                    <div className="grid grid-cols-2 gap-2">
+                                                        <a 
+                                                            href={sandboxEmails.customerEmailUrl} 
+                                                            target="_blank" 
+                                                            rel="noreferrer"
+                                                            className="block text-center rounded-lg py-2 bg-white border border-[#243119]/15 text-[10px] uppercase tracking-wider font-semibold text-forest hover:bg-[#243119] hover:text-white hover:border-transparent transition-all"
+                                                        >
+                                                            {t('sandbox.view_client')}
+                                                        </a>
+                                                        <a 
+                                                            href={sandboxEmails.adminEmailUrl} 
+                                                            target="_blank" 
+                                                            rel="noreferrer"
+                                                            className="block text-center rounded-lg py-2 bg-white border border-[#243119]/15 text-[10px] uppercase tracking-wider font-semibold text-forest hover:bg-[#243119] hover:text-white hover:border-transparent transition-all"
+                                                        >
+                                                            {t('sandbox.view_admin')}
+                                                        </a>
+                                                    </div>
+                                                    {sandboxEmails.shippedEmailUrl ? (
+                                                        <a 
+                                                            href={sandboxEmails.shippedEmailUrl} 
+                                                            target="_blank" 
+                                                            rel="noreferrer"
+                                                            className="block text-center rounded-lg py-2 bg-amber-500/10 border border-amber-500/30 text-[10px] uppercase tracking-wider font-bold text-[#A68244] hover:bg-amber-500 hover:text-white hover:border-transparent transition-all"
+                                                        >
+                                                            {t('sandbox.view_shipped')}
+                                                        </a>
+                                                    ) : (
+                                                        <button 
+                                                            onClick={handleShipOrder}
+                                                            disabled={isShipping}
+                                                            className="block w-full text-center rounded-lg py-2 bg-[#243119] text-white text-[10px] uppercase tracking-wider font-bold hover:bg-[#1a2412] disabled:opacity-50 transition-all cursor-pointer border-none"
+                                                        >
+                                                            {isShipping ? (lang === 'pt' ? 'A ENVIAR...' : 'SHIPPING...') : t('sandbox.ship_order')}
+                                                        </button>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        )}
+
+                                        <button
+                                            onClick={() => {
+                                                setIsCheckingOut(false);
+                                                setPaymentCompleted(false);
+                                                setMultibancoRef(null);
+                                            }}
+                                            className="w-full rounded-full py-2.5 px-4 text-center font-bold bg-[#C5A059] text-[#343E2C] hover:bg-[#d5b069] text-[10px] uppercase tracking-widest cursor-pointer shadow-md transition-all font-sans border-none focus:outline-none"
+                                        >
+                                            {lang === 'pt' ? 'Comprar Outra Peça' : 'Buy Another Piece'}
+                                        </button>
+                                    </div>
+                                ) : (
+                                    /* Form Fields and Gateways selection */
+                                    <div className="space-y-5">
+                                        <div className="flex justify-between items-center border-b border-forest/10 pb-3 mb-2">
+                                            <span className="text-[10px] uppercase tracking-[0.25em] font-bold text-forest/70">
+                                                {lang === 'pt' ? 'Dados de Faturação & Envio' : 'Billing & Shipping Details'}
+                                            </span>
+                                            <button 
+                                                onClick={() => setIsCheckingOut(false)}
+                                                className="text-forest/40 hover:text-forest text-[10px] uppercase tracking-widest font-bold"
+                                            >
+                                                {lang === 'pt' ? 'Cancelar' : 'Cancel'}
+                                            </button>
+                                        </div>
+
+                                        {/* Inputs */}
+                                        <div className="space-y-2.5">
+                                            <input 
+                                                type="text" 
+                                                placeholder={lang === 'pt' ? "Nome Completo" : "Full Name"} 
+                                                required
+                                                value={checkoutForm.nome}
+                                                onChange={(e) => setCheckoutForm(prev => ({ ...prev, nome: e.target.value }))}
+                                                className="w-full bg-white rounded-xl px-4 py-2.5 text-xs text-forest placeholder-forest/30 border border-forest/10 focus:border-[#C5A059] focus:outline-none transition-all font-sans"
+                                            />
+                                            <div className="grid grid-cols-2 gap-2">
+                                                <input 
+                                                    type="email" 
+                                                    placeholder={lang === 'pt' ? "E-mail" : "Email Address"} 
+                                                    required
+                                                    value={checkoutForm.email}
+                                                    onChange={(e) => setCheckoutForm(prev => ({ ...prev, email: e.target.value }))}
+                                                    className={`w-full bg-white rounded-xl px-4 py-2.5 text-xs text-forest placeholder-forest/30 border focus:outline-none transition-all font-sans ${
+                                                        checkoutForm.email && !isValidEmail(checkoutForm.email)
+                                                            ? 'border-red-300 focus:border-red-400' 
+                                                            : 'border-forest/10 focus:border-[#C5A059]'
+                                                    }`}
+                                                />
+                                                <input 
+                                                    type="tel" 
+                                                    placeholder={lang === 'pt' ? "Telemóvel" : "Phone Number"} 
+                                                    required
+                                                    value={checkoutForm.telefone}
+                                                    onChange={(e) => setCheckoutForm(prev => ({ ...prev, telefone: e.target.value }))}
+                                                    className="w-full bg-white rounded-xl px-4 py-2.5 text-xs text-forest placeholder-forest/30 border border-forest/10 focus:border-[#C5A059] focus:outline-none transition-all font-sans"
+                                                />
+                                            </div>
+
+                                            {checkoutForm.email && !isValidEmail(checkoutForm.email) && (
+                                                <div className="text-[10px] text-red-500 font-sans flex items-center gap-1 pl-1">
+                                                    <span className="inline-block w-1.5 h-1.5 rounded-full bg-red-500"></span>
+                                                    {lang === 'pt' 
+                                                        ? 'Por favor introduza um e-mail válido.' 
+                                                        : 'Please enter a valid email address.'}
+                                                </div>
+                                            )}
+
+                                            {checkoutForm.email && suggestCorrectEmail(checkoutForm.email) && (
+                                                <div className="text-[11px] text-amber-800 bg-amber-50/50 border border-amber-200/40 rounded-xl p-3 flex items-center justify-between gap-2 font-sans mt-1">
+                                                    <div className="flex items-start gap-1.5 text-left">
+                                                        <span className="text-amber-500 text-xs">💡</span>
+                                                        <span>
+                                                            {lang === 'pt' ? 'Quis dizer ' : 'Did you mean '}
+                                                            <strong 
+                                                                className="underline cursor-pointer text-amber-950 font-semibold"
+                                                                onClick={() => setCheckoutForm(prev => ({ ...prev, email: suggestCorrectEmail(checkoutForm.email)! }))}
+                                                            >
+                                                                {suggestCorrectEmail(checkoutForm.email)}
+                                                            </strong>?
+                                                        </span>
+                                                    </div>
+                                                    <button 
+                                                        type="button"
+                                                        onClick={() => setCheckoutForm(prev => ({ ...prev, email: suggestCorrectEmail(checkoutForm.email)! }))}
+                                                        className="text-[10px] font-bold text-[#C5A059] hover:text-[#A68244] uppercase tracking-wider whitespace-nowrap bg-white border border-forest/5 rounded-lg px-2 py-1 transition-all"
+                                                    >
+                                                        {lang === 'pt' ? 'Corrigir' : 'Correct'}
+                                                    </button>
+                                                </div>
+                                            )}
+
+                                            <input 
+                                                type="text" 
+                                                placeholder={lang === 'pt' ? "Morada de Envio" : "Shipping Address"} 
+                                                required
+                                                value={checkoutForm.morada}
+                                                onChange={(e) => setCheckoutForm(prev => ({ ...prev, morada: e.target.value }))}
+                                                className="w-full bg-white rounded-xl px-4 py-2.5 text-xs text-forest placeholder-forest/30 border border-forest/10 focus:border-[#C5A059] focus:outline-none transition-all font-sans"
+                                            />
+                                            <div className="grid grid-cols-2 gap-2">
+                                                <input 
+                                                    type="text" 
+                                                    placeholder={lang === 'pt' ? "Código Postal" : "Postal Code"} 
+                                                    required
+                                                    value={checkoutForm.codigoPostal}
+                                                    onChange={(e) => setCheckoutForm(prev => ({ ...prev, codigoPostal: e.target.value }))}
+                                                    className="w-full bg-white rounded-xl px-4 py-2.5 text-xs text-forest placeholder-forest/30 border border-forest/10 focus:border-[#C5A059] focus:outline-none transition-all font-sans"
+                                                />
+                                                <input 
+                                                    type="text" 
+                                                    placeholder={lang === 'pt' ? "Cidade" : "City"} 
+                                                    required
+                                                    value={checkoutForm.cidade}
+                                                    onChange={(e) => setCheckoutForm(prev => ({ ...prev, cidade: e.target.value }))}
+                                                    className="w-full bg-white rounded-xl px-4 py-2.5 text-xs text-forest placeholder-forest/30 border border-forest/10 focus:border-[#C5A059] focus:outline-none transition-all font-sans"
+                                                />
+                                            </div>
+                                            <input 
+                                                type="text" 
+                                                placeholder={lang === 'pt' ? "NIF (Opcional)" : "NIF (Optional)"} 
+                                                maxLength={9}
+                                                value={checkoutForm.nif}
+                                                onChange={(e) => setCheckoutForm(prev => ({ ...prev, nif: e.target.value.replace(/\D/g, '') }))}
+                                                className="w-full bg-white rounded-xl px-4 py-2.5 text-xs text-forest placeholder-forest/30 border border-forest/10 focus:border-[#C5A059] focus:outline-none transition-all font-sans"
+                                            />
+                                        </div>
+
+                                        {/* Gateway selection */}
+                                        <div className="space-y-2">
+                                            <span className="text-[9px] uppercase tracking-wider text-forest/40 font-mono block">
+                                                {lang === 'pt' ? 'MÉTODO DE PAGAMENTO' : 'PAYMENT METHOD'}
+                                            </span>
+                                            <div className={`grid ${canUseWallet ? 'grid-cols-4' : 'grid-cols-3'} gap-2`}>
+                                                <button
+                                                    type="button"
+                                                    onClick={() => setPaymentMethod('mbway')}
+                                                    className={`flex flex-col items-center justify-center py-2.5 rounded-xl border transition-all cursor-pointer border-solid ${
+                                                        paymentMethod === 'mbway' 
+                                                            ? 'bg-[#343E2C] text-[#C5A059] border-[#C5A059]' 
+                                                            : 'bg-white text-forest/65 border-forest/10 hover:bg-forest/5'
+                                                    }`}
+                                                >
+                                                    <span className="text-[10px] font-extrabold tracking-wider font-sans">MB WAY</span>
+                                                </button>
+                                                <button
+                                                    type="button"
+                                                    onClick={() => setPaymentMethod('multibanco')}
+                                                    className={`flex flex-col items-center justify-center py-2.5 rounded-xl border transition-all cursor-pointer border-solid ${
+                                                        paymentMethod === 'multibanco' 
+                                                            ? 'bg-[#343E2C] text-[#C5A059] border-[#C5A059]' 
+                                                            : 'bg-white text-forest/65 border-forest/10 hover:bg-forest/5'
+                                                    }`}
+                                                >
+                                                    <span className="text-[10px] font-extrabold tracking-wider font-sans">MB</span>
+                                                </button>
+                                                <button
+                                                    type="button"
+                                                    onClick={() => setPaymentMethod('card')}
+                                                    className={`flex flex-col items-center justify-center py-2.5 rounded-xl border transition-all cursor-pointer border-solid ${
+                                                        paymentMethod === 'card' 
+                                                            ? 'bg-[#343E2C] text-[#C5A059] border-[#C5A059]' 
+                                                            : 'bg-white text-forest/65 border-forest/10 hover:bg-forest/5'
+                                                    }`}
+                                                >
+                                                    <span className="text-[10px] font-extrabold tracking-wider font-sans">{lang === 'pt' ? 'CARTÃO' : 'CARD'}</span>
+                                                </button>
+                                                {canUseWallet && (
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => setPaymentMethod('wallet')}
+                                                        className={`flex flex-col items-center justify-center py-2.5 rounded-xl border transition-all cursor-pointer border-solid ${
+                                                            paymentMethod === 'wallet' 
+                                                                ? 'bg-[#343E2C] text-[#C5A059] border-[#C5A059]' 
+                                                                : 'bg-white text-forest/65 border-forest/10 hover:bg-forest/5'
+                                                        }`}
+                                                    >
+                                                        <span className="text-[10px] font-extrabold tracking-wider font-sans">PAY</span>
+                                                    </button>
+                                                )}
+                                            </div>
+                                        </div>
+
+                                        {/* Gateway sub panels */}
+                                        <div className="p-4 bg-white border border-forest/10 rounded-2xl min-h-[110px] flex flex-col justify-center">
+                                            {paymentMethod === 'mbway' && (
+                                                <div className="space-y-2.5 animate-fadeIn">
+                                                    <span className="text-[9px] uppercase tracking-wider text-forest/40 font-mono block">{lang === 'pt' ? 'Telemóvel Associado ao MB WAY' : 'Phone Associated with MB WAY'}</span>
+                                                    <input 
+                                                        type="tel" 
+                                                        placeholder="9xx xxx xxx" 
+                                                        maxLength={9}
+                                                        required
+                                                        value={checkoutForm.mbwayPhone}
+                                                        onChange={(e) => setCheckoutForm(prev => ({ ...prev, mbwayPhone: e.target.value.replace(/\D/g, '') }))}
+                                                        className="w-full bg-[#FCFBF9] rounded-xl px-4 py-2.5 text-xs text-forest placeholder-forest/30 border border-forest/10 focus:border-[#C5A059] focus:outline-none transition-all font-sans"
+                                                    />
+                                                    <p className="text-[10px] text-forest/50 font-sans leading-relaxed">
+                                                        {lang === 'pt' ? (
+                                                            <>Irá receber uma notificação na aplicação MB WAY para autorizar o pagamento no valor de <strong>{currentPrice}</strong>.</>
+                                                        ) : (
+                                                            <>You will receive a notification in the MB WAY app to authorize the payment of <strong>{currentPrice}</strong>.</>
+                                                        )}
+                                                    </p>
+                                                </div>
+                                            )}
+
+                                            {paymentMethod === 'multibanco' && (
+                                                <div className="space-y-1.5 animate-fadeIn text-center">
+                                                    <p className="text-[10px] text-forest/70 font-sans leading-relaxed">
+                                                        {lang === 'pt' ? (
+                                                            <>Será gerada uma referência oficial para pagamento do valor de <strong>{currentPrice}</strong> em qualquer Caixa Multibanco ou Homebanking.</>
+                                                        ) : (
+                                                            <>An official reference will be generated for payment of <strong>{currentPrice}</strong> in any Multibanco ATM or Homebanking.</>
+                                                        )}
+                                                    </p>
+                                                </div>
+                                            )}
+
+                                            {paymentMethod === 'card' && (
+                                                <div className="space-y-2.5 animate-fadeIn">
+                                                    <span className="text-[9px] uppercase tracking-wider text-forest/40 font-mono block">{lang === 'pt' ? 'DETALHES DO CARTÃO DE CRÉDITO' : 'CREDIT CARD DETAILS'}</span>
+                                                    <input 
+                                                        type="text" 
+                                                        placeholder={lang === 'pt' ? "Nome no Cartão" : "Name on Card"} 
+                                                        required
+                                                        value={checkoutForm.cardName}
+                                                        onChange={(e) => setCheckoutForm(prev => ({ ...prev, cardName: e.target.value }))}
+                                                        className="w-full bg-[#FCFBF9] rounded-xl px-4 py-2 text-xs text-forest placeholder-forest/30 border border-forest/10 focus:border-[#C5A059] focus:outline-none transition-all font-sans"
+                                                    />
+                                                    <input 
+                                                        type="text" 
+                                                        placeholder="Card Number" 
+                                                        maxLength={19}
+                                                        required
+                                                        value={checkoutForm.cardNumber}
+                                                        onChange={(e) => setCheckoutForm(prev => {
+                                                            const clean = e.target.value.replace(/\D/g, '');
+                                                            const parts = clean.match(/.{1,4}/g) || [];
+                                                            return { ...prev, cardNumber: parts.join(' ') };
+                                                        })}
+                                                        className="w-full bg-[#FCFBF9] rounded-xl px-4 py-2 text-xs text-forest placeholder-forest/30 border border-forest/10 focus:border-[#C5A059] focus:outline-none transition-all font-sans font-mono"
+                                                    />
+                                                    <div className="grid grid-cols-2 gap-2">
+                                                        <input 
+                                                            type="text" 
+                                                            placeholder="MM/YY" 
+                                                            maxLength={5}
+                                                            required
+                                                            value={checkoutForm.cardExpiry}
+                                                            onChange={(e) => setCheckoutForm(prev => {
+                                                                const clean = e.target.value.replace(/\D/g, '');
+                                                                let formatted = clean;
+                                                                if (clean.length > 2) {
+                                                                    formatted = `${clean.substring(0,2)}/${clean.substring(2,4)}`;
+                                                                }
+                                                                return { ...prev, cardExpiry: formatted };
+                                                            })}
+                                                            className="w-full bg-[#FCFBF9] rounded-xl px-4 py-2 text-xs text-forest placeholder-forest/30 border border-forest/10 focus:border-[#C5A059] focus:outline-none transition-all font-sans"
+                                                        />
+                                                        <input 
+                                                            type="text" 
+                                                            placeholder="CVV" 
+                                                            maxLength={3}
+                                                            required
+                                                            value={checkoutForm.cardCvv}
+                                                            onChange={(e) => setCheckoutForm(prev => ({ ...prev, cardCvv: e.target.value.replace(/\D/g, '') }))}
+                                                            className="w-full bg-[#FCFBF9] rounded-xl px-4 py-2 text-xs text-forest placeholder-forest/30 border border-forest/10 focus:border-[#C5A059] focus:outline-none transition-all font-sans font-mono"
+                                                        />
+                                                    </div>
+                                                </div>
+                                            )}
+
+                                            {paymentMethod === 'wallet' && (
+                                                <div className="space-y-3 animate-fadeIn text-center py-2 flex flex-col items-center justify-center">
+                                                    <span className="text-[9px] uppercase tracking-wider text-[#C5A059] font-mono font-bold block">
+                                                        {lang === 'pt' ? 'PAGAMENTO EXPRESSO COM CARTEIRA DIGITAL' : 'EXPRESS DIGITAL WALLET PAYMENT'}
+                                                    </span>
+                                                    <div className="w-full max-w-[320px] min-h-[44px] mt-2 flex justify-center">
+                                                        <div id="payment-request-button-page" className="w-full"></div>
+                                                    </div>
+                                                    {!canUseWallet && (
+                                                        <p className="text-[10px] text-red-500/80 font-sans leading-relaxed mt-2">
+                                                            {lang === 'pt' ? 'Carteira digital indisponível no navegador.' : 'Digital wallet unavailable in this browser.'}
+                                                        </p>
+                                                    )}
+                                                </div>
+                                            )}
+                                        </div>
+
+                                        {checkoutError && (
+                                            <div className="p-3 bg-red-50 border border-red-200/50 rounded-xl text-left text-[11px] text-red-900 leading-relaxed font-sans flex flex-col gap-1 animate-fadeIn">
+                                                <div className="flex justify-between items-center">
+                                                    <span className="font-semibold uppercase tracking-wide text-[9px] text-red-700">{lang === 'pt' ? 'Erro ou Falha de Pagamento' : 'Payment Error or Failure'}</span>
+                                                    <button onClick={() => setCheckoutError(null)} className="text-red-400 hover:text-red-700 font-bold px-1 text-xs border-none bg-transparent">✕</button>
+                                                </div>
+                                                <p>{checkoutError}</p>
+                                            </div>
+                                        )}
+
+                                        {/* Submit Action */}
+                                        {paymentMethod !== 'wallet' && (
+                                            <button
+                                                disabled={isPaying || !checkoutForm.nome || !checkoutForm.email || !isValidEmail(checkoutForm.email) || !checkoutForm.morada || (paymentMethod === 'mbway' && !checkoutForm.mbwayPhone) || (paymentMethod === 'card' && (!checkoutForm.cardNumber || !checkoutForm.cardExpiry || !checkoutForm.cardCvv))}
+                                                onClick={async () => {
+                                                    setIsPaying(true);
+                                                    setCheckoutError(null);
+                                                    setSandboxEmails(null);
+
+                                                    if (paymentMethod === 'multibanco' && multibancoRef) {
+                                                        try {
+                                                            const res = await fetch(`${API_BASE_URL}/api/payment/webhook`, {
+                                                                method: 'POST',
+                                                                headers: { 'Content-Type': 'application/json' },
+                                                                body: JSON.stringify({
+                                                                    orderId,
+                                                                    event: 'payment_intent.succeeded'
+                                                                })
+                                                            });
+                                                            const statusData = await res.json();
+                                                            if (statusData.status === 'paid') {
+                                                                setIsPaying(false);
+                                                                setPaymentCompleted(true);
+                                                                if (statusData.emailLinks) {
+                                                                    setSandboxEmails(statusData.emailLinks);
+                                                                }
+                                                            } else {
+                                                                throw new Error(lang === 'pt' ? "Erro ao simular webhook de pagamento." : "Error simulating payment webhook.");
+                                                            }
+                                                        } catch (err: any) {
+                                                            setIsPaying(false);
+                                                            setCheckoutError(err.message || (lang === 'pt' ? 'Erro ao simular webhook.' : 'Error simulating webhook.'));
+                                                        }
+                                                        return;
+                                                    }
+
+                                                    if (paymentMethod === 'card') {
+                                                        try {
+                                                            const expiryParts = checkoutForm.cardExpiry.split('/');
+                                                            const expMonth = parseInt(expiryParts[0]?.trim());
+                                                            const expYear = parseInt(expiryParts[1]?.trim());
+                                                            if (isNaN(expMonth) || expMonth < 1 || expMonth > 12 || isNaN(expYear)) {
+                                                                throw new Error(lang === 'pt' ? 'Data de validade do cartão inválida. Use o formato MM/YY.' : 'Invalid card expiry date. Use MM/YY format.');
+                                                            }
+                                                        } catch (stripeErr: any) {
+                                                            setIsPaying(false);
+                                                            setCheckoutError(stripeErr.message || (lang === 'pt' ? 'Erro ao validar os detalhes do cartão.' : 'Error validating card details.'));
+                                                            return;
+                                                        }
+                                                    }
+
+                                                    try {
+                                                        const response = await fetch(`${API_BASE_URL}/api/payment/create-intent`, {
+                                                            method: 'POST',
+                                                            headers: { 'Content-Type': 'application/json' },
+                                                            body: JSON.stringify({
+                                                                product: {
+                                                                    id: productTranslated.id,
+                                                                    name: productTranslated.name,
+                                                                    price: currentPrice
+                                                                },
+                                                                selections,
+                                                                checkoutForm,
+                                                                paymentMethod,
+                                                                amountInCents
+                                                            })
+                                                        });
+
+                                                        const data = await response.json();
+                                                        if (!response.ok || data.error) {
+                                                            throw new Error(data.error || (lang === 'pt' ? 'Erro ao conectar com a gateway de pagamentos.' : 'Error connecting to the payment gateway.'));
+                                                        }
+
+                                                        setOrderId(data.orderId);
+
+                                                        if (data.status === 'paid') {
+                                                            setIsPaying(false);
+                                                            setPaymentCompleted(true);
+                                                            if (data.emailLinks) {
+                                                                setSandboxEmails(data.emailLinks);
+                                                            }
+                                                        } else if (data.status === 'failed') {
+                                                            throw new Error(translateBackendError(data.errorMessage, lang) || (lang === 'pt' ? 'Transação recusada pela gateway.' : 'Transaction declined by the gateway.'));
+                                                        } else if (data.stripeClientSecret) {
+                                                            // Card 3D Secure Verification Simulator
+                                                            const stripePubKey = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY || "";
+                                                            const stripeObj = await loadStripe(stripePubKey);
+                                                            if (!stripeObj) {
+                                                                throw new Error('Stripe failed to load.');
+                                                            }
+
+                                                            const confirmResult = await stripeObj.confirmCardPayment(data.stripeClientSecret);
+                                                            if (confirmResult.error) {
+                                                                throw new Error(confirmResult.error.message);
+                                                            }
+
+                                                            if (confirmResult.paymentIntent && confirmResult.paymentIntent.status === 'succeeded') {
+                                                                const confirmRes = await fetch(`${API_BASE_URL}/api/payment/webhook`, {
+                                                                    method: 'POST',
+                                                                    headers: { 'Content-Type': 'application/json' },
+                                                                    body: JSON.stringify({
+                                                                        orderId: data.orderId,
+                                                                        event: 'payment_intent.succeeded'
+                                                                    })
+                                                                });
+                                                                const confirmData = await confirmRes.json();
+                                                                if (confirmData.status === 'paid') {
+                                                                    setIsPaying(false);
+                                                                    setPaymentCompleted(true);
+                                                                    if (confirmData.emailLinks) {
+                                                                        setSandboxEmails(confirmData.emailLinks);
+                                                                    }
+                                                                } else {
+                                                                    throw new Error("Erro ao finalizar encomenda.");
+                                                                }
+                                                            } else {
+                                                                throw new Error("SCA failed.");
+                                                            }
+                                                        } else {
+                                                            if (paymentMethod === 'multibanco') {
+                                                                setMultibancoRef(data.multibancoRef);
+                                                                setIsPaying(false);
+                                                                setPaymentCompleted(true);
+                                                            } else if (paymentMethod === 'mbway') {
+                                                                // Poll Status
+                                                                let attempts = 0;
+                                                                const intervalId = setInterval(async () => {
+                                                                    attempts++;
+                                                                    try {
+                                                                        const statusRes = await fetch(`${API_BASE_URL}/api/payment/status/${data.orderId}`);
+                                                                        if (!statusRes.ok) return;
+                                                                        const statusData = await statusRes.json();
+
+                                                                        if (statusData.status === 'paid') {
+                                                                            clearInterval(intervalId);
+                                                                            setIsPaying(false);
+                                                                            setPaymentCompleted(true);
+                                                                            if (statusData.emailLinks) {
+                                                                                setSandboxEmails(statusData.emailLinks);
+                                                                            }
+                                                                        } else if (statusData.status === 'failed') {
+                                                                            clearInterval(intervalId);
+                                                                            setIsPaying(false);
+                                                                            setCheckoutError(translateBackendError(statusData.errorMessage, lang) || (lang === 'pt' ? 'Transação MB WAY recusada pelo utilizador.' : 'MB WAY transaction declined by the user.'));
+                                                                        }
+                                                                    } catch (pollErr) {
+                                                                        console.error("Erro ao consultar status:", pollErr);
+                                                                    }
+
+                                                                    if (attempts > 20) {
+                                                                        clearInterval(intervalId);
+                                                                        setIsPaying(false);
+                                                                        setCheckoutError(lang === 'pt' ? 'O tempo limite de aprovação MB WAY expirou.' : 'MB WAY approval timeout expired.');
+                                                                    }
+                                                                }, 3000);
+                                                            }
+                                                        }
+                                                    } catch (err: any) {
+                                                        setIsPaying(false);
+                                                        setCheckoutError(err.message || "Erro no pagamento.");
+                                                    }
+                                                }}
+                                                className="w-full rounded-full py-3.5 px-6 text-center font-bold bg-[#343E2C] text-[#C5A059] hover:bg-[#2c3525] text-xs uppercase tracking-widest cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed border border-[#C5A059]/10 transition-all focus:outline-none"
+                                            >
+                                                {isPaying ? (
+                                                    <span className="flex items-center justify-center gap-2">
+                                                        <span className="animate-spin rounded-full h-3 w-3 border border-[#C5A059] border-t-transparent" />
+                                                        {lang === 'pt' ? 'A PROCESSAR...' : 'PROCESSING...'}
+                                                    </span>
+                                                ) : (
+                                                    paymentMethod === 'mbway' 
+                                                        ? (lang === 'pt' ? `Pagar ${currentPrice} via MB WAY` : `Pay ${currentPrice} via MB WAY`)
+                                                        : paymentMethod === 'multibanco'
+                                                            ? (lang === 'pt' ? 'Gerar Referência Multibanco' : 'Generate Multibanco Reference')
+                                                            : (lang === 'pt' ? `Pagar ${currentPrice} com Cartão` : `Pay ${currentPrice} with Card`)
+                                                )}
+                                            </button>
+                                        )}
+                                    </div>
+                                )}
+                            </div>
+                        )}
+
+                        {/* Standalone CTAs Row (Pre-checkout) */}
+                        {!isCheckingOut && (
+                            <div className="flex flex-col gap-3 pt-2">
+                                {/* Buy Direct Simulator button */}
+                                <button
+                                    onClick={() => setIsCheckingOut(true)}
+                                    className="w-full rounded-full py-4 px-6 text-center text-xs uppercase tracking-widest font-bold bg-[#343E2C] text-[#C5A059] hover:bg-[#22291d] transition-all cursor-pointer border border-[#C5A059]/10 shadow-lg shadow-forest/10 focus:outline-none"
+                                >
+                                    {lang === 'pt' ? 'Comprar Agora (Checkout Seguro)' : 'Buy Now (Secure Checkout)'}
+                                </button>
+                                
+                                {/* WhatsApp Button */}
+                                <a
+                                    href={whatsappUrl}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="w-full rounded-full py-4 px-6 text-center text-xs uppercase tracking-widest font-bold bg-white text-forest hover:bg-forest hover:text-cream transition-all border border-forest/15 shadow-sm flex items-center justify-center gap-2.5 focus:outline-none"
+                                >
+                                    <MessageCircle size={15} className="text-emerald-600 shrink-0" />
+                                    <span>{lang === 'pt' ? 'Encomendar via WhatsApp' : 'Order via WhatsApp'}</span>
+                                </a>
+                            </div>
+                        )}
+                        
+                        {/* Security Guarantees badges block */}
+                        <div className="grid grid-cols-3 gap-2.5 text-center py-4 text-[9px] uppercase tracking-widest text-forest/70">
+                            <div className="flex flex-col items-center gap-1 font-semibold">
+                                <span className="text-xs">🔒</span>
+                                <span>{lang === 'pt' ? 'Pago Seguro' : 'Secure Pay'}</span>
+                            </div>
+                            <div className="flex flex-col items-center gap-1 border-x border-forest/15 font-semibold">
+                                <span className="text-xs">🧶</span>
+                                <span>{lang === 'pt' ? '100% Manual' : '100% Handmade'}</span>
+                            </div>
+                            <div className="flex flex-col items-center gap-1 font-semibold">
+                                <span className="text-xs">✈️</span>
+                                <span>{lang === 'pt' ? 'Envio Expresso' : 'Express Ship'}</span>
+                            </div>
+                        </div>
+
+                        <hr className="border-forest/10" />
+
+                        {/* Zara / Sezane Style Accordion Sections */}
+                        <div className="space-y-1 font-sans text-xs">
+                            {/* Section 1: Descrição */}
+                            <div className="border-b border-forest/10 py-3">
+                                <button
+                                    onClick={() => setOpenAccordion(openAccordion === 'details' ? null : 'details')}
+                                    className="w-full flex justify-between items-center text-left text-[11px] font-bold uppercase tracking-wider text-forest focus:outline-none"
+                                >
+                                    <span>{lang === 'pt' ? 'Detalhes da Peça' : 'Product Details'}</span>
+                                    <span>{openAccordion === 'details' ? '−' : '+'}</span>
+                                </button>
+                                {openAccordion === 'details' && (
+                                    <div className="pt-2.5 text-forest/75 leading-relaxed space-y-1 animate-fadeIn">
+                                        <p>{lang === 'pt' ? 'Cada peça M★BRAVO de Carolina é inteiramente tricotada ou tecida à mão em Portugal, de forma orgânica e paciente. Por ser um processo 100% artesanal, cada artigo é único, carregando variações delicadas que celebram a beleza do trabalho manual exclusivo.' : 'Each M★BRAVO piece by Carolina is entirely knitted or woven by hand in Portugal, patiently and organically. Because it is a 100% handcrafted process, each item is unique, carrying delicate variations that celebrate the beauty of exclusive manual work.'}</p>
+                                    </div>
+                                )}
+                            </div>
+
+                            {/* Section 2: Material & Cuidados */}
+                            <div className="border-b border-forest/10 py-3">
+                                <button
+                                    onClick={() => setOpenAccordion(openAccordion === 'care' ? null : 'care')}
+                                    className="w-full flex justify-between items-center text-left text-[11px] font-bold uppercase tracking-wider text-forest focus:outline-none"
+                                >
+                                    <span>{lang === 'pt' ? 'Composição & Lavagem' : 'Composition & Care'}</span>
+                                    <span>{openAccordion === 'care' ? '−' : '+'}</span>
+                                </button>
+                                {openAccordion === 'care' && (
+                                    <div className="pt-2.5 text-forest/75 leading-relaxed space-y-2 animate-fadeIn">
+                                        <p><strong>{lang === 'pt' ? 'Matéria-Prima:' : 'Materials:'}</strong> {materialText}</p>
+                                        <p><strong>{lang === 'pt' ? 'Conselhos de Lavagem:' : 'Washing Tips:'}</strong> {careText}</p>
+                                    </div>
+                                )}
+                            </div>
+
+                            {/* Section 3: Envio & Devoluções */}
+                            <div className="border-b border-forest/10 py-3">
+                                <button
+                                    onClick={() => setOpenAccordion(openAccordion === 'shipping' ? null : 'shipping')}
+                                    className="w-full flex justify-between items-center text-left text-[11px] font-bold uppercase tracking-wider text-forest focus:outline-none"
+                                >
+                                    <span>{lang === 'pt' ? 'Envio & Trocas' : 'Shipping & Returns'}</span>
+                                    <span>{openAccordion === 'shipping' ? '−' : '+'}</span>
+                                </button>
+                                {openAccordion === 'shipping' && (
+                                    <div className="pt-2.5 text-forest/75 leading-relaxed space-y-1.5 animate-fadeIn">
+                                        <p>{lang === 'pt' ? 'Enviamos para Portugal (Continental e Ilhas) e toda a Europa através de CTT Expresso Registado. Todas as encomendas incluem código de rastreamento enviado por e-mail.' : 'We ship to Portugal and Europe via Registered CTT Express. All orders include a tracking code sent by email.'}</p>
+                                        <p>{lang === 'pt' ? 'Por se tratar de peças confecionadas sob encomenda com especificações de cor e tamanho personalizadas, não aceitamos trocas ou devoluções de artigos personalizados, salvo defeito de fabrico.' : 'Since pieces are made-to-order with custom size and color configurations, we do not accept returns or exchanges of customized articles unless there is a manufacturing defect.'}</p>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+
+            {/* Suggestion / Relacionados Box */}
+            <div className="border-t border-forest/10 pt-16 mb-24 px-2 sm:px-0 text-left">
+                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-10">
+                    <div className="space-y-1">
+                        <span className="text-[9px] uppercase tracking-[0.35em] text-forest/35 block font-sans font-bold">
+                            {lang === 'pt' ? 'A Coleção Continua' : 'The Collection Continues'}
+                        </span>
+                        <h3 className="font-serif text-2xl lg:text-3xl font-light text-forest">
+                            {lang === 'pt' ? `Outras Peças de ${translatedCategory.name}` : `Other Pieces of ${translatedCategory.name}`}
+                        </h3>
+                    </div>
+                    <button 
+                        onClick={() => navigateTo(getCategoryUrl(category))} 
+                        className="text-[10px] uppercase tracking-[0.25em] font-bold text-[#C5A059] hover:text-[#b08b47] flex items-center gap-2 transition-colors cursor-pointer border-none bg-transparent"
+                    >
+                        {lang === 'pt' ? 'Ver Tudo' : 'View All'} <ArrowRight size={14} />
+                    </button>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+                    {translatedCategory.products
+                        .filter(p => p.id !== product.id)
+                        .slice(0, 3)
+                        .map((otherProd, i) => (
+                            <ProductCard 
+                                key={otherProd.id}
+                                product={otherProd} 
+                                i={i} 
+                                isFocused={false}
+                                isSubdued={false}
+                                onFocus={() => navigateTo(getProductUrl(otherProd))}
+                            />
+                        ))
+                    }
+                </div>
+            </div>
+        </div>
+    );
+};
+
+// --- Dedicated Admin Page ---
+const AdminPage = () => {
+    return (
+        <div className="w-full min-h-[85vh] flex items-center justify-center p-0 md:p-6 lg:p-12">
+            <AdminDashboardModal onClose={() => navigateTo('/')} />
+        </div>
+    );
+};
+
 // --- Main App ---
 
 export default function App() {
@@ -5410,7 +6762,79 @@ export default function App() {
   const [activeLegal, setActiveLegal] = useState<'envios' | 'privacidade' | 'termos' | null>(null);
   const [showAdmin, setShowAdmin] = useState(false);
   const [currentPage, setCurrentPage] = useState<'home' | 'essence'>('home');
+  const [zoomedImage, setZoomedImage] = useState<string | null>(null);
   const { t } = useLanguage();
+  const [pathname, setPathname] = useState(window.location.pathname);
+
+  // Robust client-side custom router event and browser history state listeners
+  useEffect(() => {
+    const handlePopState = () => {
+      setPathname(window.location.pathname);
+    };
+    const handleCustomNav = (e: Event) => {
+      const newPath = (e as CustomEvent).detail;
+      setPathname(newPath);
+      
+      // Handle anchor-scrolling (e.g. #sobre) or reset page scroll
+      if (newPath.includes('#')) {
+        const hash = newPath.split('#')[1];
+        setTimeout(() => {
+          const element = document.getElementById(hash);
+          if (element) {
+            (window as any).lenis?.scrollTo(element, { duration: 1.2 });
+          }
+        }, 150);
+      } else {
+        window.scrollTo({ top: 0, behavior: 'auto' });
+        (window as any).lenis?.scrollTo(0, { immediate: true });
+      }
+    };
+    
+    window.addEventListener('popstate', handlePopState);
+    window.addEventListener('mbravo-navigate', handleCustomNav);
+    
+    // Smooth scrolling to hash anchor upon initial page mount if hash exists in URL
+    if (window.location.hash) {
+      setTimeout(() => {
+        const hash = window.location.hash.replace('#', '');
+        const element = document.getElementById(hash);
+        if (element) {
+          (window as any).lenis?.scrollTo(element, { duration: 1.2 });
+        }
+      }, 1000);
+    }
+
+    return () => {
+      window.removeEventListener('popstate', handlePopState);
+      window.removeEventListener('mbravo-navigate', handleCustomNav);
+    };
+  }, []);
+
+  // Listen for product image zoom events globally to bypass any sub-layout transforms
+  useEffect(() => {
+    const handleZoom = (e: Event) => {
+      setZoomedImage((e as CustomEvent).detail);
+    };
+    window.addEventListener('mbravo-zoom-image', handleZoom as any);
+    return () => {
+      window.removeEventListener('mbravo-zoom-image', handleZoom as any);
+    };
+  }, []);
+
+  // Manage body scroll and Lenis scrolling when zoomedImage is open
+  useEffect(() => {
+    if (zoomedImage) {
+      document.body.style.overflow = 'hidden';
+      (window as any).lenis?.stop();
+    } else {
+      document.body.style.overflow = '';
+      (window as any).lenis?.start();
+    }
+    return () => {
+      document.body.style.overflow = '';
+      (window as any).lenis?.start();
+    };
+  }, [zoomedImage]);
 
   // Smooth scroll logic for standard browser behavior using Lenis
   useEffect(() => {
@@ -5439,8 +6863,19 @@ export default function App() {
     };
   }, []);
 
+  // Close any active legal modals if the mobile menu opens
+  useEffect(() => {
+    const handleMobileMenuOpen = () => {
+      setActiveLegal(null);
+    };
+    window.addEventListener('mbravo-mobile-menu-open', handleMobileMenuOpen);
+    return () => {
+      window.removeEventListener('mbravo-mobile-menu-open', handleMobileMenuOpen);
+    };
+  }, []);
+
   return (
-    <div className="relative min-h-screen bg-cream text-forest select-none overflow-x-hidden">
+    <div className="relative min-h-screen bg-cream text-forest select-none">
       
       <AnimatePresence mode="wait">
         {loading ? (
@@ -5453,10 +6888,88 @@ export default function App() {
             transition={{ duration: 1.5 }}
             className="flex flex-col"
           >
-            <Navbar currentPage={currentPage} setCurrentPage={setCurrentPage} />
+            <Navbar currentPage={pathname === '/essencia' || pathname === '/essence' ? 'essence' : 'home'} setCurrentPage={(p) => navigateTo(p === 'essence' ? '/essencia' : '/')} />
             
             <AnimatePresence mode="wait">
-              {currentPage === 'home' ? (
+              {pathname === '/essencia' || pathname === '/essence' ? (
+                <motion.div 
+                  key="essence"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.8 }}
+                  className="relative bg-[#FCFBF9]"
+                >
+                  <EssenceHero onBackToHome={() => {
+                    navigateTo('/');
+                  }} />
+                  
+                  <div className="relative overflow-hidden">
+                    <MadeWithTimeSection />
+                    <KnotSection />
+                  </div>
+                  
+                  {/* Interlude at bottom of Essence to invite them back to Collection */}
+                  <div data-background="light" className="py-24 bg-[#FCFBF9] text-center relative border-t border-forest/10">
+                    <div className="max-w-2xl mx-auto px-6 space-y-8">
+                      <span className="text-[10px] uppercase tracking-[0.45em] font-semibold text-forest/35 block font-sans">
+                        {t('nav.exclusive')}
+                      </span>
+                      <h2 className="text-[clamp(1.5rem,5vw,3rem)] font-serif text-forest tracking-tight font-light">
+                        {t('brand.slogan')}
+                      </h2>
+                      <div className="pt-4">
+                        <button
+                          onClick={() => {
+                            navigateTo('/#collection');
+                          }}
+                          className="group inline-flex items-center gap-2.5 px-5 py-2.5 sm:px-7 sm:py-3 md:px-8 md:py-3.5 bg-forest text-cream hover:bg-[#1C2713] rounded-full text-[9px] sm:text-[10px] uppercase tracking-[0.22em] sm:tracking-[0.3em] font-semibold transition-all duration-700 cursor-pointer hover:scale-[1.02] active:scale-[0.98] shadow-sm hover:shadow-md"
+                        >
+                          {t('btn.back_collection')}
+                          <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform duration-500" />
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </motion.div>
+              ) : pathname.startsWith('/colecoes/') ? (
+                // DEDICATED CATEGORY PAGE ROUTE
+                <motion.div
+                  key={`category-${pathname}`}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.8 }}
+                  className="relative bg-[#F6F1E5] min-h-screen pt-28 pb-16"
+                >
+                  <CategoryPage pathname={pathname} />
+                </motion.div>
+              ) : pathname.startsWith('/produtos/') ? (
+                // DEDICATED PRODUCT DETAIL ROUTE
+                <motion.div
+                  key={`product-${pathname}`}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.8 }}
+                  className="relative bg-[#FCFBF9] min-h-screen pt-28 pb-16"
+                >
+                  <ProductDetailPage pathname={pathname} />
+                </motion.div>
+              ) : pathname === '/admin' ? (
+                // DEDICATED ADMIN ROUTE
+                <motion.div
+                  key="admin-page"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.8 }}
+                  className="relative bg-[#FCFBF9] min-h-screen pt-28 pb-16"
+                >
+                  <AdminPage />
+                </motion.div>
+              ) : (
+                // HOMEPAGE ROUTE (path is '/' or anything else)
                 <motion.div 
                   key="home"
                   initial={{ opacity: 0 }}
@@ -5502,65 +7015,16 @@ export default function App() {
                   </div>
 
                   <MemoryContinuesSection onDiscoverEssence={() => {
-                    setCurrentPage('essence');
-                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                    navigateTo('/essencia');
                   }} />
 
                   <InstagramSection />
                   <ContactSection />
                 </motion.div>
-              ) : (
-                <motion.div 
-                  key="essence"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  transition={{ duration: 0.8 }}
-                  className="relative bg-[#FCFBF9]"
-                >
-                  <EssenceHero onBackToHome={() => {
-                    setCurrentPage('home');
-                    window.scrollTo({ top: 0, behavior: 'smooth' });
-                  }} />
-                  
-                  <div className="relative overflow-hidden">
-                    <MadeWithTimeSection />
-                    <KnotSection />
-                  </div>
-                  
-                  {/* Interlude at bottom of Essence to invite them back to Collection */}
-                  <div data-background="light" className="py-24 bg-[#FCFBF9] text-center relative border-t border-forest/10">
-                    <div className="max-w-2xl mx-auto px-6 space-y-8">
-                      <span className="text-[10px] uppercase tracking-[0.45em] font-semibold text-forest/35 block font-sans">
-                        {t('nav.exclusive')}
-                      </span>
-                      <h2 className="text-[clamp(1.5rem,5vw,3rem)] font-serif text-forest tracking-tight font-light">
-                        {t('brand.slogan')}
-                      </h2>
-                      <div className="pt-4">
-                        <button
-                          onClick={() => {
-                            setCurrentPage('home');
-                            setTimeout(() => {
-                              const element = document.getElementById('collection');
-                              if (element) {
-                                element.scrollIntoView({ behavior: 'smooth' });
-                              }
-                            }, 100);
-                          }}
-                          className="group inline-flex items-center gap-2.5 px-5 py-2.5 sm:px-7 sm:py-3 md:px-8 md:py-3.5 bg-forest text-cream hover:bg-[#1C2713] rounded-full text-[9px] sm:text-[10px] uppercase tracking-[0.22em] sm:tracking-[0.3em] font-semibold transition-all duration-700 cursor-pointer hover:scale-[1.02] active:scale-[0.98] shadow-sm hover:shadow-md"
-                        >
-                          {t('btn.back_collection')}
-                          <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform duration-500" />
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                </motion.div>
               )}
             </AnimatePresence>
             
-            <Footer onOpenLegal={(type) => setActiveLegal(type)} onOpenAdmin={() => setShowAdmin(true)} />
+            <Footer onOpenLegal={(type) => setActiveLegal(type)} onOpenAdmin={() => navigateTo('/admin')} />
 
             <AnimatePresence>
                 {activeLegal && (
@@ -5568,6 +7032,46 @@ export default function App() {
                 )}
                 {showAdmin && (
                     <AdminDashboardModal onClose={() => setShowAdmin(false)} />
+                )}
+                {zoomedImage && (
+                    <motion.div 
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        transition={{ duration: 0.25 }}
+                        onClick={() => setZoomedImage(null)}
+                        className="fixed inset-0 z-[10000] flex flex-col items-center justify-center bg-black/95 p-4 sm:p-6 lg:p-12 cursor-zoom-out select-none backdrop-blur-md"
+                    >
+                        {/* Floating Close Button */}
+                        <button 
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                setZoomedImage(null);
+                            }}
+                            className="absolute top-6 right-6 z-[10010] p-4 rounded-full bg-white/10 hover:bg-white/20 text-white backdrop-blur-md transition-all border border-white/10 hover:scale-105 active:scale-95 cursor-pointer flex items-center justify-center shadow-2xl"
+                            title="Fechar Zoom"
+                        >
+                            <X size={24} />
+                        </button>
+
+                        {/* Interactive Large Image with scale transition */}
+                        <div className="relative w-full h-full max-w-5xl max-h-[85vh] flex items-center justify-center">
+                            <motion.img 
+                                initial={{ scale: 0.95, opacity: 0 }}
+                                animate={{ scale: 1, opacity: 1 }}
+                                exit={{ scale: 0.95, opacity: 0 }}
+                                transition={{ duration: 0.25, ease: "easeOut" }}
+                                src={zoomedImage} 
+                                alt="Zoom"
+                                className="max-w-full max-h-full object-contain rounded-2xl shadow-2xl pointer-events-none"
+                            />
+                        </div>
+
+                        {/* Informative minimal note */}
+                        <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-10 text-white/50 text-[10px] uppercase tracking-widest font-sans font-light text-center w-full px-4">
+                            Toca em qualquer lado para fechar
+                        </div>
+                    </motion.div>
                 )}
             </AnimatePresence>
           </motion.main>
