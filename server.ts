@@ -1180,18 +1180,8 @@ app.post("/api/testimonials", async (req, res) => {
 
 // Redirect user directly to Google Place review page
 app.get("/api/write-review", (req, res) => {
-  let placeId = process.env.GOOGLE_PLACE_ID || "";
-  
-  // Clean up any double/single quotes and trim whitespace that can break mobile redirects
-  placeId = placeId.replace(/['"]/g, '').trim();
-  
-  if (!placeId) {
-    // Fallback to M★BRAVO's actual Place ID ChIJ688-y7lzKkoRP7G9C9XOf8c if not configured
-    placeId = "ChIJ688-y7lzKkoRP7G9C9XOf8c";
-  }
-  
-  // Universal redirect URL that works perfectly on Desktop, iOS (Safari/Chrome/App), and Android
-  return res.redirect(`https://search.google.com/local/writereview?placeid=${placeId}`);
+  // Direct official link provided by the user for M★BRAVO
+  return res.redirect("https://g.page/r/Cdo7JGP_Xpc3EBM/review");
 });
 
 
