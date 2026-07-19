@@ -285,9 +285,9 @@ const SHOP_CATEGORIES = [
         id: 'h1_classic', 
         name: 'Classic Coasters', 
         price: calculateProductRange('Classic Coasters'), 
-        img: 'https://i.ibb.co/7JxTP2xq/Blue-coasters-7.png',
+        img: 'https://i.ibb.co/qMXpNrT0/Blue-coasters-7.png',
         images: [
-          'https://i.ibb.co/7JxTP2xq/Blue-coasters-7.png',
+          'https://i.ibb.co/qMXpNrT0/Blue-coasters-7.png',
           'https://i.ibb.co/PGmrtMMx/Pink-coasters4-2.png',
           'https://i.ibb.co/WvBLxKxN/Pink-coasters5.png',
           'https://i.ibb.co/Kc6bxwjq/Pink-coasters3.png',
