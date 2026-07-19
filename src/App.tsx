@@ -248,7 +248,7 @@ const SHOP_CATEGORIES = [
         ],
         description: "Bases em crochet inspiradas na delicadeza das margaridas e nos tons suaves da natureza. Um conjunto handmade pensado para trazer um toque cozy e acolhedor ao teu espaço.",
         material: "- Material: 100% algodão",
-        care: "- Lavagem delicada\n- Secar ao ar"
+        care: "- Lavagem delicada\n- Secar na horizontal"
       },
       { 
         id: 'h1c', 
@@ -263,7 +263,7 @@ const SHOP_CATEGORIES = [
         ],
         description: "Bases em crochet inspiradas na beleza dos girassóis e nos seus tons quentes e acolhedores. Um conjunto handmade pensado para trazer um toque cozy e luminoso ao teu espaço.",
         material: "- Material: 100% algodão",
-        care: "- Lavagem delicada\n- Secar ao ar"
+        care: "- Lavagem delicada\n- Secar na horizontal"
       },
       { 
         id: 'h1f', 
@@ -279,7 +279,7 @@ const SHOP_CATEGORIES = [
         ],
         description: "Bases em crochet inspiradas no design Coraline, tecidas à mão com todo o carinho para trazer um toque aconchegante, elegante e especial ao teu espaço.",
         material: "- Material: 100% algodão",
-        care: "- Lavagem delicada\n- Secar ao ar"
+        care: "- Lavagem delicada\n- Secar na horizontal"
       },
       { 
         id: 'h1_classic', 
@@ -300,7 +300,7 @@ const SHOP_CATEGORIES = [
         ],
         description: "Bases em crochet com um design floral clássico e delicado, pensadas para trazer um toque cozy e elegante ao teu espaço. Disponíveis em várias cores, mantendo sempre as pétalas brancas para um acabamento suave e delicado.",
         material: "- Material: 100% algodão",
-        care: "- Lavagem delicada\n- Secar ao ar"
+        care: "- Lavagem delicada\n- Secar na horizontal"
       },
       { 
         id: 'h2b', 
@@ -315,7 +315,7 @@ const SHOP_CATEGORIES = [
         ],
         description: "Almofada decorativa em forma de estrela, feita à mão em crochet para dar um toque delicado e cozy a qualquer espaço. Perfeita para decorar camas, sofás, cadeiras, quartos infantis ou qualquer cantinho especial. Disponível em várias cores para combinar com diferentes estilos de decoração.",
         material: "- Material: 100% poliéster (Fio macio e estruturado, ideal para peças decorativas)",
-        care: "- Limpeza delicada à mão\n- Secar ao ar em superfície plana\n- Evitar torcer a peça"
+        care: "- Limpeza delicada à mão\n- Secar na horizontal em superfície plana\n- Evitar torcer a peça"
       }
     ]
   },
@@ -338,7 +338,7 @@ const SHOP_CATEGORIES = [
         ],
         description: "Pouch em crochet com padrão African Flower, cuidadosamente feito à mão e forrado no interior para maior estrutura e proteção. Finalizado com fecho, é perfeito para guardar os teus essenciais do dia a dia com um toque cozy e handmade.",
         material: "- Material: 100% algodão\n- Detalhe: Forro interior em tecido",
-        care: "- Lavagem delicada à mão\n- Secar ao ar\n- Evitar máquina de secar",
+        care: "- Lavagem delicada à mão\n- Secar na horizontal\n- Evitar máquina de secar",
         dimensions: "25 cm (largura) × 14 cm (altura)"
       },
       { 
@@ -358,7 +358,7 @@ Com fecho ajustável em cordão e um acabamento delicado handmade, é perfeito p
 - Ideal para moedas, cartões, joias ou pequenos acessórios
 - Disponível em várias cores
 - Composição: 100% algodão`,
-        care: "- Lavagem delicada à mão\n- Secar ao ar em superfície plana"
+        care: "- Lavagem delicada à mão\n- Secar na horizontal em superfície plana"
       },
       { 
         id: 'b1_airpods', 
@@ -375,7 +375,7 @@ Com fecho ajustável em cordão e um acabamento delicado handmade, é perfeito p
 - Ajuste seguro à caixa dos AirPods
 - Disponível em várias combinações de cores
 - Composição: 100% algodão`,
-        care: "- Lavagem delicada à mão\n- Secar ao ar em superfície plana"
+        care: "- Lavagem delicada à mão\n- Secar na horizontal em superfície plana"
       },
       { 
         id: 'b2_sling', 
@@ -390,7 +390,7 @@ Com fecho ajustável em cordão e um acabamento delicado handmade, é perfeito p
         ],
         description: "Mala em crochet com padrão Granny Square floral, cuidadosamente feita à mão e forrada no interior para maior estrutura e durabilidade. Com alça ajustável e fecho de correr, pode ser usada à cintura, a tiracolo ou ao ombro, adaptando-se facilmente ao teu estilo e às tuas necessidades do dia a dia.\nDimensões aproximadas: 26 cm (largura) × 11 cm (altura)",
         material: "- Material: 100% algodão de alta qualidade\n- Detalhe: Forro interno macio para maior segurança e estrutura",
-        care: "- Lavagem delicada à mão\n- Secar ao ar horizontalmente\n- Não utilizar máquina de secar"
+        care: "- Lavagem delicada à mão\n- Secar na horizontal\n- Não utilizar máquina de secar"
       },
       { 
         id: 'b2_shell', 
@@ -409,7 +409,7 @@ Compacta e prática, fecha com um botão de madeira com estrela, um detalhe espe
 - Dimensões: 8,5 cm (largura) × 7,5 cm (altura)
 - Composição: 100% algodão
 - Material: Botão em madeira`,
-        care: "- Lavagem delicada\n- Secar ao ar"
+        care: "- Lavagem delicada\n- Secar na horizontal"
       }
     ]
   },
@@ -457,7 +457,7 @@ Disponível em várias combinações de cores, foi criado para acompanhar os dia
         ],
         description: "Poncho em crochet leve e delicado, feito à mão com um design de malha aberta para um look effortless and cozy. Perfeito para sobrepor a tops, vestidos ou biquínis, criando um toque elegante e descontraído ao outfit. Disponível em várias cores.",
         material: "- Material: 100% algodão",
-        care: "- Lavagem delicada à mão\n- Secar ao ar\n- Evitar máquina de secar"
+        care: "- Lavagem delicada à mão\n- Secar na horizontal\n- Evitar máquina de secar"
       },
       { 
         id: 'v2c', 
@@ -475,7 +475,7 @@ Disponível em várias combinações de cores, foi criado para acompanhar os dia
         description: "Poncho em crochet feito à mão, criado com um clássico padrão granny stitch e combinação de duas cores para um look cozy e intemporal. Com um ajuste confortável e textura aconchegante, é perfeito para sobrepor a diferentes looks e acrescentar um toque handmade e effortless ao visual.",
         details: "• Ideal para layering em diferentes looks\n• Disponível em várias combinações de cores",
         material: "- Composição: 100% algodão egípcio de alta qualidade ou mistura de algodão and lã macia (Consulte para opções)",
-        care: "- Lavagem delicada à mão com sabão neutro\n- Secar ao ar em superfície plana\n- Evitar máquina de secar"
+        care: "- Lavagem delicada à mão com sabão neutro\n- Secar na horizontal em superfície plana\n- Evitar máquina de secar"
       },
       { 
         id: 'alma_cardigan', 
@@ -490,7 +490,7 @@ Disponível em várias combinações de cores, foi criado para acompanhar os dia
         ],
         description: "Cardigan em crochet feito à mão com granny squares clássicos e um design cozy e intemporal. Uma peça confortável e delicada, perfeita para dias frescos de verão, outono ou para criar um look mais acolhedor e effortless. Disponível em várias combinações de cores e materiais.",
         material: "- Opção 1: 100% algodão (Leve, respirável e ideal para dias mais amenos ou meia-estação)\n- Opção 2: 50% algodão / 50% lã (Mais quente, macio e aconchegante, ideal para dias mais frios)",
-        care: "- Lavagem delicada à mão\n- Secar ao ar em superfície plana\n- Evitar torcer a peça",
+        care: "- Lavagem delicada à mão\n- Secar na horizontal em superfície plana\n- Evitar torcer a peça",
         details: "- Modelo de manga comprida\n- Fecho em laço frontal"
       },
       { 
@@ -506,7 +506,7 @@ Disponível em várias combinações de cores, foi criado para acompanhar os dia
         sizes: ['2 anos', '4 anos', '6 anos'],
         description: "Versão mini do Alma Cardigan, feita à mão em crochet com granny squares clássicos e um design cozy e intemporal. Pensado para os mais pequenos, combina conforto, delicadeza e um toque handmade especial. Disponível em várias combinações de cores and materiais.",
         material: "- Opção Leve: 100% algodão\n- Opção Cozy: 50% algodão, 50% lã",
-        care: "- Lavagem delicada à mão\n- Secar ao ar em superfície plana\n- Evitar máquina de secar",
+        care: "- Lavagem delicada à mão\n- Secar na horizontal em superfície plana\n- Evitar máquina de secar",
         details: "- Modelo de manga comprida\n- Fecho em laço frontal"
       }
     ]
@@ -533,7 +533,7 @@ Disponível em várias combinações de cores, foi criado para acompanhar os dia
         ],
         description: "Bandana em crochet com delicado padrão de libelinhas, feita à mão para dar um toque cozy e especial ao teu look. Leve, confortável e versátil, perfeita para usar no dia a dia. Disponível em várias cores e em duas opções de material.",
         material: "- Opção 1: 100% algodão (opção leve)\n- Opção 2: 50% algodão, 50% lã (opção mais cozy)",
-        care: "- Lavagem delicada\n- Secar ao ar"
+        care: "- Lavagem delicada\n- Secar na horizontal"
       },
       { 
         id: 'v3b', 
@@ -550,7 +550,7 @@ Disponível em várias combinações de cores, foi criado para acompanhar os dia
 Leve, versátil e ajustável através de fitas, foi criada para complementar qualquer look com um toque artesanal e intemporal.
 Disponível em várias cores.`,
         material: "- Opção 1: 100% algodão (opção leve)\n- Opção 2: 50% algodão, 50% lã (opção mais cozy)",
-        care: "- Lavagem delicada\n- Secar ao ar"
+        care: "- Lavagem delicada\n- Secar na horizontal"
       },
       { 
         id: 'h3', 
@@ -564,7 +564,7 @@ Disponível em várias cores.`,
         ],
         description: "Headband em crochet com delicado padrão de libelinhas, feita à mão para um toque leve e especial no dia a dia. Confortável, versátil e perfeita para complementar qualquer look com um detalhe handmade e cozy. Disponível em várias cores.",
         material: "- Material: 100% algodão",
-        care: "- Lavagem delicada à mão\n- Secar ao ar\n- Evitar máquina de secar"
+        care: "- Lavagem delicada à mão\n- Secar na horizontal\n- Evitar máquina de secar"
       },
       { 
         id: 'v3c', 
@@ -746,7 +746,7 @@ const LoadingScreen = ({ onComplete }: { onComplete: () => void; key?: string })
   );
 };
 
-const Navbar = ({ currentPage, setCurrentPage }: { currentPage: 'home' | 'essence', setCurrentPage: (page: 'home' | 'essence') => void }) => {
+const Navbar = ({ currentPage, setCurrentPage, pathname }: { currentPage: 'home' | 'essence', setCurrentPage: (page: 'home' | 'essence') => void, pathname: string }) => {
     const [isScrolled, setIsScrolled] = useState(false);
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const [isDarkBg, setIsDarkBg] = useState(true);
@@ -782,19 +782,33 @@ const Navbar = ({ currentPage, setCurrentPage }: { currentPage: 'home' | 'essenc
 
     const handleLinkClick = (e: React.MouseEvent, href: string) => {
         setMobileMenuOpen(false);
-        const activePath = window.location.pathname;
+        // Start lenis immediately to allow scroll to work and clear overflow lock
+        (window as any).lenis?.start();
+        document.body.style.overflow = '';
+
+        const activePath = pathname;
+        const isHomePage = activePath === '/' || activePath === '/home' || activePath.startsWith('/#');
+
         if (href === 'essence') {
             e.preventDefault();
             navigateTo('/essencia');
         } else {
-            if (activePath !== '/' && activePath !== '/home') {
+            if (!isHomePage) {
                 e.preventDefault();
                 navigateTo('/' + href);
             } else {
-                const element = document.getElementById(href.replace('#', ''));
+                const targetId = href.replace('#', '');
+                const element = document.getElementById(targetId);
                 if (element) {
                     e.preventDefault();
-                    (window as any).lenis?.scrollTo(element, { duration: 1.2 });
+                    setTimeout(() => {
+                        if (targetId === 'collection') {
+                            const targetScrollTop = getCollectionScrollTarget(element);
+                            (window as any).lenis?.scrollTo(targetScrollTop, { duration: 1.2 });
+                        } else {
+                            (window as any).lenis?.scrollTo(element, { duration: 1.2 });
+                        }
+                    }, 150);
                 }
             }
         }
@@ -802,13 +816,15 @@ const Navbar = ({ currentPage, setCurrentPage }: { currentPage: 'home' | 'essenc
 
     useEffect(() => {
         // Set initial color state based on page type
-        const activePath = window.location.pathname;
-        if (activePath === '/essencia') {
+        const activePath = pathname;
+        if (activePath === '/essencia' || activePath === '/essence') {
             setIsDarkBg(false);
         } else if (activePath === '/' || activePath === '/home') {
             setIsDarkBg(true);
+        } else if (activePath.startsWith('/produtos/') || activePath.startsWith('/colecoes/') || activePath === '/admin') {
+            setIsDarkBg(false); // Default for Category, Product detail, Admin is light background
         } else {
-            setIsDarkBg(false); // Default for Category, Product detail, Admin
+            setIsDarkBg(false);
         }
 
         const handleScroll = () => {
@@ -845,7 +861,7 @@ const Navbar = ({ currentPage, setCurrentPage }: { currentPage: 'home' | 'essenc
                 }
             });
             if (!detected) {
-                const p = window.location.pathname;
+                const p = pathname;
                 setIsDarkBg(p === '/' || p === '/home');
             }
         };
@@ -880,7 +896,7 @@ const Navbar = ({ currentPage, setCurrentPage }: { currentPage: 'home' | 'essenc
             clearTimeout(initialTimer);
             clearTimeout(secondTimer);
         };
-    }, [currentPage]);
+    }, [currentPage, pathname]);
 
     // Totally transparent with contrast-based dynamic text color as requested
     const navBg = 'bg-transparent';
@@ -1586,10 +1602,10 @@ const Hero = () => {
  
             {/* Corner Labels (Editorial feel) */}
             <div className="absolute bottom-12 left-12 hidden lg:block z-20 pointer-events-none select-none">
-                <span className="text-[9px] uppercase tracking-[0.4em] text-cream/20 [writing-mode:vertical-rl] rotate-180">ESTAB. 2025</span>
+                <span className="text-[9px] uppercase tracking-[0.4em] text-cream/20 [writing-mode:vertical-rl] rotate-180">EST. 2026</span>
             </div>
             <div className="absolute bottom-12 right-12 hidden lg:block z-20 pointer-events-none select-none">
-                <span className="text-[9px] uppercase tracking-[0.4em] text-cream/20 [writing-mode:vertical-rl]">BRAVO ARTESANATO</span>
+                <span className="text-[9px] uppercase tracking-[0.4em] text-cream/20 [writing-mode:vertical-rl]">HANDMADE IN PORTUGAL</span>
             </div>
                 </section>
             )}
@@ -1675,7 +1691,7 @@ const StorySection = () => {
                     transition={{ duration: 1.4, ease: [0.16, 1, 0.3, 1] }}
                     className="relative w-full max-w-md mx-auto lg:max-w-none md:w-full lg:w-auto lg:col-span-5"
                 >
-                    <div className="w-full aspect-[4/5] max-h-[50vh] sm:max-h-[60vh] lg:max-h-none overflow-hidden rounded-[2rem] md:rounded-[2.5rem] shadow-2xl relative bg-forest/5">
+                    <div className="w-full aspect-[4/5] max-h-[50vh] sm:max-h-[60vh] lg:max-h-none overflow-hidden rounded-xl xs:rounded-2xl md:rounded-[2rem] lg:rounded-[2.5rem] shadow-2xl relative bg-forest/5">
                         <AnimatePresence mode="wait">
                             <motion.img 
                                 key={currentImg}
@@ -1691,12 +1707,12 @@ const StorySection = () => {
                         
                         {/* Organic cotton/linen thread tactile overlay on top of images for workshop feel */}
                         <div 
-                            className="absolute inset-0 pointer-events-none z-10 opacity-[0.14] mix-blend-multiply rounded-[2rem] md:rounded-[2.5rem]"
+                            className="absolute inset-0 pointer-events-none z-10 opacity-[0.14] mix-blend-multiply rounded-xl xs:rounded-2xl md:rounded-[2rem] lg:rounded-[2.5rem]"
                             style={{
                                 backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='paperNoise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.05' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='0.8 0 0 0 0 0 0.8 0 0 0 0 0 0.8 0 0 0 0 0 0.5 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23paperNoise)'/%3E%3C/svg%3E")`
                             }}
                         />
-                        <div className="absolute inset-0 ring-1 ring-inset ring-forest/10 rounded-[2rem] md:rounded-[2.5rem] z-20" />
+                        <div className="absolute inset-0 ring-1 ring-inset ring-forest/10 rounded-xl xs:rounded-2xl md:rounded-[2rem] lg:rounded-[2.5rem] z-20" />
                         
                         {/* Slide Indicators */}
                         <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-2 z-20 bg-black/10 backdrop-blur-sm px-3 py-1.5 rounded-full">
@@ -1781,7 +1797,7 @@ const StorySection = () => {
                 </p>
                 
                 {/* Rotating Brand Badge */}
-                <div className="mx-auto w-36 h-36 md:w-40 md:h-40 bg-forest rounded-full p-1 border-4 border-cream shadow-[0_15px_40px_rgba(36,49,25,0.15)] overflow-hidden group relative">
+                <div className="mx-auto w-36 h-36 md:w-40 md:h-40 bg-forest rounded-full p-1 border-4 border-cream overflow-hidden group relative">
                     <motion.div 
                         animate={{ rotate: 360 }}
                         transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
@@ -1795,7 +1811,7 @@ const StorySection = () => {
                             />
                             <text style={{ fontSize: '9px', lineHeight: '13.5px' }} className="font-bold uppercase tracking-[0.14em] fill-cream">
                                 <textPath href="#circlePathBadgeCentered" startOffset="0%" style={{ fontSize: '9px', lineHeight: '13.5px' }}>
-                                    M★BRAVO ★ HANDMADE ★ EST. 2025 ★
+                                    M★BRAVO ★ HANDMADE ★ EST. 2026 ★
                                 </textPath>
                             </text>
                         </svg>
@@ -2082,7 +2098,7 @@ const KnotSection = () => {
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true }}
                         transition={{ duration: 1.2 }}
-                        className="aspect-[3/4] overflow-hidden rounded-2xl md:rounded-[2rem] relative group shadow-2xl"
+                        className="aspect-[3/4] overflow-hidden rounded-[12px] relative group shadow-2xl"
                     >
                         <img 
                             src="https://i.ibb.co/F4Z4Fp4Z/LOGOTIPOo.jpg" 
@@ -2101,7 +2117,7 @@ const KnotSection = () => {
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true }}
                         transition={{ duration: 1.2, delay: 0.2 }}
-                        className="aspect-[3/4] overflow-hidden rounded-2xl md:rounded-[2rem] relative group shadow-2xl"
+                        className="aspect-[3/4] overflow-hidden rounded-[12px] relative group shadow-2xl"
                     >
                         <img 
                             src="https://i.ibb.co/d0Rn6jC7/MOOD-01.png" 
@@ -2120,7 +2136,7 @@ const KnotSection = () => {
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true }}
                         transition={{ duration: 1.2, delay: 0.4 }}
-                        className="aspect-[3/4] overflow-hidden rounded-2xl md:rounded-[2rem] relative group shadow-2xl"
+                        className="aspect-[3/4] overflow-hidden rounded-[12px] relative group shadow-2xl"
                     >
                         <img 
                             src="https://i.ibb.co/PKJgWZM/emotional-thank-you-card-1.png" 
@@ -2576,14 +2592,14 @@ const ProductCard: React.FC<ProductCardProps> = ({ product: rawProduct, i, isFoc
             <motion.div 
                 ref={cardRef}
                 layoutId={`product-card-${product.id}`}
-                className="group relative flex flex-col h-full bg-white rounded-[16px] shadow-[0_4px_22px_-10px_rgba(0,0,0,0.06)] hover:shadow-[0_20px_45px_-12px_rgba(36,49,25,0.14)] hover:-translate-y-1.5 transition-all duration-500 overflow-hidden"
+                className="group relative flex flex-col h-full bg-white rounded-[12px] shadow-[0_4px_22px_-10px_rgba(0,0,0,0.06)] hover:shadow-[0_20px_45px_-12px_rgba(36,49,25,0.14)] hover:-translate-y-1.5 transition-all duration-500 overflow-hidden"
             >
                 <div className="flex flex-col h-full">
                     {/* Image Container with Fixed Aspect Ratio */}
                     <div 
                         className="relative overflow-hidden aspect-[4/5] cursor-pointer"
                         onClick={handleToggle}
-                        style={{ borderTopLeftRadius: '16px', borderTopRightRadius: '16px' }}
+                        style={{ borderTopLeftRadius: 'inherit', borderTopRightRadius: 'inherit' }}
                     >
                         <div className="relative w-full h-full overflow-hidden bg-white">
                             <motion.img 
@@ -2606,8 +2622,8 @@ const ProductCard: React.FC<ProductCardProps> = ({ product: rawProduct, i, isFoc
                     {/* Content Section */}
                     <div className="p-4 xs:p-5 sm:p-6 flex flex-col justify-between flex-grow bg-white">
                         <div>
-                            <h3 className="text-sm sm:text-base lg:text-lg font-serif font-normal tracking-wide text-forest mb-1 line-clamp-1">{product.name}</h3>
-                            <p className="text-forest/40 text-[8px] sm:text-[9px] uppercase tracking-[0.3em] font-semibold mb-3 sm:mb-4 font-sans">HANDMADE EXCLUSIVE</p>
+                            <h3 className="font-serif font-normal tracking-wide text-forest mb-1 line-clamp-1" style={{ fontSize: 'clamp(11px, 0.8vw + 5px, 14px)' }}>{product.name}</h3>
+                            <p className="text-forest/40 uppercase tracking-[0.3em] font-semibold mb-3 sm:mb-4 font-sans" style={{ fontSize: 'clamp(7px, 0.8vw + 4px, 9px)' }}>HANDMADE EXCLUSIVE</p>
                         </div>
                         <div className="flex justify-between items-end">
                             <span className="text-xs sm:text-sm font-sans font-semibold tracking-wider text-forest/70">{product.price}</span>
@@ -4025,6 +4041,17 @@ const CarouselItem: React.FC<{ children: React.ReactNode }> = ({ children }) => 
 const CollectionSection = () => {
     const containerRef = useRef(null);
     const { lang, t } = useLanguage();
+    const [isMobileOrTablet, setIsMobileOrTablet] = useState(false);
+
+    useEffect(() => {
+        const checkDevice = () => {
+            const isTouch = window.matchMedia("(pointer: coarse)").matches || ('ontouchstart' in window);
+            setIsMobileOrTablet(window.innerWidth < 1536 || isTouch);
+        };
+        checkDevice();
+        window.addEventListener('resize', checkDevice);
+        return () => window.removeEventListener('resize', checkDevice);
+    }, []);
 
     const { scrollYProgress } = useScroll({
         target: containerRef,
@@ -4118,7 +4145,7 @@ const CollectionSection = () => {
                             whileInView={{ opacity: 1, y: 0 }}
                             viewport={{ once: true }}
                             transition={{ delay: i * 0.1 }}
-                            className="group relative aspect-[4/3] rounded-[3rem] overflow-hidden bg-forest/5 cursor-pointer max-w-2xl mx-auto w-full shadow-md hover:shadow-xl transition-all duration-500"
+                            className="group relative aspect-[4/3] rounded-[12px] md:rounded-[16px] overflow-hidden bg-forest/5 cursor-pointer max-w-2xl mx-auto w-full shadow-md hover:shadow-xl transition-all duration-500"
                             style={{ willChange: 'transform' }}
                             onClick={() => navigateTo(getCategoryUrl(cat))}
                         >
@@ -4130,9 +4157,24 @@ const CollectionSection = () => {
                                 style={{ imageRendering: 'crisp-edges' }}
                                 className="w-full h-full object-cover group-hover:scale-102 transition-transform duration-700 ease-out antialiased"
                             />
-                            <div className="absolute inset-0 bg-gradient-to-t from-forest/90 via-forest/20 to-transparent flex flex-col justify-end p-6 sm:p-8 md:p-8 lg:p-10 xl:p-12 transition-all duration-500">
-                                <h3 className="text-lg sm:text-xl md:text-xl lg:text-2xl xl:text-3xl font-serif text-cream mb-2 uppercase tracking-wide">{cat.name}</h3>
-                                <p className="text-cream/60 text-xs sm:text-sm font-light mb-2 sm:mb-4 max-w-sm opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-all duration-500 transform md:translate-y-3 md:group-hover:translate-y-0">{cat.items}</p>
+                            <div className="absolute inset-0 bg-gradient-to-t from-forest/85 via-forest/15 to-transparent flex flex-col justify-end p-4 xs:p-5 sm:p-6 md:p-8 lg:p-10 xl:p-12 transition-all duration-500">
+                                <h3 className="font-serif text-cream mb-1.5 uppercase tracking-wide leading-tight" style={{ fontSize: 'clamp(14px, 1.6vw + 6px, 22px)' }}>{cat.name}</h3>
+                                {isMobileOrTablet ? (
+                                    <motion.p 
+                                        initial={{ opacity: 0, y: 12 }}
+                                        whileInView={{ opacity: 0.65, y: 0 }}
+                                        viewport={{ once: true, margin: "-10px" }}
+                                        transition={{ duration: 0.8, delay: i * 0.15 + 0.25, ease: "easeOut" }}
+                                        className="text-cream font-light mb-1 sm:mb-3 max-w-sm"
+                                        style={{ fontSize: 'clamp(9px, 0.8vw + 6px, 13px)' }}
+                                    >
+                                        {cat.items}
+                                    </motion.p>
+                                ) : (
+                                    <p className="text-cream/60 font-light mb-1 sm:mb-3 max-w-sm opacity-0 group-hover:opacity-100 transition-all duration-500 transform md:translate-y-3 md:group-hover:translate-y-0" style={{ fontSize: 'clamp(10px, 0.8vw + 6px, 14px)' }}>
+                                        {cat.items}
+                                    </p>
+                                )}
                             </div>
                         </motion.div>
                     ))}
@@ -4454,7 +4496,7 @@ const LegalModal = ({ type, onClose }: LegalModalProps) => {
                 animate={{ opacity: 1, y: 0, scale: 1 }}
                 exit={{ opacity: 0, y: 30, scale: 0.98 }}
                 transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-                className="max-w-2xl w-full bg-[#FCFBF9] text-forest rounded-[2rem] overflow-hidden shadow-[0_24px_50px_rgba(31,42,24,0.15)] flex flex-col max-h-[85vh] border border-forest/10"
+                className="max-w-2xl w-full bg-[#FCFBF9] text-forest rounded-xl xs:rounded-2xl md:rounded-[2rem] overflow-hidden shadow-[0_24px_50px_rgba(31,42,24,0.15)] flex flex-col max-h-[85vh] border border-forest/10"
                 onClick={(e) => e.stopPropagation()}
             >
                 {/* Header */}
@@ -4964,7 +5006,7 @@ const EssenceHero = ({ onBackToHome }: { onBackToHome: () => void }) => {
                                 >
                                     <g filter="url(#needle-shadow)">
                                         <path 
-                                            d="M -65,0 L -32,0 C -30,-2.5 -26,-2.5 -24,0 L -6,0 C -3,0 -1,-0.5 1,-1.2 C 3,-2 4.5,-1 5,1 C 5.5,2.5 4,3.8 2,3 C 0.5,2.4 0,1.2 -1,1 L -2,1 C -3.5,1 -4,0 -6,0" 
+                                            d="M -8,0 L -3,0 C -2,-2.5 2,-2.5 4,0 L 55,0 C 58,0 60,-0.5 62,-1.2 C 64,-2 65.5,-1 66,1 C 66.5,2.5 65,3.8 63,3 C 61.5,2.4 61,1.2 60,1 L 59,1 C 57.5,1 57,0 55,0" 
                                             stroke="url(#needle-gold-matte)" 
                                             strokeWidth="1.5" 
                                             strokeLinecap="round" 
@@ -5015,7 +5057,7 @@ const EssenceHero = ({ onBackToHome }: { onBackToHome: () => void }) => {
                                 >
                                     <g filter="url(#needle-shadow)">
                                         <path 
-                                            d="M -65,0 L -32,0 C -30,-2.5 -26,-2.5 -24,0 L -6,0 C -3,0 -1,-0.5 1,-1.2 C 3,-2 4.5,-1 5,1 C 5.5,2.5 4,3.8 2,3 C 0.5,2.4 0,1.2 -1,1 L -2,1 C -3.5,1 -4,0 -6,0" 
+                                            d="M -8,0 L -3,0 C -2,-2.5 2,-2.5 4,0 L 55,0 C 58,0 60,-0.5 62,-1.2 C 64,-2 65.5,-1 66,1 C 66.5,2.5 65,3.8 63,3 C 61.5,2.4 61,1.2 60,1 L 59,1 C 57.5,1 57,0 55,0" 
                                             stroke="url(#needle-gold-matte)" 
                                             strokeWidth="1.5" 
                                             strokeLinecap="round" 
@@ -5247,6 +5289,73 @@ export function slugify(text: string): string {
         .replace(/(^-|-$)+/g, '');
 }
 
+// --- Collection Scroll Calibration Helper ---
+export function getCollectionScrollTarget(element: HTMLElement): number {
+    const sectionTop = element.getBoundingClientRect().top + window.scrollY;
+    const firstCard = element.querySelector('.grid > div');
+    const grid = element.querySelector('.grid');
+    
+    // Fallback card offsets from sectionTop if firstCard is not rendered or has bad layout
+    const isMobile = window.innerWidth < 640;
+    const isTabletVertical = window.innerWidth >= 640 && window.innerWidth < 1024 && window.innerHeight > window.innerWidth;
+    
+    // For already working versions (Mobile and Tablet Vertical), keep them exactly as they are!
+    if (isMobile) {
+        let cardTop = sectionTop + 180;
+        if (firstCard) {
+            const rect = firstCard.getBoundingClientRect();
+            const dynamicTop = rect.top + window.scrollY;
+            if (dynamicTop > sectionTop && dynamicTop < sectionTop + 600) {
+                cardTop = dynamicTop;
+            }
+        }
+        return cardTop - 85;
+    }
+    
+    if (isTabletVertical) {
+        let cardTop = sectionTop + 250;
+        if (firstCard) {
+            const rect = firstCard.getBoundingClientRect();
+            const dynamicTop = rect.top + window.scrollY;
+            if (dynamicTop > sectionTop && dynamicTop < sectionTop + 600) {
+                cardTop = dynamicTop;
+            }
+        }
+        return cardTop - 95;
+    }
+    
+    // For Tablet Horizontal and PC:
+    // We want to center the 2x2 grid containing the 4 cards vertically in the viewport.
+    if (grid) {
+        const rect = grid.getBoundingClientRect();
+        const gridTop = rect.top + window.scrollY;
+        let gridHeight = rect.height;
+        
+        // Robust fallback if height is 0 or very small (e.g., during layout mount transition)
+        if (gridHeight < 150) {
+            const isPC = window.innerWidth >= 1024;
+            const containerWidth = Math.min(1280, window.innerWidth) - (isPC ? 64 : 48);
+            const cardWidth = containerWidth / 2;
+            const cardHeight = cardWidth * 0.75; // aspect-[4/3]
+            const gap = isPC ? 96 : 64; // gap-24 vs gap-16
+            gridHeight = (cardHeight * 2) + gap;
+        }
+        
+        const viewportHeight = window.innerHeight;
+        const navbarHeight = window.innerWidth < 1024 ? 95 : 110;
+        
+        // Target scroll top to align center of grid with center of the remaining visible area below the navbar.
+        // On PC and Tablet Horizontal, this perfectly centers the 4 categories on the screen as requested.
+        const targetScrollTop = gridTop + (gridHeight / 2) - (viewportHeight + navbarHeight) / 2;
+        
+        return Math.max(0, targetScrollTop);
+    }
+    
+    // Fallback if no grid is found
+    const navbarHeight = window.innerWidth < 1024 ? 95 : 110;
+    return sectionTop + 320 - navbarHeight;
+}
+
 // --- Navigation Helpers ---
 export function navigateTo(path: string) {
     window.history.pushState(null, '', path);
@@ -5306,11 +5415,13 @@ const CategoryPage = ({ pathname }: { pathname: string }) => {
             <div className="text-[10px] uppercase tracking-[0.3em] text-forest/40 mb-10 font-sans flex items-center gap-2">
                 <span className="cursor-pointer hover:text-forest transition-colors" onClick={() => navigateTo('/')}>M★BRAVO</span>
                 <span>/</span>
+                <span className="cursor-pointer hover:text-forest transition-colors" onClick={() => navigateTo('/#collection')}>{t('nav.collection')}</span>
+                <span>/</span>
                 <span className="text-forest/80 font-semibold">{translatedCategory.name}</span>
             </div>
 
             {/* Category Hero Header */}
-            <div className="relative rounded-[2rem] md:rounded-[3rem] overflow-hidden aspect-[16/10] md:aspect-[21/9] mb-16 shadow-lg bg-forest/5 flex items-end">
+            <div className="relative rounded-[12px] md:rounded-[16px] overflow-hidden aspect-[16/10] md:aspect-[21/9] mb-16 shadow-lg bg-forest/5 flex items-end">
                 <img 
                     src={translatedCategory.img} 
                     alt={translatedCategory.name} 
@@ -5321,8 +5432,8 @@ const CategoryPage = ({ pathname }: { pathname: string }) => {
                     <span className="text-[9px] sm:text-[10px] uppercase tracking-[0.45em] font-bold text-[#C5A059] block mb-3 font-sans">
                         {t('collection.tag')}
                     </span>
-                    <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-light tracking-wide font-serif mb-4 uppercase">{translatedCategory.name}</h1>
-                    <p className="text-cream/80 font-serif italic text-sm sm:text-base md:text-lg font-light leading-relaxed">
+                    <h1 className="font-light tracking-wide font-serif mb-4 uppercase" style={{ fontSize: 'clamp(22px, 4.5vw + 8px, 56px)' }}>{translatedCategory.name}</h1>
+                    <p className="text-cream/80 font-serif italic font-light leading-relaxed" style={{ fontSize: 'clamp(11px, 1vw + 8px, 18px)' }}>
                         {translatedCategory.items} — {t('collection.subtitle')}
                     </p>
                 </div>
@@ -5516,6 +5627,75 @@ const ProductDetailPage = ({ pathname }: { pathname: string }) => {
         return `${total}€`;
     };
     const currentPrice = calculatePriceText();
+
+    // Pinterest Tag & Rich Pins Integration (Isolated in Frontend)
+    useEffect(() => {
+        // Remove existing JSON-LD script if any to prevent duplicates when switching products
+        const existingScript = document.getElementById('pinterest-json-ld');
+        if (existingScript) {
+            existingScript.remove();
+        }
+
+        const script = document.createElement('script');
+        script.id = 'pinterest-json-ld';
+        script.type = 'application/ld+json';
+        script.innerHTML = JSON.stringify({
+            "@context": "https://schema.org/",
+            "@type": "Product",
+            "name": productTranslated.name,
+            "image": productImages.map(img => img.startsWith('http') ? img : `${window.location.origin}${img}`),
+            "description": productTranslated.description || productTranslated.detail || `${productTranslated.name} - Handmade With Love by M★BRAVO.`,
+            "sku": product.id,
+            "offers": {
+                "@type": "Offer",
+                "url": `${window.location.origin}${pathname}`,
+                "priceCurrency": "EUR",
+                "price": calculatedPriceNum.toFixed(2),
+                "availability": "https://schema.org/InStock",
+                "itemCondition": "https://schema.org/NewCondition"
+            }
+        });
+        document.head.appendChild(script);
+
+        // Fire PageVisit event with precise product metadata
+        if (typeof (window as any).pintrk === 'function') {
+            (window as any).pintrk('track', 'pagevisit', {
+                line_items: [{
+                    product_id: product.id,
+                    product_name: productTranslated.name,
+                    product_category: translatedCategory.name,
+                    product_price: calculatedPriceNum,
+                    product_quantity: 1
+                }]
+            });
+        }
+
+        return () => {
+            const scriptToRemove = document.getElementById('pinterest-json-ld');
+            if (scriptToRemove) {
+                scriptToRemove.remove();
+            }
+        };
+    }, [product.id, lang, calculatedPriceNum, pathname]);
+
+    // Track purchase completion event on Pinterest (Isolated in Frontend)
+    useEffect(() => {
+        if (paymentCompleted) {
+            if (typeof (window as any).pintrk === 'function') {
+                (window as any).pintrk('track', 'checkout', {
+                    value: calculatedPriceNum,
+                    currency: 'EUR',
+                    line_items: [{
+                        product_id: product.id,
+                        product_name: productTranslated.name,
+                        product_category: translatedCategory.name,
+                        product_price: calculatedPriceNum,
+                        product_quantity: qtyMultiplier
+                    }]
+                });
+            }
+        }
+    }, [paymentCompleted, product.id, calculatedPriceNum, qtyMultiplier]);
 
     const isLiveMode = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY?.startsWith('pk_live') || false;
 
@@ -5748,6 +5928,8 @@ const ProductDetailPage = ({ pathname }: { pathname: string }) => {
             <div className="text-[10px] uppercase tracking-[0.3em] text-forest/40 mb-8 font-sans flex flex-wrap items-center gap-2 px-2 sm:px-0">
                 <span className="cursor-pointer hover:text-forest transition-colors" onClick={() => navigateTo('/')}>M★BRAVO</span>
                 <span>/</span>
+                <span className="cursor-pointer hover:text-forest transition-colors" onClick={() => navigateTo('/#collection')}>{t('nav.collection')}</span>
+                <span>/</span>
                 <span className="cursor-pointer hover:text-forest transition-colors" onClick={() => navigateTo(getCategoryUrl(category))}>{translatedCategory.name}</span>
                 <span>/</span>
                 <span className="text-forest/80 font-semibold">{productTranslated.name}</span>
@@ -5841,7 +6023,7 @@ const ProductDetailPage = ({ pathname }: { pathname: string }) => {
                                 {productTranslated.name}
                             </h1>
                             <p className="text-forest/50 text-[9px] uppercase tracking-[0.3em] font-semibold font-sans mb-4">
-                                HANDMADE WITH LOVE IN PORTUGAL
+                                HANDMADE WITH LOVE
                             </p>
                             <div className="flex items-baseline gap-3">
                                 <span className="font-serif text-2xl lg:text-3xl text-forest font-normal">{currentPrice}</span>
@@ -5850,13 +6032,6 @@ const ProductDetailPage = ({ pathname }: { pathname: string }) => {
                                 </span>
                             </div>
                         </div>
-
-                        {/* Product Pitch/Description */}
-                        <p className="text-xs text-forest/75 font-sans font-light leading-relaxed">
-                            {productTranslated.description || productTranslated.desc}
-                        </p>
-
-                        <hr className="border-forest/10" />
 
                         {/* Interactive Selections Flow */}
                         {!isCheckingOut && (
@@ -6614,7 +6789,7 @@ const ProductDetailPage = ({ pathname }: { pathname: string }) => {
                                     onClick={() => setIsCheckingOut(true)}
                                     className="w-full rounded-full py-4 px-6 text-center text-xs uppercase tracking-widest font-bold bg-[#343E2C] text-[#C5A059] hover:bg-[#22291d] transition-all cursor-pointer border border-[#C5A059]/10 shadow-lg shadow-forest/10 focus:outline-none"
                                 >
-                                    {lang === 'pt' ? 'Comprar Agora (Checkout Seguro)' : 'Buy Now (Secure Checkout)'}
+                                    {lang === 'pt' ? 'Comprar Agora' : 'Buy Now'}
                                 </button>
                                 
                                 {/* WhatsApp Button */}
@@ -6634,15 +6809,23 @@ const ProductDetailPage = ({ pathname }: { pathname: string }) => {
                         <div className="grid grid-cols-3 gap-2.5 text-center py-4 text-[9px] uppercase tracking-widest text-forest/70">
                             <div className="flex flex-col items-center gap-1 font-semibold">
                                 <span className="text-xs">🔒</span>
-                                <span>{lang === 'pt' ? 'Pago Seguro' : 'Secure Pay'}</span>
+                                <span>{lang === 'pt' ? 'PAGAMENTO SEGURO' : 'SECURE PAYMENT'}</span>
                             </div>
                             <div className="flex flex-col items-center gap-1 border-x border-forest/15 font-semibold">
                                 <span className="text-xs">🧶</span>
-                                <span>{lang === 'pt' ? '100% Manual' : '100% Handmade'}</span>
+                                <span>{lang === 'pt' ? '100% ARTESANAL' : '100% HANDMADE'}</span>
                             </div>
                             <div className="flex flex-col items-center gap-1 font-semibold">
-                                <span className="text-xs">✈️</span>
-                                <span>{lang === 'pt' ? 'Envio Expresso' : 'Express Ship'}</span>
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 45 30" className="w-5 h-3.5 rounded-sm overflow-hidden border border-forest/10 shadow-sm" aria-hidden="true">
+                                    <rect width="18" height="30" fill="#046A38" />
+                                    <rect x="18" width="27" height="30" fill="#DA291C" />
+                                    <circle cx="18" cy="15" r="6" fill="#FFCD00" />
+                                    <path d="M18 11.5 v7 M14.5 15 h7 M15.5 12.5 l5 5 M15.5 17.5 l5 -5" stroke="#FFCD00" strokeWidth="0.5" />
+                                    <rect x="16" y="12" width="4" height="6" fill="#FFFFFF" rx="0.5" />
+                                    <rect x="16.5" y="12.5" width="3" height="5" fill="#DA291C" rx="0.5" />
+                                    <rect x="17" y="13.5" width="2" height="3" fill="#002F6C" />
+                                </svg>
+                                <span>{lang === 'pt' ? 'MADE IN PORTUGAL' : 'MADE IN PORTUGAL'}</span>
                             </div>
                         </div>
 
@@ -6660,8 +6843,18 @@ const ProductDetailPage = ({ pathname }: { pathname: string }) => {
                                     <span>{openAccordion === 'details' ? '−' : '+'}</span>
                                 </button>
                                 {openAccordion === 'details' && (
-                                    <div className="pt-2.5 text-forest/75 leading-relaxed space-y-1 animate-fadeIn">
-                                        <p>{lang === 'pt' ? 'Cada peça M★BRAVO de Carolina é inteiramente tricotada ou tecida à mão em Portugal, de forma orgânica e paciente. Por ser um processo 100% artesanal, cada artigo é único, carregando variações delicadas que celebram a beleza do trabalho manual exclusivo.' : 'Each M★BRAVO piece by Carolina is entirely knitted or woven by hand in Portugal, patiently and organically. Because it is a 100% handcrafted process, each item is unique, carrying delicate variations that celebrate the beauty of exclusive manual work.'}</p>
+                                    <div className="pt-2.5 text-forest/75 leading-relaxed space-y-2 animate-fadeIn text-justify">
+                                        <p className="whitespace-pre-line">{productTranslated.description || productTranslated.desc}</p>
+                                        {productTranslated.details && (
+                                            <div className="mt-3 pl-3 border-l border-forest/10 space-y-1 text-[11px]">
+                                                {productTranslated.details.split('\n').map((line: string, idx: number) => (
+                                                    <p key={idx} className="flex items-start gap-1">
+                                                        <span>•</span>
+                                                        <span>{line.trim().replace(/^[•\-\*]\s*/, '')}</span>
+                                                    </p>
+                                                ))}
+                                            </div>
+                                        )}
                                     </div>
                                 )}
                             </div>
@@ -6676,9 +6869,9 @@ const ProductDetailPage = ({ pathname }: { pathname: string }) => {
                                     <span>{openAccordion === 'care' ? '−' : '+'}</span>
                                 </button>
                                 {openAccordion === 'care' && (
-                                    <div className="pt-2.5 text-forest/75 leading-relaxed space-y-2 animate-fadeIn">
-                                        <p><strong>{lang === 'pt' ? 'Matéria-Prima:' : 'Materials:'}</strong> {materialText}</p>
-                                        <p><strong>{lang === 'pt' ? 'Conselhos de Lavagem:' : 'Washing Tips:'}</strong> {careText}</p>
+                                    <div className="pt-2.5 text-forest/75 leading-relaxed space-y-2.5 animate-fadeIn text-justify">
+                                        <p className="whitespace-pre-line"><strong>{lang === 'pt' ? 'Matéria-Prima:' : 'Materials:'}</strong>{"\n"}{materialText}</p>
+                                        <p className="whitespace-pre-line"><strong>{lang === 'pt' ? 'Conselhos de Lavagem:' : 'Washing Tips:'}</strong>{"\n"}{careText}</p>
                                     </div>
                                 )}
                             </div>
@@ -6693,9 +6886,13 @@ const ProductDetailPage = ({ pathname }: { pathname: string }) => {
                                     <span>{openAccordion === 'shipping' ? '−' : '+'}</span>
                                 </button>
                                 {openAccordion === 'shipping' && (
-                                    <div className="pt-2.5 text-forest/75 leading-relaxed space-y-1.5 animate-fadeIn">
-                                        <p>{lang === 'pt' ? 'Enviamos para Portugal (Continental e Ilhas) e toda a Europa através de CTT Expresso Registado. Todas as encomendas incluem código de rastreamento enviado por e-mail.' : 'We ship to Portugal and Europe via Registered CTT Express. All orders include a tracking code sent by email.'}</p>
-                                        <p>{lang === 'pt' ? 'Por se tratar de peças confecionadas sob encomenda com especificações de cor e tamanho personalizadas, não aceitamos trocas ou devoluções de artigos personalizados, salvo defeito de fabrico.' : 'Since pieces are made-to-order with custom size and color configurations, we do not accept returns or exchanges of customized articles unless there is a manufacturing defect.'}</p>
+                                    <div className="pt-2.5 text-forest/75 leading-relaxed space-y-1.5 animate-fadeIn text-justify">
+                                        <p>
+                                            {lang === 'pt' 
+                                                ? 'Envios para Portugal (Continental e Ilhas) e toda a Europa através de CTT Expresso Registado, com código de rastreamento enviado por e-mail. O processamento das peças em stock é imediato. Nos casos excecionais em que o cliente solicite uma personalização exclusiva à medida, o prazo será acordado no momento e, por se tratar de um artigo único personalizado, não haverá lugar a trocas ou devoluções, salvo defeito de fabrico.' 
+                                                : 'Shipping to Portugal (Mainland and Islands) and all of Europe via Registered CTT Express, with tracking code sent by email. Processing of stock pieces is immediate. In exceptional cases where the customer requests an exclusive custom-made design, the deadline will be agreed upon at the time and, because it is a unique personalized item, there will be no exchange or refund, except in case of manufacturing defect.'
+                                            }
+                                        </p>
                                     </div>
                                 )}
                             </div>
@@ -6778,12 +6975,32 @@ export default function App() {
       // Handle anchor-scrolling (e.g. #sobre) or reset page scroll
       if (newPath.includes('#')) {
         const hash = newPath.split('#')[1];
-        setTimeout(() => {
+        let attempts = 0;
+        const scrollToElement = () => {
           const element = document.getElementById(hash);
           if (element) {
-            (window as any).lenis?.scrollTo(element, { duration: 1.2 });
+            const grid = element.querySelector('.grid');
+            const isReady = hash !== 'collection' || !grid || grid.getBoundingClientRect().height > 200;
+            
+            if (isReady) {
+              setTimeout(() => {
+                if (hash === 'collection') {
+                  const targetScrollTop = getCollectionScrollTarget(element);
+                  (window as any).lenis?.scrollTo(targetScrollTop, { duration: 1.2 });
+                } else {
+                  (window as any).lenis?.scrollTo(element, { duration: 1.2 });
+                }
+              }, 150);
+            } else if (attempts < 25) {
+              attempts++;
+              setTimeout(scrollToElement, 100);
+            }
+          } else if (attempts < 25) {
+            attempts++;
+            setTimeout(scrollToElement, 100);
           }
-        }, 150);
+        };
+        scrollToElement();
       } else {
         window.scrollTo({ top: 0, behavior: 'auto' });
         (window as any).lenis?.scrollTo(0, { immediate: true });
@@ -6799,7 +7016,12 @@ export default function App() {
         const hash = window.location.hash.replace('#', '');
         const element = document.getElementById(hash);
         if (element) {
-          (window as any).lenis?.scrollTo(element, { duration: 1.2 });
+          if (hash === 'collection') {
+            const targetScrollTop = getCollectionScrollTarget(element);
+            (window as any).lenis?.scrollTo(targetScrollTop, { duration: 1.2 });
+          } else {
+            (window as any).lenis?.scrollTo(element, { duration: 1.2 });
+          }
         }
       }, 1000);
     }
@@ -6888,7 +7110,7 @@ export default function App() {
             transition={{ duration: 1.5 }}
             className="flex flex-col"
           >
-            <Navbar currentPage={pathname === '/essencia' || pathname === '/essence' ? 'essence' : 'home'} setCurrentPage={(p) => navigateTo(p === 'essence' ? '/essencia' : '/')} />
+            <Navbar currentPage={pathname === '/essencia' || pathname === '/essence' ? 'essence' : 'home'} setCurrentPage={(p) => navigateTo(p === 'essence' ? '/essencia' : '/')} pathname={pathname} />
             
             <AnimatePresence mode="wait">
               {pathname === '/essencia' || pathname === '/essence' ? (
@@ -6941,6 +7163,7 @@ export default function App() {
                   exit={{ opacity: 0 }}
                   transition={{ duration: 0.8 }}
                   className="relative bg-[#F6F1E5] min-h-screen pt-28 pb-16"
+                  data-background="light"
                 >
                   <CategoryPage pathname={pathname} />
                 </motion.div>
@@ -6953,6 +7176,7 @@ export default function App() {
                   exit={{ opacity: 0 }}
                   transition={{ duration: 0.8 }}
                   className="relative bg-[#FCFBF9] min-h-screen pt-28 pb-16"
+                  data-background="light"
                 >
                   <ProductDetailPage pathname={pathname} />
                 </motion.div>
@@ -6965,6 +7189,7 @@ export default function App() {
                   exit={{ opacity: 0 }}
                   transition={{ duration: 0.8 }}
                   className="relative bg-[#FCFBF9] min-h-screen pt-28 pb-16"
+                  data-background="light"
                 >
                   <AdminPage />
                 </motion.div>
