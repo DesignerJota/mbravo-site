@@ -228,6 +228,43 @@ const parseMaterials = (text: string): MaterialOption[] => {
     });
 };
 
+export function getShippingEstimate(product: any, lang: 'pt' | 'en') {
+  const stock = product.stock !== undefined && product.stock !== null && product.stock !== '' ? parseInt(product.stock, 10) : 0;
+  
+  if (stock > 0) {
+    return {
+      inStock: true,
+      title: lang === 'pt' ? 'Artigo em Stock' : 'Item in Stock',
+      desc: lang === 'pt' 
+        ? 'Esta peça já se encontra confecionada por nós. O envio será processado no prazo imediato de 24h a 48h úteis.' 
+        : 'This piece is already crafted by us. Shipping will be processed immediately within 24h to 48h business hours.',
+      badge: lang === 'pt' ? 'Envio em 24h/48h' : 'Shipping 24h/48h'
+    };
+  } else {
+    const craftingDays = product.craftingTime !== undefined && product.craftingTime !== null && product.craftingTime !== '' ? parseInt(product.craftingTime, 10) : 10;
+    
+    // Calculate date: today + craftingDays
+    const estimateDate = new Date();
+    estimateDate.setDate(estimateDate.getDate() + craftingDays);
+    
+    // Format date in PT or EN
+    const formattedDate = estimateDate.toLocaleDateString(lang === 'pt' ? 'pt-PT' : 'en-US', {
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric'
+    });
+    
+    return {
+      inStock: false,
+      title: lang === 'pt' ? 'Peça por Encomenda (Produção Artesanal)' : 'Made to Order (Artisanal Production)',
+      desc: lang === 'pt'
+        ? `Por ser um artigo artesanal e não haver stock imediato, esta peça será tecida especialmente para si. O tempo estimado de confeção é de ${craftingDays} dias, com expedição prevista para ${formattedDate}.`
+        : `Since this is a handmade item with no immediate stock, this piece will be woven especially for you. Estimated crafting time is ${craftingDays} days, with shipping expected on ${formattedDate}.`,
+      badge: lang === 'pt' ? `Produção: ${craftingDays} dias` : `Crafting: ${craftingDays} days`
+    };
+  }
+}
+
 export let SHOP_CATEGORIES = [
   {
     id: 'home',
@@ -2940,10 +2977,24 @@ const ProductCard: React.FC<ProductCardProps> = ({ product: rawProduct, i, isFoc
                                     </div>
                                 )}
 
-                                <div className="bg-amber-50/50 rounded-xl p-3.5 border border-[#C5A059]/20 text-left text-[11px] text-forest/80 leading-relaxed font-sans">
-                                    <p className="font-semibold text-[#A68244] mb-1">{t('payment.prod_note_title')}</p>
-                                    <p>{t('payment.prod_note_desc')}</p>
-                                </div>
+                                {(() => {
+                                    const estimate = getShippingEstimate(product, lang);
+                                    return (
+                                        <div className={`rounded-xl p-3.5 border text-left text-[11px] leading-relaxed font-sans ${
+                                            estimate.inStock 
+                                                ? 'bg-emerald-50/40 border-emerald-500/20 text-emerald-950' 
+                                                : 'bg-amber-50/50 border-[#C5A059]/20 text-forest/80'
+                                        }`}>
+                                            <p className={`font-semibold mb-1 flex items-center gap-1.5 ${
+                                                estimate.inStock ? 'text-emerald-700' : 'text-[#A68244]'
+                                            }`}>
+                                                <span className="text-xs">{estimate.inStock ? '✓' : '★'}</span>
+                                                {estimate.title}
+                                            </p>
+                                            <p>{estimate.desc}</p>
+                                        </div>
+                                    );
+                                })()}
 
                                 <div className="bg-[#FCF8F2] rounded-xl p-5 border border-[#C5A059]/35 text-center space-y-3.5 w-full font-sans shadow-sm">
                                     <div className="flex justify-center gap-1.5 text-[#C5A059] text-sm">
@@ -6019,9 +6070,21 @@ const ProductDetailPage = ({ pathname }: { pathname: string }) => {
                             </p>
                             <div className="flex items-baseline gap-3">
                                 <span className="font-serif text-2xl lg:text-3xl text-forest font-normal">{currentPrice}</span>
-                                <span className="text-[10px] text-emerald-700/80 uppercase tracking-widest font-bold bg-emerald-50 px-2 py-0.5 rounded border border-emerald-100">
-                                    {lang === 'pt' ? 'Disponível' : 'Available'}
-                                </span>
+                                {(() => {
+                                    const estimate = getShippingEstimate(productTranslated, lang);
+                                    return (
+                                        <span className={`text-[10px] uppercase tracking-widest font-bold px-2 py-0.5 rounded border ${
+                                            estimate.inStock 
+                                                ? 'text-emerald-700 bg-emerald-50 border-emerald-100' 
+                                                : 'text-amber-700 bg-amber-50 border-amber-100'
+                                        }`}>
+                                            {estimate.inStock 
+                                                ? (lang === 'pt' ? 'Disponível' : 'Available')
+                                                : (lang === 'pt' ? 'Por Encomenda' : 'Made to Order')
+                                            }
+                                        </span>
+                                    );
+                                })()}
                             </div>
                         </div>
 
@@ -6240,10 +6303,24 @@ const ProductDetailPage = ({ pathname }: { pathname: string }) => {
                                             </div>
                                         )}
 
-                                        <div className="bg-amber-50/50 rounded-xl p-3.5 border border-[#C5A059]/20 text-left text-[11px] text-forest/80 leading-relaxed font-sans">
-                                            <p className="font-semibold text-[#A68244] mb-1">{t('payment.prod_note_title')}</p>
-                                            <p>{t('payment.prod_note_desc')}</p>
-                                        </div>
+                                        {(() => {
+                                            const estimate = getShippingEstimate(productTranslated, lang);
+                                            return (
+                                                <div className={`rounded-xl p-3.5 border text-left text-[11px] leading-relaxed font-sans ${
+                                                    estimate.inStock 
+                                                        ? 'bg-emerald-50/40 border-emerald-500/20 text-emerald-950' 
+                                                        : 'bg-amber-50/50 border-[#C5A059]/20 text-forest/80'
+                                                }`}>
+                                                    <p className={`font-semibold mb-1 flex items-center gap-1.5 ${
+                                                        estimate.inStock ? 'text-emerald-700' : 'text-[#A68244]'
+                                                    }`}>
+                                                        <span className="text-xs">{estimate.inStock ? '✓' : '★'}</span>
+                                                        {estimate.title}
+                                                    </p>
+                                                    <p>{estimate.desc}</p>
+                                                </div>
+                                            );
+                                        })()}
 
                                         {sandboxEmails && (
                                             <div className="w-full bg-[#243119]/5 rounded-2xl p-4 border border-[#243119]/10 text-left space-y-3 font-sans">
@@ -6794,6 +6871,21 @@ const ProductDetailPage = ({ pathname }: { pathname: string }) => {
                                     <MessageCircle size={15} className="text-emerald-600 shrink-0" />
                                     <span>{lang === 'pt' ? 'Encomendar via WhatsApp' : 'Order via WhatsApp'}</span>
                                 </a>
+
+                                {/* Discreet production/delivery estimate note */}
+                                {(() => {
+                                    const estimate = getShippingEstimate(productTranslated, lang);
+                                    return (
+                                        <p className="text-[10px] text-center text-forest/55 font-sans tracking-wide italic mt-1 leading-relaxed px-4">
+                                            {estimate.inStock 
+                                                ? (lang === 'pt' ? '✓ Peça em stock: Envio em 24h/48h úteis.' : '✓ Item in stock: Ships in 24h/48h business hours.')
+                                                : (lang === 'pt' 
+                                                    ? `★ Peça por encomenda: Envio estimado em ${productTranslated.craftingTime || 10} dias úteis (confeção artesanal).` 
+                                                    : `★ Made to order: Estimated shipping in ${productTranslated.craftingTime || 10} business days (artisanal crafting).`)
+                                            }
+                                        </p>
+                                    );
+                                })()}
                             </div>
                         )}
                         
