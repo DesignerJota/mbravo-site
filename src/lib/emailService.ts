@@ -1,774 +1,1366 @@
-import fs from 'fs';
-import path from 'path';
+import React, { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'motion/react';
+import { 
+  X, Search, Lock, Unlock, User, Mail, Phone, MapPin, 
+  CreditCard, Clock, Truck, FileText, CheckCircle, AlertCircle, 
+  ExternalLink, Eye, RefreshCw, Sliders, Calendar, DollarSign, 
+  Package, ChevronRight, AlertTriangle, ShieldCheck, Plus,
+  Download, ClipboardList
+} from 'lucide-react';
 
-const FROM_EMAIL = process.env.FROM_EMAIL || 'encomendas@mbravobycarolina.com';
-const NOTIFICATION_EMAIL = process.env.NOTIFICATION_EMAIL || 'handmade.mbravo@gmail.com';
+const API_BASE_URL = import.meta.env.VITE_API_URL || '';
 
-export interface OrderData {
-  orderId: string;
-  productName: string;
-  price: string;
-  selections: {
-    cor: string;
-    tamanho?: string;
-    quantidade?: string;
-  };
-  customer: {
-    nome: string;
-    email: string;
-    telefone: string;
-    morada: string;
-    codigoPostal: string;
-    cidade: string;
-    nif?: string;
-  };
-  paymentMethod: 'mbway' | 'multibanco' | 'card';
-  status: 'pending_payment' | 'paid' | 'failed';
-  priority: 'ALTA (Atelier Urgente)' | 'NORMAL';
-  createdAt: string;
+interface AdminDashboardModalProps {
+  onClose: () => void;
 }
 
-/**
- * Generates the elegant cream & forest green customer purchase confirmation HTML email template.
- */
-export function generateCustomerEmailHtml(order: OrderData): string {
-  return `<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Confirmação de Encomenda - M★BRAVO</title>
-</head>
-<body style="margin: 0; padding: 0; background-color: #F5F2ED; color: #243119; font-family: 'Georgia', 'Garamond', serif; -webkit-font-smoothing: antialiased;">
-  <div class="wrapper" style="width: 100%; background-color: #F5F2ED; padding: 40px 0; font-family: 'Georgia', 'Garamond', serif;">
-    <table align="center" border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 600px; background-color: #FCFBF9; border: 1px solid rgba(36, 49, 25, 0.08); border-radius: 4px; box-shadow: 0 10px 30px rgba(36, 49, 25, 0.02); margin: 0 auto;">
-      <tr>
-        <td style="padding: 50px 40px;">
-          <!-- HEADER -->
-          <table align="center" border="0" cellpadding="0" cellspacing="0" style="margin: 0 auto 40px auto; text-align: center;">
-            <tr>
-              <td align="center">
-                <table align="center" border="0" cellpadding="0" cellspacing="0" style="margin: 0 auto;">
-                  <tr>
-                    <td align="center" style="border-bottom: 1px solid #C5A059; padding-bottom: 5px; font-size: 24px; letter-spacing: 0.3em; font-weight: bold; color: #243119; text-transform: uppercase; font-family: 'Georgia', 'Garamond', serif;">
-                      M★BRAVO
-                    </td>
-                  </tr>
-                </table>
-              </td>
-            </tr>
-            <tr>
-              <td align="center" style="font-size: 9px; text-transform: uppercase; letter-spacing: 0.4em; color: #C5A059; font-weight: bold; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; padding-top: 10px;">
-                Handmade with Love
-              </td>
-            </tr>
-          </table>
+export default function AdminDashboardModal({ onClose }: AdminDashboardModalProps) {
+  const [password, setPassword] = useState('');
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [loginError, setLoginError] = useState<string | null>(null);
+  const [isLoggingIn, setIsLoggingIn] = useState(false);
 
-          <!-- GREETING -->
-          <div style="font-size: 20px; line-height: 1.5; font-style: italic; text-align: center; margin-bottom: 25px; font-weight: 300; color: #243119;">
-            Olá, ${order.customer.nome}.<br>O seu pagamento foi confirmado!
-          </div>
-
-          <!-- RECEIPT BANNER -->
-          <div style="background-color: #E2EAD9; border: 1px solid #BACAA5; border-radius: 8px; padding: 18px; margin-bottom: 30px; text-align: center; font-family: 'Georgia', 'Garamond', serif;">
-            <div style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 10px; text-transform: uppercase; letter-spacing: 0.25em; color: #243119; font-weight: bold; margin-bottom: 6px;">
-              RECIBO DE PAGAMENTO &bull; COMPROVATIVO
-            </div>
-            <div style="font-size: 13px; color: #243119; font-style: italic; line-height: 1.5;">
-              Este documento serve como comprovativo de pagamento elegível da sua encomenda. O pagamento foi validado com sucesso e a peça entrou em confecção.
-            </div>
-          </div>
-
-          <!-- STORY TEXT -->
-          <div style="font-size: 14px; line-height: 1.8; color: rgba(36, 49, 25, 0.85); text-align: justify; margin-bottom: 30px; font-weight: 300;">
-            Cada peça M★BRAVO é tecida à mão, respeitando o ritmo orgânico do trabalho artesanal e a nobreza das matérias-primas nacionais. O seu pedido acaba de dar entrada no nosso atelier e começará a ganhar forma pelas mãos da nossa equipa.
-          </div>
-
-          <!-- DIVIDER -->
-          <div style="height: 1px; background-color: rgba(36, 49, 25, 0.08); margin: 30px 0;"></div>
-
-          <!-- ORDER DETAILS TITLE -->
-          <div style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 10px; text-transform: uppercase; letter-spacing: 0.2em; color: #A68244; font-weight: bold; margin-bottom: 15px;">
-            Artigos & Dados Faturação
-          </div>
-
-          <!-- ORDER DETAILS TABLE -->
-          <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #FBF9F6; border: 1px solid rgba(197, 160, 89, 0.15); border-radius: 8px; border-collapse: separate; border-spacing: 0; font-family: 'Georgia', 'Garamond', serif; margin-bottom: 30px;">
-            <tr>
-              <td style="padding: 25px;">
-                <table width="100%" cellpadding="0" cellspacing="0" style="border-collapse: collapse;">
-                  <!-- Row: ID -->
-                  <tr>
-                    <td style="color: rgba(36, 49, 25, 0.5); font-weight: 300; padding-bottom: 12px; font-size: 13px; text-align: left; border-bottom: 1px dashed rgba(36, 49, 25, 0.08);">ID da Encomenda:</td>
-                    <td align="right" style="font-weight: bold; font-family: monospace; padding-bottom: 12px; font-size: 13px; color: #243119; text-align: right; border-bottom: 1px dashed rgba(36, 49, 25, 0.08);">${order.orderId}</td>
-                  </tr>
-                  <!-- Row: Peça -->
-                  <tr>
-                    <td style="color: rgba(36, 49, 25, 0.5); font-weight: 300; padding-top: 12px; padding-bottom: 12px; font-size: 13px; text-align: left; border-bottom: 1px dashed rgba(36, 49, 25, 0.08);">Peça Selecionada:</td>
-                    <td align="right" style="font-weight: bold; padding-top: 12px; padding-bottom: 12px; font-size: 13px; color: #243119; text-align: right; border-bottom: 1px dashed rgba(36, 49, 25, 0.08);">${order.productName}</td>
-                  </tr>
-                  <!-- Row: Especificações -->
-                  <tr>
-                    <td style="color: rgba(36, 49, 25, 0.5); font-weight: 300; padding-top: 12px; padding-bottom: 12px; font-size: 13px; text-align: left; border-bottom: 1px dashed rgba(36, 49, 25, 0.08);">Especificações:</td>
-                    <td align="right" style="font-weight: bold; padding-top: 12px; padding-bottom: 12px; font-size: 13px; color: #243119; text-align: right; border-bottom: 1px dashed rgba(36, 49, 25, 0.08);">${order.selections.cor} ${order.selections.tamanho ? `| Tam. ${order.selections.tamanho}` : ''} ${order.selections.quantidade ? `| Qtd. ${order.selections.quantidade}` : ''}</td>
-                  </tr>
-                  <!-- Row: Método de Pagamento -->
-                  <tr>
-                    <td style="color: rgba(36, 49, 25, 0.5); font-weight: 300; padding-top: 12px; padding-bottom: 12px; font-size: 13px; text-align: left; border-bottom: 1px dashed rgba(36, 49, 25, 0.08);">Método de Pagamento:</td>
-                    <td align="right" style="font-weight: bold; text-transform: uppercase; padding-top: 12px; padding-bottom: 12px; font-size: 13px; color: #243119; text-align: right; border-bottom: 1px dashed rgba(36, 49, 25, 0.08);">${order.paymentMethod === 'mbway' ? 'MB WAY' : order.paymentMethod === 'multibanco' ? 'Referência Multibanco' : 'Cartão de Crédito'}</td>
-                  </tr>
-                  ${order.customer.nif ? `
-                  <!-- Row: NIF -->
-                  <tr>
-                    <td style="color: rgba(36, 49, 25, 0.5); font-weight: 300; padding-top: 12px; padding-bottom: 12px; font-size: 13px; text-align: left; border-bottom: 1px dashed rgba(36, 49, 25, 0.08);">NIF do Adquirente:</td>
-                    <td align="right" style="font-weight: bold; padding-top: 12px; padding-bottom: 12px; font-size: 13px; color: #243119; text-align: right; border-bottom: 1px dashed rgba(36, 49, 25, 0.08);">${order.customer.nif}</td>
-                  </tr>
-                  ` : ''}
-                  <!-- Row: Estado Pagamento -->
-                  <tr>
-                    <td style="color: rgba(36, 49, 25, 0.5); font-weight: 300; padding-top: 12px; padding-bottom: 15px; font-size: 13px; text-align: left; border-bottom: 1px solid rgba(36, 49, 25, 0.05);">Estado da Transação:</td>
-                    <td align="right" style="font-weight: bold; text-transform: uppercase; padding-top: 12px; padding-bottom: 15px; font-size: 13px; color: #243119; text-align: right; border-bottom: 1px solid rgba(36, 49, 25, 0.05);">LIQUIDADO / CONFIRMADO</td>
-                  </tr>
-                  <!-- Row: Total -->
-                  <tr>
-                    <td style="color: #243119; font-weight: bold; padding-top: 15px; font-size: 15px; text-align: left;">Total Recebido:</td>
-                    <td align="right" style="color: #A68244; font-weight: bold; padding-top: 15px; font-size: 16px; text-align: right;">${order.price}</td>
-                  </tr>
-                </table>
-              </td>
-            </tr>
-          </table>
-
-          <!-- SHIPPING BOX -->
-          <div style="font-size: 13px; line-height: 1.6; color: rgba(36, 49, 25, 0.8; margin-bottom: 30px;">
-            <div style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 10px; text-transform: uppercase; letter-spacing: 0.2em; color: rgba(36, 49, 25, 0.5); font-weight: bold; margin-bottom: 8px;">
-              Morada de Entrega
-            </div>
-            <div style="font-weight: 300; color: #243119;">
-              ${order.customer.morada}<br>
-              ${order.customer.codigoPostal}, ${order.customer.cidade}<br>
-              Telemóvel: ${order.customer.telefone}
-            </div>
-          </div>
-
-          <!-- PRODUCTION NOTE -->
-          <div style="background-color: #FDFBF7; border-left: 3px solid #C5A059; padding: 15px; font-size: 12px; line-height: 1.6; font-style: italic; color: rgba(36, 49, 25, 0.8; margin-bottom: 35px;">
-            <strong>Nota de Confecção:</strong> Por se tratar de um processo meticuloso e 100% manual, estimamos que a sua peça seja expedida num prazo de 7 a 14 dias úteis. Receberá uma nova notificação com o código de acompanhamento assim que for enviada.
-          </div>
-
-          <!-- DIVIDER -->
-          <div style="height: 1px; background-color: rgba(36, 49, 25, 0.08); margin: 30px 0;"></div>
-
-          <!-- FOOTER -->
-          <div style="text-align: center; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 10px; text-transform: uppercase; letter-spacing: 0.15em; color: rgba(36, 49, 25, 0.4); line-height: 1.8;">
-            M★BRAVO ATELIER &bull; PORTUGAL<br>
-            <a href="mailto:${FROM_EMAIL}" style="color: #C5A059; text-decoration: none;">${FROM_EMAIL}</a><br>
-            <span style="font-size: 8px; margin-top: 15px; display: block; color: rgba(36, 49, 25, 0.25); text-transform: none; letter-spacing: normal;">Esta é uma mensagem automática de confirmação de transação em Sandbox de Testes.</span>
-          </div>
-        </td>
-      </tr>
-    </table>
-  </div>
-</body>
-</html>`;
-}
-
-/**
- * Generates the administrator notification HTML email template.
- */
-export function generateAdminEmailHtml(order: OrderData): string {
-  const priorityColor = order.priority.includes('ALTA') ? '#922B21' : '#243119';
+  // Dashboard states
+  const [orders, setOrders] = useState<any[]>([]);
+  const [loadingOrders, setLoadingOrders] = useState(false);
+  const [ordersError, setOrdersError] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [statusFilter, setStatusFilter] = useState<'all' | 'pending_payment' | 'paid' | 'shipped' | 'failed'>('all');
   
-  return `<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="utf-8">
-  <title>[NOVO PEDIDO] M BRAVO - ${order.orderId}</title>
-  <style>
-    body {
-      background-color: #f4f4f4;
-      color: #333;
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, sans-serif;
-      padding: 20px;
-    }
-    .card {
-      max-width: 600px;
-      margin: 0 auto;
-      background: white;
-      border: 1px solid #ddd;
-      border-radius: 8px;
-      overflow: hidden;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-    }
-    .header {
-      background-color: #243119;
-      color: #F5F2ED;
-      padding: 20px 25px;
-    }
-    .header h2 {
-      margin: 0;
-      font-size: 18px;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-    }
-    .priority-badge {
-      display: inline-block;
-      background-color: ${priorityColor};
-      color: white;
-      padding: 4px 10px;
-      border-radius: 20px;
-      font-size: 10px;
-      font-weight: bold;
-      letter-spacing: 0.05em;
-      text-transform: uppercase;
-      margin-top: 8px;
-    }
-    .content {
-      padding: 25px;
-    }
-    .section-title {
-      font-size: 11px;
-      text-transform: uppercase;
-      letter-spacing: 0.1em;
-      color: #888;
-      border-bottom: 1px solid #eee;
-      padding-bottom: 5px;
-      margin-top: 20px;
-      margin-bottom: 12px;
-    }
-    .field-row {
-      display: flex;
-      justify-content: space-between;
-      margin-bottom: 8px;
-      font-size: 13px;
-    }
-    .label {
-      color: #666;
-    }
-    .value {
-      font-weight: 600;
-    }
-  </style>
-</head>
-<body>
-  <div class="card">
-    <div class="header">
-      <h2>M★BRAVO &bull; Notificação de Atelier</h2>
-      <div class="priority-badge">Prioridade: ${order.priority}</div>
-    </div>
-    <div class="content">
-      <p style="font-size: 14px; margin-top: 0;">Novo pedido recebido e processado com sucesso. Status do pagamento: <strong>PAGO (Aprovado em Sandbox)</strong>.</p>
-      
-      <div class="section-title">Dados de Produção</div>
-      <div class="field-row">
-        <span class="label">ID Encomenda:</span>
-        <span class="value" style="font-family: monospace;">${order.orderId}</span>
-      </div>
-      <div class="field-row">
-        <span class="label">Modelo:</span>
-        <span class="value">${order.productName}</span>
-      </div>
-      <div class="field-row">
-        <span class="label">Cor Selecionada:</span>
-        <span class="value">${order.selections.cor}</span>
-      </div>
-      <div class="field-row">
-        <span class="label">Tamanho:</span>
-        <span class="value">${order.selections.tamanho || 'Customizado'}</span>
-      </div>
-      <div class="field-row">
-        <span class="label">Quantidade:</span>
-        <span class="value">${order.selections.quantidade || '1'}</span>
-      </div>
-      <div class="field-row">
-        <span class="label">Método Pagamento:</span>
-        <span class="value" style="text-transform: uppercase;">${order.paymentMethod}</span>
-      </div>
-      <div class="field-row">
-        <span class="label">Total da Venda:</span>
-        <span class="value" style="color: #243119;">${order.price}</span>
-      </div>
+  // Action states
+  const [trackingInputs, setTrackingInputs] = useState<{ [orderId: string]: string }>({});
+  const [actionLoading, setActionLoading] = useState<{ [orderId: string]: boolean }>({});
+  const [actionSuccess, setActionSuccess] = useState<{ [orderId: string]: string }>({});
 
-      <div class="section-title">Dados de Envio & Contato Cliente</div>
-      <div class="field-row">
-        <span class="label">Nome Cliente:</span>
-        <span class="value">${order.customer.nome}</span>
-      </div>
-      <div class="field-row">
-        <span class="label">E-mail:</span>
-        <span class="value">${order.customer.email}</span>
-      </div>
-      <div class="field-row">
-        <span class="label">Contacto:</span>
-        <span class="value">${order.customer.telefone}</span>
-      </div>
-      <div class="field-row" style="margin-bottom: 2px;">
-        <span class="label">Morada:</span>
-        <span class="value" style="text-align: right; max-width: 70%;">${order.customer.morada}</span>
-      </div>
-      <div class="field-row">
-        <span class="label">Código Postal / Cidade:</span>
-        <span class="value">${order.customer.codigoPostal}, ${order.customer.cidade}</span>
-      </div>
+  // Manual Order states
+  const [showManualForm, setShowManualForm] = useState(false);
+  const [manualForm, setManualForm] = useState({
+    productName: '',
+    price: '',
+    cor: '',
+    tamanho: '',
+    quantidade: '1',
+    customerNome: '',
+    customerEmail: '',
+    customerTelefone: '',
+    customerMorada: '',
+    customerCodigoPostal: '',
+    customerCidade: '',
+    customerNif: '',
+    paymentMethod: 'card',
+    status: 'paid',
+    priority: 'NORMAL'
+  });
+  const [isCreatingManual, setIsCreatingManual] = useState(false);
 
-      <div class="section-title">Instruções Próximas Horas</div>
-      <p style="font-size: 12px; color: #555; line-height: 1.5; margin-bottom: 0;">
-        1. Validar as dimensões do molde para o tamanho <strong>${order.selections.tamanho || 'Sob Medida'}</strong>.<br>
-        2. Reservar o novelo de fio de cor <strong>${order.selections.cor}</strong> no estoque.<br>
-        3. Emitir a etiqueta em couro M★BRAVO correspondente ao pedido.
-      </p>
-    </div>
-  </div>
-</body>
-</html>`;
-}
+  // Audit Logs states
+  const [activeTab, setActiveTab] = useState<'orders' | 'logs'>('orders');
+  const [logs, setLogs] = useState<any[]>([]);
+  const [loadingLogs, setLoadingLogs] = useState(false);
+  const [logsError, setLogsError] = useState<string | null>(null);
+  const [logSearchQuery, setLogSearchQuery] = useState('');
 
-/**
- * Main service method that log-creates visual template previews on-disk,
- * triggers terminal logs, and integrates actual email gateways when keys are provided.
- */
-export function sendTransactionEmails(order: OrderData): { customerEmailUrl: string; adminEmailUrl: string } {
-  const customerHtml = generateCustomerEmailHtml(order);
-  const adminHtml = generateAdminEmailHtml(order);
+  const handleCreateManualOrder = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!manualForm.productName || !manualForm.customerNome) {
+      alert("Nome do Produto e Nome do Cliente são obrigatórios.");
+      return;
+    }
 
-  // Define static paths inside public/emails so that Express can serve them easily!
-  // This is exceptional for testing purposes.
-  const publicEmailsDir = path.join(process.cwd(), 'public', 'emails');
-  
-  if (!fs.existsSync(publicEmailsDir)) {
-    fs.mkdirSync(publicEmailsDir, { recursive: true });
-  }
+    setIsCreatingManual(true);
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/admin/orders/create`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-admin-password': password
+        },
+        body: JSON.stringify({
+          productName: manualForm.productName,
+          price: parseFloat(manualForm.price) || 0,
+          selections: {
+            cor: manualForm.cor || 'Padrão',
+            tamanho: manualForm.tamanho || 'Único',
+            quantidade: manualForm.quantidade || '1'
+          },
+          customer: {
+            nome: manualForm.customerNome,
+            email: manualForm.customerEmail,
+            telefone: manualForm.customerTelefone,
+            morada: manualForm.customerMorada,
+            codigoPostal: manualForm.customerCodigoPostal,
+            cidade: manualForm.customerCidade,
+            nif: manualForm.customerNif
+          },
+          paymentMethod: manualForm.paymentMethod,
+          status: manualForm.status,
+          priority: manualForm.priority,
+          createdAt: new Date().toISOString()
+        })
+      });
 
-  const custFileName = `customer-${order.orderId}.html`;
-  const adminFileName = `admin-${order.orderId}.html`;
-
-  fs.writeFileSync(path.join(publicEmailsDir, custFileName), customerHtml, 'utf-8');
-  fs.writeFileSync(path.join(publicEmailsDir, adminFileName), adminHtml, 'utf-8');
-
-  console.log(`[M.BRAVO EMAIL SYSTEM] Emails generated in Sandbox mode!`);
-  console.log(`  - Customer confirmation: /emails/${custFileName}`);
-  console.log(`  - Admin Atelier Notification: /emails/${adminFileName}`);
-
-  // Integrate live gateways here if keys exist.
-  // We document these in .env.example so that users can seamlessly hook them up later!
-  const hasSendGridKey = process.env.SENDGRID_API_KEY && 
-                        process.env.SENDGRID_API_KEY !== "" && 
-                        process.env.SENDGRID_API_KEY.startsWith("SG.") &&
-                        !process.env.SENDGRID_API_KEY.includes("INSERT_") &&
-                        !process.env.SENDGRID_API_KEY.includes("YOUR_") &&
-                        !process.env.SENDGRID_API_KEY.includes("mock") &&
-                        !process.env.SENDGRID_API_KEY.includes("test");
-
-  if (hasSendGridKey) {
-    console.log(`[M.BRAVO EMAIL SYSTEM] SendGrid API Key detected! Dispatched live email requests in background...`);
-    
-    // Asynchronous send to SendGrid to prevent blocking main transaction thread
-    const customerEmail = (order.customer.email || "").trim();
-    if (customerEmail && customerEmail.includes('@')) {
-      sendViaSendGrid(process.env.SENDGRID_API_KEY!, customerEmail, `M BRAVO | Encomenda Confirmada - ${order.orderId}`, customerHtml)
-        .then(() => console.log(`[M.BRAVO EMAIL SYSTEM] Customer email sent successfully via SendGrid to ${customerEmail}.`))
-        .catch(err => {
-          console.warn(`\n[M.BRAVO EMAIL SYSTEM WARNING] Could not send Customer email via SendGrid:`);
-          console.warn(`  - Logged Detail: ${err.message}`);
-          console.warn(`  - Action: Please double-check your SendGrid API Key and Sender Verification in .env or Settings.`);
-          console.warn(`  - Sandbox Status: Local template preview generated successfully at /emails/${custFileName}\n`);
+      const data = await res.json();
+      if (res.ok && data.success) {
+        alert("Encomenda manual registada com sucesso na base de dados!");
+        setManualForm({
+          productName: '',
+          price: '',
+          cor: '',
+          tamanho: '',
+          quantidade: '1',
+          customerNome: '',
+          customerEmail: '',
+          customerTelefone: '',
+          customerMorada: '',
+          customerCodigoPostal: '',
+          customerCidade: '',
+          customerNif: '',
+          paymentMethod: 'card',
+          status: 'paid',
+          priority: 'NORMAL'
         });
-    } else {
-      console.log(`[M.BRAVO EMAIL SYSTEM] Skipping customer email dispatch because customer email address is absent or invalid.`);
+        setShowManualForm(false);
+        fetchOrders();
+      } else {
+        alert(data.error || "Erro ao registar encomenda.");
+      }
+    } catch (err) {
+      alert("Erro de rede/ligação ao servidor.");
+    } finally {
+      setIsCreatingManual(false);
+    }
+  };
+
+  // Check saved session on mount
+  useEffect(() => {
+    const savedPass = localStorage.getItem('mbravo_admin_password');
+    if (savedPass) {
+      handleAutoLogin(savedPass);
+    }
+  }, []);
+
+  const handleAutoLogin = async (savedPass: string) => {
+    setLoadingOrders(true);
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/admin/orders`, {
+        headers: { 'x-admin-password': savedPass }
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setOrders(data.orders || []);
+        setPassword(savedPass);
+        setIsAuthenticated(true);
+        // Also load logs
+        fetchLogs(savedPass);
+      } else {
+        localStorage.removeItem('mbravo_admin_password');
+      }
+    } catch (err) {
+      console.error("Auto login failed", err);
+    } finally {
+      setLoadingOrders(false);
+    }
+  };
+
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!password) return;
+    setIsLoggingIn(true);
+    setLoginError(null);
+
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/admin/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password })
+      });
+      
+      const data = await res.json();
+      if (res.ok && data.success) {
+        localStorage.setItem('mbravo_admin_password', password);
+        setIsAuthenticated(true);
+        fetchOrders(password);
+      } else {
+        setLoginError(data.error || 'Palavra-passe incorreta. Tente novamente.');
+      }
+    } catch (err) {
+      setLoginError('Erro de conexão ao servidor administrativo.');
+    } finally {
+      setIsLoggingIn(false);
+    }
+  };
+
+  const fetchLogs = async (activePass = password) => {
+    setLoadingLogs(true);
+    setLogsError(null);
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/admin/logs`, {
+        headers: { 'x-admin-password': activePass }
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        setLogs(data.logs || []);
+      } else {
+        setLogsError(data.error || 'Erro ao carregar o histórico de logs.');
+      }
+    } catch (err) {
+      setLogsError('Erro de ligação ao carregar os logs.');
+    } finally {
+      setLoadingLogs(false);
+    }
+  };
+
+  const fetchOrders = async (activePass = password) => {
+    setLoadingOrders(true);
+    setOrdersError(null);
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/admin/orders`, {
+        headers: { 'x-admin-password': activePass }
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        setOrders(data.orders || []);
+        fetchLogs(activePass);
+      } else {
+        setOrdersError(data.error || 'Erro ao carregar as encomendas.');
+      }
+    } catch (err) {
+      setOrdersError('Não foi possível conectar ao servidor para obter encomendas.');
+    } finally {
+      setLoadingOrders(false);
+    }
+  };
+
+  const exportToCSV = () => {
+    if (filteredOrders.length === 0) {
+      alert("Não existem encomendas correspondentes aos filtros atuais para exportar.");
+      return;
     }
 
-    const adminEmail = NOTIFICATION_EMAIL;
-    sendViaSendGrid(process.env.SENDGRID_API_KEY!, adminEmail, `[NOVO PEDIDO] ${order.orderId} - Prioridade Atelier`, adminHtml)
-      .then(() => console.log(`[M.BRAVO EMAIL SYSTEM] Admin notification email sent successfully via SendGrid.`))
-      .catch(err => {
-        console.warn(`\n[M.BRAVO EMAIL SYSTEM WARNING] Could not send Admin notification email via SendGrid:`);
-        console.warn(`  - Logged Detail: ${err.message}`);
-        console.warn(`  - Action: Ensure your SendGrid Sender Identity aligns with the "from" address ('${process.env.FROM_EMAIL || 'encomendas@mbravobycarolina.com'}').`);
-        console.warn(`  - Sandbox Status: Local template preview generated successfully at /emails/${adminFileName}\n`);
-      });
-  } else {
-    console.log(`[M.BRAVO EMAIL SYSTEM] Live SendGrid key absent or unconfigured. Falling back entirely to Sandbox Local Previews.`);
-  }
+    // European Excel standard uses semicolons and a UTF-8 BOM
+    const headers = [
+      "ID da Encomenda",
+      "Data",
+      "Cliente",
+      "E-mail",
+      "Telefone",
+      "NIF",
+      "Produto",
+      "Detalhes do Item",
+      "Subtotal",
+      "Descontos",
+      "Portes",
+      "Total",
+      "Metodo de Pagamento",
+      "Estado",
+      "Codigo Rastreio CTT"
+    ];
 
-  return {
-    customerEmailUrl: `/emails/${custFileName}`,
-    adminEmailUrl: `/emails/${adminFileName}`
+    const rows = filteredOrders.map(o => {
+      const selections = o.selections || {};
+      const cor = selections.cor || "Padrao";
+      const tamanho = selections.tamanho || "Unico";
+      const quantidade = selections.quantidade || "1";
+      const itemDetails = `Cor: ${cor}, Tam: ${tamanho}, Qtd: ${quantidade}`;
+      
+      const priceVal = parsePrice(String(o.price));
+      const formattedSubtotal = priceVal.toFixed(2).replace('.', ',');
+      const formattedTotal = priceVal.toFixed(2).replace('.', ',');
+      const formattedDesconto = "0,00";
+      const formattedPortes = "0,00";
+
+      let translatedStatus = o.status;
+      if (o.status === 'paid') translatedStatus = "Pago / No Atelier";
+      else if (o.status === 'pending_payment') translatedStatus = "Aguardar Pagamento";
+      else if (o.status === 'shipped') translatedStatus = "Expedida CTT";
+      else if (o.status === 'failed') translatedStatus = "Cancelada / Falhada";
+
+      let translatedMethod = o.paymentMethod;
+      if (o.paymentMethod === 'card') translatedMethod = "Cartao de Credito";
+      else if (o.paymentMethod === 'multibanco') translatedMethod = "Multibanco";
+      else if (o.paymentMethod === 'mbway') translatedMethod = "MB WAY";
+      else if (o.paymentMethod === 'wallet') translatedMethod = "Digital Wallet";
+      else if (o.paymentMethod === 'manual') translatedMethod = "Manual / Direta";
+
+      return [
+        o.orderId || "",
+        o.createdAt ? new Date(o.createdAt).toLocaleString('pt-PT') : "",
+        o.customer?.nome || "",
+        o.customer?.email || "",
+        o.customer?.telefone || "",
+        o.customer?.nif || "",
+        o.productName || "",
+        itemDetails,
+        `${formattedSubtotal} EUR`,
+        `${formattedDesconto} EUR`,
+        `${formattedPortes} EUR`,
+        `${formattedTotal} EUR`,
+        translatedMethod,
+        translatedStatus,
+        o.trackingCode || ""
+      ];
+    });
+
+    const csvContent = [
+      headers.join(";"),
+      ...rows.map(r => r.map(val => `"${String(val).replace(/"/g, '""')}"`).join(";"))
+    ].join("\r\n");
+
+    const blob = new Blob(["\uFEFF" + csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.setAttribute("href", url);
+    link.setAttribute("download", `mbravo_contabilidade_${new Date().toISOString().slice(0, 10)}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   };
-}
 
-/**
- * Generates the elegant Multibanco payment instruction HTML email template.
- */
-export function generateMultibancoEmailHtml(order: OrderData, multibancoRef: { entidade: string; referencia: string }): string {
-  return `<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dados de Pagamento Multibanco - M★BRAVO</title>
-</head>
-<body style="margin: 0; padding: 0; background-color: #F5F2ED; color: #243119; font-family: 'Georgia', 'Garamond', serif; -webkit-font-smoothing: antialiased;">
-  <div class="wrapper" style="width: 100%; background-color: #F5F2ED; padding: 40px 0; font-family: 'Georgia', 'Garamond', serif;">
-    <table align="center" border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 600px; background-color: #FCFBF9; border: 1px solid rgba(36, 49, 25, 0.08); border-radius: 4px; box-shadow: 0 10px 30px rgba(36, 49, 25, 0.02); margin: 0 auto;">
-      <tr>
-        <td style="padding: 50px 40px;">
-          <!-- HEADER -->
-          <table align="center" border="0" cellpadding="0" cellspacing="0" style="margin: 0 auto 40px auto; text-align: center;">
-            <tr>
-              <td align="center">
-                <table align="center" border="0" cellpadding="0" cellspacing="0" style="margin: 0 auto;">
-                  <tr>
-                    <td align="center" style="border-bottom: 1px solid #C5A059; padding-bottom: 5px; font-size: 24px; letter-spacing: 0.3em; font-weight: bold; color: #243119; text-transform: uppercase; font-family: 'Georgia', 'Garamond', serif;">
-                      M★BRAVO
-                    </td>
-                  </tr>
-                </table>
-              </td>
-            </tr>
-            <tr>
-              <td align="center" style="font-size: 9px; text-transform: uppercase; letter-spacing: 0.4em; color: #C5A059; font-weight: bold; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; padding-top: 10px;">
-                Handmade with Love
-              </td>
-            </tr>
-          </table>
+  const handleLogout = () => {
+    localStorage.removeItem('mbravo_admin_password');
+    setIsAuthenticated(false);
+    setPassword('');
+    setOrders([]);
+    setLogs([]);
+  };
 
-          <!-- GREETING -->
-          <div style="font-size: 20px; line-height: 1.5; font-style: italic; text-align: center; margin-bottom: 30px; font-weight: 300; color: #243119;">
-            Olá, ${order.customer.nome}.<br>A sua referência Multibanco foi gerada.
-          </div>
+  const handleUpdateStatus = async (orderId: string, newStatus: string) => {
+    setActionLoading(prev => ({ ...prev, [orderId]: true }));
+    setActionSuccess(prev => ({ ...prev, [orderId]: '' }));
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/admin/orders/update`, {
+        method: 'POST',
+        headers: { 
+          'Content-Type': 'application/json',
+          'x-admin-password': password
+        },
+        body: JSON.stringify({ orderId, status: newStatus })
+      });
+      
+      const data = await res.json();
+      if (res.ok && data.success) {
+        setActionSuccess(prev => ({ ...prev, [orderId]: `Estado atualizado para ${newStatus.toUpperCase()}!` }));
+        fetchOrders();
+      } else {
+        alert(data.error || 'Erro ao atualizar estado.');
+      }
+    } catch (err) {
+      alert('Erro de conexão ao atualizar estado.');
+    } finally {
+      setActionLoading(prev => ({ ...prev, [orderId]: false }));
+    }
+  };
 
-          <!-- INSTRUCTION TEXT -->
-          <div style="font-size: 14px; line-height: 1.8; color: rgba(36, 49, 25, 0.85); text-align: center; margin-bottom: 30px; font-weight: 300;">
-            Para concluir a sua encomenda M★BRAVO, efeteue o pagamento com os dados abaixo através de Homebanking ou caixa ATM (Pagamento de Serviços).
-          </div>
+  const handleSimulateWebhook = async (orderId: string, action: 'simulate_payment' | 'simulate_failure') => {
+    setActionLoading(prev => ({ ...prev, [orderId]: true }));
+    setActionSuccess(prev => ({ ...prev, [orderId]: '' }));
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/payment/simulate-action`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ orderId, action })
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        setActionSuccess(prev => ({ 
+          ...prev, 
+          [orderId]: action === 'simulate_payment' 
+            ? 'Pagamento simulado com sucesso! E-mails de Recibo/Notificação gerados.' 
+            : 'Cancelamento simulado com sucesso.' 
+        }));
+        fetchOrders();
+      } else {
+        alert('Erro ao simular webhook.');
+      }
+    } catch (err) {
+      alert('Erro de conexão na simulação.');
+    } finally {
+      setActionLoading(prev => ({ ...prev, [orderId]: false }));
+    }
+  };
 
-          <!-- PAYMENT BOX TABLE -->
-          <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #FCF8F2; border: 1px solid #C5A059; border-radius: 12px; border-collapse: separate; border-spacing: 0; font-family: 'Georgia', 'Garamond', serif; margin-bottom: 30px;">
-            <tr>
-              <td style="padding: 25px;">
-                <table width="100%" cellpadding="0" cellspacing="0" style="border-collapse: collapse;">
-                  <tr>
-                    <td colspan="2" align="center" style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 11px; text-transform: uppercase; letter-spacing: 0.2em; color: #A68244; font-weight: bold; padding-bottom: 20px; text-align: center;">
-                      Dados para Pagamento
-                    </td>
-                  </tr>
-                  <!-- Row: Entidade -->
-                  <tr>
-                    <td style="color: rgba(36, 49, 25, 0.6); font-weight: 300; padding-bottom: 12px; font-size: 14px; text-align: left; border-bottom: 1px dashed rgba(36, 49, 25, 0.08);">Entidade:</td>
-                    <td align="right" style="font-weight: bold; font-family: monospace; font-size: 15px; padding-bottom: 12px; color: #243119; text-align: right; border-bottom: 1px dashed rgba(36, 49, 25, 0.08);">${multibancoRef.entidade}</td>
-                  </tr>
-                  <!-- Row: Referência -->
-                  <tr>
-                    <td style="color: rgba(36, 49, 25, 0.6); font-weight: 300; padding-top: 12px; padding-bottom: 12px; font-size: 14px; text-align: left; border-bottom: 1px dashed rgba(36, 49, 25, 0.08);">Referência:</td>
-                    <td align="right" style="font-weight: bold; font-family: monospace; font-size: 15px; padding-top: 12px; padding-bottom: 12px; color: #243119; text-align: right; border-bottom: 1px dashed rgba(36, 49, 25, 0.08);">${multibancoRef.referencia}</td>
-                  </tr>
-                  <!-- Row: Montante -->
-                  <tr>
-                    <td style="color: rgba(36, 49, 25, 0.6); font-weight: 300; padding-top: 12px; font-size: 14px; text-align: left;">Montante:</td>
-                    <td align="right" style="font-weight: bold; color: #A68244; font-size: 16px; padding-top: 12px; text-align: right;">Total: ${order.price}</td>
-                  </tr>
-                </table>
-              </td>
-            </tr>
-          </table>
+  const handleDispatchTracking = async (orderId: string) => {
+    const code = trackingInputs[orderId]?.trim();
+    if (!code) {
+      alert('Por favor, introduza um código de rastreio CTT válido.');
+      return;
+    }
 
-          <!-- NOTE TEXT -->
-          <div style="font-size: 12px; font-style: italic; color: rgba(36, 49, 25, 0.6); text-align: center; line-height: 1.6; margin-bottom: 30px; font-weight: 300;">
-            Nota: O prazo limite para pagamento desta referência é de 3 dias. Assim que efetuar o pagamento, receberá um e-mail de confirmação automático e iniciaremos a confecção da sua peça.
-          </div>
+    setActionLoading(prev => ({ ...prev, [orderId]: true }));
+    setActionSuccess(prev => ({ ...prev, [orderId]: '' }));
 
-          <!-- DIVIDER -->
-          <div style="height: 1px; background-color: rgba(36, 49, 25, 0.08); margin: 30px 0;"></div>
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/admin/orders/update`, {
+        method: 'POST',
+        headers: { 
+          'Content-Type': 'application/json',
+          'x-admin-password': password
+        },
+        body: JSON.stringify({ orderId, status: 'shipped', trackingCode: code })
+      });
+      
+      const data = await res.json();
+      if (res.ok && data.success) {
+        setActionSuccess(prev => ({ ...prev, [orderId]: 'Encomenda expedida e e-mail enviado ao cliente!' }));
+        // Clean input
+        setTrackingInputs(prev => {
+          const next = { ...prev };
+          delete next[orderId];
+          return next;
+        });
+        fetchOrders();
+      } else {
+        alert(data.error || 'Erro ao processar expedição.');
+      }
+    } catch (err) {
+      alert('Erro de conexão ao enviar dados dos CTT.');
+    } finally {
+      setActionLoading(prev => ({ ...prev, [orderId]: false }));
+    }
+  };
 
-          <!-- FOOTER -->
-          <div style="text-align: center; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 10px; text-transform: uppercase; letter-spacing: 0.15em; color: rgba(36, 49, 25, 0.4); line-height: 1.8;">
-            M★BRAVO ATELIER &bull; PORTUGAL<br>
-            <a href="mailto:${FROM_EMAIL}" style="color: #C5A059; text-decoration: none;">${FROM_EMAIL}</a><br>
-            <span style="font-size: 8px; margin-top: 15px; display: block; color: rgba(36, 49, 25, 0.25); text-transform: none; letter-spacing: normal;">Esta é uma mensagem de instruções de pagamento automático para encomenda em processamento.</span>
-          </div>
-        </td>
-      </tr>
-    </table>
-  </div>
-</body>
-</html>`;
-}
+  // Helper to parse price string like "50.00€" or "50€" to number
+  const parsePrice = (priceStr: string): number => {
+    if (!priceStr) return 0;
+    const clean = priceStr.replace(/[^0-9,.]/g, '').replace(',', '.');
+    return parseFloat(clean) || 0;
+  };
 
-/**
- * Main service method that log-creates visual templates of payment instructions,
- * and triggers live email delivery through SendGrid.
- */
-export function sendMultibancoEmails(order: OrderData, multibancoRef: { entidade: string; referencia: string }): { customerEmailUrl: string } {
-  const customerHtml = generateMultibancoEmailHtml(order, multibancoRef);
+  // Stats selectors
+  const totalOrders = orders.length;
+  const pendingOrders = orders.filter(o => o.status === 'pending_payment').length;
+  const paidOrders = orders.filter(o => o.status === 'paid').length;
+  const shippedOrders = orders.filter(o => o.status === 'shipped').length;
+  const totalRevenue = orders
+    .filter(o => o.status === 'paid' || o.status === 'shipped')
+    .reduce((sum, o) => sum + parsePrice(o.price), 0);
 
-  const publicEmailsDir = path.join(process.cwd(), 'public', 'emails');
-  if (!fs.existsSync(publicEmailsDir)) {
-    fs.mkdirSync(publicEmailsDir, { recursive: true });
-  }
-
-  const custFileName = `multibanco-instruction-${order.orderId}.html`;
-  fs.writeFileSync(path.join(publicEmailsDir, custFileName), customerHtml, 'utf-8');
-
-  console.log(`[M.BRAVO EMAIL SYSTEM] Multibanco Instruction Email generated in Sandbox mode!`);
-  console.log(`  - Customer instructions: /emails/${custFileName}`);
-
-  const hasSendGridKey = process.env.SENDGRID_API_KEY && 
-                        process.env.SENDGRID_API_KEY !== "" && 
-                        process.env.SENDGRID_API_KEY.startsWith("SG.") &&
-                        !process.env.SENDGRID_API_KEY.includes("INSERT_") &&
-                        !process.env.SENDGRID_API_KEY.includes("YOUR_") &&
-                        !process.env.SENDGRID_API_KEY.includes("mock") &&
-                        !process.env.SENDGRID_API_KEY.includes("test");
-
-  if (hasSendGridKey) {
-    console.log(`[M.BRAVO EMAIL SYSTEM] SendGrid API Key detected! Dispatched Multibanco instructions email in background...`);
+  // Filter & Search logic
+  const filteredOrders = orders.filter(order => {
+    const matchesStatus = statusFilter === 'all' || order.status === statusFilter;
     
-    sendViaSendGrid(process.env.SENDGRID_API_KEY!, order.customer.email, `M BRAVO | Dados para Pagamento Multibanco - Encomenda ${order.orderId}`, customerHtml)
-      .then(() => console.log(`[M.BRAVO EMAIL SYSTEM] Multibanco instructions email sent successfully via SendGrid.`))
-      .catch(err => {
-        console.warn(`\n[M.BRAVO EMAIL SYSTEM WARNING] Could not send Multibanco instructions email via SendGrid:`);
-        console.warn(`  - Logged Detail: ${err.message}`);
-        console.warn(`  - Sandbox Status: Local template preview generated successfully at /emails/${custFileName}\n`);
-      });
-  } else {
-    console.log(`[M.BRAVO EMAIL SYSTEM] Live SendGrid key absent or unconfigured. Falling back entirely to Sandbox Local Previews.`);
-  }
+    const customerName = order.customer?.nome || '';
+    const customerEmail = order.customer?.email || '';
+    const customerNif = order.customer?.nif || '';
+    const productName = order.productName || '';
+    const orderId = order.orderId || '';
 
-  return {
-    customerEmailUrl: `/emails/${custFileName}`
-  };
-}
+    const query = searchQuery.toLowerCase();
+    const matchesSearch = 
+      customerName.toLowerCase().includes(query) ||
+      customerEmail.toLowerCase().includes(query) ||
+      customerNif.toLowerCase().includes(query) ||
+      productName.toLowerCase().includes(query) ||
+      orderId.toLowerCase().includes(query);
 
-/**
- * Robust fetch-based SendGrid integration (zero dependencies, completely safe).
- */
-async function sendViaSendGrid(apiKey: string, toEmail: string, subject: string, htmlContent: string) {
-  const url = 'https://api.sendgrid.com/v3/mail/send';
-  const response = await fetch(url, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${apiKey}`
-    },
-    body: JSON.stringify({
-      personalizations: [{ to: [{ email: toEmail }] }],
-      from: { email: process.env.FROM_EMAIL || 'encomendas@mbravobycarolina.com', name: 'M BRAVO' },
-      subject: subject,
-      content: [{ type: 'text/html', value: htmlContent }]
-    })
+    return matchesStatus && matchesSearch;
   });
 
-  if (!response.ok) {
-    const errText = await response.text();
-    throw new Error(`SendGrid API failure: ${response.status} - ${errText}`);
-  }
-}
+  const filteredLogs = logs.filter(log => {
+    if (!logSearchQuery) return true;
+    const q = logSearchQuery.toLowerCase();
+    return (
+      (log.id || '').toLowerCase().includes(q) ||
+      (log.description || '').toLowerCase().includes(q) ||
+      (log.orderId || '').toLowerCase().includes(q) ||
+      (log.event || '').toLowerCase().includes(q) ||
+      (log.user || '').toLowerCase().includes(q)
+    );
+  });
 
-/**
- * Generates the elegant cream & forest green customer order shipped HTML email template.
- */
-export function generateShippedEmailHtml(order: OrderData, trackingCode: string): string {
-  const trackingUrl = `https://www.ctt.pt/feapl_2/app/open/objectSearch/objectSearch.jspx?lang=def&objects=${trackingCode}`;
-  return `<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>A sua Encomenda foi Enviada! - M★BRAVO</title>
-</head>
-<body style="margin: 0; padding: 0; background-color: #F5F2ED; color: #243119; font-family: 'Georgia', 'Garamond', serif; -webkit-font-smoothing: antialiased;">
-  <div class="wrapper" style="width: 100%; background-color: #F5F2ED; padding: 40px 0; font-family: 'Georgia', 'Garamond', serif;">
-    <table align="center" border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 600px; background-color: #FCFBF9; border: 1px solid rgba(36, 49, 25, 0.08); border-radius: 4px; box-shadow: 0 10px 30px rgba(36, 49, 25, 0.02); margin: 0 auto;">
-      <tr>
-        <td style="padding: 50px 40px;">
-          <!-- HEADER -->
-          <table align="center" border="0" cellpadding="0" cellspacing="0" style="margin: 0 auto 40px auto; text-align: center;">
-            <tr>
-              <td align="center">
-                <table align="center" border="0" cellpadding="0" cellspacing="0" style="margin: 0 auto;">
-                  <tr>
-                    <td align="center" style="border-bottom: 1px solid #C5A059; padding-bottom: 5px; font-size: 24px; letter-spacing: 0.3em; font-weight: bold; color: #243119; text-transform: uppercase; font-family: 'Georgia', 'Garamond', serif;">
-                      M★BRAVO
-                    </td>
-                  </tr>
-                </table>
-              </td>
-            </tr>
-            <tr>
-              <td align="center" style="font-size: 9px; text-transform: uppercase; letter-spacing: 0.4em; color: #C5A059; font-weight: bold; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; padding-top: 10px;">
-                Handmade with Love
-              </td>
-            </tr>
-          </table>
-
-          <!-- GREETING -->
-          <div style="font-size: 20px; line-height: 1.5; font-style: italic; text-align: center; margin-bottom: 30px; font-weight: 300; color: #243119;">
-            Olá, ${order.customer.nome}.<br>A sua peça M★BRAVO já está a caminho!
+  return (
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-forest/80 backdrop-blur-sm select-text">
+      <motion.div 
+        initial={{ scale: 0.95, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        exit={{ scale: 0.95, opacity: 0 }}
+        transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+        className="relative w-full max-w-6xl h-[85vh] bg-[#FCFBF9] text-forest rounded-[24px] shadow-2xl border border-[#C5A059]/10 flex flex-col overflow-hidden"
+      >
+        {/* HEADER RAIL */}
+        <div className="flex items-center justify-between px-8 py-5 border-b border-forest/5 bg-white/50">
+          <div className="flex items-center gap-3">
+            <div className="w-2.5 h-2.5 rounded-full bg-[#C5A059] animate-pulse" />
+            <h3 className="font-serif text-lg tracking-wider font-medium text-forest uppercase flex items-center gap-2">
+              M★BRAVO <span className="text-[#C5A059] font-sans text-xs font-semibold tracking-widest bg-[#FCF8F2] border border-[#C5A059]/20 px-2.5 py-0.5 rounded-full">ATELIER ADMIN</span>
+            </h3>
           </div>
-
-          <!-- SHIPPED STORY TEXT -->
-          <div style="font-size: 14px; line-height: 1.8; color: rgba(36, 49, 25, 0.85); text-align: justify; margin-bottom: 30px; font-weight: 300;">
-            A sua peça foi tecida à mão no nosso atelier com todo o afeto, cuidado e dedicação. O processo de confecção manual está agora concluído e a sua encomenda foi carinhosamente embalada e entregue aos CTT para envio.
+          <div className="flex items-center gap-4">
+            {isAuthenticated && (
+              <button 
+                onClick={handleLogout}
+                className="text-xs uppercase tracking-widest text-red-700 hover:text-red-900 bg-red-50 hover:bg-red-100/55 px-3 py-1.5 rounded-full transition-all font-semibold"
+              >
+                Sair
+              </button>
+            )}
+            <button 
+              onClick={onClose}
+              className="p-1.5 hover:bg-forest/5 rounded-full transition-all cursor-pointer text-forest/60 hover:text-forest"
+            >
+              <X className="w-5 h-5" />
+            </button>
           </div>
+        </div>
 
-          <!-- TRACKING BOX TABLE -->
-          <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #FCF8F2; border: 1px solid #C5A059; border-radius: 12px; border-collapse: separate; border-spacing: 0; font-family: 'Georgia', 'Garamond', serif; margin-bottom: 30px;">
-            <tr>
-              <td style="padding: 25px;">
-                <table width="100%" cellpadding="0" cellspacing="0" style="border-collapse: collapse;">
-                  <tr>
-                    <td colspan="2" align="center" style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 11px; text-transform: uppercase; letter-spacing: 0.2em; color: #A68244; font-weight: bold; padding-bottom: 20px; text-align: center;">
-                      Acompanhamento do Envio
-                    </td>
-                  </tr>
-                  <!-- Row: Transportadora -->
-                  <tr>
-                    <td style="color: rgba(36, 49, 25, 0.6); font-weight: 300; padding-bottom: 12px; font-size: 14px; text-align: left; border-bottom: 1px dashed rgba(36, 49, 25, 0.08);">Transportadora:</td>
-                    <td align="right" style="font-weight: bold; font-size: 14px; padding-bottom: 12px; color: #243119; text-align: right; border-bottom: 1px dashed rgba(36, 49, 25, 0.08);">CTT - Correios de Portugal</td>
-                  </tr>
-                  <!-- Row: Código de Rastreamento -->
-                  <tr>
-                    <td style="color: rgba(36, 49, 25, 0.6); font-weight: 300; padding-top: 12px; padding-bottom: 20px; font-size: 14px; text-align: left; border-bottom: 1px solid rgba(36, 49, 25, 0.05);">Código de Rastreio (Tracking):</td>
-                    <td align="right" style="font-weight: bold; font-family: monospace; font-size: 15px; padding-top: 12px; padding-bottom: 20px; color: #A68244; text-align: right; border-bottom: 1px solid rgba(36, 49, 25, 0.05);">${trackingCode}</td>
-                  </tr>
-                  <!-- Row: Button -->
-                  <tr>
-                    <td colspan="2" align="center" style="padding-top: 20px; text-align: center;">
-                      <a href="${trackingUrl}" target="_blank" style="display: inline-block; background-color: #243119; color: #F5F2ED; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: 0.15em; text-decoration: none; padding: 14px 28px; border-radius: 50px; transition: all 0.2s ease;">
-                        Rastrear nos CTT
-                      </a>
-                    </td>
-                  </tr>
-                </table>
-              </td>
-            </tr>
-          </table>
-
-          <!-- DIVIDER -->
-          <div style="height: 1px; background-color: rgba(36, 49, 25, 0.08); margin: 30px 0;"></div>
-
-          <!-- ORDER DETAILS TITLE -->
-          <div style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 10px; text-transform: uppercase; letter-spacing: 0.2em; color: #A68244; font-weight: bold; margin-bottom: 15px;">
-            Artigos Enviados
-          </div>
-
-          <!-- ORDER DETAILS TABLE -->
-          <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #FBF9F6; border: 1px solid rgba(197, 160, 89, 0.15); border-radius: 8px; border-collapse: separate; border-spacing: 0; font-family: 'Georgia', 'Garamond', serif; margin-bottom: 30px;">
-            <tr>
-              <td style="padding: 25px;">
-                <table width="100%" cellpadding="0" cellspacing="0" style="border-collapse: collapse;">
-                  <!-- Row: ID -->
-                  <tr>
-                    <td style="color: rgba(36, 49, 25, 0.5); font-weight: 300; padding-bottom: 12px; font-size: 13px; text-align: left; border-bottom: 1px dashed rgba(36, 49, 25, 0.08);">ID da Encomenda:</td>
-                    <td align="right" style="font-weight: bold; font-family: monospace; padding-bottom: 12px; font-size: 13px; color: #243119; text-align: right; border-bottom: 1px dashed rgba(36, 49, 25, 0.08);">${order.orderId}</td>
-                  </tr>
-                  <!-- Row: Peça -->
-                  <tr>
-                    <td style="color: rgba(36, 49, 25, 0.5); font-weight: 300; padding-top: 12px; padding-bottom: 12px; font-size: 13px; text-align: left; border-bottom: 1px dashed rgba(36, 49, 25, 0.08);">Peça:</td>
-                    <td align="right" style="font-weight: bold; padding-top: 12px; padding-bottom: 12px; font-size: 13px; color: #243119; text-align: right; border-bottom: 1px dashed rgba(36, 49, 25, 0.08);">${order.productName}</td>
-                  </tr>
-                  <!-- Row: Especificações -->
-                  <tr>
-                    <td style="color: rgba(36, 49, 25, 0.5); font-weight: 300; padding-top: 12px; padding-bottom: 12px; font-size: 13px; text-align: left; border-bottom: 1px dashed rgba(36, 49, 25, 0.08);">Especificações:</td>
-                    <td align="right" style="font-weight: bold; padding-top: 12px; padding-bottom: 12px; font-size: 13px; color: #243119; text-align: right; border-bottom: 1px dashed rgba(36, 49, 25, 0.08);">${order.selections.cor} ${order.selections.tamanho ? `| Tam. ${order.selections.tamanho}` : ''} ${order.selections.quantidade ? `| Qtd. ${order.selections.quantidade}` : ''}</td>
-                  </tr>
-                </table>
-              </td>
-            </tr>
-          </table>
-
-          <!-- SHIPPING BOX -->
-          <div style="font-size: 13px; line-height: 1.6; color: rgba(36, 49, 25, 0.8); margin-bottom: 30px;">
-            <div style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 10px; text-transform: uppercase; letter-spacing: 0.2em; color: rgba(36, 49, 25, 0.5); font-weight: bold; margin-bottom: 8px;">
-              Destinatário & Morada de Entrega
-            </div>
-            <div style="font-weight: 300; color: #243119;">
-              <strong>${order.customer.nome}</strong><br>
-              ${order.customer.morada}<br>
-              ${order.customer.codigoPostal}, ${order.customer.cidade}<br>
-              Telemóvel: ${order.customer.telefone}
-            </div>
-          </div>
-
-          <!-- SHIPPED NOTE -->
-          <div style="background-color: #FDFBF7; border-left: 3px solid #C5A059; padding: 15px; font-size: 12px; line-height: 1.6; font-style: italic; color: rgba(36, 49, 25, 0.8); margin-bottom: 35px;">
-            <strong>Nota de Entrega:</strong> O tempo estimado para entrega em Portugal Continental é de 1 a 3 dias úteis. Caso se trate de um envio para as Ilhas (Açores e Madeira) ou Internacional, o prazo poderá estender-se até 5 a 10 dias úteis. Acompanhe o estado do envio usando o botão acima.
-          </div>
-
-          <!-- GOOGLE REVIEWS REQUEST -->
-          <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #FAF8F5; border: 1px solid rgba(197, 160, 89, 0.25); border-radius: 12px; font-family: 'Georgia', 'Garamond', serif; margin-top: 30px; margin-bottom: 30px; text-align: center;">
-            <tr>
-              <td style="padding: 25px; text-align: center;">
-                <div style="color: #C5A059; font-size: 16px; margin-bottom: 8px; letter-spacing: 0.1em;">★ ★ ★ ★ ★</div>
-                <div style="font-size: 16px; font-style: italic; font-weight: bold; color: #243119; margin-bottom: 10px;">Partilhe a sua experiência M★BRAVO!</div>
-                <div style="font-size: 13px; line-height: 1.6; color: rgba(36, 49, 25, 0.8); margin-bottom: 18px; font-weight: 300;">
-                  Como uma marca artesanal e independente, cada opinião é imensamente valiosa para nós. Se adorou o seu atendimento e a sua nova peça tecida à mão, significaria o mundo para nós se nos pudesse deixar uma breve crítica de 5 estrelas no Google.
+        {/* CONTAINER CONTENT */}
+        <div className="flex-1 overflow-y-auto">
+          {!isAuthenticated ? (
+            /* LOGIN PANEL */
+            <div className="h-full flex items-center justify-center p-6">
+              <div className="w-full max-w-md bg-white border border-forest/5 p-8 rounded-[20px] shadow-[0_10px_35px_-10px_rgba(36,49,25,0.08)] space-y-6">
+                <div className="text-center space-y-2">
+                  <div className="w-12 h-12 bg-[#FCF8F2] border border-[#C5A059]/20 rounded-full flex items-center justify-center mx-auto text-[#C5A059]">
+                    <Lock className="w-5 h-5" />
+                  </div>
+                  <h4 className="font-serif text-xl font-medium tracking-tight">Acesso Reservado</h4>
+                  <p className="text-xs text-forest/50 font-sans">Introduza a palavra-passe do atelier para gerir as encomendas.</p>
                 </div>
-                <a href="https://g.page/r/Cdo7JGP_Xpc3EBM/review" target="_blank" style="display: inline-block; background-color: #243119; color: #F5F2ED; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: 0.15em; text-decoration: none; padding: 12px 24px; border-radius: 50px; transition: all 0.2s ease;">
-                  Deixar Crítica no Google
-                </a>
-              </td>
-            </tr>
-          </table>
 
-          <!-- DIVIDER -->
-          <div style="height: 1px; background-color: rgba(36, 49, 25, 0.08); margin: 30px 0;"></div>
+                <form onSubmit={handleLogin} className="space-y-4">
+                  <div className="space-y-1">
+                    <label className="text-[10px] font-bold uppercase tracking-wider text-forest/40">Palavra-passe:</label>
+                    <input 
+                      type="password" 
+                      placeholder="Introduza a chave de acesso..."
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      className="w-full bg-cream/30 border border-forest/10 focus:border-[#C5A059] focus:outline-none rounded-xl px-4 py-3 text-sm transition-all"
+                      required
+                    />
+                  </div>
 
-          <!-- FOOTER -->
-          <div style="text-align: center; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 10px; text-transform: uppercase; letter-spacing: 0.15em; color: rgba(36, 49, 25, 0.4); line-height: 1.8;">
-            M★BRAVO ATELIER &bull; PORTUGAL<br>
-            <a href="mailto:${FROM_EMAIL}" style="color: #C5A059; text-decoration: none;">${FROM_EMAIL}</a><br>
-            <span style="font-size: 8px; margin-top: 15px; display: block; color: rgba(36, 49, 25, 0.25); text-transform: none; letter-spacing: normal;">Esta é uma mensagem automática de aviso de expedição em Sandbox de Testes.</span>
-          </div>
-        </td>
-      </tr>
-    </table>
-  </div>
-</body>
-</html>`;
-}
+                  {loginError && (
+                    <div className="bg-red-50 text-red-800 border border-red-200/40 rounded-xl p-3 text-xs flex items-start gap-2 font-sans">
+                      <AlertCircle className="w-4 h-4 text-red-500 shrink-0 mt-0.5" />
+                      <span>{loginError}</span>
+                    </div>
+                  )}
 
-/**
- * Main service method that log-creates visual templates of shipped order notification,
- * and triggers live email delivery through SendGrid.
- */
-export function sendShippedEmails(order: OrderData, trackingCode: string): { shippedEmailUrl: string } {
-  const customerHtml = generateShippedEmailHtml(order, trackingCode);
+                  <button
+                    type="submit"
+                    disabled={isLoggingIn}
+                    className="w-full py-3 bg-[#243119] hover:bg-[#1a2412] text-cream rounded-xl text-xs uppercase font-bold tracking-widest shadow-md transition-all cursor-pointer flex items-center justify-center gap-2"
+                  >
+                    {isLoggingIn ? (
+                      <>
+                        <span className="animate-spin rounded-full h-3 w-3 border border-cream border-t-transparent" />
+                        Autenticando...
+                      </>
+                    ) : (
+                      <>
+                        <Unlock className="w-3.5 h-3.5" />
+                        Aceder ao Painel
+                      </>
+                    )}
+                  </button>
+                </form>
 
-  const publicEmailsDir = path.join(process.cwd(), 'public', 'emails');
-  if (!fs.existsSync(publicEmailsDir)) {
-    fs.mkdirSync(publicEmailsDir, { recursive: true });
-  }
+                <div className="text-[9px] text-center text-forest/30 font-serif italic border-t border-forest/5 pt-4">
+                  M★BRAVO &bull; Confeccionado com Tempo e Afeto
+                </div>
+              </div>
+            </div>
+          ) : (
+            /* ADMIN DASHBOARD */
+            <div className="p-8 space-y-8 font-sans">
+              
+              {/* STATS HIGHLIGHT PANEL */}
+              <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+                <div className="bg-white border border-forest/5 p-5 rounded-[16px] shadow-sm space-y-1">
+                  <div className="text-[10px] font-bold uppercase tracking-wider text-forest/35">Total Encomendas</div>
+                  <div className="text-2xl font-serif font-medium text-forest flex items-center gap-2">
+                    <Package className="w-4 h-4 text-[#C5A059]" />
+                    {totalOrders}
+                  </div>
+                </div>
 
-  const custFileName = `shipped-notification-${order.orderId}.html`;
-  fs.writeFileSync(path.join(publicEmailsDir, custFileName), customerHtml, 'utf-8');
+                <div className="bg-white border border-forest/5 p-5 rounded-[16px] shadow-sm space-y-1">
+                  <div className="text-[10px] font-bold uppercase tracking-wider text-forest/35">Faturação Coletada</div>
+                  <div className="text-2xl font-serif font-medium text-forest flex items-center gap-1.5">
+                    <span className="text-[#BACAA5] font-sans text-lg">€</span>
+                    {totalRevenue.toFixed(2)}
+                  </div>
+                </div>
 
-  console.log(`[M.BRAVO EMAIL SYSTEM] Shipped Notification Email generated in Sandbox mode!`);
-  console.log(`  - Customer Shipped Alert: /emails/${custFileName}`);
+                <div className="bg-white border border-forest/5 p-5 rounded-[16px] shadow-sm space-y-1">
+                  <div className="text-[10px] font-bold uppercase tracking-wider text-forest/35">Aguardam Pagamento</div>
+                  <div className="text-2xl font-serif font-medium text-amber-600 flex items-center gap-2">
+                    <Clock className="w-4 h-4" />
+                    {pendingOrders}
+                  </div>
+                </div>
 
-  const hasSendGridKey = process.env.SENDGRID_API_KEY && 
-                        process.env.SENDGRID_API_KEY !== "" && 
-                        process.env.SENDGRID_API_KEY.startsWith("SG.") &&
-                        !process.env.SENDGRID_API_KEY.includes("INSERT_") &&
-                        !process.env.SENDGRID_API_KEY.includes("YOUR_") &&
-                        !process.env.SENDGRID_API_KEY.includes("mock") &&
-                        !process.env.SENDGRID_API_KEY.includes("test");
+                <div className="bg-white border border-forest/5 p-5 rounded-[16px] shadow-sm space-y-1">
+                  <div className="text-[10px] font-bold uppercase tracking-wider text-forest/35">Pagas / No Atelier</div>
+                  <div className="text-2xl font-serif font-medium text-green-700 flex items-center gap-2">
+                    <CheckCircle className="w-4 h-4" />
+                    {paidOrders}
+                  </div>
+                </div>
 
-  if (hasSendGridKey) {
-    console.log(`[M.BRAVO EMAIL SYSTEM] SendGrid API Key detected! Dispatched Shipped Notification email in background...`);
-    
-    sendViaSendGrid(process.env.SENDGRID_API_KEY!, order.customer.email, `M BRAVO | A sua Encomenda foi Enviada! - ${order.orderId}`, customerHtml)
-      .then(() => console.log(`[M.BRAVO EMAIL SYSTEM] Shipped Notification email sent successfully via SendGrid.`))
-      .catch(err => {
-        console.warn(`\n[M.BRAVO EMAIL SYSTEM WARNING] Could not send Shipped Notification email via SendGrid:`);
-        console.warn(`  - Logged Detail: ${err.message}`);
-        console.warn(`  - Sandbox Status: Local template preview generated successfully at /emails/${custFileName}\n`);
-      });
-  } else {
-    console.log(`[M.BRAVO EMAIL SYSTEM] Live SendGrid key absent or unconfigured. Falling back entirely to Sandbox Local Previews.`);
-  }
+                <div className="bg-[#243119] text-cream p-5 rounded-[16px] shadow-sm space-y-1 col-span-2 md:col-span-1">
+                  <div className="text-[10px] font-bold uppercase tracking-wider text-cream/40">Expedidas CTT</div>
+                  <div className="text-2xl font-serif font-medium text-[#C5A059] flex items-center gap-2">
+                    <Truck className="w-4 h-4" />
+                    {shippedOrders}
+                  </div>
+                </div>
+              </div>
 
-  return {
-    shippedEmailUrl: `/emails/${custFileName}`
-  };
+              {/* TAB SWITCHER & ACTION BAR */}
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-forest/10 pb-2 gap-4">
+                <div className="flex items-center gap-1.5 bg-cream/35 p-1 rounded-xl">
+                  <button
+                    type="button"
+                    onClick={() => setActiveTab('orders')}
+                    className={`px-4 py-2 rounded-lg font-semibold text-xs tracking-wider transition-all uppercase flex items-center gap-2 cursor-pointer ${
+                      activeTab === 'orders'
+                        ? 'bg-[#243119] text-cream shadow-sm font-bold'
+                        : 'text-forest/60 hover:text-forest hover:bg-cream/50'
+                    }`}
+                  >
+                    <Package className="w-3.5 h-3.5" /> Encomendas
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setActiveTab('logs')}
+                    className={`px-4 py-2 rounded-lg font-semibold text-xs tracking-wider transition-all uppercase flex items-center gap-2 cursor-pointer ${
+                      activeTab === 'logs'
+                        ? 'bg-[#243119] text-cream shadow-sm font-bold'
+                        : 'text-forest/60 hover:text-forest hover:bg-cream/50'
+                    }`}
+                  >
+                    <ClipboardList className="w-3.5 h-3.5" /> Log de Auditoria
+                  </button>
+                </div>
+
+                <div className="flex items-center gap-3">
+                  {activeTab === 'orders' && (
+                    <button
+                      type="button"
+                      onClick={exportToCSV}
+                      className="px-4 py-2.5 rounded-xl text-xs tracking-wider font-bold transition-all bg-[#C5A059] hover:bg-[#a68244] text-white flex items-center gap-2 shadow-sm uppercase cursor-pointer"
+                    >
+                      <Download className="w-4 h-4" /> Exportar Contabilidade (CSV)
+                    </button>
+                  )}
+                  {activeTab === 'logs' && (
+                    <button
+                      type="button"
+                      onClick={() => fetchLogs()}
+                      className="px-4 py-2.5 rounded-xl text-xs tracking-wider font-bold transition-all bg-[#BACAA5] hover:bg-[#a3b38e] text-[#243119] flex items-center gap-2 shadow-sm uppercase cursor-pointer"
+                    >
+                      <RefreshCw className={`w-3.5 h-3.5 ${loadingLogs ? 'animate-spin' : ''}`} /> Sincronizar Logs
+                    </button>
+                  )}
+                </div>
+              </div>
+
+              {activeTab === 'orders' ? (
+                <>
+                  {/* SEARCH AND FILTERS */}
+                  <div className="bg-white border border-forest/5 p-5 rounded-[16px] shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
+                {/* Search Bar */}
+                <div className="relative flex-1 max-w-md">
+                  <Search className="absolute left-3.5 top-3 w-4 h-4 text-forest/35" />
+                  <input 
+                    type="text" 
+                    placeholder="Pesquisar por Cliente, E-mail, NIF, Produto ou ID..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="w-full bg-cream/20 border border-forest/10 focus:border-[#C5A059] focus:outline-none rounded-xl pl-10 pr-4 py-2.5 text-xs transition-all"
+                  />
+                </div>
+
+                {/* Filter Tabs */}
+                <div className="flex flex-wrap items-center gap-1.5 text-xs">
+                  <button 
+                    onClick={() => setStatusFilter('all')}
+                    className={`px-3 py-1.5 rounded-lg font-medium transition-all ${statusFilter === 'all' ? 'bg-[#243119] text-cream' : 'bg-cream/40 text-forest/60 hover:bg-cream/70'}`}
+                  >
+                    Todas ({totalOrders})
+                  </button>
+                  <button 
+                    onClick={() => setStatusFilter('pending_payment')}
+                    className={`px-3 py-1.5 rounded-lg font-medium transition-all flex items-center gap-1.5 ${statusFilter === 'pending_payment' ? 'bg-amber-600 text-white' : 'bg-amber-50 text-amber-800 border border-amber-200/20 hover:bg-amber-100/50'}`}
+                  >
+                    Pendentes ({pendingOrders})
+                  </button>
+                  <button 
+                    onClick={() => setStatusFilter('paid')}
+                    className={`px-3 py-1.5 rounded-lg font-medium transition-all flex items-center gap-1.5 ${statusFilter === 'paid' ? 'bg-green-700 text-white' : 'bg-green-50 text-green-800 border border-green-200/20 hover:bg-green-100/50'}`}
+                  >
+                    Pagas ({paidOrders})
+                  </button>
+                  <button 
+                    onClick={() => setStatusFilter('shipped')}
+                    className={`px-3 py-1.5 rounded-lg font-medium transition-all flex items-center gap-1.5 ${statusFilter === 'shipped' ? 'bg-[#C5A059] text-[#243119]' : 'bg-amber-50/50 text-[#A68244] border border-[#C5A059]/10 hover:bg-amber-100/30'}`}
+                  >
+                    Expedidas ({shippedOrders})
+                  </button>
+                  <button 
+                    onClick={() => setStatusFilter('failed')}
+                    className={`px-3 py-1.5 rounded-lg font-medium transition-all flex items-center gap-1.5 ${statusFilter === 'failed' ? 'bg-red-700 text-white' : 'bg-red-50 text-red-800 border border-red-200/20 hover:bg-red-100/50'}`}
+                  >
+                    Canceladas
+                  </button>
+                  <button 
+                    onClick={() => fetchOrders()}
+                    title="Atualizar dados"
+                    className="p-2 hover:bg-forest/5 rounded-lg transition-all text-forest/60 ml-2"
+                  >
+                    <RefreshCw className={`w-4 h-4 ${loadingOrders ? 'animate-spin' : ''}`} />
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setShowManualForm(!showManualForm)}
+                    className="px-3 py-1.5 rounded-lg font-medium transition-all bg-[#BACAA5] text-[#243119] hover:bg-[#a3b38e] flex items-center gap-1.5 font-sans text-xs cursor-pointer"
+                  >
+                    <Plus className="w-3.5 h-3.5" /> Registar Venda Manual
+                  </button>
+                </div>
+              </div>
+
+              {/* MANUAL ORDER FORM CONTAINER */}
+              {showManualForm && (
+                <form onSubmit={handleCreateManualOrder} className="bg-cream/45 border border-[#C5A059]/30 rounded-[20px] p-6 space-y-4 animate-fade-in text-xs text-forest">
+                  <div className="flex items-center justify-between border-b border-[#C5A059]/10 pb-3">
+                    <h4 className="font-serif text-sm font-medium text-forest flex items-center gap-2">
+                      <Package className="w-4 h-4 text-[#C5A059]" />
+                      Registar Encomenda Manual (Recuperação ou Venda Direta)
+                    </h4>
+                    <button 
+                      type="button" 
+                      onClick={() => setShowManualForm(false)}
+                      className="p-1.5 hover:bg-forest/5 rounded-full text-forest/40 cursor-pointer"
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    {/* Product Name */}
+                    <div className="space-y-1">
+                      <label className="font-bold uppercase tracking-wider text-[10px] text-forest/50">Nome do Produto *</label>
+                      <input 
+                        type="text" 
+                        placeholder="Ex: Daisy Coasters (Set de 4)" 
+                        value={manualForm.productName}
+                        onChange={(e) => setManualForm(prev => ({ ...prev, productName: e.target.value }))}
+                        className="w-full bg-white border border-forest/15 rounded-xl px-3 py-2.5 focus:outline-none focus:border-[#C5A059]"
+                        required
+                      />
+                    </div>
+
+                    {/* Price */}
+                    <div className="space-y-1">
+                      <label className="font-bold uppercase tracking-wider text-[10px] text-forest/50">Preço (€) *</label>
+                      <input 
+                        type="number" 
+                        step="0.01" 
+                        placeholder="Ex: 24.00" 
+                        value={manualForm.price}
+                        onChange={(e) => setManualForm(prev => ({ ...prev, price: e.target.value }))}
+                        className="w-full bg-white border border-forest/15 rounded-xl px-3 py-2.5 focus:outline-none focus:border-[#C5A059]"
+                        required
+                      />
+                    </div>
+
+                    {/* Selections Quantity, Color, Size */}
+                    <div className="grid grid-cols-3 gap-2">
+                      <div className="space-y-1">
+                        <label className="font-bold uppercase tracking-wider text-[10px] text-forest/50">Cor</label>
+                        <input 
+                          type="text" 
+                          placeholder="Cru" 
+                          value={manualForm.cor}
+                          onChange={(e) => setManualForm(prev => ({ ...prev, cor: e.target.value }))}
+                          className="w-full bg-white border border-forest/15 rounded-xl px-3 py-2.5 focus:outline-none"
+                        />
+                      </div>
+                      <div className="space-y-1">
+                        <label className="font-bold uppercase tracking-wider text-[10px] text-forest/50">Tam.</label>
+                        <input 
+                          type="text" 
+                          placeholder="Único" 
+                          value={manualForm.tamanho}
+                          onChange={(e) => setManualForm(prev => ({ ...prev, tamanho: e.target.value }))}
+                          className="w-full bg-white border border-forest/15 rounded-xl px-3 py-2.5 focus:outline-none"
+                        />
+                      </div>
+                      <div className="space-y-1">
+                        <label className="font-bold uppercase tracking-wider text-[10px] text-forest/50">Qtd.</label>
+                        <input 
+                          type="text" 
+                          placeholder="1" 
+                          value={manualForm.quantidade}
+                          onChange={(e) => setManualForm(prev => ({ ...prev, quantidade: e.target.value }))}
+                          className="w-full bg-white border border-forest/15 rounded-xl px-3 py-2.5 focus:outline-none"
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    {/* Customer Name */}
+                    <div className="space-y-1">
+                      <label className="font-bold uppercase tracking-wider text-[10px] text-forest/50">Nome do Cliente *</label>
+                      <input 
+                        type="text" 
+                        placeholder="Ex: Maria Santos" 
+                        value={manualForm.customerNome}
+                        onChange={(e) => setManualForm(prev => ({ ...prev, customerNome: e.target.value }))}
+                        className="w-full bg-white border border-forest/15 rounded-xl px-3 py-2.5 focus:outline-none focus:border-[#C5A059]"
+                        required
+                      />
+                    </div>
+
+                    {/* Customer Email */}
+                    <div className="space-y-1">
+                      <label className="font-bold uppercase tracking-wider text-[10px] text-forest/50">E-mail do Cliente</label>
+                      <input 
+                        type="email" 
+                        placeholder="cliente@email.com" 
+                        value={manualForm.customerEmail}
+                        onChange={(e) => setManualForm(prev => ({ ...prev, customerEmail: e.target.value }))}
+                        className="w-full bg-white border border-forest/15 rounded-xl px-3 py-2.5 focus:outline-none focus:border-[#C5A059]"
+                      />
+                    </div>
+
+                    {/* Customer Phone */}
+                    <div className="space-y-1">
+                      <label className="font-bold uppercase tracking-wider text-[10px] text-forest/50">Telefone do Cliente</label>
+                      <input 
+                        type="text" 
+                        placeholder="Ex: 912345678" 
+                        value={manualForm.customerTelefone}
+                        onChange={(e) => setManualForm(prev => ({ ...prev, customerTelefone: e.target.value }))}
+                        className="w-full bg-white border border-forest/15 rounded-xl px-3 py-2.5 focus:outline-none focus:border-[#C5A059]"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    {/* Address */}
+                    <div className="space-y-1 md:col-span-2">
+                      <label className="font-bold uppercase tracking-wider text-[10px] text-forest/50">Morada de Envio</label>
+                      <input 
+                        type="text" 
+                        placeholder="Ex: Rua Direita, 123 2º Esq" 
+                        value={manualForm.customerMorada}
+                        onChange={(e) => setManualForm(prev => ({ ...prev, customerMorada: e.target.value }))}
+                        className="w-full bg-white border border-forest/15 rounded-xl px-3 py-2.5 focus:outline-none focus:border-[#C5A059]"
+                      />
+                    </div>
+
+                    {/* Cod Postal */}
+                    <div className="space-y-1">
+                      <label className="font-bold uppercase tracking-wider text-[10px] text-forest/50">Código Postal</label>
+                      <input 
+                        type="text" 
+                        placeholder="Ex: 1000-123" 
+                        value={manualForm.customerCodigoPostal}
+                        onChange={(e) => setManualForm(prev => ({ ...prev, customerCodigoPostal: e.target.value }))}
+                        className="w-full bg-white border border-forest/15 rounded-xl px-3 py-2.5 focus:outline-none focus:border-[#C5A059]"
+                      />
+                    </div>
+
+                    {/* Cidade */}
+                    <div className="space-y-1">
+                      <label className="font-bold uppercase tracking-wider text-[10px] text-forest/50">Cidade</label>
+                      <input 
+                        type="text" 
+                        placeholder="Ex: Lisboa" 
+                        value={manualForm.customerCidade}
+                        onChange={(e) => setManualForm(prev => ({ ...prev, customerCidade: e.target.value }))}
+                        className="w-full bg-white border border-forest/15 rounded-xl px-3 py-2.5 focus:outline-none focus:border-[#C5A059]"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    {/* NIF */}
+                    <div className="space-y-1">
+                      <label className="font-bold uppercase tracking-wider text-[10px] text-forest/50">NIF (Opcional)</label>
+                      <input 
+                        type="text" 
+                        placeholder="Ex: 123456789" 
+                        value={manualForm.customerNif}
+                        onChange={(e) => setManualForm(prev => ({ ...prev, customerNif: e.target.value }))}
+                        className="w-full bg-white border border-forest/15 rounded-xl px-3 py-2.5 focus:outline-none focus:border-[#C5A059]"
+                      />
+                    </div>
+
+                    {/* Payment Method */}
+                    <div className="space-y-1">
+                      <label className="font-bold uppercase tracking-wider text-[10px] text-forest/50">Método de Pagamento</label>
+                      <select 
+                        value={manualForm.paymentMethod}
+                        onChange={(e) => setManualForm(prev => ({ ...prev, paymentMethod: e.target.value }))}
+                        className="w-full bg-white border border-forest/15 rounded-xl px-3 py-2.5 focus:outline-none focus:border-[#C5A059]"
+                      >
+                        <option value="card">Cartão de Crédito</option>
+                        <option value="mbway">MB WAY</option>
+                        <option value="multibanco">Multibanco</option>
+                        <option value="manual">Dinheiro / Transferência</option>
+                      </select>
+                    </div>
+
+                    {/* Status */}
+                    <div className="space-y-1">
+                      <label className="font-bold uppercase tracking-wider text-[10px] text-forest/50">Estado da Encomenda</label>
+                      <select 
+                        value={manualForm.status}
+                        onChange={(e) => setManualForm(prev => ({ ...prev, status: e.target.value }))}
+                        className="w-full bg-white border border-forest/15 rounded-xl px-3 py-2.5 focus:outline-none focus:border-[#C5A059]"
+                      >
+                        <option value="paid">Paga (No Atelier)</option>
+                        <option value="pending_payment">Aguardando Pagamento</option>
+                        <option value="shipped">Expedida (CTT)</option>
+                      </select>
+                    </div>
+
+                    {/* Priority */}
+                    <div className="space-y-1">
+                      <label className="font-bold uppercase tracking-wider text-[10px] text-forest/50">Prioridade</label>
+                      <select 
+                        value={manualForm.priority}
+                        onChange={(e) => setManualForm(prev => ({ ...prev, priority: e.target.value }))}
+                        className="w-full bg-white border border-forest/15 rounded-xl px-3 py-2.5 focus:outline-none focus:border-[#C5A059]"
+                      >
+                        <option value="NORMAL">NORMAL</option>
+                        <option value="ALTA (Atelier Urgente)">URGENTE (Atelier)</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div className="flex justify-end gap-3 pt-2">
+                    <button 
+                      type="button" 
+                      onClick={() => setShowManualForm(false)}
+                      className="px-4 py-2 bg-cream hover:bg-cream/70 text-forest rounded-xl font-medium cursor-pointer"
+                    >
+                      Cancelar
+                    </button>
+                    <button 
+                      type="submit" 
+                      disabled={isCreatingManual}
+                      className="px-5 py-2 bg-[#243119] hover:bg-[#1a2412] text-cream rounded-xl font-medium flex items-center gap-2 cursor-pointer"
+                    >
+                      {isCreatingManual ? (
+                        <>
+                          <span className="animate-spin rounded-full h-3 w-3 border border-cream border-t-transparent" />
+                          Gravando...
+                        </>
+                      ) : (
+                        "Gravar e Adicionar Encomenda"
+                      )}
+                    </button>
+                  </div>
+                </form>
+              )}
+
+              {/* ORDERS LIST CONTAINER */}
+              {loadingOrders && orders.length === 0 ? (
+                <div className="py-20 text-center space-y-3">
+                  <span className="animate-spin inline-block rounded-full h-8 w-8 border-2 border-[#C5A059] border-t-transparent" />
+                  <p className="text-sm text-forest/50">Carregando a base de dados do atelier...</p>
+                </div>
+              ) : filteredOrders.length === 0 ? (
+                <div className="bg-white border border-forest/5 py-16 rounded-[20px] text-center space-y-2">
+                  <div className="text-4xl">📦</div>
+                  <h5 className="font-serif text-base font-medium">Nenhuma encomenda encontrada</h5>
+                  <p className="text-xs text-forest/40 max-w-sm mx-auto">Não há registros que correspondam aos filtros de pesquisa atuais.</p>
+                </div>
+              ) : (
+                <div className="space-y-6">
+                  {filteredOrders.map((order) => {
+                    const isUpdating = actionLoading[order.orderId];
+                    const successMsg = actionSuccess[order.orderId];
+                    const trInput = trackingInputs[order.orderId] || '';
+
+                    return (
+                      <div 
+                        key={order.orderId}
+                        className="bg-white border border-forest/5 rounded-[20px] shadow-[0_4px_16px_-4px_rgba(36,49,25,0.02)] overflow-hidden transition-all hover:shadow-[0_8px_30px_-6px_rgba(36,49,25,0.06)]"
+                      >
+                        {/* Header Row */}
+                        <div className="px-6 py-4 bg-[#FCFBF9] border-b border-forest/5 flex flex-wrap items-center justify-between gap-3">
+                          <div className="flex items-center gap-2">
+                            <span className="text-[10px] font-mono uppercase bg-forest/5 text-forest/70 px-2.5 py-1 rounded-md font-bold tracking-wider">
+                              ID: {order.orderId}
+                            </span>
+                            <span className="text-[10px] text-forest/40 font-medium">
+                              Criada em: {new Date(order.createdAt).toLocaleString('pt-PT')}
+                            </span>
+                          </div>
+
+                          <div className="flex items-center gap-2">
+                            {/* Priority Badge */}
+                            {order.priority === 'ALTA (Atelier Urgente)' ? (
+                              <span className="text-[9px] uppercase font-bold tracking-wider text-red-700 bg-red-50 border border-red-200/30 px-2.5 py-0.5 rounded-full flex items-center gap-1 animate-pulse">
+                                <AlertTriangle className="w-3 h-3 shrink-0" />
+                                Urgente
+                              </span>
+                            ) : (
+                              <span className="text-[9px] uppercase font-medium tracking-wider text-forest/40 bg-forest/5 px-2.5 py-0.5 rounded-full">
+                                Normal
+                              </span>
+                            )}
+
+                            {/* Status Badge */}
+                            {order.status === 'pending_payment' && (
+                              <span className="text-[9px] uppercase font-bold tracking-wider text-amber-700 bg-amber-50 border border-amber-200/30 px-2.5 py-0.5 rounded-full flex items-center gap-1">
+                                <Clock className="w-3 h-3 shrink-0" />
+                                Pendente Pagamento
+                              </span>
+                            )}
+                            {order.status === 'paid' && (
+                              <span className="text-[9px] uppercase font-bold tracking-wider text-green-800 bg-green-50 border border-green-200/30 px-2.5 py-0.5 rounded-full flex items-center gap-1">
+                                <CheckCircle className="w-3 h-3 shrink-0" />
+                                Pago / Em Produção
+                              </span>
+                            )}
+                            {order.status === 'shipped' && (
+                              <span className="text-[9px] uppercase font-bold tracking-wider text-[#243119] bg-[#E6ECDF] border border-[#BACAA5] px-2.5 py-0.5 rounded-full flex items-center gap-1">
+                                <Truck className="w-3 h-3 shrink-0 text-[#C5A059]" />
+                                Enviado (CTT)
+                              </span>
+                            )}
+                            {order.status === 'failed' && (
+                              <span className="text-[9px] uppercase font-bold tracking-wider text-red-700 bg-red-50 border border-red-100 px-2.5 py-0.5 rounded-full">
+                                Cancelada
+                              </span>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* Order Body Grid */}
+                        <div className="p-6 grid grid-cols-1 lg:grid-cols-12 gap-6">
+                          {/* Col 1: Customer Details (5 Cols) */}
+                          <div className="lg:col-span-5 space-y-4">
+                            <div className="space-y-1">
+                              <span className="text-[9px] font-bold text-forest/35 uppercase tracking-wider block">Dados de Entrega</span>
+                              <div className="font-medium text-sm text-forest">{order.customer?.nome}</div>
+                              <div className="text-xs text-forest/75 space-y-0.5">
+                                <div className="flex items-center gap-1.5">
+                                  <Mail className="w-3.5 h-3.5 text-forest/35" />
+                                  <a href={`mailto:${order.customer?.email}`} className="hover:underline text-forest/80 font-mono">{order.customer?.email}</a>
+                                </div>
+                                <div className="flex items-center gap-1.5">
+                                  <Phone className="w-3.5 h-3.5 text-forest/35" />
+                                  <a href={`tel:${order.customer?.telefone}`} className="hover:underline text-forest/80 font-mono">{order.customer?.telefone}</a>
+                                </div>
+                                <div className="flex items-start gap-1.5 pt-1">
+                                  <MapPin className="w-3.5 h-3.5 text-forest/35 mt-0.5 shrink-0" />
+                                  <span>
+                                    {order.customer?.morada}<br />
+                                    {order.customer?.codigoPostal}, {order.customer?.cidade}
+                                  </span>
+                                </div>
+                              </div>
+                            </div>
+
+                            <div className="pt-2 border-t border-forest/5 flex items-center justify-between">
+                              <div>
+                                <span className="text-[9px] font-bold text-forest/35 uppercase tracking-wider block">NIF Contribuinte</span>
+                                <span className="text-xs font-mono font-bold text-forest">
+                                  {order.customer?.nif ? order.customer.nif : 'Consumidor Final (Sem NIF)'}
+                                </span>
+                              </div>
+                              <div className="text-right">
+                                <span className="text-[9px] font-bold text-forest/35 uppercase tracking-wider block">Método de Pagamento</span>
+                                <span className="text-xs font-semibold text-forest uppercase">
+                                  {order.paymentMethod === 'mbway' ? 'MB WAY' : order.paymentMethod === 'multibanco' ? 'Multibanco' : 'Cartão'}
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* Col 2: Product & Selections (4 Cols) */}
+                          <div className="lg:col-span-4 border-t lg:border-t-0 lg:border-l border-forest/5 lg:pl-6 space-y-4">
+                            <div className="space-y-2">
+                              <span className="text-[9px] font-bold text-forest/35 uppercase tracking-wider block">Peça Selecionada</span>
+                              <div className="font-serif text-base font-medium text-forest">{order.productName}</div>
+                              
+                              <div className="bg-[#FCF8F2]/60 border border-[#C5A059]/10 rounded-xl p-3.5 space-y-1.5 text-xs text-forest/85">
+                                <div className="flex justify-between">
+                                  <span className="text-forest/40">Cor:</span>
+                                  <span className="font-semibold">{order.selections?.cor}</span>
+                                </div>
+                                <div className="flex justify-between">
+                                  <span className="text-forest/40">Tamanho:</span>
+                                  <span className="font-semibold">{order.selections?.tamanho || 'Manual/Sob Medida'}</span>
+                                </div>
+                                <div className="flex justify-between">
+                                  <span className="text-forest/40">Quantidade:</span>
+                                  <span className="font-semibold">{order.selections?.quantidade || '1'}</span>
+                                </div>
+                                <div className="pt-1.5 border-t border-[#C5A059]/10 flex justify-between font-serif text-sm">
+                                  <span className="text-[#C5A059] italic">Preço total:</span>
+                                  <span className="font-bold text-forest">{order.price}</span>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* Col 3: Actions & Sandbox Email Hub (3 Cols) */}
+                          <div className="lg:col-span-3 border-t lg:border-t-0 lg:border-l border-forest/5 lg:pl-6 space-y-4 flex flex-col justify-between">
+                            
+                            {/* Tracking Panel & Email Triggers */}
+                            <div className="space-y-3">
+                              <span className="text-[9px] font-bold text-forest/35 uppercase tracking-wider block">Estado & Código Rastreio CTT</span>
+                              
+                              {order.status === 'paid' && (
+                                <div className="space-y-2">
+                                  <div className="relative">
+                                    <input 
+                                      type="text" 
+                                      placeholder="Ex: DA123456789PT"
+                                      value={trInput}
+                                      onChange={(e) => setTrackingInputs(prev => ({ ...prev, [order.orderId]: e.target.value.toUpperCase() }))}
+                                      className="w-full bg-[#FCFBF9] border border-forest/10 focus:border-[#C5A059] focus:outline-none rounded-lg px-3 py-2 text-xs font-mono uppercase"
+                                    />
+                                  </div>
+                                  <button
+                                    onClick={() => handleDispatchTracking(order.orderId)}
+                                    disabled={isUpdating || !trInput}
+                                    className="w-full py-2 bg-[#243119] hover:bg-[#1a2412] text-cream rounded-lg text-[10px] font-bold uppercase tracking-wider shadow-sm transition-all cursor-pointer flex items-center justify-center gap-1.5 disabled:opacity-40"
+                                  >
+                                    <Truck className="w-3.5 h-3.5" />
+                                    Expedir & Enviar E-mail
+                                  </button>
+                                </div>
+                              )}
+
+                              {order.status === 'shipped' && (
+                                <div className="bg-[#E6ECDF]/30 border border-[#BACAA5]/40 rounded-xl p-3 text-xs space-y-2">
+                                  <div className="flex items-center gap-1 text-[#243119] font-medium font-sans">
+                                    <ShieldCheck className="w-4 h-4 text-[#C5A059] shrink-0" />
+                                    <span>Rastreio CTT Ativo</span>
+                                  </div>
+                                  <div className="font-mono font-bold text-[#243119] text-center bg-white border border-forest/5 rounded px-2 py-1.5">
+                                    {order.trackingCode}
+                                  </div>
+                                  <a 
+                                    href={`https://www.ctt.pt/feapl_2/app/open/objectSearch/objectSearch.jspx?lang=def&objects=${order.trackingCode}`}
+                                    target="_blank" 
+                                    rel="noreferrer"
+                                    className="text-[10px] uppercase tracking-wider text-[#C5A059] hover:text-[#A68244] font-bold flex items-center justify-center gap-1 mt-1 hover:underline"
+                                  >
+                                    Acompanhar nos CTT
+                                    <ExternalLink className="w-3 h-3" />
+                                  </a>
+                                </div>
+                              )}
+
+                              {order.status === 'pending_payment' && (
+                                <div className="space-y-2">
+                                  <div className="text-[10px] text-amber-800 bg-amber-50 border border-amber-200/20 p-2.5 rounded-lg flex items-start gap-1.5">
+                                    <AlertTriangle className="w-3.5 h-3.5 text-amber-600 shrink-0 mt-0.5" />
+                                    <span>Aguardando transferência ou pagamento multibanco.</span>
+                                  </div>
+                                  <div className="grid grid-cols-2 gap-1.5">
+                                    <button
+                                      onClick={() => handleSimulateWebhook(order.orderId, 'simulate_payment')}
+                                      disabled={isUpdating}
+                                      className="py-1.5 bg-green-700 hover:bg-green-800 text-white rounded-lg text-[9px] uppercase font-bold tracking-wider transition-all cursor-pointer text-center"
+                                    >
+                                      Simular Pago
+                                    </button>
+                                    <button
+                                      onClick={() => handleSimulateWebhook(order.orderId, 'simulate_failure')}
+                                      disabled={isUpdating}
+                                      className="py-1.5 bg-red-700 hover:bg-red-800 text-white rounded-lg text-[9px] uppercase font-bold tracking-wider transition-all cursor-pointer text-center"
+                                    >
+                                      Simular Falha
+                                    </button>
+                                  </div>
+                                </div>
+                              )}
+                            </div>
+
+                            {/* Email Previews Hub */}
+                            <div className="pt-3 border-t border-forest/5 space-y-1.5">
+                              <span className="text-[9px] font-bold text-forest/35 uppercase tracking-wider block">Auditoria Sandbox de E-mails</span>
+                              <div className="grid grid-cols-2 gap-1.5 text-[9px]">
+                                {order.emailLinks?.customerEmailUrl && (
+                                  <a 
+                                    href={order.emailLinks.customerEmailUrl} 
+                                    target="_blank" 
+                                    rel="noreferrer"
+                                    className="p-1.5 bg-[#FCF8F2] border border-[#C5A059]/10 text-[#243119] rounded-lg hover:bg-[#F3EFE9] flex items-center justify-center gap-1 hover:underline font-medium"
+                                  >
+                                    <Eye className="w-3 h-3 text-[#C5A059]" />
+                                    Ver Recibo
+                                  </a>
+                                )}
+                                {order.emailLinks?.adminEmailUrl && (
+                                  <a 
+                                    href={order.emailLinks.adminEmailUrl} 
+                                    target="_blank" 
+                                    rel="noreferrer"
+                                    className="p-1.5 bg-[#FCF8F2] border border-[#C5A059]/10 text-[#243119] rounded-lg hover:bg-[#F3EFE9] flex items-center justify-center gap-1 hover:underline font-medium"
+                                  >
+                                    <Eye className="w-3 h-3 text-[#C5A059]" />
+                                    Notif. Atelier
+                                  </a>
+                                )}
+                                {order.shippedEmailUrl && (
+                                  <a 
+                                    href={order.shippedEmailUrl} 
+                                    target="_blank" 
+                                    rel="noreferrer"
+                                    className="p-1.5 bg-[#E6ECDF] border border-[#BACAA5]/30 text-[#243119] rounded-lg hover:bg-[#DCE4D4] flex items-center justify-center gap-1 hover:underline font-medium col-span-2"
+                                  >
+                                    <Eye className="w-3 h-3 text-green-700" />
+                                    Ver E-mail CTT Enviado
+                                  </a>
+                                )}
+                                {order.multibancoRef && !order.emailLinks?.customerEmailUrl && (
+                                  <a 
+                                    href={`/emails/multibanco-instruction-${order.orderId}.html`} 
+                                    target="_blank" 
+                                    rel="noreferrer"
+                                    className="p-1.5 bg-amber-50 border border-amber-200/20 text-amber-800 rounded-lg hover:bg-amber-100/50 flex items-center justify-center gap-1 hover:underline font-medium col-span-2"
+                                  >
+                                    <Eye className="w-3 h-3 text-amber-600" />
+                                    Ver Instruções Multibanco
+                                  </a>
+                                )}
+                              </div>
+                            </div>
+
+                            {/* Status messages */}
+                            {successMsg && (
+                              <div className="bg-green-50 text-green-800 border border-green-200/30 rounded-lg p-2 text-[10px] text-center font-medium animate-fade-in mt-2">
+                                {successMsg}
+                              </div>
+                            )}
+
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </>
+          ) : (
+            /* AUDIT LOGS VIEW */
+            <div className="space-y-6">
+              <div className="bg-white border border-forest/5 p-5 rounded-[16px] shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div>
+                  <h4 className="font-serif text-sm font-medium text-forest">Registo de Atividades e Auditoria</h4>
+                  <p className="text-xs text-forest/40">Rastreabilidade completa de ações administrativas do Atelier.</p>
+                </div>
+                
+                {/* Log Search box */}
+                <div className="relative w-full max-w-xs">
+                  <Search className="absolute left-3 top-2.5 w-3.5 h-3.5 text-forest/35" />
+                  <input 
+                    type="text" 
+                    placeholder="Pesquisar logs por ID, conteúdo ou encomenda..."
+                    value={logSearchQuery}
+                    onChange={(e) => setLogSearchQuery(e.target.value)}
+                    className="w-full bg-cream/20 border border-forest/10 focus:border-[#C5A059] focus:outline-none rounded-xl pl-8 pr-3 py-2 text-xs transition-all"
+                  />
+                </div>
+              </div>
+
+              {loadingLogs && logs.length === 0 ? (
+                <div className="py-20 text-center space-y-3">
+                  <span className="animate-spin inline-block rounded-full h-8 w-8 border-2 border-[#C5A059] border-t-transparent" />
+                  <p className="text-sm text-forest/50">Carregando histórico de auditoria...</p>
+                </div>
+              ) : filteredLogs.length === 0 ? (
+                <div className="bg-white border border-forest/5 py-16 rounded-[20px] text-center space-y-2">
+                  <div className="text-4xl">📋</div>
+                  <h5 className="font-serif text-base font-medium">Nenhum registo de auditoria</h5>
+                  <p className="text-xs text-forest/40 max-w-sm mx-auto">Não existem registos de auditoria correspondentes à pesquisa ou ações efetuadas.</p>
+                </div>
+              ) : (
+                <div className="bg-white border border-forest/5 rounded-[20px] overflow-hidden shadow-sm">
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-left border-collapse text-xs">
+                      <thead>
+                        <tr className="bg-cream/10 border-b border-forest/5 text-forest/50 font-bold uppercase tracking-wider text-[10px]">
+                          <th className="px-6 py-4">ID / Hora</th>
+                          <th className="px-6 py-4">Utilizador</th>
+                          <th className="px-6 py-4">Ação / Evento</th>
+                          <th className="px-6 py-4">Descrição</th>
+                          <th className="px-6 py-4 text-right">ID Encomenda</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-forest/5">
+                        {filteredLogs.map((log) => {
+                          let badgeColor = "bg-amber-50 text-amber-800 border-amber-200/30";
+                          let label = "Alteração";
+                          
+                          if (log.event === 'state_change') {
+                            badgeColor = "bg-blue-50 text-blue-800 border-blue-200/20";
+                            label = "Estado Encomenda";
+                          } else if (log.event === 'manual_order_creation') {
+                            badgeColor = "bg-green-50 text-green-800 border-green-200/20";
+                            label = "Registo Manual";
+                          } else if (log.event === 'ctt_label_generation') {
+                            badgeColor = "bg-[#FCF8F2] text-[#A68244] border-[#C5A059]/20";
+                            label = "Etiqueta CTT";
+                          }
+
+                          return (
+                            <tr key={log.id} className="hover:bg-cream/5 transition-colors">
+                              <td className="px-6 py-4 whitespace-nowrap font-mono space-y-1">
+                                <div className="font-bold text-forest/80 text-[11px]">{log.id}</div>
+                                <div className="text-[10px] text-forest/40">
+                                  {new Date(log.timestamp).toLocaleString('pt-PT')}
+                                </div>
+                              </td>
+                              <td className="px-6 py-4 whitespace-nowrap font-sans font-medium text-forest/70">
+                                {log.user || 'Carolina (Atelier)'}
+                              </td>
+                              <td className="px-6 py-4 whitespace-nowrap">
+                                <span className={`inline-block px-2.5 py-1 text-[10px] font-semibold rounded-full border ${badgeColor}`}>
+                                  {label}
+                                </span>
+                              </td>
+                              <td className="px-6 py-4 font-sans text-forest/80 max-w-md">
+                                <div className="font-medium leading-relaxed">{log.description}</div>
+                                {log.details && Object.keys(log.details).length > 0 && (
+                                  <div className="mt-1.5 p-2 bg-[#FCFBF9] border border-forest/5 rounded-lg text-[10px] font-mono text-forest/60 space-y-0.5">
+                                    {Object.entries(log.details).map(([k, v]) => (
+                                      <div key={k}>
+                                        <span className="font-bold text-forest/40 uppercase">{k}:</span> {String(v)}
+                                      </div>
+                                    ))}
+                                  </div>
+                                )}
+                              </td>
+                              <td className="px-6 py-4 whitespace-nowrap text-right font-mono text-forest/60 font-medium">
+                                {log.orderId ? (
+                                  <span className="bg-forest/5 px-2 py-1 rounded-md text-[10px] font-bold">
+                                    {log.orderId}
+                                  </span>
+                                ) : (
+                                  "-"
+                                )}
+                              </td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+      </motion.div>
+    </div>
+  );
 }
