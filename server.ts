@@ -85,15 +85,29 @@ function loadOrders() {
 
 function saveOrders(map: Map<string, any>) {
   try {
-    // Automatically manage physical raw materials inventory when order status transitions to 'paid' or 'failed'
+    // Automatically manage physical raw materials inventory and finished product stock when order status transitions to 'paid' or 'failed'
     for (const order of map.values()) {
-      if (order.status === 'paid' && !order.inventoryAbated) {
-        if (typeof abateInventoryForOrder === 'function') {
-          abateInventoryForOrder(order);
+      if (order.status === 'paid') {
+        if (!order.inventoryAbated) {
+          if (typeof abateInventoryForOrder === 'function') {
+            abateInventoryForOrder(order);
+          }
         }
-      } else if (order.status === 'failed' && order.inventoryAbated) {
-        if (typeof restoreInventoryForOrder === 'function') {
-          restoreInventoryForOrder(order);
+        if (!order.productStockAbated) {
+          if (typeof abateProductStockForOrder === 'function') {
+            abateProductStockForOrder(order);
+          }
+        }
+      } else if (order.status === 'failed') {
+        if (order.inventoryAbated) {
+          if (typeof restoreInventoryForOrder === 'function') {
+            restoreInventoryForOrder(order);
+          }
+        }
+        if (order.productStockAbated) {
+          if (typeof restoreProductStockForOrder === 'function') {
+            restoreProductStockForOrder(order);
+          }
         }
       }
     }
@@ -1109,6 +1123,77 @@ function restoreInventoryForOrder(order: any) {
     order.orderId,
     { needed }
   );
+}
+
+function abateProductStockForOrder(order: any) {
+  if (!order || order.productStockAbated) return;
+  const catalog = loadCatalog();
+  if (!catalog) return;
+
+  let updated = false;
+  for (const category of catalog) {
+    if (category.products) {
+      for (const prod of category.products) {
+        if (prod.name.toLowerCase() === order.productName.toLowerCase()) {
+          if (prod.stock !== undefined && prod.stock !== null && prod.stock > 0) {
+            // Determine quantity ordered
+            const qty = parseInt(order.selections?.quantidade || "1") || 1;
+            const oldStock = prod.stock;
+            prod.stock = Math.max(0, prod.stock - qty);
+            console.log(`[FINISHED PRODUCT STOCK] Abated stock for ${prod.name}: ${oldStock} -> ${prod.stock}`);
+            
+            addAuditLog(
+              'state_change',
+              `Stock do produto final '${prod.name}' reduzido de ${oldStock} para ${prod.stock} devido à encomenda paga ${order.orderId}.`,
+              order.orderId
+            );
+            
+            updated = true;
+          }
+        }
+      }
+    }
+  }
+
+  if (updated) {
+    saveCatalog(catalog);
+    order.productStockAbated = true;
+  }
+}
+
+function restoreProductStockForOrder(order: any) {
+  if (!order || !order.productStockAbated) return;
+  const catalog = loadCatalog();
+  if (!catalog) return;
+
+  let updated = false;
+  for (const category of catalog) {
+    if (category.products) {
+      for (const prod of category.products) {
+        if (prod.name.toLowerCase() === order.productName.toLowerCase()) {
+          if (prod.stock !== undefined && prod.stock !== null) {
+            const qty = parseInt(order.selections?.quantidade || "1") || 1;
+            const oldStock = prod.stock;
+            prod.stock = prod.stock + qty;
+            console.log(`[FINISHED PRODUCT STOCK] Restored stock for ${prod.name}: ${oldStock} -> ${prod.stock}`);
+            
+            addAuditLog(
+              'state_change',
+              `Stock do produto final '${prod.name}' restaurado de ${oldStock} para ${prod.stock} devido ao cancelamento da encomenda ${order.orderId}.`,
+              order.orderId
+            );
+            
+            updated = true;
+          }
+        }
+      }
+    }
+  }
+
+  if (updated) {
+    saveCatalog(catalog);
+    order.productStockAbated = false;
+  }
 }
 
 // --- CMS & Inventory Endpoints ---
