@@ -866,7 +866,7 @@ function saveLogs(list: any[]) {
 
 let activeLogs = loadLogs();
 
-function addAuditLog(event: 'state_change' | 'manual_order_creation' | 'ctt_label_generation', description: string, orderId?: string, details?: any) {
+function addAuditLog(event: 'state_change' | 'manual_order_creation' | 'ctt_label_generation' | 'crm_customer_update', description: string, orderId?: string, details?: any) {
   const logEntry = {
     id: `LOG-${Math.floor(100000 + Math.random() * 900000)}`,
     timestamp: new Date().toISOString(),
@@ -1442,6 +1442,203 @@ app.post("/api/admin/orders/create", verifyAdmin, (req, res) => {
   );
 
   res.json({ success: true, order: newOrder });
+});
+
+
+/**
+ * 7. CRM & CLIENT PROFILE PERSISTENCE AND ENDPOINTS
+ */
+const getCustomersFilePath = () => {
+  const railwayPersistentDir = "/app/data";
+  try {
+    if (!fs.existsSync(railwayPersistentDir)) {
+      fs.mkdirSync(railwayPersistentDir, { recursive: true });
+    }
+    return path.join(railwayPersistentDir, "customers.json");
+  } catch (e) {
+    return path.join(process.cwd(), "customers.json");
+  }
+};
+
+const CUSTOMERS_FILE = getCustomersFilePath();
+
+function loadCustomers() {
+  const map = new Map<string, any>();
+  if (fs.existsSync(CUSTOMERS_FILE)) {
+    try {
+      const data = JSON.parse(fs.readFileSync(CUSTOMERS_FILE, 'utf8'));
+      for (const [email, cust] of Object.entries(data)) {
+        map.set(email.toLowerCase().trim(), cust);
+      }
+    } catch (err) {
+      console.error("[CRM DATABASE] Failed to load customers.json", err);
+    }
+  }
+  return map;
+}
+
+function saveCustomers(map: Map<string, any>) {
+  try {
+    const obj = Object.fromEntries(map);
+    fs.writeFileSync(CUSTOMERS_FILE, JSON.stringify(obj, null, 2), 'utf8');
+  } catch (err) {
+    console.error("[CRM DATABASE] Failed to save customers.json", err);
+  }
+}
+
+// CRM Endpoint to retrieve consolidated list of all unique customers from actual orders + custom metadata
+app.get("/api/admin/customers", verifyAdmin, (req, res) => {
+  try {
+    const cMap = loadCustomers();
+    const ordersMap = loadOrders();
+    const customerConsolidation = new Map<string, any>();
+
+    // 1. Gather distinct customers from actual orders
+    for (const order of ordersMap.values()) {
+      if (order.customer && order.customer.email) {
+        const email = order.customer.email.toLowerCase().trim();
+        const existing = customerConsolidation.get(email);
+        const orderDate = new Date(order.createdAt).getTime();
+        const priceNum = parseFloat(String(order.price || "0").replace(/[^0-9.,]/g, "").replace(",", ".") || "0");
+        
+        if (!existing || orderDate > existing.latestOrderDate) {
+          customerConsolidation.set(email, {
+            email,
+            name: order.customer.nome,
+            phone: order.customer.telefone || "",
+            address: `${order.customer.morada || ""}, ${order.customer.codigoPostal || ""} ${order.customer.cidade || ""}`,
+            latestOrderDate: orderDate,
+            orderCount: (existing?.orderCount || 0) + 1,
+            totalSpent: (existing?.totalSpent || 0) + priceNum
+          });
+        } else {
+          existing.orderCount += 1;
+          existing.totalSpent += priceNum;
+        }
+      }
+    }
+
+    // 2. Merge with CRM-specific fields
+    const customersList = Array.from(customerConsolidation.values()).map(c => {
+      const crmData = cMap.get(c.email) || {};
+      return {
+        ...c,
+        instagram: crmData.instagram || "",
+        birthday: crmData.birthday || "",
+        instagramNotes: crmData.instagramNotes || "",
+        customNotes: crmData.customNotes || "",
+        createdAt: crmData.createdAt || new Date(c.latestOrderDate).toISOString(),
+        updatedAt: crmData.updatedAt || new Date(c.latestOrderDate).toISOString()
+      };
+    });
+
+    // Add any CRM-only customers who have no orders yet
+    for (const [email, crmData] of cMap.entries()) {
+      if (!customerConsolidation.has(email)) {
+        customersList.push({
+          email,
+          name: crmData.name || "",
+          phone: crmData.phone || "",
+          address: "",
+          latestOrderDate: 0,
+          orderCount: 0,
+          totalSpent: 0,
+          instagram: crmData.instagram || "",
+          birthday: crmData.birthday || "",
+          instagramNotes: crmData.instagramNotes || "",
+          customNotes: crmData.customNotes || "",
+          createdAt: crmData.createdAt || new Date().toISOString(),
+          updatedAt: crmData.updatedAt || new Date().toISOString()
+        });
+      }
+    }
+
+    // Sort by latest activity (recent orders first)
+    customersList.sort((a, b) => b.latestOrderDate - a.latestOrderDate);
+
+    res.json({ success: true, customers: customersList });
+  } catch (error: any) {
+    console.error("[CRM API ERROR] GET /api/admin/customers failed:", error);
+    res.status(500).json({ error: "Erro interno ao carregar a lista de clientes." });
+  }
+});
+
+// CRM Endpoint to retrieve a specific customer profile and all their associated orders
+app.get("/api/admin/customers/:email", verifyAdmin, (req, res) => {
+  try {
+    const email = req.params.email.toLowerCase().trim();
+    const cMap = loadCustomers();
+    const ordersMap = loadOrders();
+    
+    // Scan all orders matching this client
+    const clientOrders = Array.from(ordersMap.values())
+      .filter(order => order.customer && order.customer.email && order.customer.email.toLowerCase().trim() === email)
+      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+
+    const latestOrder = clientOrders[0];
+    const defaultName = latestOrder?.customer?.nome || "";
+    const defaultPhone = latestOrder?.customer?.telefone || "";
+
+    const crmData = cMap.get(email) || {};
+
+    const profile = {
+      email,
+      name: crmData.name || defaultName,
+      phone: crmData.phone || defaultPhone,
+      instagram: crmData.instagram || "",
+      birthday: crmData.birthday || "",
+      instagramNotes: crmData.instagramNotes || "",
+      customNotes: crmData.customNotes || "",
+      createdAt: crmData.createdAt || (latestOrder ? latestOrder.createdAt : new Date().toISOString()),
+      updatedAt: crmData.updatedAt || (latestOrder ? latestOrder.createdAt : new Date().toISOString()),
+      orders: clientOrders
+    };
+
+    res.json({ success: true, profile });
+  } catch (error: any) {
+    console.error("[CRM API ERROR] GET /api/admin/customers/:email failed:", error);
+    res.status(500).json({ error: "Erro interno ao obter ficha de cliente." });
+  }
+});
+
+// CRM Endpoint to update/save custom CRM metadata fields for a specific customer
+app.post("/api/admin/customers/:email", verifyAdmin, (req, res) => {
+  try {
+    const email = req.params.email.toLowerCase().trim();
+    const { name, phone, instagram, birthday, instagramNotes, customNotes } = req.body;
+
+    const cMap = loadCustomers();
+    const existing = cMap.get(email) || {};
+
+    const updatedProfile = {
+      ...existing,
+      email,
+      name: name !== undefined ? name : (existing.name || ""),
+      phone: phone !== undefined ? phone : (existing.phone || ""),
+      instagram: instagram !== undefined ? instagram : (existing.instagram || ""),
+      birthday: birthday !== undefined ? birthday : (existing.birthday || ""),
+      instagramNotes: instagramNotes !== undefined ? instagramNotes : (existing.instagramNotes || ""),
+      customNotes: customNotes !== undefined ? customNotes : (existing.customNotes || ""),
+      createdAt: existing.createdAt || new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    };
+
+    cMap.set(email, updatedProfile);
+    saveCustomers(cMap);
+
+    // Audit Log to trace changes
+    addAuditLog(
+      'crm_customer_update',
+      `Ficha do cliente atualizada no CRM: ${email} (Insta: ${updatedProfile.instagram || 'n/a'}, Aniv: ${updatedProfile.birthday || 'n/a'})`,
+      '',
+      { email, instagram: updatedProfile.instagram, birthday: updatedProfile.birthday }
+    );
+
+    res.json({ success: true, profile: updatedProfile });
+  } catch (error: any) {
+    console.error("[CRM API ERROR] POST /api/admin/customers/:email failed:", error);
+    res.status(500).json({ error: "Erro interno ao gravar dados da ficha de cliente." });
+  }
 });
 
 
