@@ -7,15 +7,14 @@ import {
   Package, ChevronRight, AlertTriangle, ShieldCheck, Plus,
   Download, ClipboardList, Trash, Edit, Save, Check, EyeOff, Layers, Settings
 } from 'lucide-react';
-import { SHOP_CATEGORIES } from '../App';
-
 const API_BASE_URL = import.meta.env.VITE_API_URL || '';
 
 interface AdminDashboardModalProps {
   onClose: () => void;
+  shopCategories?: any[];
 }
 
-export default function AdminDashboardModal({ onClose }: AdminDashboardModalProps) {
+export default function AdminDashboardModal({ onClose, shopCategories = [] }: AdminDashboardModalProps) {
   const [password, setPassword] = useState('');
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [loginError, setLoginError] = useState<string | null>(null);
@@ -246,7 +245,7 @@ export default function AdminDashboardModal({ onClose }: AdminDashboardModalProp
                 'Content-Type': 'application/json',
                 'x-admin-password': activePass
               },
-              body: JSON.stringify({ categories: SHOP_CATEGORIES })
+              body: JSON.stringify({ categories: shopCategories })
             });
             const seedData = await seedRes.json();
             setCatalog(seedData.categories || []);
