@@ -2613,10 +2613,17 @@ const ProductCard: React.FC<ProductCardProps> = ({ product: rawProduct, i, isFoc
                             />
                         </div>
                         <div className="absolute top-4 left-4 z-10 pointer-events-none">
-                            <span className="bg-forest/85 backdrop-blur-md text-white text-[8px] uppercase tracking-widest px-3 py-1.5 rounded-full font-bold">
+                            <span className="brand-patch">
                                 M★BRAVO
                             </span>
                         </div>
+                        {isClassicCoasters && (
+                            <div className="absolute bottom-4 right-4 z-10 pointer-events-none">
+                                <span className="colors-patch">
+                                    VÁRIAS<br/>CORES
+                                </span>
+                            </div>
+                        )}
                     </div>
 
                     {/* Content Section */}
@@ -4881,22 +4888,7 @@ const EssenceHero = ({ onBackToHome }: { onBackToHome: () => void }) => {
                 </defs>
             </svg>
 
-            {/* Parallax Floating Crochet Needle with Matte Gold material gradient & 3D shadow depth */}
-            <motion.div 
-                style={{ y: needleY }}
-                className="absolute left-[8%] top-[25%] pointer-events-none z-[1] hidden lg:block opacity-90"
-            >
-                <svg width="60" height="200" viewBox="0 0 60 200" fill="none" className="overflow-visible" style={{ filter: 'drop-shadow(3px 5px 6px rgba(28,46,36,0.18))' }}>
-                    {/* A beautifully styled vertical crochet hook pointing upwards */}
-                    <path 
-                        d="M 30,180 L 30,115 C 27.5,113 27.5,107 30,105 L 30,36 C 30,33 29.5,31 28.8,29 C 28,27 29,25.5 31,25 C 32.5,24.5 33.8,26 33,28 C 32.4,29.5 31.2,30 31,31 L 31,32 C 31,33.5 32,34 34,34 C 34,34 30,36 30,36" 
-                        stroke="url(#needle-gold-matte)" 
-                        strokeWidth="1.8" 
-                        strokeLinecap="round" 
-                        fill="none" 
-                    />
-                </svg>
-            </motion.div>
+            {/* Parallax Floating Crochet Needle removed per user request to streamline layout */}
 
             {/* Elegant Background organic line representing the thread (Fio) with movement */}
             <div className="absolute inset-0 pointer-events-none z-0">
