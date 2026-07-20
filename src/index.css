@@ -63,6 +63,83 @@ html.lenis, html.lenis body {
               color 1000ms cubic-bezier(0.4, 0, 0.2, 1);
 }
 
+/* Custom M★BRAVO brand and variation patches with physical luxury texture */
+.brand-patch {
+  background-color: rgba(36, 49, 25, 0.85); /* forest/85 */
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  color: #ffffff;
+  font-size: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  padding: 6px 12px;
+  border-radius: 9999px;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  /* Luxury woven texture overlay */
+  background-image: 
+    radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.04) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.05), transparent);
+  background-size: 3px 3px, 100% 100%;
+}
+
+.colors-patch {
+    background-color: rgba(36, 49, 25, 0.85) !important; /* forest/85 - exact match with .brand-patch */
+    backdrop-filter: blur(12px) !important;
+    -webkit-backdrop-filter: blur(12px) !important;
+    color: #ffffff !important;
+    position: relative !important; /* Required for the internal stitch layer */
+    
+    /* Wax Seal Dimensions & Organic Shape */
+    width: 48px !important;
+    height: 48px !important;
+    border-radius: 42% 58% 70% 30% / 45% 45% 55% 55% !important; /* Creates the irregular wax seal edges */
+    
+    /* Centering Layout */
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    text-align: center !important;
+    
+    /* Typography - slightly smaller and lighter for luxury feel */
+    font-family: inherit !important;
+    font-size: 6.5px !important;
+    font-weight: 700 !important;
+    line-height: 1.1 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.15em !important;
+    
+    /* Premium Finishes & Depth */
+    border: none !important; /* REMOVE outer gold line completely */
+    box-shadow: inset 2px 2px 4px rgba(255,255,255,0.1), 0 4px 12px rgba(0, 0, 0, 0.2) !important; /* Gives the realistic melted wax depth */
+    
+    /* Elegant Rotation */
+    transform: rotate(-3deg) !important; /* Slight organic tilt */
+}
+
+/* Internal Golden Stitch Effect */
+.colors-patch::after {
+    content: "" !important;
+    position: absolute !important;
+    /* Pushes the stitch closer to the edge for a cleaner look */
+    top: 2px !important;
+    left: 2px !important;
+    right: 2px !important;
+    bottom: 2px !important;
+    
+    /* Matches the organic shape of the parent container */
+    border-radius: inherit !important; 
+    
+    /* Fine Golden Dashed/Stitched line */
+    border: 1px dashed rgba(197, 160, 89, 0.4) !important; /* Elegant thin stitched line */
+    pointer-events: none !important;
+}
+
+
 
 
 
