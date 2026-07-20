@@ -1645,7 +1645,7 @@ export default function AdminDashboardModal({ onClose, shopCategories = [] }: Ad
                     onClick={() => {
                       const newProd = {
                         id: `p-${Date.now()}`,
-                        name: 'Nova Peça em Croché',
+                        name: 'Nova Peça em Crochet',
                         price: '25€',
                         img: 'https://i.ibb.co/L8N8b9p/african-flower-pouch.jpg',
                         description: 'Peça feita à mão com amor e afeto.',
