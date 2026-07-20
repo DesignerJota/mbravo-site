@@ -85,6 +85,18 @@ function loadOrders() {
 
 function saveOrders(map: Map<string, any>) {
   try {
+    // Automatically manage physical raw materials inventory when order status transitions to 'paid' or 'failed'
+    for (const order of map.values()) {
+      if (order.status === 'paid' && !order.inventoryAbated) {
+        if (typeof abateInventoryForOrder === 'function') {
+          abateInventoryForOrder(order);
+        }
+      } else if (order.status === 'failed' && order.inventoryAbated) {
+        if (typeof restoreInventoryForOrder === 'function') {
+          restoreInventoryForOrder(order);
+        }
+      }
+    }
     const obj = Object.fromEntries(map);
     fs.writeFileSync(ORDERS_FILE, JSON.stringify(obj, null, 2), 'utf8');
   } catch (err) {
@@ -857,6 +869,323 @@ function addAuditLog(event: 'state_change' | 'manual_order_creation' | 'ctt_labe
   saveLogs(activeLogs);
   console.log(`[AUDIT LOG] [${event.toUpperCase()}] ${description}`);
 }
+
+/**
+ * ATELIER CATALOG & PHYSICAL INVENTORY MANAGER (FASE 2)
+ */
+
+const getCatalogFilePath = () => {
+  const railwayPersistentDir = "/app/data";
+  try {
+    if (!fs.existsSync(railwayPersistentDir)) {
+      fs.mkdirSync(railwayPersistentDir, { recursive: true });
+    }
+    return path.join(railwayPersistentDir, "catalog.json");
+  } catch (e) {
+    return path.join(process.cwd(), "catalog.json");
+  }
+};
+
+const CATALOG_FILE = getCatalogFilePath();
+
+function loadCatalog() {
+  if (fs.existsSync(CATALOG_FILE)) {
+    try {
+      const data = JSON.parse(fs.readFileSync(CATALOG_FILE, 'utf8'));
+      if (Array.isArray(data)) return data;
+    } catch (err) {
+      console.error("[CATALOG DATABASE ERROR] Failed to load catalog.json", err);
+    }
+  }
+  return null;
+}
+
+function saveCatalog(catalog: any[]) {
+  try {
+    fs.writeFileSync(CATALOG_FILE, JSON.stringify(catalog, null, 2), 'utf8');
+  } catch (err) {
+    console.error("[CATALOG DATABASE ERROR] Failed to save catalog.json", err);
+  }
+}
+
+const getInventoryFilePath = () => {
+  const railwayPersistentDir = "/app/data";
+  try {
+    if (!fs.existsSync(railwayPersistentDir)) {
+      fs.mkdirSync(railwayPersistentDir, { recursive: true });
+    }
+    return path.join(railwayPersistentDir, "inventory.json");
+  } catch (e) {
+    return path.join(process.cwd(), "inventory.json");
+  }
+};
+
+const INVENTORY_FILE = getInventoryFilePath();
+
+const DEFAULT_INVENTORY = [
+  // Fios Principais e de Pormenor (Alinhados com a paleta M★BRAVO)
+  { id: 'rm_fio_algodao_cru', name: 'Novelo de Fio de Algodão Cru', quantity: 25.0, unit: 'novelos', minSafety: 5.0 },
+  { id: 'rm_fio_algodao_cacau', name: 'Novelo de Fio de Algodão Cacau Escuro', quantity: 15.0, unit: 'novelos', minSafety: 3.0 },
+  { id: 'rm_fio_algodao_oliva', name: 'Novelo de Fio de Algodão Oliva Suave', quantity: 18.0, unit: 'novelos', minSafety: 4.0 },
+  { id: 'rm_fio_algodao_verde_musgo', name: 'Novelo de Fio de Algodão Verde Musgo', quantity: 20.0, unit: 'novelos', minSafety: 5.0 },
+  { id: 'rm_fio_algodao_azul_noite', name: 'Novelo de Fio de Algodão Azul Noite', quantity: 22.0, unit: 'novelos', minSafety: 4.0 },
+  { id: 'rm_fio_algodao_baunilha', name: 'Novelo de Fio de Algodão Amarelo Baunilha', quantity: 15.0, unit: 'novelos', minSafety: 3.0 },
+  { id: 'rm_fio_algodao_terracota', name: 'Novelo de Fio de Algodão Terracota', quantity: 16.0, unit: 'novelos', minSafety: 3.0 },
+  { id: 'rm_fio_algodao_branco_creme', name: 'Novelo de Fio de Algodão Branco Creme', quantity: 25.0, unit: 'novelos', minSafety: 5.0 },
+  { id: 'rm_fio_algodao_rosa_quartzo', name: 'Novelo de Fio de Algodão Rosa Quartzo Subtil', quantity: 18.0, unit: 'novelos', minSafety: 4.0 },
+  { id: 'rm_fio_algodao_hortela', name: 'Novelo de Fio de Algodão Hortelã-Pimenta', quantity: 20.0, unit: 'novelos', minSafety: 4.0 },
+  { id: 'rm_fio_algodao_petroleo', name: 'Novelo de Fio de Algodão Petróleo', quantity: 15.0, unit: 'novelos', minSafety: 3.0 },
+  { id: 'rm_fio_algodao_azul_glaciar', name: 'Novelo de Fio de Algodão Azul Glaciar', quantity: 18.0, unit: 'novelos', minSafety: 4.0 },
+  { id: 'rm_fio_algodao_sorvete_limao', name: 'Novelo de Fio de Algodão Sorvete Limão', quantity: 12.0, unit: 'novelos', minSafety: 3.0 },
+  { id: 'rm_fio_algodao_creme', name: 'Novelo de Fio de Algodão Creme', quantity: 25.0, unit: 'novelos', minSafety: 5.0 },
+  { id: 'rm_fio_algodao_bege', name: 'Novelo de Fio de Algodão Bege Claro', quantity: 20.0, unit: 'novelos', minSafety: 4.0 },
+  { id: 'rm_fio_algodao_rosa_ternura', name: 'Novelo de Fio de Algodão Rosa Ternura', quantity: 18.0, unit: 'novelos', minSafety: 4.0 },
+  
+  // Acessórios e Embalagem
+  { id: 'rm_fecho_correr', name: 'Fecho de Correr (Zipper)', quantity: 45.0, unit: 'unidades', minSafety: 10.0 },
+  { id: 'rm_botao_madeira', name: 'Botão de Madeira M★BRAVO', quantity: 60.0, unit: 'unidades', minSafety: 15.0 },
+  { id: 'rm_forro_tecido', name: 'Tecido para Forro (Algodão)', quantity: 20.0, unit: 'metros', minSafety: 5.0 },
+  { id: 'rm_caixa_embalamento', name: 'Caixa de Embalamento Premium', quantity: 50.0, unit: 'unidades', minSafety: 12.0 },
+  { id: 'rm_etiqueta_couro', name: 'Etiqueta em Couro M★BRAVO', quantity: 100.0, unit: 'unidades', minSafety: 20.0 }
+];
+
+function loadInventory() {
+  if (fs.existsSync(INVENTORY_FILE)) {
+    try {
+      const data = JSON.parse(fs.readFileSync(INVENTORY_FILE, 'utf8'));
+      if (Array.isArray(data)) {
+        // Se for o inventário antigo (que não tem os novos fios alinhados ou ainda usa Bobina), migramos automaticamente
+        const hasNewFio = data.some(item => item.id === 'rm_fio_algodao_cru');
+        const hasBobina = data.some(item => item.name && (item.name.includes('Bobina') || item.unit === 'bobinas'));
+        if (!hasNewFio || hasBobina) {
+          saveInventory(DEFAULT_INVENTORY);
+          return DEFAULT_INVENTORY;
+        }
+        return data;
+      }
+    } catch (err) {
+      console.error("[INVENTORY DATABASE ERROR] Failed to load inventory.json", err);
+    }
+  }
+  saveInventory(DEFAULT_INVENTORY);
+  return DEFAULT_INVENTORY;
+}
+
+function saveInventory(list: any[]) {
+  try {
+    fs.writeFileSync(INVENTORY_FILE, JSON.stringify(list, null, 2), 'utf8');
+  } catch (err) {
+    console.error("[INVENTORY DATABASE ERROR] Failed to save inventory.json", err);
+  }
+}
+
+function getMaterialsNeededForProduct(productName: string, selections: any = {}) {
+  const nameLower = productName.toLowerCase();
+  const quantity = parseInt(selections.quantidade || "1", 10) || 1;
+  const color = (selections.cor || selections.corFio || "").toLowerCase().trim();
+  
+  const materials: { id: string; quantityNeeded: number }[] = [];
+  
+  // Base packaging and leather brand tags are consumed with every item in an order
+  materials.push({ id: 'rm_caixa_embalamento', quantityNeeded: 1 * quantity });
+  materials.push({ id: 'rm_etiqueta_couro', quantityNeeded: 1 * quantity });
+  
+  // Helper to resolve yarn bobbin ID by color name
+  function getYarnIdForColor(colorName: string) {
+    const norm = colorName.toLowerCase();
+    if (norm.includes('cru') || norm.includes('natural')) return 'rm_fio_algodao_cru';
+    if (norm.includes('cacau')) return 'rm_fio_algodao_cacau';
+    if (norm.includes('oliva')) return 'rm_fio_algodao_oliva';
+    if (norm.includes('musgo') || norm.includes('verde musgo')) return 'rm_fio_algodao_verde_musgo';
+    if (norm.includes('noite') || norm.includes('azul noite')) return 'rm_fio_algodao_azul_noite';
+    if (norm.includes('baunilha') || norm.includes('amarelo baunilha')) return 'rm_fio_algodao_baunilha';
+    if (norm.includes('terracota')) return 'rm_fio_algodao_terracota';
+    if (norm.includes('creme') || norm.includes('branco creme')) return 'rm_fio_algodao_branco_creme';
+    if (norm.includes('rosa quartzo') || norm.includes('quartzo')) return 'rm_fio_algodao_rosa_quartzo';
+    if (norm.includes('hortelã') || norm.includes('hortela')) return 'rm_fio_algodao_hortela';
+    if (norm.includes('petróleo') || norm.includes('petroleo')) return 'rm_fio_algodao_petroleo';
+    if (norm.includes('glaciar') || norm.includes('azul glaciar')) return 'rm_fio_algodao_azul_glaciar';
+    if (norm.includes('limão') || norm.includes('limao')) return 'rm_fio_algodao_sorvete_limao';
+    if (norm.includes('rosa ternura') || norm.includes('rosa')) return 'rm_fio_algodao_rosa_ternura';
+    if (norm.includes('bege') || norm.includes('bege claro')) return 'rm_fio_algodao_bege';
+    
+    // Default fallback
+    return 'rm_fio_algodao_cru';
+  }
+
+  const yarnId = getYarnIdForColor(color);
+
+  if (nameLower.includes('african flower pouch')) {
+    materials.push({ id: yarnId, quantityNeeded: 0.15 * quantity });
+    materials.push({ id: 'rm_fecho_correr', quantityNeeded: 1 * quantity });
+    materials.push({ id: 'rm_forro_tecido', quantityNeeded: 0.2 * quantity });
+  } 
+  else if (nameLower.includes('mini pouches') || nameLower.includes('mini pouch')) {
+    materials.push({ id: yarnId, quantityNeeded: 0.08 * quantity });
+    materials.push({ id: 'rm_fecho_correr', quantityNeeded: 1 * quantity });
+  }
+  else if (nameLower.includes('mini shell pouch')) {
+    materials.push({ id: 'rm_fio_algodao_cru', quantityNeeded: 0.1 * quantity });
+    materials.push({ id: 'rm_botao_madeira', quantityNeeded: 1 * quantity });
+  }
+  else if (nameLower.includes('airpods case')) {
+    materials.push({ id: 'rm_fio_algodao_cru', quantityNeeded: 0.05 * quantity });
+  }
+  else if (nameLower.includes('daisy coasters') || nameLower.includes('coasters') || nameLower.includes('coaster')) {
+    materials.push({ id: 'rm_fio_algodao_branco_creme', quantityNeeded: 0.05 * quantity });
+    materials.push({ id: 'rm_fio_algodao_cru', quantityNeeded: 0.02 * quantity });
+  }
+  else if (nameLower.includes('bikini') || nameLower.includes('top')) {
+    materials.push({ id: yarnId, quantityNeeded: 0.3 * quantity });
+  }
+  else if (nameLower.includes('cardigan') || nameLower.includes('poncho')) {
+    materials.push({ id: 'rm_fio_algodao_cru', quantityNeeded: 1.2 * quantity });
+  }
+  else if (nameLower.includes('bandana') || nameLower.includes('headband')) {
+    materials.push({ id: 'rm_fio_algodao_cru', quantityNeeded: 0.2 * quantity });
+  }
+  else {
+    materials.push({ id: 'rm_fio_algodao_cru', quantityNeeded: 0.15 * quantity });
+  }
+  
+  return materials;
+}
+
+function abateInventoryForOrder(order: any) {
+  if (!order || order.inventoryAbated) return;
+  
+  console.log(`[INVENTORY] Deducting raw materials for order ${order.orderId} (${order.productName})`);
+  const inventoryList = loadInventory();
+  const needed = getMaterialsNeededForProduct(order.productName, order.selections);
+  const alerts: string[] = [];
+  
+  needed.forEach(item => {
+    const rawMaterial = inventoryList.find(rm => rm.id === item.id);
+    if (rawMaterial) {
+      const oldQty = rawMaterial.quantity;
+      rawMaterial.quantity = Math.max(0, parseFloat((rawMaterial.quantity - item.quantityNeeded).toFixed(2)));
+      console.log(` - ${rawMaterial.name}: ${oldQty} -> ${rawMaterial.quantity} ${rawMaterial.unit} (deducted ${item.quantityNeeded})`);
+      
+      if (rawMaterial.quantity < rawMaterial.minSafety) {
+        alerts.push(`${rawMaterial.name} está abaixo do limite de segurança (${rawMaterial.quantity} ${rawMaterial.unit} restante, mínimo: ${rawMaterial.minSafety})`);
+      }
+    }
+  });
+  
+  saveInventory(inventoryList);
+  order.inventoryAbated = true;
+  
+  addAuditLog(
+    'state_change',
+    `Matérias-primas deduzidas automaticamente para a encomenda ${order.orderId}. ` + 
+    (alerts.length > 0 ? `⚠️ ALERTA DE STOCK: ${alerts.join("; ")}` : `Stock atualizado com sucesso.`),
+    order.orderId,
+    { needed, alerts }
+  );
+}
+
+function restoreInventoryForOrder(order: any) {
+  if (!order || !order.inventoryAbated) return;
+  
+  console.log(`[INVENTORY] Restoring raw materials for order ${order.orderId} (${order.productName})`);
+  const inventoryList = loadInventory();
+  const needed = getMaterialsNeededForProduct(order.productName, order.selections);
+  
+  needed.forEach(item => {
+    const rawMaterial = inventoryList.find(rm => rm.id === item.id);
+    if (rawMaterial) {
+      const oldQty = rawMaterial.quantity;
+      rawMaterial.quantity = parseFloat((rawMaterial.quantity + item.quantityNeeded).toFixed(2));
+      console.log(` - ${rawMaterial.name}: ${oldQty} -> ${rawMaterial.quantity} ${rawMaterial.unit} (restored ${item.quantityNeeded})`);
+    }
+  });
+  
+  saveInventory(inventoryList);
+  order.inventoryAbated = false;
+  
+  addAuditLog(
+    'state_change',
+    `Matérias-primas repostas no inventário devido ao cancelamento da encomenda ${order.orderId}.`,
+    order.orderId,
+    { needed }
+  );
+}
+
+// --- CMS & Inventory Endpoints ---
+app.get("/api/catalog", (req, res) => {
+  const catalog = loadCatalog();
+  if (!catalog) {
+    return res.json({ success: true, empty: true });
+  }
+  res.json({ success: true, categories: catalog });
+});
+
+app.post("/api/admin/catalog/seed", (req, res) => {
+  const { categories } = req.body;
+  if (!categories || !Array.isArray(categories)) {
+    return res.status(400).json({ error: "Coleções inválidas para seed" });
+  }
+  saveCatalog(categories);
+  res.json({ success: true, categories });
+});
+
+app.post("/api/admin/catalog/save", verifyAdmin, (req, res) => {
+  const { categories } = req.body;
+  if (!categories || !Array.isArray(categories)) {
+    return res.status(400).json({ error: "Coleções inválidas" });
+  }
+  saveCatalog(categories);
+  
+  addAuditLog(
+    'state_change',
+    `Catálogo do Atelier atualizado no CMS (Categorias, Produtos, Preços ou Cores alterados)`
+  );
+  
+  res.json({ success: true, categories });
+});
+
+app.get("/api/admin/inventory", verifyAdmin, (req, res) => {
+  const list = loadInventory();
+  res.json({ success: true, inventory: list });
+});
+
+app.post("/api/admin/inventory/save", verifyAdmin, (req, res) => {
+  const { inventory } = req.body;
+  if (!inventory || !Array.isArray(inventory)) {
+    return res.status(400).json({ error: "Inventário inválido" });
+  }
+  saveInventory(inventory);
+  
+  addAuditLog(
+    'state_change',
+    `Inventário de matérias-primas atualizado globalmente no painel`
+  );
+  
+  res.json({ success: true, inventory });
+});
+
+app.post("/api/admin/inventory/update", verifyAdmin, (req, res) => {
+  const { materialId, quantity, minSafety, name } = req.body;
+  const list = loadInventory();
+  const index = list.findIndex((m: any) => m.id === materialId);
+  
+  if (index !== -1) {
+    if (quantity !== undefined) list[index].quantity = quantity;
+    if (minSafety !== undefined) list[index].minSafety = minSafety;
+    if (name !== undefined) list[index].name = name;
+    
+    saveInventory(list);
+    
+    addAuditLog(
+      'state_change',
+      `Matéria-prima ${list[index].name} atualizada. Stock: ${list[index].quantity} ${list[index].unit}`
+    );
+    
+    return res.json({ success: true, item: list[index] });
+  }
+  
+  res.status(404).json({ error: "Matéria-prima não encontrada" });
+});
 
 /**
  * 6. ADMINISTRATIVE DASHBOARD ENDPOINTS
