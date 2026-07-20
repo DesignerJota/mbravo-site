@@ -228,7 +228,7 @@ const parseMaterials = (text: string): MaterialOption[] => {
     });
 };
 
-const SHOP_CATEGORIES = [
+export let SHOP_CATEGORIES = [
   {
     id: 'home',
     name: 'Casa',
@@ -6939,7 +6939,7 @@ const ProductDetailPage = ({ pathname }: { pathname: string }) => {
 const AdminPage = () => {
     return (
         <div className="w-full min-h-[85vh] flex items-center justify-center p-0 md:p-6 lg:p-12">
-            <AdminDashboardModal onClose={() => navigateTo('/')} />
+            <AdminDashboardModal onClose={() => navigateTo('/')} shopCategories={SHOP_CATEGORIES} />
         </div>
     );
 };
@@ -6954,6 +6954,43 @@ export default function App() {
   const [zoomedImage, setZoomedImage] = useState<string | null>(null);
   const { t } = useLanguage();
   const [pathname, setPathname] = useState(window.location.pathname);
+  const [catalogVersion, setCatalogVersion] = useState(0);
+
+  // Dynamic catalog loader & seed trigger
+  useEffect(() => {
+    const fetchCatalog = async () => {
+      try {
+        const response = await fetch(`${API_BASE_URL}/api/catalog`);
+        const data = await response.json();
+        if (data.success) {
+          if (data.empty) {
+            // Seed the server with our initial categories array
+            await fetch(`${API_BASE_URL}/api/admin/catalog/seed`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ categories: SHOP_CATEGORIES })
+            });
+          } else if (data.categories && data.categories.length > 0) {
+            // Override global SHOP_CATEGORIES array to sync dynamically
+            SHOP_CATEGORIES.length = 0;
+            SHOP_CATEGORIES.push(...data.categories);
+            setCatalogVersion(v => v + 1);
+          }
+        }
+      } catch (err) {
+        console.error("[CATALOG LOAD ERROR] Failed to fetch active catalog:", err);
+      }
+    };
+    fetchCatalog();
+
+    const handleCatalogUpdate = () => {
+      setCatalogVersion(v => v + 1);
+    };
+    window.addEventListener('catalog-updated', handleCatalogUpdate);
+    return () => {
+      window.removeEventListener('catalog-updated', handleCatalogUpdate);
+    };
+  }, []);
 
   // Robust client-side custom router event and browser history state listeners
   useEffect(() => {
@@ -7248,7 +7285,7 @@ export default function App() {
                     <LegalModal type={activeLegal} onClose={() => setActiveLegal(null)} />
                 )}
                 {showAdmin && (
-                    <AdminDashboardModal onClose={() => setShowAdmin(false)} />
+                    <AdminDashboardModal onClose={() => setShowAdmin(false)} shopCategories={SHOP_CATEGORIES} />
                 )}
                 {zoomedImage && (
                     <motion.div 
