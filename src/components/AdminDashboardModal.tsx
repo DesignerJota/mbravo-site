@@ -5,7 +5,8 @@ import {
   CreditCard, Clock, Truck, FileText, CheckCircle, AlertCircle, 
   ExternalLink, Eye, RefreshCw, Sliders, Calendar, DollarSign, 
   Package, ChevronRight, AlertTriangle, ShieldCheck, Plus,
-  Download, ClipboardList, Trash, Edit, Save, Check, EyeOff, Layers, Settings
+  Download, ClipboardList, Trash, Edit, Save, Check, EyeOff, Layers, Settings,
+  BarChart3, Percent, TrendingUp, ArrowUpRight, Instagram
 } from 'lucide-react';
 const API_BASE_URL = import.meta.env.VITE_API_URL || '';
 
@@ -25,7 +26,7 @@ export default function AdminDashboardModal({ onClose, shopCategories = [] }: Ad
   const [loadingOrders, setLoadingOrders] = useState(false);
   const [ordersError, setOrdersError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
-  const [statusFilter, setStatusFilter] = useState<'all' | 'pending_payment' | 'paid' | 'shipped' | 'failed'>('all');
+  const [statusFilter, setStatusFilter] = useState<'all' | 'pending_payment' | 'paid' | 'shipped' | 'delivered' | 'failed'>('all');
   
   // Action states
   const [trackingInputs, setTrackingInputs] = useState<{ [orderId: string]: string }>({});
@@ -54,7 +55,7 @@ export default function AdminDashboardModal({ onClose, shopCategories = [] }: Ad
   const [isCreatingManual, setIsCreatingManual] = useState(false);
 
   // Audit Logs states
-  const [activeTab, setActiveTab] = useState<'orders' | 'logs' | 'catalog' | 'inventory'>('orders');
+  const [activeTab, setActiveTab] = useState<'orders' | 'logs' | 'catalog' | 'inventory' | 'analytics'>('analytics');
   const [logs, setLogs] = useState<any[]>([]);
   const [loadingLogs, setLoadingLogs] = useState(false);
   const [logsError, setLogsError] = useState<string | null>(null);
@@ -74,6 +75,94 @@ export default function AdminDashboardModal({ onClose, shopCategories = [] }: Ad
   const [inventoryError, setInventoryError] = useState<string | null>(null);
   const [isSavingInventory, setIsSavingInventory] = useState(false);
   const [editingMaterial, setEditingMaterial] = useState<any | null>(null);
+
+  // Analytics simulation toggle state
+  const [showSimulatedData, setShowSimulatedData] = useState<boolean>(true);
+
+  // CRM states
+  const [selectedCustomerEmail, setSelectedCustomerEmail] = useState<string | null>(null);
+  const [customerProfile, setCustomerProfile] = useState<any | null>(null);
+  const [loadingCustomerProfile, setLoadingCustomerProfile] = useState(false);
+  const [customerProfileError, setCustomerProfileError] = useState<string | null>(null);
+  const [isSavingCustomerProfile, setIsSavingCustomerProfile] = useState(false);
+
+  // Editable fields inside the CRM drawer
+  const [crmFields, setCrmFields] = useState({
+    name: '',
+    phone: '',
+    instagram: '',
+    birthday: '',
+    instagramNotes: '',
+    customNotes: ''
+  });
+
+  const fetchCustomerProfile = async (email: string) => {
+    setLoadingCustomerProfile(true);
+    setCustomerProfileError(null);
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/admin/customers/${encodeURIComponent(email)}`, {
+        headers: {
+          'x-admin-password': password || 'CarolinaM26',
+          'Authorization': password || 'CarolinaM26',
+          'Content-Type': 'application/json'
+        }
+      });
+      const data = await response.json();
+      if (response.ok && data.success) {
+        setCustomerProfile(data.profile);
+        setCrmFields({
+          name: data.profile.name || '',
+          phone: data.profile.phone || '',
+          instagram: data.profile.instagram || '',
+          birthday: data.profile.birthday || '',
+          instagramNotes: data.profile.instagramNotes || '',
+          customNotes: data.profile.customNotes || ''
+        });
+      } else {
+        setCustomerProfileError(data.error || 'Erro ao carregar dados do cliente.');
+      }
+    } catch (err) {
+      console.error(err);
+      setCustomerProfileError('Erro de ligação ao servidor.');
+    } finally {
+      setLoadingCustomerProfile(false);
+    }
+  };
+
+  const handleOpenCustomerProfile = (email: string) => {
+    if (!email) return;
+    setSelectedCustomerEmail(email);
+    fetchCustomerProfile(email);
+  };
+
+  const handleSaveCustomerProfile = async () => {
+    if (!selectedCustomerEmail) return;
+    setIsSavingCustomerProfile(true);
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/admin/customers/${encodeURIComponent(selectedCustomerEmail)}`, {
+        method: 'POST',
+        headers: {
+          'x-admin-password': password || 'CarolinaM26',
+          'Authorization': password || 'CarolinaM26',
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(crmFields)
+      });
+      const data = await response.json();
+      if (response.ok && data.success) {
+        setCustomerProfile(prev => prev ? { ...prev, ...data.profile } : data.profile);
+        alert('Ficha de cliente gravada com sucesso!');
+        fetchOrders();
+      } else {
+        alert(data.error || 'Erro ao gravar os dados do cliente.');
+      }
+    } catch (err) {
+      console.error(err);
+      alert('Erro de ligação ao servidor ao gravar ficha.');
+    } finally {
+      setIsSavingCustomerProfile(false);
+    }
+  };
 
   const handleCreateManualOrder = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -347,10 +436,11 @@ export default function AdminDashboardModal({ onClose, shopCategories = [] }: Ad
       const formattedPortes = "0,00";
 
       let translatedStatus = o.status;
-      if (o.status === 'paid') translatedStatus = "Pago / No Atelier";
-      else if (o.status === 'pending_payment') translatedStatus = "Aguardar Pagamento";
-      else if (o.status === 'shipped') translatedStatus = "Expedida CTT";
-      else if (o.status === 'failed') translatedStatus = "Cancelada / Falhada";
+      if (o.status === 'paid') translatedStatus = "No Atelier";
+      else if (o.status === 'pending_payment') translatedStatus = "Aguardar Liquidação";
+      else if (o.status === 'shipped') translatedStatus = "A Caminho";
+      else if (o.status === 'delivered') translatedStatus = "Entregue";
+      else if (o.status === 'failed') translatedStatus = "Cancelada";
 
       let translatedMethod = o.paymentMethod;
       if (o.paymentMethod === 'card') translatedMethod = "Cartao de Credito";
@@ -508,8 +598,9 @@ export default function AdminDashboardModal({ onClose, shopCategories = [] }: Ad
   const pendingOrders = orders.filter(o => o.status === 'pending_payment').length;
   const paidOrders = orders.filter(o => o.status === 'paid').length;
   const shippedOrders = orders.filter(o => o.status === 'shipped').length;
+  const deliveredOrders = orders.filter(o => o.status === 'delivered').length;
   const totalRevenue = orders
-    .filter(o => o.status === 'paid' || o.status === 'shipped')
+    .filter(o => o.status === 'paid' || o.status === 'shipped' || o.status === 'delivered')
     .reduce((sum, o) => sum + parsePrice(o.price), 0);
 
   // Filter & Search logic
@@ -643,44 +734,52 @@ export default function AdminDashboardModal({ onClose, shopCategories = [] }: Ad
             <div className="p-8 space-y-8 font-sans">
               
               {/* STATS HIGHLIGHT PANEL */}
-              <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-                <div className="bg-white border border-forest/5 p-5 rounded-[16px] shadow-sm space-y-1">
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
+                <div className="bg-white border border-forest/5 p-4 rounded-[16px] shadow-sm space-y-1">
                   <div className="text-[10px] font-bold uppercase tracking-wider text-forest/35">Total Encomendas</div>
-                  <div className="text-2xl font-serif font-medium text-forest flex items-center gap-2">
-                    <Package className="w-4 h-4 text-[#C5A059]" />
-                    {totalOrders}
+                  <div className="text-xl font-serif font-medium text-forest flex items-center gap-1.5">
+                    <Package className="w-4 h-4 text-[#C5A059] shrink-0" />
+                    <span>{totalOrders}</span>
                   </div>
                 </div>
 
-                <div className="bg-white border border-forest/5 p-5 rounded-[16px] shadow-sm space-y-1">
+                <div className="bg-white border border-forest/5 p-4 rounded-[16px] shadow-sm space-y-1">
                   <div className="text-[10px] font-bold uppercase tracking-wider text-forest/35">Total Faturado</div>
-                  <div className="text-2xl font-serif font-medium text-forest flex items-center gap-1.5">
-                    <span className="text-[#BACAA5] font-sans text-lg">€</span>
-                    {totalRevenue.toFixed(2)}
+                  <div className="text-xl font-serif font-medium text-forest flex items-center gap-1">
+                    <span className="text-[#BACAA5] font-sans text-base">€</span>
+                    <span>{totalRevenue.toFixed(2)}</span>
                   </div>
                 </div>
 
-                <div className="bg-white border border-forest/5 p-5 rounded-[16px] shadow-sm space-y-1">
-                  <div className="text-[10px] font-bold uppercase tracking-wider text-forest/35">Aguardam Pagamento</div>
-                  <div className="text-2xl font-serif font-medium text-amber-600 flex items-center gap-2">
-                    <Clock className="w-4 h-4" />
-                    {pendingOrders}
+                <div className="bg-white border border-forest/5 p-4 rounded-[16px] shadow-sm space-y-1">
+                  <div className="text-[10px] font-bold uppercase tracking-wider text-forest/35">Aguardar Liquidação</div>
+                  <div className="text-xl font-serif font-medium text-amber-600 flex items-center gap-1.5">
+                    <Clock className="w-4 h-4 shrink-0" />
+                    <span>{pendingOrders}</span>
                   </div>
                 </div>
 
-                <div className="bg-white border border-forest/5 p-5 rounded-[16px] shadow-sm space-y-1">
-                  <div className="text-[10px] font-bold uppercase tracking-wider text-forest/35">Pagas / No Atelier</div>
-                  <div className="text-2xl font-serif font-medium text-green-700 flex items-center gap-2">
-                    <CheckCircle className="w-4 h-4" />
-                    {paidOrders}
+                <div className="bg-white border border-forest/5 p-4 rounded-[16px] shadow-sm space-y-1">
+                  <div className="text-[10px] font-bold uppercase tracking-wider text-forest/35">No Atelier</div>
+                  <div className="text-xl font-serif font-medium text-green-700 flex items-center gap-1.5">
+                    <CheckCircle className="w-4 h-4 shrink-0" />
+                    <span>{paidOrders}</span>
                   </div>
                 </div>
 
-                <div className="bg-[#243119] text-cream p-5 rounded-[16px] shadow-sm space-y-1 col-span-2 md:col-span-1">
-                  <div className="text-[10px] font-bold uppercase tracking-wider text-cream/40">Enviadas CTT</div>
-                  <div className="text-2xl font-serif font-medium text-[#C5A059] flex items-center gap-2">
-                    <Truck className="w-4 h-4" />
-                    {shippedOrders}
+                <div className="bg-white border border-forest/5 p-4 rounded-[16px] shadow-sm space-y-1">
+                  <div className="text-[10px] font-bold uppercase tracking-wider text-[#A68244]">A Caminho</div>
+                  <div className="text-xl font-serif font-medium text-amber-700 flex items-center gap-1.5">
+                    <Truck className="w-4 h-4 shrink-0" />
+                    <span>{shippedOrders}</span>
+                  </div>
+                </div>
+
+                <div className="bg-[#243119] text-cream p-4 rounded-[16px] shadow-sm space-y-1">
+                  <div className="text-[10px] font-bold uppercase tracking-wider text-cream/40">Entregues</div>
+                  <div className="text-xl font-serif font-medium text-[#C5A059] flex items-center gap-1.5">
+                    <Check className="w-4 h-4 shrink-0" />
+                    <span>{deliveredOrders}</span>
                   </div>
                 </div>
               </div>
@@ -688,6 +787,17 @@ export default function AdminDashboardModal({ onClose, shopCategories = [] }: Ad
               {/* TAB SWITCHER & ACTION BAR */}
               <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-forest/10 pb-2 gap-4">
                 <div className="flex flex-wrap items-center gap-1.5 bg-cream/35 p-1 rounded-xl">
+                  <button
+                    type="button"
+                    onClick={() => setActiveTab('analytics')}
+                    className={`px-3.5 py-2 rounded-lg font-semibold text-xs tracking-wider transition-all uppercase flex items-center gap-2 cursor-pointer ${
+                      activeTab === 'analytics'
+                        ? 'bg-[#243119] text-cream shadow-sm font-bold'
+                        : 'text-forest/60 hover:text-forest hover:bg-cream/50'
+                    }`}
+                  >
+                    <BarChart3 className="w-3.5 h-3.5" /> Painel de Vendas
+                  </button>
                   <button
                     type="button"
                     onClick={() => setActiveTab('orders')}
@@ -796,31 +906,37 @@ export default function AdminDashboardModal({ onClose, shopCategories = [] }: Ad
                     onClick={() => setStatusFilter('all')}
                     className={`px-3 py-1.5 rounded-lg font-medium transition-all ${statusFilter === 'all' ? 'bg-[#243119] text-cream' : 'bg-cream/40 text-forest/60 hover:bg-cream/70'}`}
                   >
-                    Todas ({totalOrders})
+                    Todas <span className={`ml-1 text-[10px] font-mono ${statusFilter === 'all' ? 'text-cream/70' : 'text-forest/40'}`}>{totalOrders}</span>
                   </button>
                   <button 
                     onClick={() => setStatusFilter('pending_payment')}
                     className={`px-3 py-1.5 rounded-lg font-medium transition-all flex items-center gap-1.5 ${statusFilter === 'pending_payment' ? 'bg-amber-600 text-white' : 'bg-amber-50 text-amber-800 border border-amber-200/20 hover:bg-amber-100/50'}`}
                   >
-                    Pendentes ({pendingOrders})
+                    Aguardar Liquidação <span className={`ml-1 text-[10px] font-mono ${statusFilter === 'pending_payment' ? 'text-white/70' : 'text-amber-800/40'}`}>{pendingOrders}</span>
                   </button>
                   <button 
                     onClick={() => setStatusFilter('paid')}
                     className={`px-3 py-1.5 rounded-lg font-medium transition-all flex items-center gap-1.5 ${statusFilter === 'paid' ? 'bg-green-700 text-white' : 'bg-green-50 text-green-800 border border-green-200/20 hover:bg-green-100/50'}`}
                   >
-                    Pagas ({paidOrders})
+                    No Atelier <span className={`ml-1 text-[10px] font-mono ${statusFilter === 'paid' ? 'text-white/70' : 'text-green-800/40'}`}>{paidOrders}</span>
                   </button>
                   <button 
                     onClick={() => setStatusFilter('shipped')}
                     className={`px-3 py-1.5 rounded-lg font-medium transition-all flex items-center gap-1.5 ${statusFilter === 'shipped' ? 'bg-[#C5A059] text-[#243119]' : 'bg-amber-50/50 text-[#A68244] border border-[#C5A059]/10 hover:bg-amber-100/30'}`}
                   >
-                    Enviadas ({shippedOrders})
+                    A Caminho <span className={`ml-1 text-[10px] font-mono ${statusFilter === 'shipped' ? 'text-[#243119]/70' : 'text-[#A68244]/50'}`}>{shippedOrders}</span>
+                  </button>
+                  <button 
+                    onClick={() => setStatusFilter('delivered')}
+                    className={`px-3 py-1.5 rounded-lg font-medium transition-all flex items-center gap-1.5 ${statusFilter === 'delivered' ? 'bg-[#243119] text-cream' : 'bg-green-50 text-green-800 border border-green-200/20 hover:bg-green-100/50'}`}
+                  >
+                    Entregues <span className={`ml-1 text-[10px] font-mono ${statusFilter === 'delivered' ? 'text-cream/70' : 'text-green-800/40'}`}>{deliveredOrders}</span>
                   </button>
                   <button 
                     onClick={() => setStatusFilter('failed')}
                     className={`px-3 py-1.5 rounded-lg font-medium transition-all flex items-center gap-1.5 ${statusFilter === 'failed' ? 'bg-red-700 text-white' : 'bg-red-50 text-red-800 border border-red-200/20 hover:bg-red-100/50'}`}
                   >
-                    Canceladas
+                    Canceladas <span className={`ml-1 text-[10px] font-mono ${statusFilter === 'failed' ? 'text-white/70' : 'text-red-800/40'}`}>{orders.filter(o => o.status === 'failed').length}</span>
                   </button>
                   <button 
                     onClick={() => fetchOrders()}
@@ -835,7 +951,7 @@ export default function AdminDashboardModal({ onClose, shopCategories = [] }: Ad
                     onClick={() => setShowManualForm(!showManualForm)}
                     className="px-3 py-1.5 rounded-lg font-medium transition-all bg-[#BACAA5] text-[#243119] hover:bg-[#a3b38e] flex items-center gap-1.5 font-sans text-xs cursor-pointer"
                   >
-                    <Plus className="w-3.5 h-3.5" /> Registar Venda Manual
+                    <Plus className="w-3.5 h-3.5" /> Registar Venda
                   </button>
                 </div>
               </div>
@@ -1131,19 +1247,25 @@ export default function AdminDashboardModal({ onClose, shopCategories = [] }: Ad
                             {order.status === 'pending_payment' && (
                               <span className="text-[9px] uppercase font-bold tracking-wider text-amber-700 bg-amber-50 border border-amber-200/30 px-2.5 py-0.5 rounded-full flex items-center gap-1">
                                 <Clock className="w-3 h-3 shrink-0" />
-                                Pendente Pagamento
+                                Aguardar Liquidação
                               </span>
                             )}
                             {order.status === 'paid' && (
                               <span className="text-[9px] uppercase font-bold tracking-wider text-green-800 bg-green-50 border border-green-200/30 px-2.5 py-0.5 rounded-full flex items-center gap-1">
                                 <CheckCircle className="w-3 h-3 shrink-0" />
-                                Pago / Em Produção
+                                No Atelier
                               </span>
                             )}
                             {order.status === 'shipped' && (
-                              <span className="text-[9px] uppercase font-bold tracking-wider text-[#243119] bg-[#E6ECDF] border border-[#BACAA5] px-2.5 py-0.5 rounded-full flex items-center gap-1">
-                                <Truck className="w-3 h-3 shrink-0 text-[#C5A059]" />
-                                Enviado (CTT)
+                              <span className="text-[9px] uppercase font-bold tracking-wider text-amber-950 bg-amber-50 border border-amber-200 px-2.5 py-0.5 rounded-full flex items-center gap-1">
+                                <Truck className="w-3 h-3 shrink-0 text-amber-600" />
+                                A Caminho
+                              </span>
+                            )}
+                            {order.status === 'delivered' && (
+                              <span className="text-[9px] uppercase font-bold tracking-wider text-emerald-900 bg-emerald-50 border border-emerald-200 px-2.5 py-0.5 rounded-full flex items-center gap-1">
+                                <Check className="w-3 h-3 shrink-0 text-emerald-600" />
+                                Entregue
                               </span>
                             )}
                             {order.status === 'failed' && (
@@ -1178,6 +1300,17 @@ export default function AdminDashboardModal({ onClose, shopCategories = [] }: Ad
                                   </span>
                                 </div>
                               </div>
+                              {order.customer?.email && (
+                                <div className="pt-2">
+                                  <button
+                                    type="button"
+                                    onClick={() => handleOpenCustomerProfile(order.customer.email)}
+                                    className="text-[10px] font-semibold text-[#C5A059] hover:text-[#9e7d3e] flex items-center gap-1.5 transition-all cursor-pointer bg-[#FCF8F2] hover:bg-[#F7EFE3] px-2.5 py-1.5 rounded-lg border border-[#C5A059]/15 shadow-[0_1px_2px_rgba(197,160,89,0.05)] font-serif italic"
+                                  >
+                                    <User className="w-3 h-3 text-[#C5A059]" /> Ver Ficha de Cliente
+                                  </button>
+                                </div>
+                              )}
                             </div>
 
                             <div className="pt-2 border-t border-forest/5 flex items-center justify-between">
@@ -1253,23 +1386,48 @@ export default function AdminDashboardModal({ onClose, shopCategories = [] }: Ad
                               )}
 
                               {order.status === 'shipped' && (
-                                <div className="bg-[#E6ECDF]/30 border border-[#BACAA5]/40 rounded-xl p-3 text-xs space-y-2">
-                                  <div className="flex items-center gap-1 text-[#243119] font-medium font-sans">
-                                    <ShieldCheck className="w-4 h-4 text-[#C5A059] shrink-0" />
-                                    <span>Rastreio CTT Ativo</span>
+                                <div className="space-y-3">
+                                  <div className="bg-[#E6ECDF]/30 border border-[#BACAA5]/40 rounded-xl p-3 text-xs space-y-2">
+                                    <div className="flex items-center gap-1 text-[#243119] font-medium font-sans">
+                                      <ShieldCheck className="w-4 h-4 text-[#C5A059] shrink-0" />
+                                      <span>Rastreio CTT Ativo</span>
+                                    </div>
+                                    <div className="font-mono font-bold text-[#243119] text-center bg-white border border-forest/5 rounded px-2 py-1.5">
+                                      {order.trackingCode}
+                                    </div>
+                                    <a 
+                                      href={`https://www.ctt.pt/feapl_2/app/open/objectSearch/objectSearch.jspx?lang=def&objects=${order.trackingCode}`}
+                                      target="_blank" 
+                                      rel="noreferrer"
+                                      className="text-[10px] uppercase tracking-wider text-[#C5A059] hover:text-[#A68244] font-bold flex items-center justify-center gap-1 mt-1 hover:underline"
+                                    >
+                                      Acompanhar nos CTT
+                                      <ExternalLink className="w-3 h-3" />
+                                    </a>
                                   </div>
-                                  <div className="font-mono font-bold text-[#243119] text-center bg-white border border-forest/5 rounded px-2 py-1.5">
-                                    {order.trackingCode}
-                                  </div>
-                                  <a 
-                                    href={`https://www.ctt.pt/feapl_2/app/open/objectSearch/objectSearch.jspx?lang=def&objects=${order.trackingCode}`}
-                                    target="_blank" 
-                                    rel="noreferrer"
-                                    className="text-[10px] uppercase tracking-wider text-[#C5A059] hover:text-[#A68244] font-bold flex items-center justify-center gap-1 mt-1 hover:underline"
+                                  <button
+                                    onClick={() => handleUpdateStatus(order.orderId, 'delivered')}
+                                    disabled={isUpdating}
+                                    className="w-full py-2 bg-green-800 hover:bg-green-900 text-white rounded-lg text-[10px] font-bold uppercase tracking-wider shadow-sm transition-all cursor-pointer flex items-center justify-center gap-1.5 disabled:opacity-40"
                                   >
-                                    Acompanhar nos CTT
-                                    <ExternalLink className="w-3 h-3" />
-                                  </a>
+                                    <Check className="w-3.5 h-3.5" />
+                                    Confirmar Entrega (Entregue)
+                                  </button>
+                                </div>
+                              )}
+
+                              {order.status === 'delivered' && (
+                                <div className="bg-green-50 border border-green-200 rounded-xl p-3 text-xs space-y-2">
+                                  <div className="flex items-center gap-1 text-green-800 font-medium font-sans">
+                                    <CheckCircle className="w-4 h-4 text-green-600 shrink-0" />
+                                    <span>Encomenda Entregue com Sucesso</span>
+                                  </div>
+                                  {order.trackingCode && (
+                                    <div className="text-[11px] text-forest/70">
+                                      Código de rastreio usado: <span className="font-mono font-bold">{order.trackingCode}</span>
+                                    </div>
+                                  )}
+                                  <p className="text-[10px] text-forest/50">Esta encomenda está concluída e arquivada.</p>
                                 </div>
                               )}
 
@@ -1372,7 +1530,7 @@ export default function AdminDashboardModal({ onClose, shopCategories = [] }: Ad
             <div className="space-y-6">
               <div className="bg-white border border-forest/5 p-5 rounded-[16px] shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
-                  <h4 className="font-serif text-sm font-medium text-forest">Registo de Atividades e Auditoria</h4>
+                  <h4 className="font-serif text-sm font-medium text-forest">Auditoria</h4>
                 </div>
                 
                 {/* Log Search box */}
@@ -1394,10 +1552,8 @@ export default function AdminDashboardModal({ onClose, shopCategories = [] }: Ad
                   <p className="text-sm text-forest/50">Carregando histórico de auditoria...</p>
                 </div>
               ) : filteredLogs.length === 0 ? (
-                <div className="bg-white border border-forest/5 py-16 rounded-[20px] text-center space-y-2">
-                  <div className="text-4xl">📋</div>
-                  <h5 className="font-serif text-base font-medium">Nenhum registo de auditoria</h5>
-                  <p className="text-xs text-forest/40 max-w-sm mx-auto">Não existem registos de auditoria correspondentes à pesquisa ou ações efetuadas.</p>
+                <div className="bg-white border border-forest/5 py-16 rounded-[20px] text-center">
+                  <p className="text-xs text-forest/50">Sem registos de atividade de momento.</p>
                 </div>
               ) : (
                 <div className="bg-white border border-forest/5 rounded-[20px] overflow-hidden shadow-sm">
@@ -1503,7 +1659,7 @@ export default function AdminDashboardModal({ onClose, shopCategories = [] }: Ad
                     }}
                     className="px-4 py-2 bg-[#243119] hover:bg-[#1a2412] text-cream rounded-xl text-xs font-bold tracking-wider uppercase flex items-center gap-1.5 cursor-pointer"
                   >
-                    <Plus className="w-3.5 h-3.5" /> Adicionar Peça
+                    <Plus className="w-3.5 h-3.5" /> Adicionar Produto
                   </button>
                   <button
                     type="button"
@@ -1607,7 +1763,7 @@ export default function AdminDashboardModal({ onClose, shopCategories = [] }: Ad
 
                         {(!currentCat.products || currentCat.products.length === 0) ? (
                           <div className="bg-white border border-dashed border-forest/15 rounded-xl p-8 text-center text-xs text-forest/40">
-                            Nenhum produto nesta coleção. Clique em "Adicionar Peça" para começar!
+                            Nenhum produto nesta coleção. Clique em "Adicionar Produto" para começar!
                           </div>
                         ) : (
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -1633,7 +1789,11 @@ export default function AdminDashboardModal({ onClose, shopCategories = [] }: Ad
 
                                   {/* Finished product stock & crafting time badges */}
                                   <div className="flex gap-1.5 pt-1 flex-wrap">
-                                    <span className={`px-1.5 py-0.5 rounded text-[8.5px] font-bold uppercase tracking-wider ${prod.stock > 0 ? 'bg-emerald-50 text-emerald-700 border border-emerald-100' : 'bg-amber-50 text-amber-700 border border-amber-100'}`}>
+                                    <span className={`px-2.5 py-0.5 rounded-full text-[8.5px] font-semibold uppercase tracking-wider border ${
+                                      prod.stock > 0 
+                                        ? 'bg-emerald-50/50 text-emerald-800 border-emerald-500/15' 
+                                        : 'bg-amber-50/50 text-amber-800 border-amber-500/15'
+                                    }`}>
                                       {prod.stock > 0 ? `${prod.stock} em Stock` : `Por Encomenda (${prod.craftingTime || 10} dias)`}
                                     </span>
                                   </div>
@@ -1967,12 +2127,533 @@ export default function AdminDashboardModal({ onClose, shopCategories = [] }: Ad
             </div>
           )}
 
+          {/* SALES ANALYTICS & PERFORMANCE PANEL (FASE 4) */}
+          {activeTab === 'analytics' && (() => {
+            // Calculate real stats from orders
+            const paidOrdersList = orders.filter(o => o.status === 'paid');
+            const shippedOrdersList = orders.filter(o => o.status === 'shipped');
+            const deliveredOrdersList = orders.filter(o => o.status === 'delivered');
+            const pendingOrdersList = orders.filter(o => o.status === 'pending_payment');
+            const failedOrdersList = orders.filter(o => o.status === 'failed');
+
+            const successOrdersList = [...paidOrdersList, ...shippedOrdersList, ...deliveredOrdersList];
+            const hasRealPaid = successOrdersList.length > 0;
+
+            // Determine what data to display based on showSimulatedData
+            const useSimulated = showSimulatedData && !hasRealPaid;
+
+            // Counts & Values
+            const totalOrdersCount = useSimulated ? 183 : orders.length;
+            const successOrdersCount = useSimulated ? 152 : successOrdersList.length;
+            const pendingOrdersCount = useSimulated ? 18 : pendingOrdersList.length;
+            const failedOrdersCount = useSimulated ? 13 : failedOrdersList.length;
+            const paidOrdersCount = useSimulated ? 5 : paidOrdersList.length;
+            const shippedOrdersCount = useSimulated ? 12 : shippedOrdersList.length;
+            const deliveredOrdersCount = useSimulated ? 135 : deliveredOrdersList.length;
+
+            const successRevenue = useSimulated 
+              ? 19340 
+              : successOrdersList.reduce((sum, o) => sum + parsePrice(o.price), 0);
+              
+            const pendingRevenue = useSimulated 
+              ? 1680 
+              : pendingOrdersList.reduce((sum, o) => sum + parsePrice(o.price), 0);
+
+            const conversionRate = totalOrdersCount > 0 
+              ? Math.round((successOrdersCount / totalOrdersCount) * 100) 
+              : 0;
+
+            const avgOrderValue = successOrdersCount > 0
+              ? Math.round(successRevenue / successOrdersCount)
+              : 0;
+
+            // Group sales by product
+            let topProducts: { name: string; count: number; revenue: number }[] = [];
+            
+            if (useSimulated) {
+              topProducts = [
+                { name: 'Alma Cardigan', count: 48, revenue: 6240 },
+                { name: 'Marea Bikini', count: 35, revenue: 3150 },
+                { name: 'African Flower Pouch', count: 29, revenue: 1160 },
+                { name: 'Coral Bikini Top', count: 22, revenue: 1540 },
+                { name: 'Classic Coasters (Set de 4)', count: 18, revenue: 630 }
+              ];
+            } else {
+              const productSales: { [name: string]: { count: number; revenue: number } } = {};
+              successOrdersList.forEach(o => {
+                const name = o.productName || 'Peça Personalizada';
+                const qty = parseInt(o.selections?.quantidade || "1") || 1;
+                const priceVal = parsePrice(o.price);
+                if (!productSales[name]) {
+                  productSales[name] = { count: 0, revenue: 0 };
+                }
+                productSales[name].count += qty;
+                productSales[name].revenue += priceVal;
+              });
+
+              topProducts = Object.entries(productSales)
+                .map(([name, data]) => ({ name, ...data }))
+                .sort((a, b) => b.count - a.count);
+            }
+
+            // Active crafting workload: sum of crafting times of active 'paid' orders
+            let totalActiveCraftingDays = 0;
+            if (useSimulated) {
+              totalActiveCraftingDays = 42; // Simulation workload
+            } else {
+              paidOrdersList.forEach(o => {
+                const qty = parseInt(o.selections?.quantidade || "1") || 1;
+                let itemCraftingTime = 10; // Default fallback
+                if (catalog && catalog.length > 0) {
+                  for (const cat of catalog) {
+                    if (cat.products) {
+                      const match = cat.products.find((p: any) => p.name.toLowerCase() === o.productName?.toLowerCase());
+                      if (match && match.craftingTime !== undefined && match.craftingTime !== null && match.craftingTime !== '') {
+                        itemCraftingTime = parseInt(match.craftingTime, 10) || 10;
+                      }
+                    }
+                  }
+                }
+                totalActiveCraftingDays += itemCraftingTime * qty;
+              });
+            }
+
+            // Monthly Trend Chart Data
+            const monthsPT = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
+            const currentMonthIndex = new Date().getMonth();
+            
+            let activeChartData: { month: string; revenue: number; ordersCount: number }[] = [];
+            
+            if (useSimulated) {
+              const simulatedData = [
+                { month: 'Jan', revenue: 1250, ordersCount: 10 },
+                { month: 'Fev', revenue: 1480, ordersCount: 12 },
+                { month: 'Mar', revenue: 1320, ordersCount: 11 },
+                { month: 'Abr', revenue: 1980, ordersCount: 15 },
+                { month: 'Mai', revenue: 2450, ordersCount: 19 },
+                { month: 'Jun', revenue: 2210, ordersCount: 17 },
+                { month: 'Jul', revenue: 2890, ordersCount: 22 },
+                { month: 'Ago', revenue: 2600, ordersCount: 20 },
+                { month: 'Set', revenue: 3100, ordersCount: 24 },
+                { month: 'Out', revenue: 3450, ordersCount: 27 },
+                { month: 'Nov', revenue: 3800, ordersCount: 30 },
+                { month: 'Dez', revenue: 4950, ordersCount: 38 },
+              ];
+              activeChartData = simulatedData.slice(0, currentMonthIndex + 1);
+            } else {
+              const monthlyRealData = Array(12).fill(0).map((_, i) => ({
+                month: monthsPT[i],
+                revenue: 0,
+                ordersCount: 0
+              }));
+              
+              successOrdersList.forEach(o => {
+                if (o.createdAt) {
+                  const date = new Date(o.createdAt);
+                  const mIndex = date.getMonth();
+                  if (date.getFullYear() === new Date().getFullYear()) {
+                    monthlyRealData[mIndex].revenue += parsePrice(o.price);
+                    monthlyRealData[mIndex].ordersCount += 1;
+                  }
+                }
+              });
+              activeChartData = monthlyRealData.slice(0, currentMonthIndex + 1);
+            }
+
+            const maxRevenueInChart = Math.max(...activeChartData.map(d => d.revenue), 100);
+
+            // Chart coordinates calculation for custom SVG Area Chart
+            const chartHeight = 150;
+            const chartWidth = 500;
+            const paddingLeft = 45;
+            const paddingRight = 15;
+            const paddingBottom = 25;
+            const paddingTop = 15;
+
+            const graphWidth = chartWidth - paddingLeft - paddingRight;
+            const graphHeight = chartHeight - paddingTop - paddingBottom;
+
+            const points = activeChartData.map((d, index) => {
+              const x = paddingLeft + (activeChartData.length > 1 ? (index / (activeChartData.length - 1)) * graphWidth : graphWidth / 2);
+              const y = paddingTop + graphHeight - (d.revenue / maxRevenueInChart) * graphHeight;
+              return { x, y, label: d.month, value: d.revenue };
+            });
+
+            const linePath = points.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x} ${p.y}`).join(' ');
+            const areaPath = points.length > 0 
+              ? `${linePath} L ${points[points.length - 1].x} ${chartHeight - paddingBottom} L ${points[0].x} ${chartHeight - paddingBottom} Z`
+              : '';
+
+            // Smart Production recommendations
+            const lowStockRawMaterials = inventory ? inventory.filter(m => m.quantity < m.minSafety) : [];
+            const recommendations: string[] = [];
+
+            if (lowStockRawMaterials.length > 0) {
+              recommendations.push(
+                `Rutura de Stock iminente em ${lowStockRawMaterials.length} matéria(s)-prima(s): ` +
+                lowStockRawMaterials.slice(0, 2).map(m => m.name).join(', ') + 
+                (lowStockRawMaterials.length > 2 ? ' e outros.' : '.') + 
+                ' Considere reabastecer para não comprometer as encomendas.'
+              );
+            }
+
+            // Find best sellers with zero catalog stock
+            const zeroStockBestSellers = topProducts.filter(tp => {
+              let isOutOfStock = false;
+              if (catalog && catalog.length > 0) {
+                for (const cat of catalog) {
+                  if (cat.products) {
+                    const match = cat.products.find((p: any) => p.name.toLowerCase() === tp.name.toLowerCase());
+                    if (match && (match.stock === undefined || match.stock === null || match.stock <= 0)) {
+                      isOutOfStock = true;
+                      break;
+                    }
+                  }
+                }
+              }
+              return isOutOfStock;
+            });
+
+            if (zeroStockBestSellers.length > 0) {
+              recommendations.push(
+                `Artigo com elevada procura está esgotado: "${zeroStockBestSellers[0].name}". Considere iniciar confeção imediata ou ajustar o stock no CMS catálogo.`
+              );
+            }
+
+            // Standard recommendations
+            if (recommendations.length === 0) {
+              recommendations.push("Excelente! Todas as matérias-primas e artigos de elevada procura encontram-se com níveis de stock saudáveis.");
+              recommendations.push("Dica de Atelier: Continue a atualizar o stock das matérias-primas conforme recebe novos novelos para manter os dados corretos.");
+            }
+
+            return (
+              <div className="space-y-6">
+                {/* SUBHEADER WITH TOGGLE */}
+                <div className="bg-white border border-forest/5 p-5 rounded-[16px] shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                  <div>
+                    <h4 className="font-serif text-sm font-medium text-forest">Painel de Gestão e Análise de Vendas</h4>
+                  </div>
+                  
+                  {/* SIMULATION TOGGLE */}
+                  {!hasRealPaid && (
+                    <div className="flex items-center gap-2">
+                      <span className="text-[10px] font-medium text-forest/60">Modo de Visualização:</span>
+                      <button
+                        type="button"
+                        onClick={() => setShowSimulatedData(!showSimulatedData)}
+                        className={`px-3 py-1.5 rounded-lg text-[10px] font-bold tracking-wider uppercase transition-all flex items-center gap-1.5 cursor-pointer border ${
+                          showSimulatedData 
+                            ? 'bg-[#BACAA5]/20 text-emerald-800 border-emerald-600/20' 
+                            : 'bg-cream text-forest/70 border-forest/10'
+                        }`}
+                      >
+                        <span className={`w-1.5 h-1.5 rounded-full ${showSimulatedData ? 'bg-emerald-600 animate-pulse' : 'bg-forest/40'}`}></span>
+                        {showSimulatedData ? 'Dados de Demonstração Ativos' : 'Apenas Dados Reais'}
+                      </button>
+                    </div>
+                  )}
+                </div>
+
+                {/* BENTO GRID SUMMARY */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                  {/* METRIC 1: FATURAÇÃO GLOBAL */}
+                  <div className="bg-white border border-forest/5 p-4.5 rounded-[16px] shadow-sm flex flex-col justify-between">
+                    <div className="flex items-center justify-between">
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-forest/50">Faturação Global</span>
+                      <div className="p-1.5 bg-emerald-50 text-emerald-700 rounded-lg">
+                        <DollarSign className="w-4 h-4" />
+                      </div>
+                    </div>
+                    <div className="mt-2.5">
+                      <h3 className="font-serif text-xl font-normal text-forest">{successRevenue.toLocaleString('pt-PT', { style: 'currency', currency: 'EUR' })}</h3>
+                    </div>
+                    <div className="mt-3.5 pt-2.5 border-t border-forest/5 flex justify-between text-[9px] text-forest/60">
+                      <span>Pendente CTT: {pendingRevenue.toLocaleString('pt-PT', { style: 'currency', currency: 'EUR' })}</span>
+                    </div>
+                  </div>
+
+                  {/* METRIC 2: CONVERSÃO DE ENCOMENDAS */}
+                  <div className="bg-white border border-forest/5 p-4.5 rounded-[16px] shadow-sm flex flex-col justify-between">
+                    <div className="flex items-center justify-between">
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-forest/50">Taxa de Conversão</span>
+                      <div className="p-1.5 bg-sky-50 text-sky-700 rounded-lg">
+                        <Percent className="w-4 h-4" />
+                      </div>
+                    </div>
+                    <div className="mt-2.5">
+                      <h3 className="font-serif text-xl font-normal text-forest">{conversionRate}%</h3>
+                    </div>
+                    <div className="mt-3.5 pt-2.5 border-t border-forest/5 flex justify-between text-[9px] text-forest/60">
+                      <span>Pagas: {successOrdersCount}</span>
+                      <span>Falhadas: {failedOrdersCount}</span>
+                    </div>
+                  </div>
+
+                  {/* METRIC 3: CARGA DE TRABALHO ESTIMADA */}
+                  <div className="bg-white border border-forest/5 p-4.5 rounded-[16px] shadow-sm flex flex-col justify-between">
+                    <div className="flex items-center justify-between">
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-forest/50">Carga de Produção</span>
+                      <div className="p-1.5 bg-amber-50 text-amber-700 rounded-lg">
+                        <Clock className="w-4 h-4" />
+                      </div>
+                    </div>
+                    <div className="mt-2.5">
+                      <h3 className="font-serif text-xl font-normal text-forest">{totalActiveCraftingDays} dias</h3>
+                    </div>
+                    <div className="mt-3.5 pt-2.5 border-t border-forest/5 flex justify-between text-[9px] text-forest/60">
+                      <span>Peças a produzir: {useSimulated ? 5 : paidOrdersList.length}</span>
+                    </div>
+                  </div>
+
+                  {/* METRIC 4: TICKET MÉDIO */}
+                  <div className="bg-white border border-forest/5 p-4.5 rounded-[16px] shadow-sm flex flex-col justify-between">
+                    <div className="flex items-center justify-between">
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-forest/50">Valor Médio Encomenda</span>
+                      <div className="p-1.5 bg-purple-50 text-purple-700 rounded-lg">
+                        <TrendingUp className="w-4 h-4" />
+                      </div>
+                    </div>
+                    <div className="mt-2.5">
+                      <h3 className="font-serif text-xl font-normal text-forest">{avgOrderValue.toLocaleString('pt-PT', { style: 'currency', currency: 'EUR' })}</h3>
+                    </div>
+                    <div className="mt-3.5 pt-2.5 border-t border-forest/5 flex justify-between text-[9px] text-forest/60">
+                      <span>Método top: MB WAY</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* MAIN ANALYTICS GRID */}
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                  {/* COLUMN 1 & 2: REVENUE GRAPH & PIPELINE */}
+                  <div className="lg:col-span-2 space-y-6">
+                    {/* CHART BOX */}
+                    <div className="bg-white border border-forest/5 p-5 rounded-[20px] shadow-sm space-y-4">
+                      <div className="flex items-center justify-between border-b border-forest/5 pb-3">
+                        <div>
+                          <h5 className="font-serif text-xs font-semibold text-forest">Faturação</h5>
+                        </div>
+                        <div className="flex items-center gap-3">
+                          <span className="text-[9px] font-bold tracking-wider text-forest/60 flex items-center gap-1 uppercase">
+                            <span className="w-2.5 h-2.5 rounded-full bg-[#243119]/80"></span> Faturação (€)
+                          </span>
+                        </div>
+                      </div>
+
+                      {activeChartData.length === 0 ? (
+                        <div className="h-[150px] flex flex-col items-center justify-center text-center space-y-2 bg-cream/10 rounded-xl">
+                          <BarChart3 className="w-8 h-8 text-forest/20" />
+                          <p className="text-[10px] text-forest/50 font-medium">Sem dados históricos para desenhar o gráfico.</p>
+                        </div>
+                      ) : (
+                        <div className="w-full flex justify-center">
+                          <svg viewBox={`0 0 ${chartWidth} ${chartHeight}`} className="w-full h-[180px] overflow-visible">
+                            <defs>
+                              <linearGradient id="chartGradient" x1="0" y1="0" x2="0" y2="1">
+                                <stop offset="0%" stopColor="#243119" stopOpacity="0.25" />
+                                <stop offset="100%" stopColor="#243119" stopOpacity="0.00" />
+                              </linearGradient>
+                            </defs>
+                            
+                            {/* Horizontal Grid lines */}
+                            {Array(4).fill(0).map((_, i) => {
+                              const y = paddingTop + (graphHeight / 3) * i;
+                              const val = Math.round(maxRevenueInChart - (maxRevenueInChart / 3) * i);
+                              return (
+                                <g key={i}>
+                                  <line 
+                                    x1={paddingLeft} 
+                                    y1={y} 
+                                    x2={chartWidth - paddingRight} 
+                                    y2={y} 
+                                    stroke="#243119" 
+                                    strokeOpacity="0.05" 
+                                    strokeDasharray="3 3"
+                                  />
+                                  <text 
+                                    x={paddingLeft - 8} 
+                                    y={y + 3} 
+                                    textAnchor="end" 
+                                    className="font-sans text-[8px] fill-forest/40"
+                                  >
+                                    {val}€
+                                  </text>
+                                </g>
+                              );
+                            })}
+
+                            {/* Area under line */}
+                            <path d={areaPath} fill="url(#chartGradient)" />
+
+                            {/* Line path */}
+                            <path 
+                              d={linePath} 
+                              fill="none" 
+                              stroke="#243119" 
+                              strokeWidth="2" 
+                              strokeLinecap="round" 
+                              strokeLinejoin="round" 
+                            />
+
+                            {/* Grid vertical dots & highlights */}
+                            {points.map((p, i) => (
+                              <g key={i}>
+                                <circle 
+                                  cx={p.x} 
+                                  cy={p.y} 
+                                  r="4" 
+                                  fill="#C5A059" 
+                                  stroke="white" 
+                                  strokeWidth="1.5" 
+                                  className="transition-all hover:scale-150 cursor-pointer"
+                                />
+                                <text 
+                                  x={p.x} 
+                                  y={chartHeight - 6} 
+                                  textAnchor="middle" 
+                                  className="font-sans text-[8px] fill-forest/65 font-medium"
+                                >
+                                  {p.label}
+                                </text>
+                                {/* Tooltip hover helper */}
+                                <title>{`${p.label}: ${p.value}€`}</title>
+                              </g>
+                            ))}
+                          </svg>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* PIPELINE CONTROL / CONVERSÃO */}
+                    <div className="bg-white border border-forest/5 p-5 rounded-[20px] shadow-sm space-y-4">
+                      <div>
+                        <h5 className="font-serif text-xs font-semibold text-forest">Fluxo de Encomendas</h5>
+                      </div>
+
+                      <div className="grid grid-cols-1 sm:grid-cols-5 gap-3 pt-2">
+                        {/* Passo 1 */}
+                        <div className="bg-cream/10 border border-forest/5 p-3 rounded-xl flex flex-col justify-between space-y-1.5">
+                          <div className="flex items-center justify-between text-forest/40 font-semibold text-[8px] uppercase tracking-wider">
+                            <span>Passo 1</span>
+                            <span>Pendentes</span>
+                          </div>
+                          <div>
+                            <h4 className="font-serif text-base font-normal text-forest/75">{pendingOrdersCount} enc.</h4>
+                          </div>
+                        </div>
+
+                        {/* Passo 2 */}
+                        <div className="bg-amber-50/20 border border-amber-500/10 p-3 rounded-xl flex flex-col justify-between space-y-1.5">
+                          <div className="flex items-center justify-between text-amber-800/60 font-semibold text-[8px] uppercase tracking-wider">
+                            <span>Passo 2</span>
+                            <span>No Atelier</span>
+                          </div>
+                          <div>
+                            <h4 className="font-serif text-base font-normal text-amber-900">{paidOrdersCount} enc.</h4>
+                          </div>
+                        </div>
+
+                        {/* Passo 3 */}
+                        <div className="bg-blue-50/25 border border-blue-500/10 p-3 rounded-xl flex flex-col justify-between space-y-1.5">
+                          <div className="flex items-center justify-between text-blue-800/60 font-semibold text-[8px] uppercase tracking-wider">
+                            <span>Passo 3</span>
+                            <span>A Caminho</span>
+                          </div>
+                          <div>
+                            <h4 className="font-serif text-base font-normal text-blue-950">{shippedOrdersCount} enc.</h4>
+                          </div>
+                        </div>
+
+                        {/* Passo 4 */}
+                        <div className="bg-emerald-50/20 border border-emerald-500/10 p-3 rounded-xl flex flex-col justify-between space-y-1.5">
+                          <div className="flex items-center justify-between text-emerald-800/60 font-semibold text-[8px] uppercase tracking-wider">
+                            <span>Passo 4</span>
+                            <span>Entregues</span>
+                          </div>
+                          <div>
+                            <h4 className="font-serif text-base font-normal text-emerald-950">{deliveredOrdersCount} enc.</h4>
+                          </div>
+                        </div>
+
+                        {/* Canceladas */}
+                        <div className="bg-rose-50/20 border border-rose-500/10 p-3 rounded-xl flex flex-col justify-between space-y-1.5">
+                          <div className="flex items-center justify-between text-rose-800/60 font-semibold text-[8px] uppercase tracking-wider">
+                            <span>Canceladas</span>
+                          </div>
+                          <div>
+                            <h4 className="font-serif text-base font-normal text-rose-950">{failedOrdersCount} enc.</h4>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* COLUMN 3: BEST SELLERS & RECOMMENDATIONS */}
+                  <div className="space-y-6">
+                    {/* BEST SELLERS */}
+                    <div className="bg-white border border-forest/5 p-5 rounded-[20px] shadow-sm space-y-4">
+                      <div>
+                        <h5 className="font-serif text-xs font-semibold text-forest">Mais Vendidos</h5>
+                      </div>
+
+                      {topProducts.length === 0 ? (
+                        <div className="py-8 flex flex-col items-center justify-center text-center space-y-1 bg-cream/10 rounded-xl">
+                          <Package className="w-6 h-6 text-forest/20" />
+                          <p className="text-[10px] text-forest/50 font-medium">Nenhum artigo vendido ainda.</p>
+                        </div>
+                      ) : (
+                        <div className="space-y-3 pt-1">
+                          {topProducts.slice(0, 5).map((item, idx) => {
+                            // Find percentage based on highest seller count
+                            const maxCount = topProducts[0]?.count || 1;
+                            const percentage = Math.round((item.count / maxCount) * 100);
+                            
+                            return (
+                              <div key={item.name} className="space-y-1 text-xs text-left">
+                                <div className="flex items-center justify-between font-sans text-[10px]">
+                                  <span className="font-medium text-forest truncate max-w-[140px]">{idx + 1}. {item.name}</span>
+                                  <span className="font-bold text-forest/75 shrink-0">{item.count} un. ({item.revenue}€)</span>
+                                </div>
+                                <div className="w-full bg-cream/35 h-1.5 rounded-full overflow-hidden">
+                                  <div 
+                                    className="bg-[#243119] h-full rounded-full transition-all duration-500" 
+                                    style={{ width: `${percentage}%` }}
+                                  ></div>
+                                </div>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      )}
+                    </div>
+
+                    {/* SMART RECOMMENDATIONS */}
+                    <div className="bg-white border border-forest/5 p-5 rounded-[20px] shadow-sm space-y-4">
+                      <div className="flex items-center gap-1.5 text-[#C5A059]">
+                        <Settings className="w-4 h-4 shrink-0" />
+                        <h5 className="font-serif text-xs font-semibold text-[#A68244]">Alertas</h5>
+                      </div>
+                      
+                      <div className="space-y-3.5 text-left text-[10px] leading-relaxed font-sans text-forest/80">
+                        {recommendations.map((rec, i) => (
+                          <div key={i} className="flex gap-2 p-2.5 rounded-xl border border-forest/5 bg-cream/15">
+                            <span className="text-amber-600 shrink-0 text-xs">★</span>
+                            <p>{rec}</p>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            );
+          })()}
+
           {/* INTERNAL PHYSICAL INVENTORY VIEW (FASE 2) */}
           {activeTab === 'inventory' && (
             <div className="space-y-6">
               <div className="bg-white border border-forest/5 p-5 rounded-[16px] shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
-                  <h4 className="font-serif text-sm font-medium text-forest">Sincronização de Inventário Físico</h4>
+                  <h4 className="font-serif text-sm font-medium text-forest">Gestão de Stock</h4>
                 </div>
                 <div className="flex gap-2">
                   <button
@@ -2080,14 +2761,14 @@ export default function AdminDashboardModal({ onClose, shopCategories = [] }: Ad
                                           }
                                         }
                                       }}
-                                      className="text-[10px] font-bold text-[#C5A059] hover:underline uppercase tracking-wider cursor-pointer"
+                                      className="text-[11px] font-medium text-[#C5A059] hover:underline cursor-pointer"
                                     >
                                       Ajustar
                                     </button>
                                     <button
                                       type="button"
                                       onClick={() => setEditingMaterial({ isNew: false, material: item })}
-                                      className="text-[10px] font-bold text-forest/50 hover:text-forest hover:underline uppercase tracking-wider cursor-pointer"
+                                      className="text-[11px] font-medium text-forest/50 hover:text-forest hover:underline cursor-pointer"
                                     >
                                       Editar
                                     </button>
@@ -2098,7 +2779,7 @@ export default function AdminDashboardModal({ onClose, shopCategories = [] }: Ad
                                           setInventory(inventory.filter(m => m.id !== item.id));
                                         }
                                       }}
-                                      className="text-[10px] font-bold text-red-600 hover:text-red-800 hover:underline uppercase tracking-wider cursor-pointer"
+                                      className="text-[11px] font-medium text-red-600 hover:text-red-800 hover:underline cursor-pointer"
                                     >
                                       Eliminar
                                     </button>
@@ -2267,6 +2948,308 @@ export default function AdminDashboardModal({ onClose, shopCategories = [] }: Ad
       )}
     </div>
       </motion.div>
+
+    {/* CRM CLIENT PROFILE SLIDING DRAWER */}
+    <AnimatePresence>
+      {selectedCustomerEmail && (
+        <>
+          {/* Backdrop overlay */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 0.35 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setSelectedCustomerEmail(null)}
+            className="fixed inset-0 bg-[#243119] z-[110]"
+          />
+          
+          {/* Sliding Panel */}
+          <motion.div
+            initial={{ x: '100%' }}
+            animate={{ x: 0 }}
+            exit={{ x: '100%' }}
+            transition={{ type: 'spring', damping: 25, stiffness: 150 }}
+            className="fixed top-0 right-0 bottom-0 w-full max-w-lg bg-[#FAF8F5] shadow-2xl z-[120] flex flex-col border-l border-forest/15 h-full overflow-hidden"
+          >
+            {/* Drawer Header */}
+            <div className="px-6 py-5 border-b border-forest/5 bg-[#FCFBF9] flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <User className="w-5 h-5 text-[#C5A059]" />
+                <div className="text-left">
+                  <h3 className="font-serif text-base font-semibold text-forest">Ficha de Cliente Artesanal</h3>
+                  <p className="text-[10px] text-forest/40">M★BRAVO CRM & Relacionamento</p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setSelectedCustomerEmail(null)}
+                className="p-1.5 rounded-lg hover:bg-forest/5 text-forest/40 hover:text-forest transition-colors cursor-pointer"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Drawer Body - Scrollable */}
+            <div className="flex-1 overflow-y-auto p-6 space-y-6 text-left">
+              {loadingCustomerProfile ? (
+                <div className="py-20 flex flex-col items-center justify-center space-y-3">
+                  <RefreshCw className="w-6 h-6 animate-spin text-[#C5A059]" />
+                  <span className="text-xs text-forest/50">A carregar perfil de cliente...</span>
+                </div>
+              ) : customerProfileError ? (
+                <div className="bg-red-50 border border-red-200 rounded-xl p-4 text-center space-y-2">
+                  <p className="text-xs text-red-800">{customerProfileError}</p>
+                  <button
+                    type="button"
+                    onClick={() => fetchCustomerProfile(selectedCustomerEmail)}
+                    className="text-xs font-bold text-red-950 hover:underline flex items-center gap-1 mx-auto"
+                  >
+                    <RefreshCw className="w-3.5 h-3.5" /> Tentar Novamente
+                  </button>
+                </div>
+              ) : customerProfile ? (
+                <>
+                  {/* CRM STATS / QUICK METRICS */}
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="bg-[#FCF8F2] border border-[#C5A059]/10 rounded-xl p-3.5 text-left">
+                      <span className="text-[9px] font-bold uppercase tracking-wider text-forest/40 block">Total Encomendas</span>
+                      <div className="font-serif text-lg text-forest mt-0.5">
+                        {customerProfile.orders?.length || 0} { (customerProfile.orders?.length || 0) === 1 ? 'encomenda' : 'encomendas' }
+                      </div>
+                    </div>
+                    <div className="bg-[#FCF8F2] border border-[#C5A059]/10 rounded-xl p-3.5 text-left">
+                      <span className="text-[9px] font-bold uppercase tracking-wider text-forest/40 block">Valor Acumulado</span>
+                      <div className="font-serif text-lg text-forest mt-0.5">
+                        {(() => {
+                          const total = (customerProfile.orders || []).reduce((sum: number, ord: any) => {
+                            const cleanVal = parseFloat(String(ord.price || "0").replace(/[^0-9.,]/g, "").replace(",", ".") || "0");
+                            return sum + cleanVal;
+                          }, 0);
+                          return total.toLocaleString('pt-PT', { style: 'currency', currency: 'EUR' });
+                        })()}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* PILAR 1: DADOS DE CONTACTO & NOTAS DE INSTAGRAM */}
+                  <div className="bg-white border border-forest/5 rounded-2xl p-5 space-y-4 shadow-sm text-left">
+                    <h4 className="font-serif text-xs font-bold text-forest border-b border-forest/5 pb-2 uppercase tracking-wide flex items-center gap-1.5">
+                      <Instagram className="w-3.5 h-3.5 text-[#C5A059]" /> Pilar 1: Identidade & Redes Sociais
+                    </h4>
+
+                    <div className="grid grid-cols-2 gap-3 text-xs">
+                      <div className="space-y-1">
+                        <label className="font-bold text-forest/50 block">Nome do Cliente</label>
+                        <input
+                          type="text"
+                          value={crmFields.name}
+                          onChange={(e) => setCrmFields(prev => ({ ...prev, name: e.target.value }))}
+                          className="w-full bg-[#FCFBF9] border border-forest/10 focus:border-[#C5A059] focus:outline-none rounded-lg px-2.5 py-1.5 text-forest"
+                        />
+                      </div>
+                      <div className="space-y-1">
+                        <label className="font-bold text-forest/50 block">Telefone</label>
+                        <input
+                          type="text"
+                          value={crmFields.phone}
+                          onChange={(e) => setCrmFields(prev => ({ ...prev, phone: e.target.value }))}
+                          className="w-full bg-[#FCFBF9] border border-forest/10 focus:border-[#C5A059] focus:outline-none rounded-lg px-2.5 py-1.5 text-forest font-mono"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="space-y-1 text-xs">
+                      <label className="font-bold text-forest/50 block">E-mail de Contacto (Único)</label>
+                      <input
+                        type="text"
+                        disabled
+                        value={customerProfile.email}
+                        className="w-full bg-forest/5 border border-forest/5 rounded-lg px-2.5 py-1.5 text-forest/50 font-mono select-all"
+                      />
+                    </div>
+
+                    <div className="space-y-1 text-xs">
+                      <label className="font-bold text-forest/50 block">Utilizador de Instagram</label>
+                      <div className="flex rounded-lg overflow-hidden border border-forest/10 bg-[#FCFBF9]">
+                        <span className="px-2.5 py-1.5 bg-forest/5 border-r border-forest/10 text-forest/55 font-medium">@</span>
+                        <input
+                          type="text"
+                          placeholder="carolina_mbravo"
+                          value={crmFields.instagram}
+                          onChange={(e) => setCrmFields(prev => ({ ...prev, instagram: e.target.value }))}
+                          className="flex-1 bg-transparent focus:outline-none px-2.5 py-1.5 text-forest"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="space-y-1 text-xs">
+                      <label className="font-bold text-forest/50 block">Notas de Contacto e Instagram</label>
+                      <textarea
+                        rows={3}
+                        placeholder="Ex: Falou por DM sobre casaco de linho. Prefere tons terra e botões de madeira..."
+                        value={crmFields.instagramNotes}
+                        onChange={(e) => setCrmFields(prev => ({ ...prev, instagramNotes: e.target.value }))}
+                        className="w-full bg-[#FCFBF9] border border-forest/10 focus:border-[#C5A059] focus:outline-none rounded-lg px-2.5 py-1.5 text-forest"
+                      />
+                    </div>
+                  </div>
+
+                  {/* PILAR 3: ANIVERSÁRIO E DATAS ESPECIAIS */}
+                  <div className="bg-white border border-forest/5 rounded-2xl p-5 space-y-4 shadow-sm text-left">
+                    <h4 className="font-serif text-xs font-bold text-forest border-b border-forest/5 pb-2 uppercase tracking-wide flex items-center gap-1.5">
+                      <Calendar className="w-3.5 h-3.5 text-[#C5A059]" /> Pilar 3: Datas Especiais & Aniversário
+                    </h4>
+
+                    <div className="grid grid-cols-2 gap-4 text-xs">
+                      <div className="space-y-1">
+                        <label className="font-bold text-forest/50 block">Data de Aniversário</label>
+                        <input
+                          type="date"
+                          value={crmFields.birthday}
+                          onChange={(e) => setCrmFields(prev => ({ ...prev, birthday: e.target.value }))}
+                          className="w-full bg-[#FCFBF9] border border-forest/10 focus:border-[#C5A059] focus:outline-none rounded-lg px-2.5 py-1.5 text-forest font-mono"
+                        />
+                      </div>
+
+                      {/* Birthday Status */}
+                      <div className="flex flex-col justify-end text-xs text-forest/70 bg-[#FCF8F2]/40 rounded-lg p-2 border border-[#C5A059]/5 text-left font-sans">
+                        {crmFields.birthday ? (
+                          (() => {
+                            try {
+                              const bDate = new Date(crmFields.birthday);
+                              if (!isNaN(bDate.getTime())) {
+                                const today = new Date();
+                                const monthName = bDate.toLocaleString('pt-PT', { month: 'long' });
+                                const bDay = bDate.getDate();
+                                
+                                // Check if birthday has passed this year
+                                const nextBday = new Date(today.getFullYear(), bDate.getMonth(), bDay);
+                                if (today.getTime() > nextBday.getTime()) {
+                                  nextBday.setFullYear(today.getFullYear() + 1);
+                                }
+                                const diffDays = Math.ceil((nextBday.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+                                
+                                return (
+                                  <div className="space-y-0.5 text-left">
+                                    <span className="text-[10px] font-semibold text-forest/40">Próximo aniversário:</span>
+                                    <div className="font-serif font-medium text-forest/90">
+                                      {bDay} de {monthName}
+                                    </div>
+                                    <div className="text-[9px] text-[#C5A059] italic">
+                                      Faltam {diffDays} dias
+                                    </div>
+                                  </div>
+                                );
+                              }
+                            } catch(e) {}
+                            return <span className="text-forest/30 italic text-[10px]">Data introduzida inválida</span>;
+                          })()
+                        ) : (
+                          <span className="text-forest/30 italic text-[10px] self-center my-auto">Sem aniversário definido</span>
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="space-y-1 text-xs">
+                      <label className="font-bold text-forest/50 block">Medidas de Costura / Notas Operacionais</label>
+                      <textarea
+                        rows={2.5}
+                        placeholder="Ex: Altura da manga +2cm, tamanho M padrão mas com corte subido..."
+                        value={crmFields.customNotes}
+                        onChange={(e) => setCrmFields(prev => ({ ...prev, customNotes: e.target.value }))}
+                        className="w-full bg-[#FCFBF9] border border-forest/10 focus:border-[#C5A059] focus:outline-none rounded-lg px-2.5 py-1.5 text-forest"
+                      />
+                    </div>
+                  </div>
+
+                  {/* PILAR 2: HISTÓRICO DE ENCOMENDAS (TIMELINE) */}
+                  <div className="bg-white border border-forest/5 rounded-2xl p-5 space-y-4 shadow-sm text-left">
+                    <h4 className="font-serif text-xs font-bold text-forest border-b border-forest/5 pb-2 uppercase tracking-wide flex items-center gap-1.5">
+                      <Package className="w-3.5 h-3.5 text-[#C5A059]" /> Pilar 2: Histórico de Encomendas ({customerProfile.orders?.length || 0})
+                    </h4>
+
+                    {(!customerProfile.orders || customerProfile.orders.length === 0) ? (
+                      <p className="text-xs text-forest/40 italic">Sem encomendas associadas a este e-mail.</p>
+                    ) : (
+                      <div className="space-y-3.5 max-h-60 overflow-y-auto pr-1">
+                        {customerProfile.orders.map((ord: any) => (
+                          <div key={ord.orderId} className="border-l-2 border-[#C5A059]/30 pl-3.5 space-y-1 text-xs relative text-left">
+                            <div className="absolute w-2 h-2 rounded-full bg-[#C5A059] -left-[5px] top-1" />
+                            <div className="flex items-center justify-between">
+                              <span className="font-mono font-bold text-forest hover:underline cursor-pointer" onClick={() => {
+                                setSelectedCustomerEmail(null);
+                                setSearchQuery(ord.orderId);
+                                setStatusFilter('all');
+                                setActiveTab('orders');
+                              }}>
+                                ID: {ord.orderId}
+                              </span>
+                              <span className="text-[10px] text-forest/40">
+                                {new Date(ord.createdAt).toLocaleDateString('pt-PT')}
+                              </span>
+                            </div>
+                            <div className="font-serif text-forest/95">{ord.productName}</div>
+                            <div className="text-[10px] text-forest/60 flex items-center gap-3">
+                              <span>Cor: {ord.selections?.cor}</span>
+                              <span>Tamanho: {ord.selections?.tamanho || 'M'}</span>
+                              <span className="font-semibold text-forest/80 ml-auto">{ord.price}</span>
+                            </div>
+                            <div className="pt-0.5 flex justify-between items-center">
+                              {/* Small status pill */}
+                              <span className={`text-[8.5px] uppercase font-bold tracking-wider rounded-full px-2 py-0.5 ${
+                                ord.status === 'paid' ? 'bg-green-50 text-green-800' :
+                                ord.status === 'pending_payment' ? 'bg-amber-50 text-amber-800' :
+                                ord.status === 'shipped' ? 'bg-amber-950/10 text-amber-950' :
+                                ord.status === 'delivered' ? 'bg-emerald-50 text-emerald-800' :
+                                'bg-red-50 text-red-800'
+                              }`}>
+                                {ord.status === 'paid' ? 'No Atelier' :
+                                 ord.status === 'pending_payment' ? 'Aguardar Liquidação' :
+                                 ord.status === 'shipped' ? 'A Caminho' :
+                                 ord.status === 'delivered' ? 'Entregue' :
+                                 'Cancelada'}
+                              </span>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </>
+              ) : null}
+            </div>
+
+            {/* Drawer Footer Actions */}
+            {customerProfile && !loadingCustomerProfile && (
+              <div className="px-6 py-4 border-t border-forest/5 bg-[#FCFBF9] flex gap-3">
+                <button
+                  type="button"
+                  onClick={() => setSelectedCustomerEmail(null)}
+                  className="flex-1 py-2.5 bg-white border border-forest/10 hover:bg-forest/5 text-forest/70 hover:text-forest rounded-xl font-bold uppercase tracking-wider text-xs transition-colors cursor-pointer"
+                >
+                  Fechar
+                </button>
+                <button
+                  type="button"
+                  disabled={isSavingCustomerProfile}
+                  onClick={handleSaveCustomerProfile}
+                  className="flex-1 py-2.5 bg-[#243119] hover:bg-[#1a2412] text-cream rounded-xl font-bold uppercase tracking-wider text-xs transition-colors cursor-pointer flex items-center justify-center gap-2 shadow-md disabled:opacity-50"
+                >
+                  {isSavingCustomerProfile ? (
+                    <>
+                      <RefreshCw className="w-3.5 h-3.5 animate-spin" /> A Gravar...
+                    </>
+                  ) : (
+                    <>
+                      <Save className="w-3.5 h-3.5" /> Gravar Ficha
+                    </>
+                  )}
+                </button>
+              </div>
+            )}
+          </motion.div>
+        </>
+      )}
+    </AnimatePresence>
     </div>
   );
 }
