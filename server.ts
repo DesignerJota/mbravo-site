@@ -801,6 +801,64 @@ app.post("/api/payment/ship-order", (req, res) => {
 });
 
 /**
+ * 5.1 AUDIT LOGGING SYSTEM FOR ADMINISTRATIVE ACTIONS
+ * Tracks state changes, manual order registrations, and CTT label generations.
+ */
+const getLogsFilePath = () => {
+  const railwayPersistentDir = "/app/data";
+  try {
+    if (!fs.existsSync(railwayPersistentDir)) {
+      fs.mkdirSync(railwayPersistentDir, { recursive: true });
+    }
+    return path.join(railwayPersistentDir, "audit_logs.json");
+  } catch (e) {
+    return path.join(process.cwd(), "audit_logs.json");
+  }
+};
+
+const LOGS_FILE = getLogsFilePath();
+
+function loadLogs(): any[] {
+  if (fs.existsSync(LOGS_FILE)) {
+    try {
+      const data = JSON.parse(fs.readFileSync(LOGS_FILE, 'utf8'));
+      if (Array.isArray(data)) return data;
+    } catch (err) {
+      console.error("[LOGS DATABASE ERROR] Failed to load audit_logs.json", err);
+    }
+  }
+  return [];
+}
+
+function saveLogs(list: any[]) {
+  try {
+    fs.writeFileSync(LOGS_FILE, JSON.stringify(list, null, 2), 'utf8');
+  } catch (err) {
+    console.error("[LOGS DATABASE ERROR] Failed to save audit_logs.json", err);
+  }
+}
+
+let activeLogs = loadLogs();
+
+function addAuditLog(event: 'state_change' | 'manual_order_creation' | 'ctt_label_generation', description: string, orderId?: string, details?: any) {
+  const logEntry = {
+    id: `LOG-${Math.floor(100000 + Math.random() * 900000)}`,
+    timestamp: new Date().toISOString(),
+    event,
+    description,
+    orderId,
+    user: 'Carolina (Atelier)', // default admin role for the atelier
+    details: details || {}
+  };
+  activeLogs.unshift(logEntry);
+  if (activeLogs.length > 500) {
+    activeLogs = activeLogs.slice(0, 500);
+  }
+  saveLogs(activeLogs);
+  console.log(`[AUDIT LOG] [${event.toUpperCase()}] ${description}`);
+}
+
+/**
  * 6. ADMINISTRATIVE DASHBOARD ENDPOINTS
  */
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'CarolinaM26';
@@ -838,6 +896,13 @@ app.get("/api/admin/orders", verifyAdmin, (req, res) => {
   res.json({ success: true, orders: ordersList });
 });
 
+// Endpoint to fetch all audit logs
+app.get("/api/admin/logs", verifyAdmin, (req, res) => {
+  const currentLogs = loadLogs();
+  activeLogs = currentLogs;
+  res.json({ success: true, logs: activeLogs });
+});
+
 // Endpoint to update an order
 app.post("/api/admin/orders/update", verifyAdmin, (req, res) => {
   const { orderId, status, trackingCode, priority, selections } = req.body;
@@ -854,6 +919,9 @@ app.post("/api/admin/orders/update", verifyAdmin, (req, res) => {
   if (!order) {
     return res.status(404).json({ error: "Order not found" });
   }
+
+  const oldStatus = order.status;
+  const oldTrackingCode = order.trackingCode;
 
   if (status) {
     order.status = status;
@@ -885,6 +953,26 @@ app.post("/api/admin/orders/update", verifyAdmin, (req, res) => {
 
   activeOrders.set(orderId, order);
   saveOrders(activeOrders);
+
+  // Trigger audit log for status change
+  if (status && status !== oldStatus) {
+    addAuditLog(
+      'state_change',
+      `Estado da encomenda ${orderId} alterado de '${oldStatus}' para '${status}'`,
+      orderId,
+      { oldStatus, newStatus: status }
+    );
+  }
+
+  // Trigger audit log for CTT label registration/generation
+  if (trackingCode !== undefined && trackingCode !== oldTrackingCode) {
+    addAuditLog(
+      'ctt_label_generation',
+      `Etiqueta de envio CTT registada para a encomenda ${orderId} com código ${trackingCode}`,
+      orderId,
+      { trackingCode }
+    );
+  }
 
   res.json({ success: true, order });
 });
@@ -930,6 +1018,14 @@ app.post("/api/admin/orders/create", verifyAdmin, (req, res) => {
 
   activeOrders.set(orderId, newOrder);
   saveOrders(activeOrders);
+
+  // Trigger audit log for manual order registration
+  addAuditLog(
+    'manual_order_creation',
+    `Encomenda manual registada: ${orderId} para o cliente ${customer.nome} (${productName})`,
+    orderId,
+    { customerName: customer.nome, productName }
+  );
 
   res.json({ success: true, order: newOrder });
 });
