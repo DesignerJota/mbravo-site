@@ -314,7 +314,7 @@ export function generateAdminEmailHtml(order: OrderData): string {
       <div class="section-title">Instruções Próximas Horas</div>
       <p style="font-size: 12px; color: #555; line-height: 1.5; margin-bottom: 0;">
         1. Validar as dimensões do molde para o tamanho <strong>${order.selections.tamanho || 'Sob Medida'}</strong>.<br>
-        2. Reservar o novelo de fio de cor <strong>${order.selections.cor}</strong> no estoque.<br>
+        2. Reservar o novelo de fio de cor <strong>${order.selections.cor}</strong> no stock.<br>
         3. Emitir a etiqueta em couro M★BRAVO correspondente ao pedido.
       </p>
     </div>
