@@ -4,7 +4,8 @@ import {
   X, Search, Lock, Unlock, User, Mail, Phone, MapPin, 
   CreditCard, Clock, Truck, FileText, CheckCircle, AlertCircle, 
   ExternalLink, Eye, RefreshCw, Sliders, Calendar, DollarSign, 
-  Package, ChevronRight, AlertTriangle, ShieldCheck, Plus
+  Package, ChevronRight, AlertTriangle, ShieldCheck, Plus,
+  Download, ClipboardList
 } from 'lucide-react';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || '';
@@ -51,6 +52,13 @@ export default function AdminDashboardModal({ onClose }: AdminDashboardModalProp
     priority: 'NORMAL'
   });
   const [isCreatingManual, setIsCreatingManual] = useState(false);
+
+  // Audit Logs states
+  const [activeTab, setActiveTab] = useState<'orders' | 'logs'>('orders');
+  const [logs, setLogs] = useState<any[]>([]);
+  const [loadingLogs, setLoadingLogs] = useState(false);
+  const [logsError, setLogsError] = useState<string | null>(null);
+  const [logSearchQuery, setLogSearchQuery] = useState('');
 
   const handleCreateManualOrder = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -142,6 +150,8 @@ export default function AdminDashboardModal({ onClose }: AdminDashboardModalProp
         setOrders(data.orders || []);
         setPassword(savedPass);
         setIsAuthenticated(true);
+        // Also load logs
+        fetchLogs(savedPass);
       } else {
         localStorage.removeItem('mbravo_admin_password');
       }
@@ -180,6 +190,26 @@ export default function AdminDashboardModal({ onClose }: AdminDashboardModalProp
     }
   };
 
+  const fetchLogs = async (activePass = password) => {
+    setLoadingLogs(true);
+    setLogsError(null);
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/admin/logs`, {
+        headers: { 'x-admin-password': activePass }
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        setLogs(data.logs || []);
+      } else {
+        setLogsError(data.error || 'Erro ao carregar o histórico de logs.');
+      }
+    } catch (err) {
+      setLogsError('Erro de ligação ao carregar os logs.');
+    } finally {
+      setLoadingLogs(false);
+    }
+  };
+
   const fetchOrders = async (activePass = password) => {
     setLoadingOrders(true);
     setOrdersError(null);
@@ -190,6 +220,7 @@ export default function AdminDashboardModal({ onClose }: AdminDashboardModalProp
       const data = await res.json();
       if (res.ok && data.success) {
         setOrders(data.orders || []);
+        fetchLogs(activePass);
       } else {
         setOrdersError(data.error || 'Erro ao carregar as encomendas.');
       }
@@ -200,11 +231,97 @@ export default function AdminDashboardModal({ onClose }: AdminDashboardModalProp
     }
   };
 
+  const exportToCSV = () => {
+    if (filteredOrders.length === 0) {
+      alert("Não existem encomendas correspondentes aos filtros atuais para exportar.");
+      return;
+    }
+
+    // European Excel standard uses semicolons and a UTF-8 BOM
+    const headers = [
+      "ID da Encomenda",
+      "Data",
+      "Cliente",
+      "E-mail",
+      "Telefone",
+      "NIF",
+      "Produto",
+      "Detalhes do Item",
+      "Subtotal",
+      "Descontos",
+      "Portes",
+      "Total",
+      "Metodo de Pagamento",
+      "Estado",
+      "Codigo Rastreio CTT"
+    ];
+
+    const rows = filteredOrders.map(o => {
+      const selections = o.selections || {};
+      const cor = selections.cor || "Padrao";
+      const tamanho = selections.tamanho || "Unico";
+      const quantidade = selections.quantidade || "1";
+      const itemDetails = `Cor: ${cor}, Tam: ${tamanho}, Qtd: ${quantidade}`;
+      
+      const priceVal = parsePrice(String(o.price));
+      const formattedSubtotal = priceVal.toFixed(2).replace('.', ',');
+      const formattedTotal = priceVal.toFixed(2).replace('.', ',');
+      const formattedDesconto = "0,00";
+      const formattedPortes = "0,00";
+
+      let translatedStatus = o.status;
+      if (o.status === 'paid') translatedStatus = "Pago / No Atelier";
+      else if (o.status === 'pending_payment') translatedStatus = "Aguardar Pagamento";
+      else if (o.status === 'shipped') translatedStatus = "Expedida CTT";
+      else if (o.status === 'failed') translatedStatus = "Cancelada / Falhada";
+
+      let translatedMethod = o.paymentMethod;
+      if (o.paymentMethod === 'card') translatedMethod = "Cartao de Credito";
+      else if (o.paymentMethod === 'multibanco') translatedMethod = "Multibanco";
+      else if (o.paymentMethod === 'mbway') translatedMethod = "MB WAY";
+      else if (o.paymentMethod === 'wallet') translatedMethod = "Digital Wallet";
+      else if (o.paymentMethod === 'manual') translatedMethod = "Manual / Direta";
+
+      return [
+        o.orderId || "",
+        o.createdAt ? new Date(o.createdAt).toLocaleString('pt-PT') : "",
+        o.customer?.nome || "",
+        o.customer?.email || "",
+        o.customer?.telefone || "",
+        o.customer?.nif || "",
+        o.productName || "",
+        itemDetails,
+        `${formattedSubtotal} EUR`,
+        `${formattedDesconto} EUR`,
+        `${formattedPortes} EUR`,
+        `${formattedTotal} EUR`,
+        translatedMethod,
+        translatedStatus,
+        o.trackingCode || ""
+      ];
+    });
+
+    const csvContent = [
+      headers.join(";"),
+      ...rows.map(r => r.map(val => `"${String(val).replace(/"/g, '""')}"`).join(";"))
+    ].join("\r\n");
+
+    const blob = new Blob(["\uFEFF" + csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.setAttribute("href", url);
+    link.setAttribute("download", `mbravo_contabilidade_${new Date().toISOString().slice(0, 10)}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   const handleLogout = () => {
     localStorage.removeItem('mbravo_admin_password');
     setIsAuthenticated(false);
     setPassword('');
     setOrders([]);
+    setLogs([]);
   };
 
   const handleUpdateStatus = async (orderId: string, newStatus: string) => {
@@ -337,6 +454,18 @@ export default function AdminDashboardModal({ onClose }: AdminDashboardModalProp
       orderId.toLowerCase().includes(query);
 
     return matchesStatus && matchesSearch;
+  });
+
+  const filteredLogs = logs.filter(log => {
+    if (!logSearchQuery) return true;
+    const q = logSearchQuery.toLowerCase();
+    return (
+      (log.id || '').toLowerCase().includes(q) ||
+      (log.description || '').toLowerCase().includes(q) ||
+      (log.orderId || '').toLowerCase().includes(q) ||
+      (log.event || '').toLowerCase().includes(q) ||
+      (log.user || '').toLowerCase().includes(q)
+    );
   });
 
   return (
@@ -479,8 +608,59 @@ export default function AdminDashboardModal({ onClose }: AdminDashboardModalProp
                 </div>
               </div>
 
-              {/* SEARCH AND FILTERS */}
-              <div className="bg-white border border-forest/5 p-5 rounded-[16px] shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
+              {/* TAB SWITCHER & ACTION BAR */}
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-forest/10 pb-2 gap-4">
+                <div className="flex items-center gap-1.5 bg-cream/35 p-1 rounded-xl">
+                  <button
+                    type="button"
+                    onClick={() => setActiveTab('orders')}
+                    className={`px-4 py-2 rounded-lg font-semibold text-xs tracking-wider transition-all uppercase flex items-center gap-2 cursor-pointer ${
+                      activeTab === 'orders'
+                        ? 'bg-[#243119] text-cream shadow-sm font-bold'
+                        : 'text-forest/60 hover:text-forest hover:bg-cream/50'
+                    }`}
+                  >
+                    <Package className="w-3.5 h-3.5" /> Encomendas
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setActiveTab('logs')}
+                    className={`px-4 py-2 rounded-lg font-semibold text-xs tracking-wider transition-all uppercase flex items-center gap-2 cursor-pointer ${
+                      activeTab === 'logs'
+                        ? 'bg-[#243119] text-cream shadow-sm font-bold'
+                        : 'text-forest/60 hover:text-forest hover:bg-cream/50'
+                    }`}
+                  >
+                    <ClipboardList className="w-3.5 h-3.5" /> Log de Auditoria
+                  </button>
+                </div>
+
+                <div className="flex items-center gap-3">
+                  {activeTab === 'orders' && (
+                    <button
+                      type="button"
+                      onClick={exportToCSV}
+                      className="px-4 py-2.5 rounded-xl text-xs tracking-wider font-bold transition-all bg-[#C5A059] hover:bg-[#a68244] text-white flex items-center gap-2 shadow-sm uppercase cursor-pointer"
+                    >
+                      <Download className="w-4 h-4" /> Exportar Contabilidade (CSV)
+                    </button>
+                  )}
+                  {activeTab === 'logs' && (
+                    <button
+                      type="button"
+                      onClick={() => fetchLogs()}
+                      className="px-4 py-2.5 rounded-xl text-xs tracking-wider font-bold transition-all bg-[#BACAA5] hover:bg-[#a3b38e] text-[#243119] flex items-center gap-2 shadow-sm uppercase cursor-pointer"
+                    >
+                      <RefreshCw className={`w-3.5 h-3.5 ${loadingLogs ? 'animate-spin' : ''}`} /> Sincronizar Logs
+                    </button>
+                  )}
+                </div>
+              </div>
+
+              {activeTab === 'orders' ? (
+                <>
+                  {/* SEARCH AND FILTERS */}
+                  <div className="bg-white border border-forest/5 p-5 rounded-[16px] shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
                 {/* Search Bar */}
                 <div className="relative flex-1 max-w-md">
                   <Search className="absolute left-3.5 top-3 w-4 h-4 text-forest/35" />
@@ -1067,10 +1247,119 @@ export default function AdminDashboardModal({ onClose }: AdminDashboardModalProp
                   })}
                 </div>
               )}
-              
+            </>
+          ) : (
+            /* AUDIT LOGS VIEW */
+            <div className="space-y-6">
+              <div className="bg-white border border-forest/5 p-5 rounded-[16px] shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div>
+                  <h4 className="font-serif text-sm font-medium text-forest">Registo de Atividades e Auditoria</h4>
+                  <p className="text-xs text-forest/40">Rastreabilidade completa de ações administrativas do Atelier.</p>
+                </div>
+                
+                {/* Log Search box */}
+                <div className="relative w-full max-w-xs">
+                  <Search className="absolute left-3 top-2.5 w-3.5 h-3.5 text-forest/35" />
+                  <input 
+                    type="text" 
+                    placeholder="Pesquisar logs por ID, conteúdo ou encomenda..."
+                    value={logSearchQuery}
+                    onChange={(e) => setLogSearchQuery(e.target.value)}
+                    className="w-full bg-cream/20 border border-forest/10 focus:border-[#C5A059] focus:outline-none rounded-xl pl-8 pr-3 py-2 text-xs transition-all"
+                  />
+                </div>
+              </div>
+
+              {loadingLogs && logs.length === 0 ? (
+                <div className="py-20 text-center space-y-3">
+                  <span className="animate-spin inline-block rounded-full h-8 w-8 border-2 border-[#C5A059] border-t-transparent" />
+                  <p className="text-sm text-forest/50">Carregando histórico de auditoria...</p>
+                </div>
+              ) : filteredLogs.length === 0 ? (
+                <div className="bg-white border border-forest/5 py-16 rounded-[20px] text-center space-y-2">
+                  <div className="text-4xl">📋</div>
+                  <h5 className="font-serif text-base font-medium">Nenhum registo de auditoria</h5>
+                  <p className="text-xs text-forest/40 max-w-sm mx-auto">Não existem registos de auditoria correspondentes à pesquisa ou ações efetuadas.</p>
+                </div>
+              ) : (
+                <div className="bg-white border border-forest/5 rounded-[20px] overflow-hidden shadow-sm">
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-left border-collapse text-xs">
+                      <thead>
+                        <tr className="bg-cream/10 border-b border-forest/5 text-forest/50 font-bold uppercase tracking-wider text-[10px]">
+                          <th className="px-6 py-4">ID / Hora</th>
+                          <th className="px-6 py-4">Utilizador</th>
+                          <th className="px-6 py-4">Ação / Evento</th>
+                          <th className="px-6 py-4">Descrição</th>
+                          <th className="px-6 py-4 text-right">ID Encomenda</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-forest/5">
+                        {filteredLogs.map((log) => {
+                          let badgeColor = "bg-amber-50 text-amber-800 border-amber-200/30";
+                          let label = "Alteração";
+                          
+                          if (log.event === 'state_change') {
+                            badgeColor = "bg-blue-50 text-blue-800 border-blue-200/20";
+                            label = "Estado Encomenda";
+                          } else if (log.event === 'manual_order_creation') {
+                            badgeColor = "bg-green-50 text-green-800 border-green-200/20";
+                            label = "Registo Manual";
+                          } else if (log.event === 'ctt_label_generation') {
+                            badgeColor = "bg-[#FCF8F2] text-[#A68244] border-[#C5A059]/20";
+                            label = "Etiqueta CTT";
+                          }
+
+                          return (
+                            <tr key={log.id} className="hover:bg-cream/5 transition-colors">
+                              <td className="px-6 py-4 whitespace-nowrap font-mono space-y-1">
+                                <div className="font-bold text-forest/80 text-[11px]">{log.id}</div>
+                                <div className="text-[10px] text-forest/40">
+                                  {new Date(log.timestamp).toLocaleString('pt-PT')}
+                                </div>
+                              </td>
+                              <td className="px-6 py-4 whitespace-nowrap font-sans font-medium text-forest/70">
+                                {log.user || 'Carolina (Atelier)'}
+                              </td>
+                              <td className="px-6 py-4 whitespace-nowrap">
+                                <span className={`inline-block px-2.5 py-1 text-[10px] font-semibold rounded-full border ${badgeColor}`}>
+                                  {label}
+                                </span>
+                              </td>
+                              <td className="px-6 py-4 font-sans text-forest/80 max-w-md">
+                                <div className="font-medium leading-relaxed">{log.description}</div>
+                                {log.details && Object.keys(log.details).length > 0 && (
+                                  <div className="mt-1.5 p-2 bg-[#FCFBF9] border border-forest/5 rounded-lg text-[10px] font-mono text-forest/60 space-y-0.5">
+                                    {Object.entries(log.details).map(([k, v]) => (
+                                      <div key={k}>
+                                        <span className="font-bold text-forest/40 uppercase">{k}:</span> {String(v)}
+                                      </div>
+                                    ))}
+                                  </div>
+                                )}
+                              </td>
+                              <td className="px-6 py-4 whitespace-nowrap text-right font-mono text-forest/60 font-medium">
+                                {log.orderId ? (
+                                  <span className="bg-forest/5 px-2 py-1 rounded-md text-[10px] font-bold">
+                                    {log.orderId}
+                                  </span>
+                                ) : (
+                                  "-"
+                                )}
+                              </td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              )}
             </div>
           )}
         </div>
+      )}
+    </div>
       </motion.div>
     </div>
   );
