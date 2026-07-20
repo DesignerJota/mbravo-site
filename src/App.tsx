@@ -258,7 +258,7 @@ export function getShippingEstimate(product: any, lang: 'pt' | 'en') {
       inStock: false,
       title: lang === 'pt' ? 'Peça por Encomenda (Produção Artesanal)' : 'Made to Order (Artisanal Production)',
       desc: lang === 'pt'
-        ? `Por ser um artigo artesanal e não haver stock imediato, esta peça será tecida especialmente para si. O tempo estimado de confeção é de ${craftingDays} dias, com expedição prevista para ${formattedDate}.`
+        ? `Por ser um artigo artesanal e não haver stock imediato, esta peça será tecida especialmente para si. O tempo estimado de produção é de ${craftingDays} dias, com expedição prevista para ${formattedDate}.`
         : `Since this is a handmade item with no immediate stock, this piece will be woven especially for you. Estimated crafting time is ${craftingDays} days, with shipping expected on ${formattedDate}.`,
       badge: lang === 'pt' ? `Produção: ${craftingDays} dias` : `Crafting: ${craftingDays} days`
     };
@@ -4355,7 +4355,7 @@ const LegalModal = ({ type, onClose }: LegalModalProps) => {
                         <ul className="space-y-4 text-forest/75 text-sm font-sans font-light">
                             <li className="flex flex-col gap-1">
                                 <strong className="font-medium text-forest text-xs uppercase tracking-wider">Prazo de Produção</strong>
-                                <span>O tempo estimado para a confeção e preparação de cada peça varia entre 4 a 7 dias úteis após a confirmação do pagamento.</span>
+                                <span>O tempo estimado para a produção e preparação de cada peça varia entre 4 a 7 dias úteis após a confirmação do pagamento.</span>
                             </li>
                             <li className="flex flex-col gap-1">
                                 <strong className="font-medium text-forest text-xs uppercase tracking-wider">Método de Envio</strong>
@@ -6880,7 +6880,7 @@ const ProductDetailPage = ({ pathname }: { pathname: string }) => {
                                             {estimate.inStock 
                                                 ? (lang === 'pt' ? '✓ Peça em stock: Envio em 24h/48h úteis.' : '✓ Item in stock: Ships in 24h/48h business hours.')
                                                 : (lang === 'pt' 
-                                                    ? `★ Peça por encomenda: Envio estimado em ${productTranslated.craftingTime || 10} dias úteis (confeção artesanal).` 
+                                                    ? `★ Peça por encomenda: Envio estimado em ${productTranslated.craftingTime || 10} dias úteis (produção artesanal).` 
                                                     : `★ Made to order: Estimated shipping in ${productTranslated.craftingTime || 10} business days (artisanal crafting).`)
                                             }
                                         </p>
