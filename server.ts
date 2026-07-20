@@ -39,6 +39,14 @@ app.use((req, res, next) => {
   res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization, Accept");
 
+  // Prevent Google and search crawlers from indexing any requests directed to the API subdomain or raw API endpoints
+  const host = req.headers.host || "";
+  const isApiHost = host.toLowerCase().startsWith("api.");
+  const isApiRoute = req.path.startsWith("/api/");
+  if (isApiHost || isApiRoute) {
+    res.setHeader("X-Robots-Tag", "noindex, nofollow");
+  }
+
   if (req.method === "OPTIONS") {
     return res.sendStatus(200);
   }
@@ -119,6 +127,17 @@ function saveOrders(map: Map<string, any>) {
 }
 
 const activeOrders = loadOrders();
+
+// Serve dynamic robots.txt depending on whether the request accesses the brand site or the API subdomain
+app.get("/robots.txt", (req, res) => {
+  const host = req.headers.host || "";
+  res.type("text/plain");
+  if (host.toLowerCase().startsWith("api.")) {
+    res.send("User-agent: *\nDisallow: /\n");
+  } else {
+    res.send("User-agent: *\nAllow: /\n");
+  }
+});
 
 // Serve public directory statically so sandbox emails can be viewed in browser tabs
 app.use('/emails', express.static(path.join(process.cwd(), 'public', 'emails')));
