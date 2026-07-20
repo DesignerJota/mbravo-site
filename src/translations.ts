@@ -132,7 +132,9 @@ export function translateCategory(category: any, lang: 'pt' | 'en') {
     ...category,
     name: match.name,
     items: match.items,
-    products: (category.products || []).map((p: any) => translateProduct(p, lang))
+    products: (category.products || [])
+      .filter((p: any) => !p.hidden)
+      .map((p: any) => translateProduct(p, lang))
   };
 }
 
@@ -237,7 +239,7 @@ export const translations = {
     "memory.subtitle": "Continuam presentes nos gestos, nas memórias e nas pequenas coisas que criamos com amor.",
     "memory.mbravo_born": "M★Bravo nasceu dessa presença.",
     "memory.desc": "Cada ponto, cada textura e cada detalhe transportam um pedaço dessa história, transformando fios em peças únicas e memórias em algo que pode ser tocado.",
-    "memory.quote": "\"Mais do que croché, é uma forma de preservar aquilo que realmente importa.\"",
+    "memory.quote": "\"Mais do que crochet, é uma forma de preservar aquilo que realmente importa.\"",
     
     // Interlude
     "interlude.quote": "\"A beleza está na alma que colocamos em cada gesto.\"",
@@ -711,63 +713,63 @@ export const translatedProductsData = {
       name: 'Daisy Coasters',
       description: 'Bases em crochet inspiradas na delicadeza das margaridas e nos tons suaves da natureza. Um conjunto handmade pensado para trazer um toque cozy e acolhedor ao teu espaço.',
       material: '- Material: 100% algodão',
-      care: '- Lavagem delicada\n- Secar ao ar'
+      care: '- Lavagem delicada\n- Secar na horizontal'
     },
     'h1c': {
       name: 'Sunflower Coasters',
       description: 'Bases em crochet inspiradas na beleza dos girassóis e nos seus tons quentes e acolhedores. Um conjunto handmade pensado para trazer um toque cozy e luminoso ao teu espaço.',
       material: '- Material: 100% algodão',
-      care: '- Lavagem delicada\n- Secar ao ar'
+      care: '- Lavagem delicada\n- Secar na horizontal'
     },
     'h1f': {
       name: 'Coraline Coasters',
       description: 'Bases em crochet inspiradas no design Coraline, tecidas à mão com todo o carinho para trazer um toque aconchegante, elegante e especial ao teu espaço.',
       material: '- Material: 100% algodão',
-      care: '- Lavagem delicada\n- Secar ao ar'
+      care: '- Lavagem delicada\n- Secar na horizontal'
     },
     'h1_classic': {
       name: 'Classic Coasters',
       description: 'Bases em crochet com um design floral clássico e delicado, pensadas para trazer um toque cozy e elegante ao teu espaço. Disponíveis em várias cores, mantendo sempre as pétalas brancas para um acabamento suave e delicado.',
       material: '- Material: 100% algodão',
-      care: '- Lavagem delicada\n- Secar ao ar'
+      care: '- Lavagem delicada\n- Secar na horizontal'
     },
     'h2b': {
       name: 'Stella Cushion',
       description: 'Almofada decorativa em forma de estrela, feita à mão em crochet para dar um toque delicado e cozy a qualquer espaço. Perfeita para decorar camas, sofás, cadeiras, quartos infantis ou qualquer cantinho especial. Disponível em várias cores para combinar com diferentes estilos de decoração.',
       material: '- Material: 100% poliéster (Fio macio e estruturado, ideal para peças decorativas)',
-      care: '- Limpeza delicada à mão\n- Secar ao ar em superfície plana\n- Evitar torcer a peça'
+      care: '- Limpeza delicada à mão\n- Secar na horizontal em superfície plana\n- Evitar torcer a peça'
     },
     // BAGS items
     'b1': {
       name: 'African Flower Pouch',
       description: 'Pouch em crochet com padrão African Flower, cuidadosamente feito à mão e forrado no interior para maior estrutura e proteção. Finalizado com fecho, é perfeito para guardar os teus essenciais do dia a dia com um toque cozy e handmade.',
       material: '- Material: 100% algodão\n- Detalhe: Forro interior em tecido',
-      care: '- Lavagem delicada à mão\n- Secar ao ar\n- Evitar máquina de secar',
+      care: '- Lavagem delicada à mão\n- Secar na horizontal\n- Evitar máquina de secar',
       dimensions: '25 cm (largura) × 14 cm (altura)'
     },
     'b1b': {
       name: 'Mini Pouches',
       description: 'Mini pouch em crochet feito à mão, criado com um design simples e intemporal para guardar pequenos essenciais do dia a dia. Com fecho ajustável em cordão e um acabamento delicado handmade, é perfeito para moedas, cartões, joias, lip products ou pequenos tesouros do dia a dia.',
       material: '- Fecho ajustável com cordão\n- Ideal para moedas, cartões, joias ou pequenos acessórios\n- Disponível em várias cores\n- Composição: 100% algodão',
-      care: '- Lavagem delicada à mão\n- Secar ao ar em superfície plana'
+      care: '- Lavagem delicada à mão\n- Secar na horizontal em superfície plana'
     },
     'b1_airpods': {
       name: 'AirPods Case',
       description: 'Capa para AirPods em crochet feita à mão, criada para proteger os teus auriculares com charme, style e um toque cozy especial. Prática, delicada e perfeita para o dia a dia.',
       material: '- Design minimalista e intemporal\n- Ajuste seguro à caixa dos AirPods\n- Disponível em várias combinações de cores\n- Composição: 100% algodão',
-      care: '- Lavagem delicada à mão\n- Secar ao ar em superfície plana'
+      care: '- Lavagem delicada à mão\n- Secar na horizontal em superfície plana'
     },
     'b2_sling': {
       name: 'Granny Square Sling Bag',
       description: 'Mala em crochet com padrão Granny Square floral, cuidadosamente feita à mão e forrada no interior para maior estrutura e durabilidade. Com alça ajustável e fecho de correr, pode ser usada à cintura, a tiracolo ou ao ombro, adaptando-se facilmente ao teu estilo e às tuas necessidades do dia a dia.\nDimensões aproximadas: 26 cm (largura) × 11 cm (altura)',
       material: '- Material: 100% algodão de alta qualidade\n- Detalhe: Forro interno macio para maior segurança e estrutura',
-      care: '- Lavagem delicada à mão\n- Secar ao ar horizontalmente\n- Não utilizar máquina de secar'
+      care: '- Lavagem delicada à mão\n- Secar na horizontal\n- Não utilizar máquina de secar'
     },
     'b2_shell': {
       name: 'Mini shell Pouch',
       description: 'Mini pouch em crochet com design inspirado em conchas, cuidadosamente feita à mão. Compacta e prática, fecha com um botão de madeira com estrela, um detalhe especial que reflete a identidade da marca, sendo perfeita para guardar os teus essenciais do dia a dia com um toque cozy e handmade.',
       material: '- Detalhes: Ideal para moedas, auriculares/AirPods, anéis e pequenos tesouros do dia a dia\n- Dimensões: 8,5 cm (largura) × 7,5 cm (altura)\n- Composição: 100% algodão\n- Material: Botão em madeira',
-      care: '- Lavagem delicada\n- Secar ao ar'
+      care: '- Lavagem delicada\n- Secar na horizontal'
     },
     // VESTUARIO items
     'v1': {
@@ -786,27 +788,27 @@ export const translatedProductsData = {
       name: 'Mesh Poncho',
       description: 'Poncho em crochet leve e delicado, feito à mão com um design de malha aberta para um look effortless e cozy. Perfeito para sobrepor a tops, vestidos ou biquínis, criando um toque elegante e descontraído ao outfit. Disponível em várias cores.',
       material: '- Material: 100% algodão',
-      care: '- Lavagem delicada à mão\n- Secar ao ar\n- Evitar máquina de secar'
+      care: '- Lavagem delicada à mão\n- Secar na horizontal\n- Evitar máquina de secar'
     },
     'v2c': {
       name: 'Signature Granny Poncho',
       description: 'Poncho em crochet feito à mão, criado com um clássico padrão granny stitch e combinação de duas cores para um look cozy e intemporal. Com um ajuste confortável e textura aconchegante, é perfeito para sobrepor a diferentes looks e acrescentar um toque handmade e effortless ao visual.',
       material: '- Composição: 100% algodão egípcio de alta qualidade ou mistura de algodão e lã macia (Consulte para opções)',
-      care: '- Lavagem delicada à mão com sabão neutro\n- Secar ao ar em superfície plana\n- Evitar máquina de secar',
+      care: '- Lavagem delicada à mão com sabão neutro\n- Secar na horizontal em superfície plana\n- Evitar máquina de secar',
       details: '• Ideal para layering em diferentes looks\n• Disponível em várias combinações de cores'
     },
     'alma_cardigan': {
       name: 'Alma Cardigan',
       description: 'Cardigan em crochet feito à mão com granny squares clássicos e um design cozy e intemporal. Uma peça confortável e delicada, perfeita para dias frescos de verão, outono ou para criar um look mais acolhedor e effortless. Disponível em várias combinações de cores e materiais.',
       material: '- Opção 1: 100% algodão (Leve, respirável e ideal para dias mais amenos ou meia-estação)\n- Opção 2: 50% algodão / 50% lã (Mais quente, macio e aconchegante, ideal para dias mais frios)',
-      care: '- Lavagem delicada à mão\n- Secar ao ar em superfície plana\n- Evitar torcer a peça',
+      care: '- Lavagem delicada à mão\n- Secar na horizontal em superfície plana\n- Evitar torcer a peça',
       details: '- Modelo de manga comprida\n- Fecho em laço frontal'
     },
     'mini_alma_cardigan': {
       name: 'Mini Alma Cardigan',
       description: 'Versão mini do Alma Cardigan, feita à mão em crochet com granny squares clássicos e um design cozy e intemporal. Pensado para os mais pequenos, combina conforto, delicadeza e um toque handmade especial. Disponível em várias combinações de cores e materiais.',
       material: '- Opção Leve: 100% algodão\n- Opção Cozy: 50% algodão, 50% lã',
-      care: '- Lavagem delicada à mão\n- Secar ao ar em superfície plana\n- Evitar máquina de secar',
+      care: '- Lavagem delicada à mão\n- Secar na horizontal em superfície plana\n- Evitar máquina de secar',
       details: '- Modelo de manga comprida\n- Fecho em laço frontal',
       sizes: ['2 anos', '4 anos', '6 anos']
     },
@@ -815,19 +817,19 @@ export const translatedProductsData = {
       name: 'Dragonfly Bandana',
       description: 'Bandana em crochet com delicado padrão de libelinhas, feita à mão para dar um toque cozy e especial ao teu look. Leve, confortável e versátil, perfeita para usar no dia a dia. Disponível em várias cores e em duas opções de material.',
       material: '- Opção 1: 100% algodão (opção leve)\n- Opção 2: 50% algodão, 50% lã (opção mais cozy)',
-      care: '- Lavagem delicada\n- Secar ao ar'
+      care: '- Lavagem delicada\n- Secar na horizontal'
     },
     'v3b': {
       name: 'Classic Bandana',
       description: 'Bandana em crochet feita à mão, com um design clássico em granny stitch. Leve, versátil e ajustável através de fitas, foi criada para complementar qualquer look com um toque artesanal e intemporal. Disponível em várias cores.',
       material: '- Opção 1: 100% algodão (opção leve)\n- Opção 2: 50% algodão, 50% lã (opção mais cozy)',
-      care: '- Lavagem delicada\n- Secar ao ar'
+      care: '- Lavagem delicada\n- Secar na horizontal'
     },
     'h3': {
       name: 'Dragonfly Headband',
       description: 'Headband em crochet com delicado padrão de libelinhas, feita à mão para um toque leve e especial no dia a dia. Confortável, versátil e perfeita para complementar qualquer look com um detalhe handmade e cozy. Disponível em várias cores.',
       material: '- Material: 100% algodão',
-      care: '- Lavagem delicada à mão\n- Secar ao ar\n- Evitar máquina de secar'
+      care: '- Lavagem delicada à mão\n- Secar na horizontal\n- Evitar máquina de secar'
     },
     'v3c': {
       name: 'Scarf Hip Bandana',
@@ -974,7 +976,7 @@ export const translatedFeaturedProducts = {
     {
       id: 'v2c',
       title: 'Signature Granny Poncho',
-      desc: 'Croché autoral premium e intemporal',
+      desc: 'Crochet autoral premium e intemporal',
       img: 'https://images.unsplash.com/photo-1434389677669-e08b4cac3105?auto=format&fit=crop&q=80&w=800'
     },
     {
