@@ -5,8 +5,9 @@ import {
   CreditCard, Clock, Truck, FileText, CheckCircle, AlertCircle, 
   ExternalLink, Eye, RefreshCw, Sliders, Calendar, DollarSign, 
   Package, ChevronRight, AlertTriangle, ShieldCheck, Plus,
-  Download, ClipboardList
+  Download, ClipboardList, Trash, Edit, Save, Check, EyeOff, Layers, Settings
 } from 'lucide-react';
+import { SHOP_CATEGORIES } from '../App';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || '';
 
@@ -54,11 +55,26 @@ export default function AdminDashboardModal({ onClose }: AdminDashboardModalProp
   const [isCreatingManual, setIsCreatingManual] = useState(false);
 
   // Audit Logs states
-  const [activeTab, setActiveTab] = useState<'orders' | 'logs'>('orders');
+  const [activeTab, setActiveTab] = useState<'orders' | 'logs' | 'catalog' | 'inventory'>('orders');
   const [logs, setLogs] = useState<any[]>([]);
   const [loadingLogs, setLoadingLogs] = useState(false);
   const [logsError, setLogsError] = useState<string | null>(null);
   const [logSearchQuery, setLogSearchQuery] = useState('');
+
+  // CMS Catalog states
+  const [catalog, setCatalog] = useState<any[]>([]);
+  const [loadingCatalog, setLoadingCatalog] = useState(false);
+  const [catalogError, setCatalogError] = useState<string | null>(null);
+  const [editingProduct, setEditingProduct] = useState<any | null>(null);
+  const [selectedCategoryId, setSelectedCategoryId] = useState<string>('home');
+  const [isSavingCatalog, setIsSavingCatalog] = useState(false);
+
+  // CMS Physical Inventory states
+  const [inventory, setInventory] = useState<any[]>([]);
+  const [loadingInventory, setLoadingInventory] = useState(false);
+  const [inventoryError, setInventoryError] = useState<string | null>(null);
+  const [isSavingInventory, setIsSavingInventory] = useState(false);
+  const [editingMaterial, setEditingMaterial] = useState<any | null>(null);
 
   const handleCreateManualOrder = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -150,8 +166,10 @@ export default function AdminDashboardModal({ onClose }: AdminDashboardModalProp
         setOrders(data.orders || []);
         setPassword(savedPass);
         setIsAuthenticated(true);
-        // Also load logs
+        // Also load logs, catalog and inventory
         fetchLogs(savedPass);
+        fetchCatalog(savedPass);
+        fetchInventory(savedPass);
       } else {
         localStorage.removeItem('mbravo_admin_password');
       }
@@ -180,6 +198,8 @@ export default function AdminDashboardModal({ onClose }: AdminDashboardModalProp
         localStorage.setItem('mbravo_admin_password', password);
         setIsAuthenticated(true);
         fetchOrders(password);
+        fetchCatalog(password);
+        fetchInventory(password);
       } else {
         setLoginError(data.error || 'Palavra-passe incorreta. Tente novamente.');
       }
@@ -210,6 +230,62 @@ export default function AdminDashboardModal({ onClose }: AdminDashboardModalProp
     }
   };
 
+  const fetchCatalog = async (activePass = password) => {
+    setLoadingCatalog(true);
+    setCatalogError(null);
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/catalog`);
+      if (res.ok) {
+        const data = await res.json();
+        if (data.success) {
+          if (data.empty) {
+            // Seed the server's catalog with static SHOP_CATEGORIES
+            const seedRes = await fetch(`${API_BASE_URL}/api/admin/catalog/seed`, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'x-admin-password': activePass
+              },
+              body: JSON.stringify({ categories: SHOP_CATEGORIES })
+            });
+            const seedData = await seedRes.json();
+            setCatalog(seedData.categories || []);
+          } else {
+            setCatalog(data.categories || []);
+          }
+        }
+      } else {
+        setCatalogError("Não foi possível obter o catálogo.");
+      }
+    } catch (err) {
+      setCatalogError("Erro ao carregar catálogo.");
+    } finally {
+      setLoadingCatalog(false);
+    }
+  };
+
+  const fetchInventory = async (activePass = password) => {
+    setLoadingInventory(true);
+    setInventoryError(null);
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/admin/inventory`, {
+        headers: { 'x-admin-password': activePass }
+      });
+      if (res.ok) {
+        const data = await res.json();
+        if (data.success) {
+          setInventory(data.inventory || []);
+        }
+      } else {
+        setInventoryError("Não foi possível carregar o inventário de matérias-primas.");
+      }
+    } catch (err) {
+      setInventoryError("Erro ao carregar inventário.");
+    } finally {
+      setLoadingInventory(false);
+    }
+  };
+
   const fetchOrders = async (activePass = password) => {
     setLoadingOrders(true);
     setOrdersError(null);
@@ -221,6 +297,8 @@ export default function AdminDashboardModal({ onClose }: AdminDashboardModalProp
       if (res.ok && data.success) {
         setOrders(data.orders || []);
         fetchLogs(activePass);
+        fetchCatalog(activePass);
+        fetchInventory(activePass);
       } else {
         setOrdersError(data.error || 'Erro ao carregar as encomendas.');
       }
@@ -469,34 +547,34 @@ export default function AdminDashboardModal({ onClose }: AdminDashboardModalProp
   });
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-forest/80 backdrop-blur-sm select-text">
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-0 md:p-4 bg-forest/80 backdrop-blur-sm select-text">
       <motion.div 
         initial={{ scale: 0.95, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         exit={{ scale: 0.95, opacity: 0 }}
         transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-        className="relative w-full max-w-6xl h-[85vh] bg-[#FCFBF9] text-forest rounded-[24px] shadow-2xl border border-[#C5A059]/10 flex flex-col overflow-hidden"
+        className="relative w-full max-w-6xl h-full md:h-[85vh] bg-[#FCFBF9] text-forest rounded-none md:rounded-[24px] shadow-2xl border border-[#C5A059]/10 flex flex-col overflow-hidden"
       >
         {/* HEADER RAIL */}
-        <div className="flex items-center justify-between px-8 py-5 border-b border-forest/5 bg-white/50">
+        <div className="flex items-center justify-between px-4 sm:px-8 py-4 sm:py-5 border-b border-forest/5 bg-white/50">
           <div className="flex items-center gap-3">
             <div className="w-2.5 h-2.5 rounded-full bg-[#C5A059] animate-pulse" />
-            <h3 className="font-serif text-lg tracking-wider font-medium text-forest uppercase flex items-center gap-2">
-              M★BRAVO <span className="text-[#C5A059] font-sans text-xs font-semibold tracking-widest bg-[#FCF8F2] border border-[#C5A059]/20 px-2.5 py-0.5 rounded-full">ATELIER ADMIN</span>
+            <h3 className="font-serif text-sm sm:text-lg tracking-wider font-medium text-forest uppercase flex items-center gap-2">
+              M★BRAVO <span className="text-[#C5A059] font-sans text-[10px] sm:text-xs font-semibold tracking-widest bg-[#FCF8F2] border border-[#C5A059]/20 px-2 sm:px-2.5 py-0.5 rounded-full">ATELIER ADMIN</span>
             </h3>
           </div>
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3 sm:gap-4">
             {isAuthenticated && (
               <button 
                 onClick={handleLogout}
-                className="text-xs uppercase tracking-widest text-red-700 hover:text-red-900 bg-red-50 hover:bg-red-100/55 px-3 py-1.5 rounded-full transition-all font-semibold"
+                className="text-[10px] sm:text-xs uppercase tracking-widest text-red-700 hover:text-red-900 bg-red-50 hover:bg-red-100/55 px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-full transition-all font-semibold"
               >
                 Sair
               </button>
             )}
             <button 
               onClick={onClose}
-              className="p-1.5 hover:bg-forest/5 rounded-full transition-all cursor-pointer text-forest/60 hover:text-forest"
+              className="p-1 sm:p-1.5 hover:bg-forest/5 rounded-full transition-all cursor-pointer text-forest/60 hover:text-forest"
             >
               <X className="w-5 h-5" />
             </button>
@@ -504,7 +582,7 @@ export default function AdminDashboardModal({ onClose }: AdminDashboardModalProp
         </div>
 
         {/* CONTAINER CONTENT */}
-        <div className="flex-1 overflow-y-auto">
+        <div data-lenis-prevent className="flex-1 overflow-y-auto">
           {!isAuthenticated ? (
             /* LOGIN PANEL */
             <div className="h-full flex items-center justify-center p-6">
@@ -576,7 +654,7 @@ export default function AdminDashboardModal({ onClose }: AdminDashboardModalProp
                 </div>
 
                 <div className="bg-white border border-forest/5 p-5 rounded-[16px] shadow-sm space-y-1">
-                  <div className="text-[10px] font-bold uppercase tracking-wider text-forest/35">Faturação Coletada</div>
+                  <div className="text-[10px] font-bold uppercase tracking-wider text-forest/35">Total Faturado</div>
                   <div className="text-2xl font-serif font-medium text-forest flex items-center gap-1.5">
                     <span className="text-[#BACAA5] font-sans text-lg">€</span>
                     {totalRevenue.toFixed(2)}
@@ -600,7 +678,7 @@ export default function AdminDashboardModal({ onClose }: AdminDashboardModalProp
                 </div>
 
                 <div className="bg-[#243119] text-cream p-5 rounded-[16px] shadow-sm space-y-1 col-span-2 md:col-span-1">
-                  <div className="text-[10px] font-bold uppercase tracking-wider text-cream/40">Expedidas CTT</div>
+                  <div className="text-[10px] font-bold uppercase tracking-wider text-cream/40">Enviadas CTT</div>
                   <div className="text-2xl font-serif font-medium text-[#C5A059] flex items-center gap-2">
                     <Truck className="w-4 h-4" />
                     {shippedOrders}
@@ -610,11 +688,11 @@ export default function AdminDashboardModal({ onClose }: AdminDashboardModalProp
 
               {/* TAB SWITCHER & ACTION BAR */}
               <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-forest/10 pb-2 gap-4">
-                <div className="flex items-center gap-1.5 bg-cream/35 p-1 rounded-xl">
+                <div className="flex flex-wrap items-center gap-1.5 bg-cream/35 p-1 rounded-xl">
                   <button
                     type="button"
                     onClick={() => setActiveTab('orders')}
-                    className={`px-4 py-2 rounded-lg font-semibold text-xs tracking-wider transition-all uppercase flex items-center gap-2 cursor-pointer ${
+                    className={`px-3.5 py-2 rounded-lg font-semibold text-xs tracking-wider transition-all uppercase flex items-center gap-2 cursor-pointer ${
                       activeTab === 'orders'
                         ? 'bg-[#243119] text-cream shadow-sm font-bold'
                         : 'text-forest/60 hover:text-forest hover:bg-cream/50'
@@ -624,14 +702,36 @@ export default function AdminDashboardModal({ onClose }: AdminDashboardModalProp
                   </button>
                   <button
                     type="button"
+                    onClick={() => setActiveTab('catalog')}
+                    className={`px-3.5 py-2 rounded-lg font-semibold text-xs tracking-wider transition-all uppercase flex items-center gap-2 cursor-pointer ${
+                      activeTab === 'catalog'
+                        ? 'bg-[#243119] text-cream shadow-sm font-bold'
+                        : 'text-forest/60 hover:text-forest hover:bg-cream/50'
+                    }`}
+                  >
+                    <Sliders className="w-3.5 h-3.5" /> CMS Catálogo
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setActiveTab('inventory')}
+                    className={`px-3.5 py-2 rounded-lg font-semibold text-xs tracking-wider transition-all uppercase flex items-center gap-2 cursor-pointer ${
+                      activeTab === 'inventory'
+                        ? 'bg-[#243119] text-cream shadow-sm font-bold'
+                        : 'text-forest/60 hover:text-forest hover:bg-cream/50'
+                    }`}
+                  >
+                    <Layers className="w-3.5 h-3.5" /> Inventário
+                  </button>
+                  <button
+                    type="button"
                     onClick={() => setActiveTab('logs')}
-                    className={`px-4 py-2 rounded-lg font-semibold text-xs tracking-wider transition-all uppercase flex items-center gap-2 cursor-pointer ${
+                    className={`px-3.5 py-2 rounded-lg font-semibold text-xs tracking-wider transition-all uppercase flex items-center gap-2 cursor-pointer ${
                       activeTab === 'logs'
                         ? 'bg-[#243119] text-cream shadow-sm font-bold'
                         : 'text-forest/60 hover:text-forest hover:bg-cream/50'
                     }`}
                   >
-                    <ClipboardList className="w-3.5 h-3.5" /> Log de Auditoria
+                    <ClipboardList className="w-3.5 h-3.5" /> Auditoria
                   </button>
                 </div>
 
@@ -643,6 +743,24 @@ export default function AdminDashboardModal({ onClose }: AdminDashboardModalProp
                       className="px-4 py-2.5 rounded-xl text-xs tracking-wider font-bold transition-all bg-[#C5A059] hover:bg-[#a68244] text-white flex items-center gap-2 shadow-sm uppercase cursor-pointer"
                     >
                       <Download className="w-4 h-4" /> Exportar Contabilidade (CSV)
+                    </button>
+                  )}
+                  {activeTab === 'catalog' && (
+                    <button
+                      type="button"
+                      onClick={() => fetchCatalog()}
+                      className="px-4 py-2.5 rounded-xl text-xs tracking-wider font-bold transition-all bg-[#BACAA5] hover:bg-[#a3b38e] text-[#243119] flex items-center gap-2 shadow-sm uppercase cursor-pointer"
+                    >
+                      <RefreshCw className={`w-3.5 h-3.5 ${loadingCatalog ? 'animate-spin' : ''}`} /> Sincronizar Catálogo
+                    </button>
+                  )}
+                  {activeTab === 'inventory' && (
+                    <button
+                      type="button"
+                      onClick={() => fetchInventory()}
+                      className="px-4 py-2.5 rounded-xl text-xs tracking-wider font-bold transition-all bg-[#BACAA5] hover:bg-[#a3b38e] text-[#243119] flex items-center gap-2 shadow-sm uppercase cursor-pointer"
+                    >
+                      <RefreshCw className={`w-3.5 h-3.5 ${loadingInventory ? 'animate-spin' : ''}`} /> Sincronizar Stock
                     </button>
                   )}
                   {activeTab === 'logs' && (
@@ -657,7 +775,7 @@ export default function AdminDashboardModal({ onClose }: AdminDashboardModalProp
                 </div>
               </div>
 
-              {activeTab === 'orders' ? (
+              {activeTab === 'orders' && (
                 <>
                   {/* SEARCH AND FILTERS */}
                   <div className="bg-white border border-forest/5 p-5 rounded-[16px] shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -697,7 +815,7 @@ export default function AdminDashboardModal({ onClose }: AdminDashboardModalProp
                     onClick={() => setStatusFilter('shipped')}
                     className={`px-3 py-1.5 rounded-lg font-medium transition-all flex items-center gap-1.5 ${statusFilter === 'shipped' ? 'bg-[#C5A059] text-[#243119]' : 'bg-amber-50/50 text-[#A68244] border border-[#C5A059]/10 hover:bg-amber-100/30'}`}
                   >
-                    Expedidas ({shippedOrders})
+                    Enviadas ({shippedOrders})
                   </button>
                   <button 
                     onClick={() => setStatusFilter('failed')}
@@ -1248,13 +1366,14 @@ export default function AdminDashboardModal({ onClose }: AdminDashboardModalProp
                 </div>
               )}
             </>
-          ) : (
+          )}
+
+          {activeTab === 'logs' && (
             /* AUDIT LOGS VIEW */
             <div className="space-y-6">
               <div className="bg-white border border-forest/5 p-5 rounded-[16px] shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
                   <h4 className="font-serif text-sm font-medium text-forest">Registo de Atividades e Auditoria</h4>
-                  <p className="text-xs text-forest/40">Rastreabilidade completa de ações administrativas do Atelier.</p>
                 </div>
                 
                 {/* Log Search box */}
@@ -1352,6 +1471,756 @@ export default function AdminDashboardModal({ onClose }: AdminDashboardModalProp
                         })}
                       </tbody>
                     </table>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* CMS CATÁLOGO VIEW (FASE 2) */}
+          {activeTab === 'catalog' && (
+            <div className="space-y-6">
+              <div className="bg-white border border-forest/5 p-5 rounded-[16px] shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div>
+                  <h4 className="font-serif text-sm font-medium text-forest">CMS do Catálogo de Produtos</h4>
+                </div>
+                <div className="flex gap-2">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const newProd = {
+                        id: `p-${Date.now()}`,
+                        name: 'Nova Peça em Croché',
+                        price: '25€',
+                        img: 'https://i.ibb.co/L8N8b9p/african-flower-pouch.jpg',
+                        description: 'Peça feita à mão com amor e afeto.',
+                        material: 'Fio 100% Algodão',
+                        care: 'Lavar à mão com água fria',
+                        dimensions: '15 x 15 cm',
+                        hidden: false,
+                        availableColors: ['Natural', 'Rosa Pálido', 'Verde Musgo']
+                      };
+                      setEditingProduct({ isNew: true, product: newProd, categoryId: selectedCategoryId });
+                    }}
+                    className="px-4 py-2 bg-[#243119] hover:bg-[#1a2412] text-cream rounded-xl text-xs font-bold tracking-wider uppercase flex items-center gap-1.5 cursor-pointer"
+                  >
+                    <Plus className="w-3.5 h-3.5" /> Adicionar Peça
+                  </button>
+                  <button
+                    type="button"
+                    onClick={async () => {
+                      setIsSavingCatalog(true);
+                      try {
+                        const res = await fetch(`${API_BASE_URL}/api/admin/catalog/save`, {
+                          method: 'POST',
+                          headers: {
+                            'Content-Type': 'application/json',
+                            'x-admin-password': password
+                          },
+                          body: JSON.stringify({ categories: catalog })
+                        });
+                        const data = await res.json();
+                        if (res.ok && data.success) {
+                          alert("Catálogo do Atelier guardado e publicado com sucesso!");
+                          setCatalog(data.categories || []);
+                          window.dispatchEvent(new CustomEvent('catalog-updated'));
+                        } else {
+                          alert(data.error || "Erro ao guardar catálogo.");
+                        }
+                      } catch (err) {
+                        alert("Erro de rede ao guardar catálogo.");
+                      } finally {
+                        setIsSavingCatalog(false);
+                      }
+                    }}
+                    disabled={isSavingCatalog}
+                    className="px-4 py-2 bg-[#C5A059] hover:bg-[#a68244] text-white rounded-xl text-xs font-bold tracking-wider uppercase flex items-center gap-1.5 cursor-pointer shadow-sm"
+                  >
+                    <Save className="w-3.5 h-3.5" /> Guardar Alterações
+                  </button>
+                </div>
+              </div>
+
+              {catalogError && (
+                <div className="bg-red-50 text-red-800 border border-red-100 rounded-xl p-4 text-xs">
+                  {catalogError}
+                </div>
+              )}
+
+              {loadingCatalog ? (
+                <div className="text-center py-12 text-forest/40 text-xs flex flex-col items-center gap-2">
+                  <RefreshCw className="animate-spin w-6 h-6 text-[#C5A059]" />
+                  A carregar catálogo do Atelier...
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+                  {/* Category selector column */}
+                  <div className="lg:col-span-1 bg-white border border-forest/5 p-4 rounded-[16px] shadow-sm space-y-2 h-fit">
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-forest/35 block mb-2">Coleções Ativas</span>
+                    {catalog.map((cat) => (
+                      <button
+                        key={cat.id}
+                        type="button"
+                        onClick={() => setSelectedCategoryId(cat.id)}
+                        className={`w-full text-left px-3.5 py-3 rounded-xl transition-all flex items-center justify-between text-xs font-medium cursor-pointer ${
+                          selectedCategoryId === cat.id
+                            ? 'bg-cream/70 border border-forest/15 text-[#243119] font-bold shadow-sm'
+                            : 'text-forest/60 hover:bg-cream/20 hover:text-forest'
+                        }`}
+                      >
+                        <span className="truncate">{cat.name}</span>
+                        <span className="bg-forest/5 px-2 py-0.5 rounded-full text-[10px] font-bold text-forest/50">
+                          {cat.products ? cat.products.length : 0}
+                        </span>
+                      </button>
+                    ))}
+                  </div>
+
+                  {/* Products Grid column */}
+                  <div className="lg:col-span-3 space-y-4">
+                    {catalog.filter(cat => cat.id === selectedCategoryId).map((currentCat) => (
+                      <div key={currentCat.id} className="space-y-4">
+                        <div className="flex items-center justify-between bg-cream/15 p-4 rounded-xl border border-forest/5">
+                          <div>
+                            <h5 className="font-serif text-sm font-bold text-forest">{currentCat.name}</h5>
+                            <p className="text-[11px] text-forest/40 italic">{currentCat.items || 'Sem descrição'}</p>
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const newName = prompt("Alterar nome da coleção:", currentCat.name);
+                              const newItems = prompt("Alterar resumo/peças (ex: Coasters, Cushions):", currentCat.items);
+                              if (newName !== null) {
+                                const updated = catalog.map(c => {
+                                  if (c.id === currentCat.id) {
+                                    return { ...c, name: newName, items: newItems || c.items };
+                                  }
+                                  return c;
+                                });
+                                setCatalog(updated);
+                              }
+                            }}
+                            className="text-[10px] font-bold text-[#C5A059] hover:underline uppercase tracking-wider cursor-pointer"
+                          >
+                            Editar Coleção
+                          </button>
+                        </div>
+
+                        {(!currentCat.products || currentCat.products.length === 0) ? (
+                          <div className="bg-white border border-dashed border-forest/15 rounded-xl p-8 text-center text-xs text-forest/40">
+                            Nenhum produto nesta coleção. Clique em "Adicionar Peça" para começar!
+                          </div>
+                        ) : (
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            {currentCat.products.map((prod: any) => (
+                              <div
+                                key={prod.id}
+                                className={`bg-white border p-4 rounded-[16px] shadow-sm flex gap-4 transition-all ${
+                                  prod.hidden ? 'opacity-65 border-dashed border-forest/10 bg-gray-50/50' : 'border-forest/5'
+                                }`}
+                              >
+                                <img
+                                  src={prod.img}
+                                  alt={prod.name}
+                                  referrerPolicy="no-referrer"
+                                  className="w-16 h-16 rounded-xl object-cover border border-forest/5 bg-cream/20 shrink-0"
+                                />
+                                <div className="flex-1 min-w-0 space-y-1 text-left">
+                                  <div className="flex items-start justify-between gap-2">
+                                    <h6 className="font-serif text-xs font-semibold text-forest truncate">{prod.name}</h6>
+                                    <span className="font-mono text-xs font-bold text-[#C5A059]">{prod.price}</span>
+                                  </div>
+                                  <p className="text-[10px] text-forest/40 line-clamp-1 italic">{prod.description}</p>
+                                  
+                                  {/* Yarn colors display */}
+                                  <div className="flex flex-wrap gap-1 pt-1">
+                                    {prod.availableColors && Array.isArray(prod.availableColors) ? (
+                                      prod.availableColors.map((col: string, idx: number) => (
+                                        <span key={idx} className="bg-cream/40 border border-forest/5 px-1.5 py-0.5 rounded text-[8px] font-medium text-forest/60">
+                                          {col}
+                                        </span>
+                                      ))
+                                    ) : (
+                                      <span className="text-[8px] text-forest/30 italic">Sem cores específicas</span>
+                                    )}
+                                  </div>
+
+                                  {/* Interactive admin actions */}
+                                  <div className="flex items-center justify-between border-t border-forest/5 pt-2.5 mt-2 text-[10px]">
+                                    <button
+                                      type="button"
+                                      onClick={() => {
+                                        const updatedCatalog = catalog.map(c => {
+                                          if (c.id === currentCat.id) {
+                                            return {
+                                              ...c,
+                                              products: c.products.map((p: any) => {
+                                                if (p.id === prod.id) {
+                                                  return { ...p, hidden: !p.hidden };
+                                                }
+                                                return p;
+                                              })
+                                            };
+                                          }
+                                          return c;
+                                        });
+                                        setCatalog(updatedCatalog);
+                                      }}
+                                      className={`font-semibold flex items-center gap-1 cursor-pointer hover:underline ${
+                                        prod.hidden ? 'text-green-700' : 'text-amber-600'
+                                      }`}
+                                    >
+                                      {prod.hidden ? (
+                                        <>
+                                          <Check className="w-3 h-3" /> Reativar
+                                        </>
+                                      ) : (
+                                        <>
+                                          <EyeOff className="w-3 h-3" /> Ocultar Temporariamente
+                                        </>
+                                      )}
+                                    </button>
+
+                                    <div className="flex items-center gap-2">
+                                      <button
+                                        type="button"
+                                        onClick={() => setEditingProduct({ isNew: false, product: prod, categoryId: currentCat.id })}
+                                        className="text-forest/60 hover:text-forest font-bold flex items-center gap-0.5 cursor-pointer hover:underline"
+                                      >
+                                        <Edit className="w-2.5 h-2.5" /> Editar
+                                      </button>
+                                      <button
+                                        type="button"
+                                        onClick={() => {
+                                          if (confirm(`Tem a certeza que deseja eliminar ${prod.name} permanentemente do catálogo?`)) {
+                                            const updatedCatalog = catalog.map(c => {
+                                              if (c.id === currentCat.id) {
+                                                return {
+                                                  ...c,
+                                                  products: c.products.filter((p: any) => p.id !== prod.id)
+                                                };
+                                              }
+                                              return c;
+                                            });
+                                            setCatalog(updatedCatalog);
+                                          }
+                                        }}
+                                        className="text-red-600 hover:text-red-800 font-bold flex items-center gap-0.5 cursor-pointer hover:underline"
+                                      >
+                                        <Trash className="w-2.5 h-2.5" /> Eliminar
+                                      </button>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* PRODUCT CREATION/EDITING FLOATING OVERLAY FORM */}
+              {editingProduct && (
+                <div className="fixed inset-0 bg-[#243119]/40 backdrop-blur-sm flex items-center justify-center z-[110] p-4">
+                  <div data-lenis-prevent className="bg-white border border-forest/10 rounded-[24px] max-w-lg w-full p-6 shadow-2xl text-left space-y-4 max-h-[90vh] overflow-y-auto">
+                    <div className="flex items-center justify-between border-b border-forest/5 pb-3">
+                      <h5 className="font-serif text-base font-bold text-forest">
+                        {editingProduct.isNew ? 'Adicionar Nova Peça Única' : `Editar Peça: ${editingProduct.product.name}`}
+                      </h5>
+                      <button
+                        type="button"
+                        onClick={() => setEditingProduct(null)}
+                        className="text-forest/40 hover:text-forest cursor-pointer"
+                      >
+                        <X className="w-5 h-5" />
+                      </button>
+                    </div>
+
+                    <form
+                      onSubmit={(e) => {
+                        e.preventDefault();
+                        const prodForm = editingProduct.product;
+                        
+                        // Parse availableColors if input is a string
+                        let parsedColors = prodForm.availableColors;
+                        if (typeof parsedColors === 'string') {
+                          parsedColors = (parsedColors as string)
+                            .split(',')
+                            .map(c => c.trim())
+                            .filter(Boolean);
+                        }
+
+                        const finalProd = {
+                          ...prodForm,
+                          availableColors: parsedColors
+                        };
+
+                        const updatedCatalog = catalog.map(c => {
+                          if (c.id === editingProduct.categoryId) {
+                            let newProducts = [];
+                            if (editingProduct.isNew) {
+                              newProducts = [...c.products, finalProd];
+                            } else {
+                              newProducts = c.products.map((p: any) => p.id === finalProd.id ? finalProd : p);
+                            }
+                            return { ...c, products: newProducts };
+                          }
+                          return c;
+                        });
+
+                        setCatalog(updatedCatalog);
+                        setEditingProduct(null);
+                      }}
+                      className="space-y-4 text-xs text-left"
+                    >
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-1">
+                          <label className="font-bold text-forest/70 block">Nome do Produto</label>
+                          <input
+                            type="text"
+                            required
+                            value={editingProduct.product.name}
+                            onChange={(e) => setEditingProduct({
+                              ...editingProduct,
+                              product: { ...editingProduct.product, name: e.target.value }
+                            })}
+                            className="w-full bg-cream/20 border border-forest/10 focus:border-[#C5A059] focus:outline-none rounded-xl px-3 py-2"
+                          />
+                        </div>
+                        <div className="space-y-1">
+                          <label className="font-bold text-forest/70 block">Preço (ex: 28€)</label>
+                          <input
+                            type="text"
+                            required
+                            value={editingProduct.product.price}
+                            onChange={(e) => setEditingProduct({
+                              ...editingProduct,
+                              product: { ...editingProduct.product, price: e.target.value }
+                            })}
+                            className="w-full bg-cream/20 border border-forest/10 focus:border-[#C5A059] focus:outline-none rounded-xl px-3 py-2"
+                          />
+                        </div>
+                      </div>
+
+                      <div className="space-y-1">
+                        <label className="font-bold text-forest/70 block">URL da Foto</label>
+                        <input
+                          type="text"
+                          required
+                          value={editingProduct.product.img}
+                          onChange={(e) => setEditingProduct({
+                            ...editingProduct,
+                            product: { ...editingProduct.product, img: e.target.value }
+                          })}
+                          className="w-full bg-cream/20 border border-forest/10 focus:border-[#C5A059] focus:outline-none rounded-xl px-3 py-2"
+                        />
+                      </div>
+
+                      <div className="space-y-1">
+                        <label className="font-bold text-forest/70 block">Descrição do Artigo</label>
+                        <textarea
+                          rows={3}
+                          required
+                          value={editingProduct.product.description}
+                          onChange={(e) => setEditingProduct({
+                            ...editingProduct,
+                            product: { ...editingProduct.product, description: e.target.value }
+                          })}
+                          className="w-full bg-cream/20 border border-forest/10 focus:border-[#C5A059] focus:outline-none rounded-xl px-3 py-2 resize-none"
+                        />
+                      </div>
+
+                      <div className="grid grid-cols-3 gap-3">
+                        <div className="space-y-1">
+                          <label className="font-bold text-forest/70 block">Material</label>
+                          <input
+                            type="text"
+                            value={editingProduct.product.material}
+                            onChange={(e) => setEditingProduct({
+                              ...editingProduct,
+                              product: { ...editingProduct.product, material: e.target.value }
+                            })}
+                            className="w-full bg-cream/20 border border-forest/10 focus:border-[#C5A059] focus:outline-none rounded-xl px-2.5 py-2"
+                          />
+                        </div>
+                        <div className="space-y-1">
+                          <label className="font-bold text-forest/70 block">Cuidados</label>
+                          <input
+                            type="text"
+                            value={editingProduct.product.care}
+                            onChange={(e) => setEditingProduct({
+                              ...editingProduct,
+                              product: { ...editingProduct.product, care: e.target.value }
+                            })}
+                            className="w-full bg-cream/20 border border-forest/10 focus:border-[#C5A059] focus:outline-none rounded-xl px-2.5 py-2"
+                          />
+                        </div>
+                        <div className="space-y-1">
+                          <label className="font-bold text-forest/70 block">Dimensões</label>
+                          <input
+                            type="text"
+                            value={editingProduct.product.dimensions || ''}
+                            onChange={(e) => setEditingProduct({
+                              ...editingProduct,
+                              product: { ...editingProduct.product, dimensions: e.target.value }
+                            })}
+                            className="w-full bg-cream/20 border border-forest/10 focus:border-[#C5A059] focus:outline-none rounded-xl px-2.5 py-2"
+                          />
+                        </div>
+                      </div>
+
+                      <div className="space-y-1">
+                        <label className="font-bold text-forest/70 block">
+                          Cores Disponíveis (separadas por vírgula, ex: Natural, Rosa Pálido, Verde Musgo)
+                        </label>
+                        <input
+                          type="text"
+                          value={
+                            Array.isArray(editingProduct.product.availableColors)
+                              ? editingProduct.product.availableColors.join(', ')
+                              : editingProduct.product.availableColors || ''
+                          }
+                          onChange={(e) => setEditingProduct({
+                            ...editingProduct,
+                            product: { ...editingProduct.product, availableColors: e.target.value }
+                          })}
+                          className="w-full bg-cream/20 border border-forest/10 focus:border-[#C5A059] focus:outline-none rounded-xl px-3 py-2"
+                          placeholder="Natural, Rosa Pálido, Verde Musgo"
+                        />
+                      </div>
+
+                      <div className="flex items-center gap-2 pt-2">
+                        <input
+                          type="checkbox"
+                          id="hidden_check"
+                          checked={editingProduct.product.hidden || false}
+                          onChange={(e) => setEditingProduct({
+                            ...editingProduct,
+                            product: { ...editingProduct.product, hidden: e.target.checked }
+                          })}
+                          className="w-4 h-4 text-[#243119] focus:ring-forest border-forest/10 rounded"
+                        />
+                        <label htmlFor="hidden_check" className="font-bold text-forest/70 cursor-pointer">
+                          Ocultar este produto no catálogo público temporariamente
+                        </label>
+                      </div>
+
+                      <div className="flex gap-3 pt-3 border-t border-forest/5">
+                        <button
+                          type="button"
+                          onClick={() => setEditingProduct(null)}
+                          className="flex-1 py-2.5 bg-cream hover:bg-cream/70 text-forest rounded-xl font-bold uppercase transition-all cursor-pointer text-center"
+                        >
+                          Cancelar
+                        </button>
+                        <button
+                          type="submit"
+                          className="flex-1 py-2.5 bg-[#243119] hover:bg-[#1a2412] text-cream rounded-xl font-bold uppercase transition-all cursor-pointer text-center shadow-md"
+                        >
+                          Confirmar Peça
+                        </button>
+                      </div>
+                    </form>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* INTERNAL PHYSICAL INVENTORY VIEW (FASE 2) */}
+          {activeTab === 'inventory' && (
+            <div className="space-y-6">
+              <div className="bg-white border border-forest/5 p-5 rounded-[16px] shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div>
+                  <h4 className="font-serif text-sm font-medium text-forest">Sincronização de Inventário Físico</h4>
+                </div>
+                <div className="flex gap-2">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const newId = `rm_${Date.now()}`;
+                      const newMat = { id: newId, name: 'Nova Matéria-Prima', quantity: 10.0, unit: 'unidades', minSafety: 2.0 };
+                      setEditingMaterial({ isNew: true, material: newMat });
+                    }}
+                    className="px-4 py-2 bg-[#243119] hover:bg-[#1a2412] text-cream rounded-xl text-xs font-bold tracking-wider uppercase flex items-center gap-1.5 cursor-pointer"
+                  >
+                    <Plus className="w-3.5 h-3.5" /> Adicionar Matéria-Prima
+                  </button>
+                  <button
+                    type="button"
+                    onClick={async () => {
+                      setIsSavingInventory(true);
+                      try {
+                        const res = await fetch(`${API_BASE_URL}/api/admin/inventory/save`, {
+                          method: 'POST',
+                          headers: {
+                            'Content-Type': 'application/json',
+                            'x-admin-password': password
+                          },
+                          body: JSON.stringify({ inventory })
+                        });
+                        const data = await res.json();
+                        if (res.ok && data.success) {
+                          alert("Inventário físico de matérias-primas guardado com sucesso!");
+                          setInventory(data.inventory || []);
+                        } else {
+                          alert(data.error || "Erro ao guardar inventário.");
+                        }
+                      } catch (err) {
+                        alert("Erro de rede ao guardar inventário.");
+                      } finally {
+                        setIsSavingInventory(false);
+                      }
+                    }}
+                    disabled={isSavingInventory}
+                    className="px-4 py-2 bg-[#C5A059] hover:bg-[#a68244] text-white rounded-xl text-xs font-bold tracking-wider uppercase flex items-center gap-1.5 cursor-pointer shadow-sm"
+                  >
+                    <Save className="w-3.5 h-3.5" /> Guardar Alterações
+                  </button>
+                </div>
+              </div>
+
+              {inventoryError && (
+                <div className="bg-red-50 text-red-800 border border-red-100 rounded-xl p-4 text-xs">
+                  {inventoryError}
+                </div>
+              )}
+
+              {loadingInventory ? (
+                <div className="text-center py-12 text-forest/40 text-xs flex flex-col items-center gap-2">
+                  <RefreshCw className="animate-spin w-6 h-6 text-[#C5A059]" />
+                  A carregar inventário de matérias-primas...
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                  {/* Inventory List Column */}
+                  <div className="lg:col-span-2 space-y-4">
+                    <div className="bg-white border border-forest/5 rounded-[16px] shadow-sm overflow-hidden">
+                      <div className="overflow-x-auto">
+                        <table className="w-full text-left text-xs">
+                          <thead className="bg-cream/45 text-forest/50 uppercase tracking-wider text-[9px] font-bold border-b border-forest/5">
+                            <tr>
+                              <th className="px-6 py-3.5">Matéria-Prima</th>
+                              <th className="px-6 py-3.5 text-center">Stock Atual</th>
+                              <th className="px-6 py-3.5 text-center">Stock Mínimo</th>
+                              <th className="px-6 py-3.5 text-right">Ações</th>
+                            </tr>
+                          </thead>
+                          <tbody className="divide-y divide-forest/5">
+                            {inventory.map((item) => {
+                              const isLow = item.quantity < item.minSafety;
+                              return (
+                                <tr key={item.id} className={`transition-colors ${isLow ? 'bg-amber-50/20 hover:bg-amber-50/45' : 'hover:bg-cream/10'}`}>
+                                  <td className="px-6 py-4">
+                                    <div className="font-semibold text-forest flex items-center gap-2">
+                                      {isLow && <AlertTriangle className="w-4 h-4 text-amber-500 shrink-0" />}
+                                      {item.name}
+                                    </div>
+                                  </td>
+                                  <td className="px-6 py-4 text-center font-mono">
+                                    <span className={`px-2 py-0.5 rounded-full font-bold text-[10px] ${
+                                      isLow ? 'bg-amber-100 text-amber-800' : 'bg-green-100 text-green-800'
+                                    }`}>
+                                      {item.quantity} {item.unit}
+                                    </span>
+                                  </td>
+                                  <td className="px-6 py-4 text-center font-mono text-forest/60">
+                                    {item.minSafety} {item.unit}
+                                  </td>
+                                  <td className="px-6 py-4 text-right space-x-3">
+                                    <button
+                                      type="button"
+                                      onClick={() => {
+                                        const qtyStr = prompt(`Reabastecer / Ajustar Stock de ${item.name}:`, String(item.quantity));
+                                        if (qtyStr !== null) {
+                                          const newQty = parseFloat(parseFloat(qtyStr).toFixed(2));
+                                          if (!isNaN(newQty)) {
+                                            const updated = inventory.map(m => m.id === item.id ? { ...m, quantity: newQty } : m);
+                                            setInventory(updated);
+                                          }
+                                        }
+                                      }}
+                                      className="text-[10px] font-bold text-[#C5A059] hover:underline uppercase tracking-wider cursor-pointer"
+                                    >
+                                      Ajustar
+                                    </button>
+                                    <button
+                                      type="button"
+                                      onClick={() => setEditingMaterial({ isNew: false, material: item })}
+                                      className="text-[10px] font-bold text-forest/50 hover:text-forest hover:underline uppercase tracking-wider cursor-pointer"
+                                    >
+                                      Editar
+                                    </button>
+                                    <button
+                                      type="button"
+                                      onClick={() => {
+                                        if (confirm(`Pretende eliminar permanentemente a matéria-prima ${item.name}?`)) {
+                                          setInventory(inventory.filter(m => m.id !== item.id));
+                                        }
+                                      }}
+                                      className="text-[10px] font-bold text-red-600 hover:text-red-800 hover:underline uppercase tracking-wider cursor-pointer"
+                                    >
+                                      Eliminar
+                                    </button>
+                                  </td>
+                                </tr>
+                              );
+                            })}
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Deductions & Auto-abate logs panel */}
+                  <div className="lg:col-span-1 space-y-4">
+                    <div className="bg-white border border-forest/5 p-5 rounded-[16px] shadow-sm space-y-4 text-left">
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-forest/35 block border-b border-forest/5 pb-2">Alertas de Stock</span>
+                      
+                      <div className="space-y-2">
+                        {inventory.filter(m => m.quantity < m.minSafety).length === 0 ? (
+                          <div className="bg-green-50/30 text-green-800 border border-green-100 p-3 rounded-xl flex items-center gap-2 text-[10px] font-medium">
+                            <CheckCircle className="w-3.5 h-3.5 text-green-600" />
+                            Todas as matérias-primas têm stock acima do limite de segurança.
+                          </div>
+                        ) : (
+                          inventory.filter(m => m.quantity < m.minSafety).map(item => (
+                            <div key={item.id} className="bg-amber-50 text-amber-900 border border-amber-200/40 p-3 rounded-xl flex items-start gap-2 text-[10px] leading-relaxed">
+                              <AlertTriangle className="w-4 h-4 text-amber-500 shrink-0 mt-0.5" />
+                              <div>
+                                <strong>{item.name}</strong> está abaixo do limite! Restam apenas {item.quantity} {item.unit} (Segurança: {item.minSafety}).
+                              </div>
+                            </div>
+                          ))
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* MATERIAL CREATION/EDITING FLOATING OVERLAY FORM */}
+              {editingMaterial && (
+                <div className="fixed inset-0 bg-[#243119]/40 backdrop-blur-sm flex items-center justify-center z-[110] p-4">
+                  <div data-lenis-prevent className="bg-white border border-forest/10 rounded-[24px] max-w-sm w-full p-6 shadow-2xl text-left space-y-4">
+                    <div className="flex items-center justify-between border-b border-forest/5 pb-3">
+                      <h5 className="font-serif text-base font-bold text-forest">
+                        {editingMaterial.isNew ? 'Nova Matéria-Prima' : `Editar: ${editingMaterial.material.name}`}
+                      </h5>
+                      <button
+                        type="button"
+                        onClick={() => setEditingMaterial(null)}
+                        className="text-forest/40 hover:text-forest cursor-pointer"
+                      >
+                        <X className="w-5 h-5" />
+                      </button>
+                    </div>
+
+                    <form
+                      onSubmit={(e) => {
+                        e.preventDefault();
+                        const updated = editingMaterial.isNew
+                          ? [...inventory, editingMaterial.material]
+                          : inventory.map(m => m.id === editingMaterial.material.id ? editingMaterial.material : m);
+                        
+                        setInventory(updated);
+                        setEditingMaterial(null);
+                      }}
+                      className="space-y-4 text-xs text-left"
+                    >
+                      <div className="space-y-1">
+                        <label className="font-bold text-forest/70 block">Identificador ID (ex: rm_feltro_azul)</label>
+                        <input
+                          type="text"
+                          required
+                          disabled={!editingMaterial.isNew}
+                          value={editingMaterial.material.id}
+                          onChange={(e) => setEditingMaterial({
+                            ...editingMaterial,
+                            material: { ...editingMaterial.material, id: e.target.value }
+                          })}
+                          className="w-full bg-cream/20 border border-forest/10 focus:border-[#C5A059] focus:outline-none rounded-xl px-3 py-2 disabled:opacity-50"
+                        />
+                      </div>
+
+                      <div className="space-y-1">
+                        <label className="font-bold text-forest/70 block">Nome Descritivo</label>
+                        <input
+                          type="text"
+                          required
+                          value={editingMaterial.material.name}
+                          onChange={(e) => setEditingMaterial({
+                            ...editingMaterial,
+                            material: { ...editingMaterial.material, name: e.target.value }
+                          })}
+                          className="w-full bg-cream/20 border border-forest/10 focus:border-[#C5A059] focus:outline-none rounded-xl px-3 py-2"
+                        />
+                      </div>
+
+                      <div className="grid grid-cols-3 gap-3">
+                        <div className="space-y-1 col-span-2">
+                          <label className="font-bold text-forest/70 block">Unidade (ex: novelos, metros)</label>
+                          <input
+                            type="text"
+                            required
+                            value={editingMaterial.material.unit}
+                            onChange={(e) => setEditingMaterial({
+                              ...editingMaterial,
+                              material: { ...editingMaterial.material, unit: e.target.value }
+                            })}
+                            className="w-full bg-cream/20 border border-forest/10 focus:border-[#C5A059] focus:outline-none rounded-xl px-2.5 py-2"
+                          />
+                        </div>
+                        <div className="space-y-1">
+                          <label className="font-bold text-forest/70 block">Stock Inicial</label>
+                          <input
+                            type="number"
+                            step="0.01"
+                            required
+                            value={editingMaterial.material.quantity}
+                            onChange={(e) => setEditingMaterial({
+                              ...editingMaterial,
+                              material: { ...editingMaterial.material, quantity: parseFloat(e.target.value) || 0 }
+                            })}
+                            className="w-full bg-cream/20 border border-forest/10 focus:border-[#C5A059] focus:outline-none rounded-xl px-2.5 py-2"
+                          />
+                        </div>
+                      </div>
+
+                      <div className="space-y-1">
+                        <label className="font-bold text-forest/70 block">Mínimo de Segurança (Emissão de Alerta)</label>
+                        <input
+                          type="number"
+                          step="0.01"
+                          required
+                          value={editingMaterial.material.minSafety}
+                          onChange={(e) => setEditingMaterial({
+                            ...editingMaterial,
+                            material: { ...editingMaterial.material, minSafety: parseFloat(e.target.value) || 0 }
+                          })}
+                          className="w-full bg-cream/20 border border-forest/10 focus:border-[#C5A059] focus:outline-none rounded-xl px-3 py-2"
+                        />
+                      </div>
+
+                      <div className="flex gap-3 pt-3 border-t border-forest/5">
+                        <button
+                          type="button"
+                          onClick={() => setEditingMaterial(null)}
+                          className="flex-1 py-2.5 bg-cream hover:bg-cream/70 text-forest rounded-xl font-bold uppercase transition-all cursor-pointer text-center"
+                        >
+                          Cancelar
+                        </button>
+                        <button
+                          type="submit"
+                          className="flex-1 py-2.5 bg-[#243119] hover:bg-[#1a2412] text-cream rounded-xl font-bold uppercase transition-all cursor-pointer text-center shadow-md"
+                        >
+                          Confirmar
+                        </button>
+                      </div>
+                    </form>
                   </div>
                 </div>
               )}
