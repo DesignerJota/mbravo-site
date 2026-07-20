@@ -2316,7 +2316,7 @@ export default function AdminDashboardModal({ onClose, shopCategories = [] }: Ad
 
             if (zeroStockBestSellers.length > 0) {
               recommendations.push(
-                `Artigo com elevada procura está esgotado: "${zeroStockBestSellers[0].name}". Considere iniciar confeção imediata ou ajustar o stock no CMS catálogo.`
+                `Artigo com elevada procura está esgotado: "${zeroStockBestSellers[0].name}". Considere iniciar produção imediata ou ajustar o stock no CMS catálogo.`
               );
             }
 
