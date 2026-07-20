@@ -1630,6 +1630,13 @@ export default function AdminDashboardModal({ onClose, shopCategories = [] }: Ad
                                     <span className="font-mono text-xs font-bold text-[#C5A059]">{prod.price}</span>
                                   </div>
                                   <p className="text-[10px] text-forest/40 line-clamp-1 italic">{prod.description}</p>
+
+                                  {/* Finished product stock & crafting time badges */}
+                                  <div className="flex gap-1.5 pt-1 flex-wrap">
+                                    <span className={`px-1.5 py-0.5 rounded text-[8.5px] font-bold uppercase tracking-wider ${prod.stock > 0 ? 'bg-emerald-50 text-emerald-700 border border-emerald-100' : 'bg-amber-50 text-amber-700 border border-amber-100'}`}>
+                                      {prod.stock > 0 ? `${prod.stock} em Stock` : `Por Encomenda (${prod.craftingTime || 10} dias)`}
+                                    </span>
+                                  </div>
                                   
                                   {/* Yarn colors display */}
                                   <div className="flex flex-wrap gap-1 pt-1">
@@ -1865,6 +1872,37 @@ export default function AdminDashboardModal({ onClose, shopCategories = [] }: Ad
                             onChange={(e) => setEditingProduct({
                               ...editingProduct,
                               product: { ...editingProduct.product, dimensions: e.target.value }
+                            })}
+                            className="w-full bg-cream/20 border border-forest/10 focus:border-[#C5A059] focus:outline-none rounded-xl px-2.5 py-2"
+                          />
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-1">
+                          <label className="font-bold text-forest/70 block">Peças em Stock (Estoque)</label>
+                          <input
+                            type="number"
+                            min="0"
+                            placeholder="0 (Produção sob Encomenda)"
+                            value={editingProduct.product.stock !== undefined ? editingProduct.product.stock : ''}
+                            onChange={(e) => setEditingProduct({
+                              ...editingProduct,
+                              product: { ...editingProduct.product, stock: e.target.value === '' ? '' : parseInt(e.target.value, 10) }
+                            })}
+                            className="w-full bg-cream/20 border border-forest/10 focus:border-[#C5A059] focus:outline-none rounded-xl px-2.5 py-2"
+                          />
+                        </div>
+                        <div className="space-y-1">
+                          <label className="font-bold text-forest/70 block">Tempo de Confeção (dias)</label>
+                          <input
+                            type="number"
+                            min="1"
+                            placeholder="Ex: 7"
+                            value={editingProduct.product.craftingTime !== undefined ? editingProduct.product.craftingTime : ''}
+                            onChange={(e) => setEditingProduct({
+                              ...editingProduct,
+                              product: { ...editingProduct.product, craftingTime: e.target.value === '' ? '' : parseInt(e.target.value, 10) }
                             })}
                             className="w-full bg-cream/20 border border-forest/10 focus:border-[#C5A059] focus:outline-none rounded-xl px-2.5 py-2"
                           />
