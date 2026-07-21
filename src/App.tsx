@@ -1734,6 +1734,8 @@ const StorySection = () => {
                                 key={currentImg}
                                 src={storyImages[currentImg]} 
                                 alt="Crochet craft hands and label process by M★Bravo" 
+                                loading="lazy"
+                                decoding="async"
                                 initial={{ opacity: 0, scale: 1.05, filter: "contrast(0.92) brightness(1.04)" }}
                                 animate={{ opacity: 0.95, scale: 1, filter: "contrast(1.02) brightness(1.0)" }}
                                 exit={{ opacity: 0, scale: 0.97 }}
@@ -2016,6 +2018,8 @@ const MadeWithTimeSection = () => {
                             <img 
                                 src="https://i.ibb.co/j9LHyxq6/Firefly-Gemini-Flash-Imagem-com-ambiente-cosy-tema-handmade-crochet-usar-o-logo-em-label-de-cartao.png" 
                                 alt="Destaque de textura de lã e rótulo M★Bravo" 
+                                loading="lazy"
+                                decoding="async"
                                 className="w-full h-full object-cover select-none brightness-[0.98] transition-transform duration-[3000ms] ease-out group-hover:scale-[1.03]"
                             />
                             
@@ -2140,6 +2144,8 @@ const KnotSection = () => {
                         <img 
                             src="https://i.ibb.co/F4Z4Fp4Z/LOGOTIPOo.jpg" 
                             alt="Textura de malha" 
+                            loading="lazy"
+                            decoding="async"
                             className="w-full h-full object-cover brightness-95 group-hover:scale-105 transition-all duration-[1.5s] ease-out"
                         />
                         <div className="absolute inset-x-0 bottom-0 p-6 bg-gradient-to-t from-[#121a0d]/90 via-[#121a0d]/40 to-transparent">
@@ -2159,6 +2165,8 @@ const KnotSection = () => {
                         <img 
                             src="https://i.ibb.co/d0Rn6jC7/MOOD-01.png" 
                             alt="Mãos da artesã" 
+                            loading="lazy"
+                            decoding="async"
                             className="w-full h-full object-cover brightness-95 group-hover:scale-105 transition-all duration-[1.5s] ease-out"
                         />
                         <div className="absolute inset-x-0 bottom-0 p-6 bg-gradient-to-t from-[#121a0d]/90 via-[#121a0d]/40 to-transparent">
@@ -2178,6 +2186,8 @@ const KnotSection = () => {
                         <img 
                             src="https://i.ibb.co/PKJgWZM/emotional-thank-you-card-1.png" 
                             alt="Detalhe de material" 
+                            loading="lazy"
+                            decoding="async"
                             className="w-full h-full object-cover brightness-95 group-hover:scale-105 transition-all duration-[1.5s] ease-out"
                         />
                         <div className="absolute inset-x-0 bottom-0 p-6 bg-gradient-to-t from-[#121a0d]/90 via-[#121a0d]/40 to-transparent">
@@ -2643,8 +2653,8 @@ const ProductCard: React.FC<ProductCardProps> = ({ product: rawProduct, i, isFoc
                                 layoutId={`product-img-${product.id}`}
                                 src={productImages[0]} 
                                 alt={product.name} 
-                                loading="eager"
-                                decoding="sync"
+                                loading="lazy"
+                                decoding="async"
                                 style={{ imageRendering: 'crisp-edges', filter: 'none', opacity: 1 }}
                                 className="w-full h-full object-cover group-hover:scale-[1.05] transition-transform duration-700 ease-out antialiased filter-none opacity-100"
                             />
@@ -2721,8 +2731,8 @@ const ProductCard: React.FC<ProductCardProps> = ({ product: rawProduct, i, isFoc
                             layoutId={activeImgIndex === 0 ? `product-img-${product.id}` : undefined}
                             src={currentImg} 
                             alt={`${product.name} - Imagem ${activeImgIndex + 1}`} 
-                            loading="eager"
-                            decoding="sync"
+                            loading="lazy"
+                            decoding="async"
                             style={{ imageRendering: 'crisp-edges', filter: 'none', opacity: 1 }}
                             custom={direction}
                             variants={slideVariants}
@@ -2823,8 +2833,8 @@ const ProductCard: React.FC<ProductCardProps> = ({ product: rawProduct, i, isFoc
                                     <img 
                                         src={imgUrl} 
                                         alt="" 
-                                        loading="eager"
-                                        decoding="sync"
+                                        loading="lazy"
+                                        decoding="async"
                                         style={{ imageRendering: 'crisp-edges', filter: 'none', opacity: 1 }}
                                         className="w-full h-full object-cover antialiased filter-none opacity-100" 
                                     />
@@ -3082,8 +3092,8 @@ const ProductCard: React.FC<ProductCardProps> = ({ product: rawProduct, i, isFoc
                                             <img 
                                                 src={productImages[0]} 
                                                 alt="" 
-                                                loading="eager"
-                                                decoding="sync"
+                                                loading="lazy"
+                                                decoding="async"
                                                 style={{ imageRendering: 'crisp-edges' }}
                                                 className="w-12 h-12 rounded-lg object-cover border border-forest/5 antialiased" 
                                             />
@@ -4210,8 +4220,8 @@ const CollectionSection = () => {
                             <img 
                                 src={cat.img} 
                                 alt={cat.name} 
-                                loading="eager"
-                                decoding="sync"
+                                loading="lazy"
+                                decoding="async"
                                 style={{ imageRendering: 'crisp-edges' }}
                                 className="w-full h-full object-cover group-hover:scale-102 transition-transform duration-700 ease-out antialiased"
                             />
@@ -4830,6 +4840,8 @@ const InstagramSection = () => {
                                     <img 
                                         src={post.img} 
                                         alt={post.alt}
+                                        loading="lazy"
+                                        decoding="async"
                                         className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
                                         style={{ imageRendering: 'crisp-edges' }}
                                     />
@@ -5070,6 +5082,8 @@ const EssenceHero = ({ onBackToHome }: { onBackToHome: () => void }) => {
                                     <img 
                                         src="https://i.ibb.co/3907byLt/IMG-2738-2.jpg" 
                                         alt="Signature Granny Poncho" 
+                                        loading="eager"
+                                        fetchPriority="high"
                                         className="w-full h-full object-cover group-hover/heroimg:scale-105 transition-transform duration-700 ease-out"
                                     />
                                 </div>
@@ -5468,6 +5482,8 @@ const CategoryPage = ({ pathname }: { pathname: string }) => {
                 <img 
                     src={translatedCategory.img} 
                     alt={translatedCategory.name} 
+                    loading="eager"
+                    fetchPriority="high"
                     className="absolute inset-0 w-full h-full object-cover brightness-[0.7] grayscale-[0.1]"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-forest/85 via-forest/10 to-transparent pointer-events-none" />
@@ -5999,6 +6015,7 @@ const ProductDetailPage = ({ pathname }: { pathname: string }) => {
                             src={currentImg} 
                             alt={productTranslated.name} 
                             loading="eager"
+                            fetchPriority="high"
                             decoding="sync"
                             className="w-full h-full object-cover transition-transform duration-500 hover:scale-[1.02] cursor-zoom-in"
                             onClick={() => {
@@ -6056,6 +6073,7 @@ const ProductDetailPage = ({ pathname }: { pathname: string }) => {
                                         src={imgUrl} 
                                         alt="" 
                                         loading="lazy"
+                                        decoding="async"
                                         className="w-full h-full object-cover" 
                                     />
                                 </button>
@@ -7359,6 +7377,8 @@ export default function App() {
                         <img 
                             src="https://i.ibb.co/xqh0LJ7g/Firefly-Gemini-Flash-Imagem-com-ambiente-cosy-tema-handmade-crochet-usar-o-logo-em-business-card.png" 
                             alt="Brand visual" 
+                            loading="lazy"
+                            decoding="async"
                             className="w-full h-full object-cover brightness-[0.4] grayscale-[0.5]"
                         />
                     </motion.div>
@@ -7425,6 +7445,8 @@ export default function App() {
                                 transition={{ duration: 0.25, ease: "easeOut" }}
                                 src={zoomedImage} 
                                 alt="Zoom"
+                                loading="lazy"
+                                decoding="async"
                                 className="max-w-full max-h-full object-contain rounded-2xl shadow-2xl pointer-events-none"
                             />
                         </div>
