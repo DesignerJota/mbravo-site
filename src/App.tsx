@@ -4,7 +4,7 @@ import { motion, AnimatePresence, useScroll, useTransform, useSpring, useVelocit
 import { Menu, X, Instagram, Facebook, ArrowRight, ArrowLeft, ChevronLeft, ChevronRight, Share2, Mail, MessageCircle, Sparkles, Feather, Palette, Heart, Maximize2 } from 'lucide-react';
 import { loadStripe } from '@stripe/stripe-js';
 import Lenis from 'lenis';
-import AdminDashboardModal from './components/AdminDashboardModal';
+const AdminDashboardModal = React.lazy(() => import('./components/AdminDashboardModal'));
 import { 
   useLanguage, 
   translateProduct, 
@@ -1517,6 +1517,7 @@ const Hero = () => {
                                         className="w-full h-full object-cover"
                                         fetchPriority="high"
                                         loading="eager"
+                                        decoding="async"
                                     />
                                 </motion.div>
                             ))}
@@ -7077,7 +7078,14 @@ const ProductDetailPage = ({ pathname }: { pathname: string }) => {
 const AdminPage = () => {
     return (
         <div className="w-full min-h-[85vh] flex items-center justify-center p-0 md:p-6 lg:p-12">
-            <AdminDashboardModal onClose={() => navigateTo('/')} shopCategories={SHOP_CATEGORIES} />
+            <React.Suspense fallback={
+                <div className="flex flex-col items-center justify-center p-12 text-forest min-h-[50vh]">
+                    <Sparkles className="animate-spin text-[#C5A059] w-8 h-8 mb-4" />
+                    <p className="font-serif italic text-sm tracking-wide">A carregar painel...</p>
+                </div>
+            }>
+                <AdminDashboardModal onClose={() => navigateTo('/')} shopCategories={SHOP_CATEGORIES} />
+            </React.Suspense>
         </div>
     );
 };
@@ -7431,7 +7439,14 @@ export default function App() {
                     <LegalModal type={activeLegal} onClose={() => setActiveLegal(null)} />
                 )}
                 {showAdmin && (
-                    <AdminDashboardModal onClose={() => setShowAdmin(false)} shopCategories={SHOP_CATEGORIES} />
+                    <React.Suspense fallback={
+                        <div className="fixed inset-0 bg-[#FCFBF9] z-[120] flex flex-col items-center justify-center p-6 text-forest">
+                            <Sparkles className="animate-spin text-[#C5A059] w-8 h-8 mb-4" />
+                            <p className="font-serif italic text-sm tracking-wide">A carregar painel...</p>
+                        </div>
+                    }>
+                        <AdminDashboardModal onClose={() => setShowAdmin(false)} shopCategories={SHOP_CATEGORIES} />
+                    </React.Suspense>
                 )}
                 {zoomedImage && (
                     <motion.div 
