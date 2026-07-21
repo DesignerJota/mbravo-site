@@ -769,7 +769,7 @@ const LoadingScreen = ({ onComplete }: { onComplete: () => void; key?: string })
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.8, duration: 1 }}
-        className="mt-12 text-cream/30 font-serif italic tracking-[0.15em] sm:tracking-[0.3em] text-[10px] sm:text-xs uppercase text-center px-6 max-w-[90vw] sm:max-w-none leading-relaxed"
+        className="mt-12 text-cream/65 font-serif italic tracking-[0.15em] sm:tracking-[0.3em] text-[10px] sm:text-xs uppercase text-center px-6 max-w-[90vw] sm:max-w-none leading-relaxed"
       >
         {t('loading.slogan')}
       </motion.p>
@@ -953,6 +953,7 @@ const Navbar = ({ currentPage, setCurrentPage, pathname }: { currentPage: 'home'
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 1, ease: "easeOut" }}
             className="relative"
+            aria-label="M★BRAVO"
         >
           <Logo light={isDarkBg} className="h-10 md:h-12" />
         </motion.a>
@@ -977,7 +978,7 @@ const Navbar = ({ currentPage, setCurrentPage, pathname }: { currentPage: 'home'
                         isDarkBg 
                           ? 'border-cream/30 hover:bg-cream hover:text-forest' 
                           : 'border-forest/30 hover:bg-forest hover:text-cream'
-                      }` 
+                       }` 
                     : 'hover:opacity-60'
                 } ${isActive ? 'text-[#C5A059]' : ''}`}
               >
@@ -1019,6 +1020,7 @@ const Navbar = ({ currentPage, setCurrentPage, pathname }: { currentPage: 'home'
             animate={{ opacity: 1, x: 0 }}
             className={`md:hidden transition-colors duration-200 ${textColor}`}
             onClick={() => setMobileMenuOpen(true)}
+            aria-label={lang === 'PT' ? 'Abrir Menu' : 'Open Menu'}
           >
             <Menu size={24} />
           </motion.button>
@@ -2684,6 +2686,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product: rawProduct, i, isFoc
                             <button 
                                 onClick={handleToggle}
                                 className="p-1.5 sm:p-2 rounded-full bg-forest text-cream hover:bg-forest/90 transition-all shadow-lg shadow-forest/10 hover:scale-105 active:scale-95 duration-200"
+                                aria-label={lang === 'pt' ? 'Ver Detalhes do Produto' : 'View Product Details'}
                             >
                                 <ArrowRight size={14} />
                             </button>
@@ -2719,6 +2722,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product: rawProduct, i, isFoc
                     }}
                     className="absolute top-6 right-6 z-20 p-2.5 sm:p-3 rounded-full bg-[#FCFBF9]/80 text-forest hover:bg-forest hover:text-cream backdrop-blur-md shadow-md border border-forest/10 cursor-pointer flex items-center justify-center hover:scale-105 active:scale-95 transition-all duration-300"
                     title={lang === 'pt' ? 'Ampliar Imagem' : 'Zoom Image'}
+                    aria-label={lang === 'pt' ? 'Ampliar Imagem' : 'Zoom Image'}
                 >
                     <Maximize2 size={16} />
                 </button>
@@ -2778,6 +2782,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product: rawProduct, i, isFoc
                                     setActiveImgIndex((prev) => (prev === 0 ? productImages.length - 1 : prev - 1));
                                 }}
                                 className="w-11 h-11 rounded-full bg-[#FCFBF9]/85 hover:bg-forest text-forest hover:text-cream backdrop-blur-md shadow-md flex items-center justify-center transition-all duration-300 pointer-events-auto hover:scale-105 active:scale-95 border border-forest/5 cursor-pointer"
+                                aria-label={lang === 'pt' ? 'Imagem anterior' : 'Previous image'}
                             >
                                 <ChevronLeft size={20} />
                             </button>
@@ -2790,6 +2795,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product: rawProduct, i, isFoc
                                     setActiveImgIndex((prev) => (prev === productImages.length - 1 ? 0 : prev + 1));
                                 }}
                                 className="w-11 h-11 rounded-full bg-[#FCFBF9]/85 hover:bg-forest text-forest hover:text-cream backdrop-blur-md shadow-md flex items-center justify-center transition-all duration-300 pointer-events-auto hover:scale-105 active:scale-95 border border-forest/5 cursor-pointer"
+                                aria-label={lang === 'pt' ? 'Próxima imagem' : 'Next image'}
                             >
                                 <ChevronRight size={20} />
                             </button>
@@ -2808,6 +2814,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product: rawProduct, i, isFoc
                                         }
                                     }}
                                     className={`h-1.5 rounded-full transition-all duration-300 ${idx === activeImgIndex ? 'w-5 bg-forest' : 'w-1.5 bg-forest/30 hover:bg-forest'}`}
+                                    aria-label={lang === 'pt' ? `Ir para imagem ${idx + 1}` : `Go to image ${idx + 1}`}
                                 />
                             ))}
                         </div>
@@ -2829,6 +2836,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product: rawProduct, i, isFoc
                                             ? 'border-forest scale-95 shadow-md' 
                                             : 'border-transparent opacity-60 hover:opacity-100'
                                     }`}
+                                    aria-label={lang === 'pt' ? `Ver miniatura ${idx + 1}` : `View thumbnail ${idx + 1}`}
                                 >
                                     <img 
                                         src={imgUrl} 
@@ -2874,6 +2882,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product: rawProduct, i, isFoc
                                     onClick={handleToggle}
                                     className="p-1.5 rounded-full bg-forest/5 text-forest hover:bg-forest hover:text-cream transition-all border border-forest/10 shadow-sm cursor-pointer ml-1"
                                     title="Fechar"
+                                    aria-label={lang === 'pt' ? 'Fechar' : 'Close'}
                                 >
                                     <X size={12} />
                                 </button>
@@ -4575,6 +4584,7 @@ const LegalModal = ({ type, onClose }: LegalModalProps) => {
                     <button 
                         onClick={onClose}
                         className="w-8 h-8 rounded-full bg-forest/5 hover:bg-forest/10 flex items-center justify-center transition-colors text-forest/70 hover:text-forest cursor-pointer"
+                        aria-label={lang === 'pt' ? 'Fechar' : 'Close'}
                     >
                         <X size={16} />
                     </button>
@@ -4628,17 +4638,17 @@ const Footer = ({ onOpenLegal, onOpenAdmin }: { onOpenLegal: (type: 'envios' | '
                     </div>
                 </div>
                 
-                <div className="flex flex-col sm:flex-row gap-6 sm:gap-12 text-[10px] uppercase tracking-[0.2em] font-medium text-cream/30 text-center lg:text-left">
+                <div className="flex flex-col sm:flex-row gap-6 sm:gap-12 text-[10px] uppercase tracking-[0.2em] font-medium text-cream/65 text-center lg:text-left">
                     <button onClick={() => onOpenLegal('envios')} className="hover:text-cream transition-colors cursor-pointer text-center lg:text-left uppercase tracking-[0.2em]">{t('footer.legal_shipping')}</button>
                     <button onClick={() => onOpenLegal('privacidade')} className="hover:text-cream transition-colors cursor-pointer text-center lg:text-left uppercase tracking-[0.2em]">{t('footer.legal_privacy')}</button>
                     <button onClick={() => onOpenLegal('termos')} className="hover:text-cream transition-colors cursor-pointer text-center lg:text-left uppercase tracking-[0.2em]">{t('footer.legal_terms')}</button>
                 </div>
 
-                <div className="text-[9px] uppercase tracking-[0.2em] text-cream/45 text-center lg:text-right flex flex-col gap-1 items-center lg:items-end">
-                    <div className="text-cream/30 text-[8px] tracking-[0.3em] uppercase mb-1">{t('footer.support')}</div>
+                <div className="text-[9px] uppercase tracking-[0.2em] text-cream/70 text-center lg:text-right flex flex-col gap-1 items-center lg:items-end">
+                    <div className="text-cream/50 text-[8px] tracking-[0.3em] uppercase mb-1">{t('footer.support')}</div>
                     <a href={MAILTO_LINK} className="hover:text-cream transition-colors font-mono">{CONTACT_EMAIL}</a>
                     <a href="tel:+351912828182" className="hover:text-cream transition-colors font-mono">+351 912 828 182</a>
-                    <div className="text-cream/20 mt-2 whitespace-pre-line text-center lg:text-right">
+                    <div className="text-cream/45 mt-2 whitespace-pre-line text-center lg:text-right">
                         <span 
                             onClick={onOpenAdmin}
                             className="cursor-default select-none active:opacity-80"
@@ -4666,7 +4676,7 @@ const MemoryContinuesSection = ({ onDiscoverEssence }: { onDiscoverEssence: () =
                 
                 {/* Header Badge */}
                 <div className="space-y-4 mb-10 md:mb-12">
-                    <span className="text-[10px] uppercase tracking-[0.45em] font-semibold text-cream/40 block font-sans">
+                    <span className="text-[10px] uppercase tracking-[0.45em] font-semibold text-cream/65 block font-sans">
                         {t('memory.tag')}
                     </span>
                     <div className="h-[1px] w-12 bg-cream/20 mx-auto" />
