@@ -748,10 +748,18 @@ const Logo = ({ className = "h-12", light = false }: { className?: string, light
 
 const LoadingScreen = ({ onComplete }: { onComplete: () => void; key?: string }) => {
   const { t } = useLanguage();
+  const onCompleteRef = useRef(onComplete);
+  
   useEffect(() => {
-    const timer = setTimeout(onComplete, 3000);
-    return () => clearTimeout(timer);
+    onCompleteRef.current = onComplete;
   }, [onComplete]);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      onCompleteRef.current();
+    }, 3000);
+    return () => clearTimeout(timer);
+  }, []);
 
   return (
     <motion.div
