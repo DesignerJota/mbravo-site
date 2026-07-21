@@ -1778,6 +1778,8 @@ export default function AdminDashboardModal({ onClose, shopCategories = [] }: Ad
                                   src={prod.img}
                                   alt={prod.name}
                                   referrerPolicy="no-referrer"
+                                  loading="lazy"
+                                  decoding="async"
                                   className="w-16 h-16 rounded-xl object-cover border border-forest/5 bg-cream/20 shrink-0"
                                 />
                                 <div className="flex-1 min-w-0 space-y-1 text-left">
