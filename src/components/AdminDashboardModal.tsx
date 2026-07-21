@@ -665,6 +665,7 @@ export default function AdminDashboardModal({ onClose, shopCategories = [] }: Ad
             <button 
               onClick={onClose}
               className="p-1 sm:p-1.5 hover:bg-forest/5 rounded-full transition-all cursor-pointer text-forest/60 hover:text-forest"
+              aria-label="Fechar Painel de Administração"
             >
               <X className="w-5 h-5" />
             </button>
@@ -1902,6 +1903,7 @@ export default function AdminDashboardModal({ onClose, shopCategories = [] }: Ad
                         type="button"
                         onClick={() => setEditingProduct(null)}
                         className="text-forest/40 hover:text-forest cursor-pointer"
+                        aria-label="Fechar"
                       >
                         <X className="w-5 h-5" />
                       </button>
