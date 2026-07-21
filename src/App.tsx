@@ -5486,10 +5486,10 @@ const CategoryPage = ({ pathname }: { pathname: string }) => {
             <div className="mb-20">
                 <div className="flex items-center justify-between border-b border-forest/10 pb-6 mb-12">
                     <h2 className="font-serif italic text-xl sm:text-2xl font-light">
-                        {translatedCategory.products.length} {translatedCategory.products.length === 1 ? (lang === 'pt' ? 'peça única' : 'unique piece') : (lang === 'pt' ? 'peças únicas' : 'unique pieces')}
+                        {translatedCategory.products.length} {translatedCategory.products.length === 1 ? (lang === 'pt' ? 'Produto' : 'Product') : (lang === 'pt' ? 'Produtos' : 'Products')}
                     </h2>
-                    <button onClick={() => navigateTo('/')} className="text-[10px] uppercase tracking-[0.3em] font-bold text-forest/50 hover:text-forest flex items-center gap-2 transition-colors cursor-pointer">
-                        <ChevronLeft size={14} /> {lang === 'pt' ? 'Voltar ao Início' : 'Back to Home'}
+                    <button onClick={() => navigateTo('/#collection')} className="text-[10px] uppercase tracking-[0.3em] font-bold text-forest/50 hover:text-forest flex items-center gap-2 transition-colors cursor-pointer">
+                        <ChevronLeft size={14} /> {lang === 'pt' ? 'Voltar à Coleção' : 'Back to Collection'}
                     </button>
                 </div>
 
@@ -5505,6 +5505,16 @@ const CategoryPage = ({ pathname }: { pathname: string }) => {
                             />
                         </div>
                     ))}
+                </div>
+
+                {/* Back to Collection at the bottom of the page */}
+                <div className="mt-16 flex justify-center border-t border-forest/10 pt-10">
+                    <button 
+                        onClick={() => navigateTo('/#collection')} 
+                        className="text-[10px] uppercase tracking-[0.3em] font-bold text-forest/50 hover:text-forest flex items-center gap-2 transition-colors cursor-pointer"
+                    >
+                        <ChevronLeft size={14} /> {lang === 'pt' ? 'Voltar à Coleção' : 'Back to Collection'}
+                    </button>
                 </div>
             </div>
         </div>
@@ -7098,14 +7108,17 @@ export default function App() {
         const hash = newPath.split('#')[1];
         let attempts = 0;
         const scrollToElement = () => {
-          const element = document.getElementById(hash);
+          let element = document.getElementById(hash);
+          if (!element && hash === 'colecao') {
+            element = document.getElementById('collection');
+          }
           if (element) {
             const grid = element.querySelector('.grid');
-            const isReady = hash !== 'collection' || !grid || grid.getBoundingClientRect().height > 200;
+            const isReady = (hash !== 'collection' && hash !== 'colecao') || !grid || grid.getBoundingClientRect().height > 200;
             
             if (isReady) {
               setTimeout(() => {
-                if (hash === 'collection') {
+                if (hash === 'collection' || hash === 'colecao') {
                   const targetScrollTop = getCollectionScrollTarget(element);
                   (window as any).lenis?.scrollTo(targetScrollTop, { duration: 1.2 });
                 } else {
@@ -7135,9 +7148,12 @@ export default function App() {
     if (window.location.hash) {
       setTimeout(() => {
         const hash = window.location.hash.replace('#', '');
-        const element = document.getElementById(hash);
+        let element = document.getElementById(hash);
+        if (!element && hash === 'colecao') {
+          element = document.getElementById('collection');
+        }
         if (element) {
-          if (hash === 'collection') {
+          if (hash === 'collection' || hash === 'colecao') {
             const targetScrollTop = getCollectionScrollTarget(element);
             (window as any).lenis?.scrollTo(targetScrollTop, { duration: 1.2 });
           } else {
