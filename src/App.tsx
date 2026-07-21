@@ -1503,14 +1503,22 @@ const Hero = () => {
                             {HERO_BACKGROUNDS.map((bgUrl, index) => (
                                 <motion.div 
                                     key={bgUrl}
-                                    style={{ y: bgY, scale: bgScale, backgroundImage: `url(${bgUrl})` }}
+                                    style={{ y: bgY, scale: bgScale }}
                                     initial={{ opacity: 0 }}
                                     animate={{ 
                                         opacity: bgIndex === index ? 0.93 : 0,
                                     }}
                                     transition={{ duration: 2.2, ease: "easeInOut" }}
-                                    className="absolute inset-0 bg-cover bg-center brightness-[0.46] contrast-[1.40] saturate-[1.05]"
-                                />
+                                    className="absolute inset-0 brightness-[0.46] contrast-[1.40] saturate-[1.05]"
+                                >
+                                    <img 
+                                        src={bgUrl} 
+                                        alt={`M★BRAVO Background ${index + 1}`}
+                                        className="w-full h-full object-cover"
+                                        fetchPriority="high"
+                                        loading="eager"
+                                    />
+                                </motion.div>
                             ))}
                         </motion.div>
 
