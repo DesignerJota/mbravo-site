@@ -111,11 +111,12 @@ A lógica de envio de e-mails comunica as atualizações de forma profissional:
     3.  **Proporção de Aspeto Rígida & Layout Lock:** Definição explícita do rácio visual (`aspect-[4/5]` e `aspect-[4/3]`) com `content-visibility: auto` e `contain-intrinsic-size: 0 420px`, prevenindo repinturas (*layout shifts*) durante o scroll acelerado.
 
 ### B. Plano de Otimização LCP Mobile (Metas: PageSpeed >90) — [FASE 1 & 2 IMPLEMENTADAS]
-1.  **Estrutura Responsiva `<picture>` com WebP Otimizado:** Implementada no Hero da homepage com `<source media="(max-width: 640px)" ...>` que serve uma imagem WebP comprimida de ~38KB em ecrãs móveis (em vez de PNGs pesados de 3.5MB), reduzindo o LCP de 16,6s para <0,3s.
-2.  **Preload Crítico Condicional no HTML `<head>`:** Declaração de `<link rel="preload" as="image" href="..." media="(max-width: 640px)" fetchpriority="high" type="image/webp" />` antecipando a descoberta do Hero móvel pelo parser do browser.
-3.  **Defer de Scripts de Terceiros:** Execução do Pinterest Pixel diferida para 2 segundos após o evento `load` (`window.onload`), desonerando a thread principal do CPU em telemóveis durante o FCP e Speed Index.
-4.  **Code-Splitting de Modais (`React.lazy()`):** Módulos pesados (`LegalModal`, `AdminDashboardModal`) isolados em bundles dinâmicos, diminuindo a carga inicial do bundle principal.
-5.  **Estratégia de Carregamento Prioritário na Grelha:** As primeiras 4 imagens do catálogo carregam com `loading="eager"` e `fetchPriority="high"`, enquanto as restantes (a partir do 5.º artigo) usam `loading="lazy"`.
+1.  **Imagens Locais Autênticas M★BRAVO em WebP:** Processamento e alojamento local na pasta `/public/` de todas as 4 imagens rotativas do Hero (geradas diretamente dos PNGs autênticos da marca M★BRAVO), eliminando dependências de servidores terceiros (ex: Unsplash / ImgBB) e reduzindo o peso do Hero mobile para 45KB (redução de 98%).
+2.  **Estrutura Responsiva `<picture>` com WebP Local:** Serve `/hero-bg-1-mobile.webp` (45KB) em ecrãs de menor dimensão (`max-width: 640px`) e `/hero-bg-1-desktop.webp` (159KB) no desktop.
+3.  **Preload Crítico Condicional no HTML `<head>`:** Declaração de `<link rel="preload" as="image" href="/hero-bg-1-mobile.webp" media="(max-width: 640px)" fetchpriority="high" type="image/webp" />` antecipando a descoberta da imagem local pelo parser do browser.
+4.  **Defer de Scripts de Terceiros:** Execução do Pinterest Pixel diferida para 2 segundos após o evento `load` (`window.onload`), desonerando a thread principal do CPU em telemóveis durante o FCP e Speed Index.
+5.  **Code-Splitting de Modais (`React.lazy()`):** Módulos pesados (`LegalModal`, `AdminDashboardModal`) isolados em bundles dinâmicos, diminuindo a carga inicial do bundle principal.
+6.  **Estratégia de Carregamento Prioritário na Grelha:** As primeiras 4 imagens do catálogo carregam com `loading="eager"` e `fetchPriority="high"`, enquanto as restantes (a partir do 5.º artigo) usam `loading="lazy"`.
 
 ### C. Roteiro de Funcionalidades Disruptivas de Luxo (Padrão Global M★BRAVO)
 *   **Certificado de Autenticidade Digital via Tap NFC:** Cada peça M★BRAVO inclui um chip NFC cosido na etiqueta. Ao aproximar o smartphone, a cliente abre a página de autenticação da peça com número de série, artesã que a produziu, data e instruções exclusivas de preservação.
