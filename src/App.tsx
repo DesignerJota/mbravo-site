@@ -2810,8 +2810,10 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({ product: rawProduct,
                                 layoutId={`product-img-${product.id}`}
                                 src={productImages[0]} 
                                 alt={product.name} 
-                                loading={i < 4 ? "eager" : "lazy"}
-                                fetchPriority={i < 4 ? "high" : "auto"}
+                                width={600}
+                                height={750}
+                                loading={i < 2 ? "eager" : "lazy"}
+                                fetchPriority={i < 2 ? "high" : "low"}
                                 decoding="async"
                                 style={{ 
                                     imageRendering: 'crisp-edges', 
@@ -5406,8 +5408,11 @@ const CategoryPage = ({ pathname }: { pathname: string }) => {
                 <img 
                     src={translatedCategory.img} 
                     alt={translatedCategory.name} 
+                    width={1200}
+                    height={600}
                     loading="eager"
                     fetchPriority="high"
+                    decoding="async"
                     className="absolute inset-0 w-full h-full object-cover brightness-[0.7] grayscale-[0.1]"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-forest/85 via-forest/10 to-transparent pointer-events-none" />
