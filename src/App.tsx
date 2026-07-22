@@ -1103,7 +1103,7 @@ const Navbar = ({ currentPage, setCurrentPage, pathname, isAppLoading = false }:
         </motion.a>
 
         {/* Desktop Nav */}
-        <div className="hidden md:flex items-center gap-6 lg:gap-10">
+        <div className="hidden lg:flex items-center gap-6 lg:gap-10">
           {NAV_LINKS_LIST.map((link, i) => {
             const displayName = t(link.key);
             const isHighlight = link.name === 'Contactos';
@@ -1163,7 +1163,7 @@ const Navbar = ({ currentPage, setCurrentPage, pathname, isAppLoading = false }:
             initial={{ opacity: 0, x: 20 }}
             animate={isAppLoading ? { opacity: 0, x: 20 } : { opacity: 1, x: 0 }}
             transition={{ delay: 0.2, duration: 0.6 }}
-            className={`md:hidden transition-colors duration-200 ${textColor}`}
+            className={`lg:hidden transition-colors duration-200 ${textColor}`}
             onClick={() => setMobileMenuOpen(true)}
             aria-label={lang === 'PT' ? 'Abrir Menu' : 'Open Menu'}
           >
@@ -1179,7 +1179,7 @@ const Navbar = ({ currentPage, setCurrentPage, pathname, isAppLoading = false }:
             initial={{ opacity: 0, backdropFilter: "blur(0px)" }}
             animate={{ opacity: 1, backdropFilter: "blur(20px)" }}
             exit={{ opacity: 0, backdropFilter: "blur(0px)" }}
-            className="fixed inset-0 z-[999] bg-forest flex flex-col items-center justify-center p-8 space-y-8 sm:space-y-10"
+            className="fixed inset-0 z-[999] bg-forest flex flex-col items-center justify-center p-6 sm:p-8 space-y-6 sm:space-y-10 overflow-y-auto max-h-screen my-auto"
           >
              <button 
                 className="absolute top-8 right-8 text-cream hover:text-brand-green-light transition-all duration-300 p-3 bg-white/5 hover:bg-white/10 rounded-full border border-white/10 flex items-center justify-center cursor-pointer shadow-lg"
