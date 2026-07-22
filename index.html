@@ -29,14 +29,19 @@
     <!-- Pinterest Domain Verification Meta Tag -->
     <meta name="p:domain_verify" content="c32665e021fefd842c4d20a190181ba7"/>
 
-    <!-- Deferred Pinterest Tag Base Script for Non-Blocking Initial Render -->
+    <!-- Deferred Non-Critical Analytics / Pinterest Script Execution (Zero Main Thread Blocking) -->
     <script>
       window.addEventListener('load', function() {
-        setTimeout(function() {
+        var loadDeferred = function() {
           !function(e){if(!window.pintrk){window.pintrk=function(){window.pintrk.queue.push(Array.prototype.slice.call(arguments))};var n=window.pintrk;n.queue=[],n.version="3.0";var t=document.createElement("script");t.async=!0,t.src=e;var r=document.getElementsByTagName("script")[0];r.parentNode.insertBefore(t,r)}}("https://s.pinterest.com/js/pintrk.js");
           pintrk('load', '1426456723223', { em: 'handmade.mbravo@gmail.com' });
           pintrk('page');
-        }, 2000);
+        };
+        if ('requestIdleCallback' in window) {
+          requestIdleCallback(function() { setTimeout(loadDeferred, 2500); });
+        } else {
+          setTimeout(loadDeferred, 2500);
+        }
       });
     </script>
     
