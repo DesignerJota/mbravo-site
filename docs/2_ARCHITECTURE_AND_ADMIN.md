@@ -87,3 +87,37 @@ A lógica de envio de e-mails comunica as atualizações de forma profissional:
     *   `generateCustomerEmailHtml`: Envia um recibo de pagamento luxuoso em tons de creme e verde floresta, com os detalhes da peça comprada, especificações de cor e tamanho, e uma mensagem personalizada que valoriza o processo de produção artesanal.
     *   `sendMultibancoEmails`: Instruções detalhadas com Entidade, Referência e Montante.
     *   `sendShippedEmails`: Confirmação de expedição com o respetivo código de registo da transportadora para rastreamento.
+
+---
+
+## 6. Otimização de Performance e Estratégia de Bundling (Vite & React)
+
+*   **Code-Splitting do Painel Admin (`React.lazy()` + `Suspense`):**
+    *   Para reduzir o tamanho do bundle crítico inicial e acelerar a renderização do First Contentful Paint (FCP) da homepage, o modal do painel administrativo (`AdminDashboardModal`) foi segregado utilizando carregamento diferido (`React.lazy()` e `<React.Suspense>`).
+    *   O componente e as suas respetivas dependências de gestão são descarregados dinamicamente apenas quando o utilizador acede à rota `/admin` ou abre o painel administrativo.
+*   **Estratégia de Bundling Unificado do Vite (`manualChunks`):**
+    *   Para evitar exceções de contexto em tempo de execução (`Uncaught TypeError: Cannot read properties of undefined (reading 'createContext') at LayoutGroupContext.mjs`) provocadas pela divisão isolada de chunks de fornecedores para bibliotecas de animação (`framer-motion`), o projeto adota a estratégia de bundling padrão e coesa do Vite/Rollup sem a inclusão de `manualChunks` fragmentados para dependências do React.
+    *   Esta abordagem preserva a estabilidade do contexto do React e reduz o risco de inconsistências de carregamento em ambiente de produção.
+
+---
+
+## 7. Roteiro Técnico de Solução iOS WebKit & Otimização Mobile (FASE 1 APLICADA)
+
+### A. Diagnóstico & Solução de Flicker de Imagens no iOS (Safari/WebKit) — [IMPLEMENTADO]
+*   **Causa Raiz no WebKit:** O motor Safari/WebKit em iOS impõe limites rigorosos de alocação de memória gráfica por aba. Durante o scroll rápido com inércia em grelhas de imagens, o WebKit descarta ativamente texturas descodificadas em memória GPU para evitar estoiros de memória (*tab crash*), resultando no efeito de piscar (*flicker*) quando as imagens voltam a ser compostas.
+*   **Arquitetura de Solução Aplicada no Código:**
+    1.  **Hardware-Backing CSS:** Aplicação de `-webkit-backface-visibility: hidden; backface-visibility: hidden; transform: translateZ(0);` nos invólucros dos cartões de produtos (`ProductCard`) e categorias para manter as camadas de composição ativas na GPU sem exceder limites de memória.
+    2.  **Modo de Descodificação Assíncrono (`decoding="async"`):** Força o descodificador de imagem do browser a processar os pixéis fora do thread principal de UI.
+    3.  **Proporção de Aspeto Rígida & Layout Lock:** Definição explícita do rácio visual (`aspect-[4/5]` e `aspect-[4/3]`) com `content-visibility: auto` e `contain-intrinsic-size: 0 420px`, prevenindo repinturas (*layout shifts*) durante o scroll acelerado.
+
+### B. Plano de Otimização LCP Mobile (Metas: PageSpeed >90) — [IMPLEMENTADO]
+1.  **Estrutura Responsiva `<picture>`:** Implementada no Hero da homepage com atributos `fetchpriority="high"`, `loading="eager"` e `decoding="async"` garantindo renderização zero-lag.
+2.  **Preload Crítico no HTML `<head>`:** Declaração de `<link rel="preload" as="image" href="https://i.ibb.co/KppF2KLq/Background.png" fetchpriority="high" />` no `<head>` do `index.html` antecipando o pedido da imagem antes do carregamento dos scripts JS.
+3.  **Estratégia de Carregamento Prioritário na Grelha:** As primeiras 4 imagens do catálogo carregam com `loading="eager"` e `fetchPriority="high"`, enquanto as restantes (a partir do 5.º artigo) usam `loading="lazy"`.
+
+### C. Roteiro de Funcionalidades Disruptivas de Luxo (Padrão Global M★BRAVO)
+*   **Certificado de Autenticidade Digital via Tap NFC:** Cada peça M★BRAVO inclui um chip NFC cosido na etiqueta. Ao aproximar o smartphone, a cliente abre a página de autenticação da peça com número de série, artesã que a produziu, data e instruções exclusivas de preservação.
+*   **Personalizador 3D / Atelier Studio:** Módulo interativo onde a cliente escolhe fios, combinações de cores, alças e adiciona medalhas em metal gravadas com iniciais em tempo real.
+*   **VIP Atelier Concierge:** Canal de agendamento privado para atendimento personalizado diretamente com o Atelier via videochamada para peças por encomenda (ex: noivas e eventos formais).
+*   **Soundscape Atmosférico do Atelier:** Leitor sonoro opcional e subtil na barra superior que reproduz os sons calmos do atelier (tear e textura do fio), criando uma atmosfera envolvente e artesanal.
+
