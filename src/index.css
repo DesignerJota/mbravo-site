@@ -14,10 +14,25 @@
     overflow-x: hidden;
     max-width: 100vw;
     width: 100%;
+    -webkit-overflow-scrolling: touch;
+    touch-action: manipulation;
   }
   body {
     @apply bg-cream text-forest font-sans antialiased selection:bg-forest selection:text-cream;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
+}
+
+/* Hardware Accelerated Composition Layers for Mobile GPU Smoothness */
+.gpu-accelerated,
+img,
+svg,
+.product-card-img {
+  will-change: transform, opacity;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
 }
 
 /* Custom noise overlay for texture */
