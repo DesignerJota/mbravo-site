@@ -6874,7 +6874,7 @@ const AdminPage = () => {
 // --- Main App ---
 
 export default function App() {
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [activeLegal, setActiveLegal] = useState<'envios' | 'privacidade' | 'termos' | null>(null);
   const [showAdmin, setShowAdmin] = useState(false);
   const [currentPage, setCurrentPage] = useState<'home' | 'essence'>('home');
@@ -7060,19 +7060,8 @@ export default function App() {
 
   return (
     <div className="relative min-h-screen bg-cream text-forest select-none">
-      
-      <AnimatePresence mode="wait">
-        {loading ? (
-          <LoadingScreen key="loading" onComplete={() => setLoading(false)} />
-        ) : (
-          <motion.main
-            key="main"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 1.5 }}
-            className="flex flex-col"
-          >
-            <Navbar currentPage={pathname === '/essencia' || pathname === '/essence' ? 'essence' : 'home'} setCurrentPage={(p) => navigateTo(p === 'essence' ? '/essencia' : '/')} pathname={pathname} />
+      <main className="flex flex-col">
+        <Navbar currentPage={pathname === '/essencia' || pathname === '/essence' ? 'essence' : 'home'} setCurrentPage={(p) => navigateTo(p === 'essence' ? '/essencia' : '/')} pathname={pathname} />
             
             <AnimatePresence mode="wait">
               {pathname === '/essencia' || pathname === '/essence' ? (
@@ -7274,9 +7263,7 @@ export default function App() {
                     </motion.div>
                 )}
             </AnimatePresence>
-          </motion.main>
-        )}
-      </AnimatePresence>
-    </div>
+          </main>
+        </div>
   );
 }
