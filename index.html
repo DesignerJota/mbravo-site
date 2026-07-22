@@ -91,46 +91,10 @@
         padding: 0;
         overflow-x: hidden;
       }
-      @keyframes mbravoFadeIn {
-        from { opacity: 0; transform: scale(0.96); }
-        to { opacity: 1; transform: scale(1); }
-      }
-      @keyframes mbravoPulse {
-        0%, 100% { transform: scale(1); opacity: 0.05; }
-        50% { transform: scale(1.15); opacity: 0.18; }
-      }
     </style>
   </head>
   <body style="background-color: #1F2A18;">
-    <div id="root">
-      <!-- Critical Pre-rendered HTML for Instant Frame 1 Mobile FCP (< 0.3s) -->
-      <div style="position: fixed; inset: 0; z-index: 100; background-color: #1F2A18; display: flex; flex-direction: column; align-items: center; justify-content: center; overflow: hidden; font-family: 'Cormorant Garamond', Georgia, serif;">
-        <div style="animation: mbravoFadeIn 0.8s ease-out forwards; width: 180px; max-width: 75vw;">
-          <svg viewBox="0 0 500 430" style="width: 100%; height: auto; display: block;" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <defs>
-              <path id="handmadePathHtml" d="M 135 80 A 380 380 0 0 1 365 80" fill="none" />
-            </defs>
-            <text fill="#C5A059" style="font-size: 12px; letter-spacing: 0.85em; font-weight: 600; font-family: 'Cormorant Garamond', Georgia, serif;">
-              <textPath href="#handmadePathHtml" startOffset="50%" textAnchor="middle">HANDMADE</textPath>
-            </text>
-            <g transform="translate(250, 135)">
-              <path d="M0 -45 L13 -16 L44 -13 L22 8 L27 38 L0 24 L-27 38 L-22 8 L-44 -13 L-13 -16 Z" fill="#C5A059" />
-              <text y="9" textAnchor="middle" fill="#243119" style="font-size: 24px; font-family: 'Cormorant Garamond', Georgia, serif; font-weight: bold;">M</text>
-            </g>
-            <text x="50%" y="310" textAnchor="middle" fill="#C5A059" style="font-size: 105px; font-family: 'Cormorant Garamond', Georgia, serif; letter-spacing: 0.04em; font-weight: 400;">BRAVO</text>
-            <g transform="translate(250, 395)">
-              <text x="0" y="0" textAnchor="middle" fill="#C5A059" style="font-size: 12px; letter-spacing: 0.6em; font-weight: 600; font-family: 'Cormorant Garamond', Georgia, serif;">BY CAROLINA</text>
-              <line x1="-135" y1="-4" x2="-90" y2="-4" stroke="#C5A059" stroke-width="1.2" opacity="0.8" />
-              <line x1="90" y1="-4" x2="135" y2="-4" stroke="#C5A059" stroke-width="1.2" opacity="0.8" />
-            </g>
-          </svg>
-        </div>
-        <p style="margin-top: 2.5rem; color: rgba(250, 249, 246, 0.65); font-family: 'Cormorant Garamond', Georgia, serif; font-style: italic; letter-spacing: 0.2em; font-size: 11px; text-transform: uppercase; text-align: center; padding: 0 1.5rem; max-width: 90vw; margin-bottom: 0; line-height: 1.6; animation: mbravoFadeIn 0.8s ease-out 0.3s forwards; opacity: 0;">
-          Cada ponto guarda uma memória. Peças feitas com tempo, amor e memória.
-        </p>
-        <div style="position: absolute; width: 600px; height: 600px; max-width: 85vw; max-height: 85vw; border: 1px solid rgba(250, 249, 246, 0.12); border-radius: 50%; pointer-events: none; animation: mbravoPulse 4s infinite ease-in-out;"></div>
-      </div>
-    </div>
+    <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
