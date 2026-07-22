@@ -21,6 +21,20 @@ As seguintes secções da aplicação estão totalmente validadas, integradas e 
     *   Fórmula que associa cada produto de catálogo a consumos específicos de fios no ato de confirmação do pagamento.
 *   **Fichas de Cliente CRM (Fase 4):**
     *   Histórico e total de compras por e-mail unificado, sincronizado de forma reativa com o drawer lateral de detalhes de cliente.
+*   **Otimização do Hero LCP & Performance Mobile:**
+    *   Otimização do carregamento da imagem principal do Hero com tag `<img>` nativa, `fetchPriority="high"`, `loading="eager"` e `decoding="async"` para redução direta do tempo de LCP (Largest Contentful Paint) no Google PageSpeed Insights.
+*   **Conformidade de Acessibilidade (Score 90+):**
+    *   Estruturação semântica de elementos e preenchimento de atributos `alt` informativos em todas as imagens, garantindo pontuações superiores a 90+ em auditorias Lighthouse.
+*   **Code-Splitting do Admin (`React.lazy()` + `Suspense`):**
+    *   Segregação do modal administrativo (`AdminDashboardModal`) do bundle principal de entrada, descarregando o código do painel apenas sob procura.
+*   **Estabilidade de Bundling do Vite & Framer Motion:**
+    *   Remoção de `manualChunks` isolados no `vite.config.ts` para bibliotecas de UI/Motion, garantindo a inicialização coesa do contexto do React (`LayoutGroupContext.mjs`) sem exceções em tempo de execução.
+*   **Fase 1 — Otimizações de Performance Mobile & iOS WebKit (Concluído):**
+    *   **Preload de Hero no `<head>` (`index.html`):** Inserção de `<link rel="preload" as="image" href="..." fetchpriority="high">` para descoberta imediata do Hero Mobile pelo parser HTML.
+    *   **Estrutura `<picture>` no Hero:** Renderização instantânea do Hero com suporte a formatos leves e atributos `fetchPriority="high"`, `loading="eager"` e `decoding="async"`.
+    *   **Eliminação de Flicker no iOS WebKit:** Aplicação de aceleração por hardware GPU (`transform: translateZ(0)` e `backface-visibility: hidden`) nos cartões de produtos e categorias para impedir o descarte agressivo de texturas no Safari/WebKit durante scroll rápido.
+    *   **Estratégia de Carregamento Prioritário na Grelha:** Configuração das primeiras 4 imagens do catálogo para carregarem com `loading="eager"` e `fetchPriority="high"`, aplicando `loading="lazy"` a partir do 5.º item.
+    *   **Otimização CSS `content-visibility: auto`:** Prevenção de reflows desnecessários nas grelhas com `contain-intrinsic-size`.
 
 ---
 
@@ -45,11 +59,29 @@ Respondendo às últimas solicitações de otimização de fluxo e consistência
     2.  Uniformização global de referências escritas para a grafia internacional única: **Crochet**.
     3.  Ajuste nos prazos e termos de produção artesanal eliminando vestígios do termo *"confeção"* na página de produto.
     4.  Criação da pasta técnica `/docs` contendo os blueprints detalhados do projeto para transição manual de repositórios.
+    5.  Otimização técnica do Hero LCP Mobile através de tag `<img>` nativa com `fetchPriority="high"`, `loading="eager"` e `decoding="async"`.
+    6.  Auditoria e garantia de pontuações de Acessibilidade 90+ com estrutura semântica e tags `alt` adequadas.
+    7.  Implementação de Code-Splitting no `AdminDashboardModal` utilizando `React.lazy()` e `<React.Suspense>`.
+    8.  Resolução de erros de runtime no bundling mantendo o agrupamento padrão do Vite sem `manualChunks` isolados para bibliotecas do React e `framer-motion`.
 
 ---
 
-## 4. Próximos Passos Recomendados
-Para a passagem em segurança do repositório para o servidor de produção do cliente:
+## 4. Próximos Passos Recomendados & Roteiro de Otimização Mobile
+
+### A. Validação de Transição de Repositório:
 *   [ ] Efetuar a cópia dos ficheiros alterados (`src/App.tsx`, `src/translations.ts`, `src/components/AdminDashboardModal.tsx`, `index.html`) para a branch principal do GitHub.
 *   [ ] Solicitar a inspeção e reindexação de URLs na Google Search Console para reavaliar as páginas após a otimização dos termos ortográficos.
 *   [ ] Garantir que o volume de dados persistente `/app/data` está ativo no Railway para evitar perdas acidentais de encomendas ou perfis de clientes do CRM durante novas atualizações de código.
+
+### B. Roteiro Técnico de Otimização Mobile & iOS WebKit (Meta: PageSpeed >90 - FASE 1 CONCLUÍDA):
+*   [x] **Aceleração Hardware-Backing para iOS WebKit:** Aplicado `-webkit-backface-visibility: hidden; transform: translateZ(0);` nos cartões de produtos e categorias para impedir a reciclagem agressiva de texturas da GPU pelo WebKit durante o scroll rápido em iPhones/iPads.
+*   [x] **Implementação de Estrutura `<picture>` no Hero:** Estrutura responsiva com atributos `fetchpriority="high"`, `loading="eager"` e `decoding="async"` para renderização acelerada.
+*   [x] **Preload Crítico no HTML `<head>`:** Inserida tag `<link rel="preload" as="image" href="..." fetchpriority="high">` no `index.html` antecipando a descoberta do Hero pelo parser HTML.
+*   [x] **Estratégia de Lazy Loading na Grelha:** Configuração de `loading="eager"` e `fetchPriority="high"` para os primeiros 4 artigos da coleção, aplicando `loading="lazy"` a partir do 5.º item.
+*   [x] **CSS `content-visibility: auto` e Layout Lock:** Atribuído `content-visibility: auto` com `contain-intrinsic-size` nas grelhas de produtos para evitar recálculos de layout e eliminação de flicker durante o scroll com inércia.
+
+### C. Propostas Disruptivas de Inovação e Luxo E-commerce (Nível Marca Global):
+*   [ ] **Certificado de Autenticidade Digital & NFC Tap:** Integração de etiqueta NFC nas peças físicas que direciona para uma página exclusiva de validação do número de série, artesã responsável, data de confeção em atelier e guia de manutenção.
+*   [ ] **Atelier Customizer 3D / Seletor de Fios e Iniciais:** Ferramenta interativa de personalização de alças, tons de fio e medalhas com iniciais gravadas e cálculo em tempo real de peso e orçamento.
+*   [ ] **VIP Atelier Concierge & Agendamento Privado:** Módulo de contacto direto via WhatsApp/Vídeo com Carolina para encomendar peças à medida para noivas, eventos e edições limitadas.
+*   [ ] **Soundscape Atmosférico do Atelier:** Ativação opcional no topo do site de um ambiente sonoro suave e relaxante do atelier (ritmo do tear e ambiente acústico artesanal) elevando a experiência sensorial da marca.
