@@ -5,6 +5,7 @@ import { Menu, X, Instagram, Facebook, ArrowRight, ArrowLeft, ChevronLeft, Chevr
 import { loadStripe } from '@stripe/stripe-js';
 import Lenis from 'lenis';
 const AdminDashboardModal = React.lazy(() => import('./components/AdminDashboardModal'));
+const LegalModal = React.lazy(() => import('./components/LegalModal'));
 import { 
   useLanguage, 
   translateProduct, 
@@ -1503,7 +1504,8 @@ const Hero = () => {
                                 className="absolute inset-0 brightness-[0.46] contrast-[1.40] saturate-[1.05]"
                             >
                                 <picture className="w-full h-full block">
-                                    <source srcSet={bgUrl} type="image/png" />
+                                    <source media="(max-width: 640px)" srcSet="https://images.unsplash.com/photo-1584917865442-de89df76afd3?auto=format&fit=crop&w=750&q=75&fm=webp" type="image/webp" />
+                                    <source media="(min-width: 641px)" srcSet={bgUrl} type="image/png" />
                                     <img 
                                         src={bgUrl} 
                                         alt={`M★BRAVO Background ${index + 1}`}
@@ -4380,274 +4382,7 @@ const ContactSection = () => {
     );
 };
 
-interface LegalModalProps {
-    type: 'envios' | 'privacidade' | 'termos';
-    onClose: () => void;
-}
 
-const LegalModal = ({ type, onClose }: LegalModalProps) => {
-    const { lang } = useLanguage();
-    
-    useEffect(() => {
-        // Prevent body scroll when modal is open
-        document.body.style.overflow = 'hidden';
-        (window as any).lenis?.stop();
-        return () => {
-            document.body.style.overflow = '';
-            (window as any).lenis?.start();
-        };
-    }, []);
-
-    const ptContent = {
-        envios: {
-            title: "Política de Envios e Devoluções",
-            body: (
-                <div className="space-y-8 text-forest">
-                    <div>
-                        <h3 className="text-xs uppercase tracking-[0.3em] font-semibold text-[#C5A059] mb-4 font-sans">
-                            Envios e Prazos de Entrega
-                        </h3>
-                        <p className="font-serif italic text-base text-forest/95 mb-6 leading-relaxed">
-                            Na M★BRAVO, cada peça é meticulosamente desenvolvida à mão, respeitando o tempo do artesanato de luxo.
-                        </p>
-                        <ul className="space-y-4 text-forest/75 text-sm font-sans font-light">
-                            <li className="flex flex-col gap-1">
-                                <strong className="font-medium text-forest text-xs uppercase tracking-wider">Prazo de Produção</strong>
-                                <span>O tempo estimado para a produção e preparação de cada peça varia entre 4 a 7 dias úteis após a confirmação do pagamento.</span>
-                            </li>
-                            <li className="flex flex-col gap-1">
-                                <strong className="font-medium text-forest text-xs uppercase tracking-wider">Método de Envio</strong>
-                                <span>Todos os envios são realizados através de transportadora registada. Assim que a sua encomenda for expedida, receberá um e-mail com o respetivo código de rastreamento (tracking number) para acompanhar a entrega.</span>
-                            </li>
-                            <li className="flex flex-col gap-1">
-                                <strong className="font-medium text-forest text-xs uppercase tracking-wider">Custos de Envio</strong>
-                                <span>Os custos de transporte são calculados de forma automática no momento do checkout, variando consoante o destino e a distância da entrega.</span>
-                            </li>
-                        </ul>
-                    </div>
-
-                    <div className="pt-6 border-t border-forest/10">
-                        <h3 className="text-xs uppercase tracking-[0.3em] font-semibold text-[#C5A059] mb-4 font-sans">
-                            Política de Devoluções
-                        </h3>
-                        <p className="text-forest/75 text-sm font-sans font-light leading-relaxed mb-4">
-                            Por se tratarem de artigos de design autoral, confecionados artesanalmente sob encomenda, a M★BRAVO apenas aceita devoluções ou trocas em caso de defeito de fabrico comprovado.
-                        </p>
-                        <p className="text-forest/75 text-sm font-sans font-light leading-relaxed mb-4">
-                            Se detetar algum defeito na sua peça, deverá contactar-nos no prazo máximo de 14 dias após a receção, através do e-mail <a href={`mailto:${CONTACT_EMAIL}`} className="underline hover:text-forest transition-colors font-medium font-mono">{CONTACT_EMAIL}</a>, enviando fotografias detalhadas do problema.
-                        </p>
-                        <p className="text-forest/75 text-sm font-sans font-light leading-relaxed">
-                            Após a validação da nossa equipa, procederemos à recolha do artigo e ao respetivo reembolso ou substituição da peça, sem qualquer custo adicional para o cliente.
-                        </p>
-                    </div>
-                </div>
-            )
-        },
-        privacidade: {
-            title: "Política de Privacidade",
-            body: (
-                <div className="space-y-8 text-forest">
-                    <p className="font-serif italic text-base text-forest/95 leading-relaxed">
-                        A M★BRAVO está empenhada em proteger a privacidade e os dados pessoais dos seus clientes. Em conformidade com o Regulamento Geral sobre a Proteção de Dados (RGPD), informamos:
-                    </p>
-                    <ul className="space-y-6 text-forest/75 text-sm font-sans font-light">
-                        <li className="flex flex-col gap-1.5">
-                            <strong className="font-medium text-forest text-xs uppercase tracking-wider">Recolha de Dados</strong>
-                            <span>Os dados recolhidos no nosso website (nome, e-mail, telefone, morada de envio e dados de faturação) destinam-se única e exclusivamente ao processamento das suas encomendas, comunicação sobre o estado do envio e suporte ao cliente.</span>
-                        </li>
-                        <li className="flex flex-col gap-1.5">
-                            <strong className="font-medium text-forest text-xs uppercase tracking-wider">Segurança e Terceiros</strong>
-                            <span>Os seus dados de pagamento são processados de forma encriptada e segura através de plataformas parceiras certificadas (como Stripe). A M★BRAVO não armazena os seus dados bancários ou de cartões de crédito. Os seus dados de morada serão partilhados estritamente com a empresa transportadora para efeitos de entrega.</span>
-                        </li>
-                        <li className="flex flex-col gap-1.5">
-                            <strong className="font-medium text-forest text-xs uppercase tracking-wider">Direitos do Utilizador</strong>
-                            <span>O cliente tem o direito de aceder, retificar ou solicitar a eliminação definitiva dos seus dados pessoais a qualquer momento. Para exercer estes direitos, basta enviar um pedido para <a href={`mailto:${CONTACT_EMAIL}`} className="underline hover:text-forest transition-colors font-medium font-mono">{CONTACT_EMAIL}</a>.</span>
-                        </li>
-                    </ul>
-                </div>
-            )
-        },
-        termos: {
-            title: "Termos e Condições de Serviço",
-            body: (
-                <div className="space-y-8 text-forest">
-                    <p className="font-serif italic text-base text-forest/95 leading-relaxed">
-                        Ao navegar e efetuar compras no website M★BRAVO, o utilizador aceita cumprir os seguintes termos:
-                    </p>
-                    <ul className="space-y-6 text-forest/75 text-sm font-sans font-light">
-                        <li className="flex flex-col gap-1.5">
-                            <strong className="font-medium text-forest text-xs uppercase tracking-wider">Propriedade Intelectual</strong>
-                            <span>Todos os designs, imagens, fotografias de catálogo, logótipos e textos presentes neste website são propriedade exclusiva da M★BRAVO, sendo estritamente proibida a sua reprodução ou utilização sem autorização prévia.</span>
-                        </li>
-                        <li className="flex flex-col gap-1.5">
-                            <strong className="font-medium text-forest text-xs uppercase tracking-wider">Produtos e Preços</strong>
-                            <span>Sendo peças feitas à mão, podem ocorrer variações mínimas de textura ou tonalidade em comparação com as fotos apresentadas, o que confere exclusividade a cada artigo. Os preços estão indicados em Euros (€) e a M★BRAVO reserva-se o direito de os alterar sem aviso prévio, garantindo-se sempre a aplicação do preço indicado no momento da compra.</span>
-                        </li>
-                        <li className="flex flex-col gap-1.5">
-                            <strong className="font-medium text-forest text-xs uppercase tracking-wider">Suporte e Resolução de Litígios</strong>
-                            <span>Para qualquer dúvida, reclamação ou assistência, o cliente dispõe dos seguintes canais oficiais:</span>
-                            <div className="mt-2 pl-4 border-l border-forest/10 space-y-1 text-xs">
-                                <div><strong className="font-medium">E-mail:</strong> <a href={`mailto:${CONTACT_EMAIL}`} className="underline hover:text-forest transition-colors font-mono">{CONTACT_EMAIL}</a></div>
-                                <div><strong className="font-medium">Telefone/WhatsApp:</strong> <a href="tel:+351912828182" className="underline hover:text-forest transition-colors font-mono">+351 912 828 182</a> <span className="text-forest/50 font-light italic">(Chamada para a rede móvel nacional)</span></div>
-                            </div>
-                        </li>
-                    </ul>
-                </div>
-            )
-        }
-    };
-
-    const enContent = {
-        envios: {
-            title: "Shipping & Returns Policy",
-            body: (
-                <div className="space-y-8 text-forest">
-                    <div>
-                        <h3 className="text-xs uppercase tracking-[0.3em] font-semibold text-[#C5A059] mb-4 font-sans">
-                            Shipping and Delivery Times
-                        </h3>
-                        <p className="font-serif italic text-base text-forest/95 mb-6 leading-relaxed">
-                            At M★BRAVO, each piece is meticulously handcrafted, respecting the pace of luxury craftsmanship.
-                        </p>
-                        <ul className="space-y-4 text-forest/75 text-sm font-sans font-light">
-                            <li className="flex flex-col gap-1">
-                                <strong className="font-medium text-forest text-xs uppercase tracking-wider">Production Time</strong>
-                                <span>The estimated time for crafting and preparing each piece varies between 4 to 7 business days after payment confirmation.</span>
-                            </li>
-                            <li className="flex flex-col gap-1">
-                                <strong className="font-medium text-forest text-xs uppercase tracking-wider">Shipping Method</strong>
-                                <span>All shipments are carried out via registered courier. Once your order is dispatched, you will receive an email with the tracking number to monitor your delivery.</span>
-                            </li>
-                            <li className="flex flex-col gap-1">
-                                <strong className="font-medium text-forest text-xs uppercase tracking-wider">Shipping Costs</strong>
-                                <span>Shipping costs are automatically calculated at checkout, varying based on the destination and delivery distance.</span>
-                            </li>
-                        </ul>
-                    </div>
-
-                    <div className="pt-6 border-t border-forest/10">
-                        <h3 className="text-xs uppercase tracking-[0.3em] font-semibold text-[#C5A059] mb-4 font-sans">
-                            Returns Policy
-                        </h3>
-                        <p className="text-forest/75 text-sm font-sans font-light leading-relaxed mb-4">
-                            Because these are signature pieces custom made-to-order, M★BRAVO only accepts returns or exchanges in the event of a proven manufacturing defect.
-                        </p>
-                        <p className="text-forest/75 text-sm font-sans font-light leading-relaxed mb-4">
-                            If you detect any defect in your piece, you must contact us within a maximum of 14 days of receipt at <a href={`mailto:${CONTACT_EMAIL}`} className="underline hover:text-forest transition-colors font-medium font-mono">{CONTACT_EMAIL}</a>, sending detailed photographs of the issue.
-                        </p>
-                        <p className="text-forest/75 text-sm font-sans font-light leading-relaxed">
-                            After validation by our team, we will collect the item and proceed with the refund or replacement of the piece at no additional cost to the client.
-                        </p>
-                    </div>
-                </div>
-            )
-        },
-        privacidade: {
-            title: "Privacy Policy",
-            body: (
-                <div className="space-y-8 text-forest">
-                    <p className="font-serif italic text-base text-forest/95 leading-relaxed">
-                        M★BRAVO is committed to protecting the privacy and personal data of its clients. In accordance with the General Data Protection Regulation (GDPR), we inform:
-                    </p>
-                    <ul className="space-y-6 text-forest/75 text-sm font-sans font-light">
-                        <li className="flex flex-col gap-1.5">
-                            <strong className="font-medium text-forest text-xs uppercase tracking-wider">Data Collection</strong>
-                            <span>The data collected on our website (name, email, telephone, shipping address, and billing data) is used solely and exclusively to process your orders, communicate about shipment status, and provide customer support.</span>
-                        </li>
-                        <li className="flex flex-col gap-1.5">
-                            <strong className="font-medium text-forest text-xs uppercase tracking-wider">Security and Third Parties</strong>
-                            <span>Your payment data is processed securely and encrypted through certified partner platforms (such as Stripe). M★BRAVO does not store your banking or credit card details. Your address details will be shared strictly with the shipping carrier for delivery purposes.</span>
-                        </li>
-                        <li className="flex flex-col gap-1.5">
-                            <strong className="font-medium text-forest text-xs uppercase tracking-wider">User Rights</strong>
-                            <span>Clients have the right to access, rectify, or request the permanent deletion of their personal data at any time. To exercise these rights, simply send a request to <a href={`mailto:${CONTACT_EMAIL}`} className="underline hover:text-forest transition-colors font-medium font-mono">{CONTACT_EMAIL}</a>.</span>
-                        </li>
-                    </ul>
-                </div>
-            )
-        },
-        termos: {
-            title: "Terms and Conditions of Service",
-            body: (
-                <div className="space-y-8 text-forest">
-                    <p className="font-serif italic text-base text-forest/95 leading-relaxed">
-                        By browsing and purchasing on the M★BRAVO website, the user agrees to comply with the following terms:
-                    </p>
-                    <ul className="space-y-6 text-forest/75 text-sm font-sans font-light">
-                        <li className="flex flex-col gap-1.5">
-                            <strong className="font-medium text-forest text-xs uppercase tracking-wider">Intellectual Property</strong>
-                            <span>All designs, images, catalog photographs, logos, and text present on this website are the exclusive property of M★BRAVO, and their reproduction or use without prior authorization is strictly prohibited.</span>
-                        </li>
-                        <li className="flex flex-col gap-1.5">
-                            <strong className="font-medium text-forest text-xs uppercase tracking-wider">Products and Prices</strong>
-                            <span>Being handmade pieces, minimal variations in texture or tone may occur compared to the photos shown, which guarantees the exclusivity of each item. Prices are shown in Euros (€) and M★BRAVO reserves the right to change them without prior notice, always guaranteeing the application of the price indicated at the time of purchase.</span>
-                        </li>
-                        <li className="flex flex-col gap-1.5">
-                            <strong className="font-medium text-forest text-xs uppercase tracking-wider">Support and Dispute Resolution</strong>
-                            <span>For any questions, claims, or assistance, the customer has the following official channels:</span>
-                            <div className="mt-2 pl-4 border-l border-forest/10 space-y-1 text-xs">
-                                <div><strong className="font-medium">E-mail:</strong> <a href={`mailto:${CONTACT_EMAIL}`} className="underline hover:text-forest transition-colors font-mono">{CONTACT_EMAIL}</a></div>
-                                <div><strong className="font-medium">Phone/WhatsApp:</strong> <a href="tel:+351912828182" className="underline hover:text-forest transition-colors font-mono">+351 912 828 182</a> <span className="text-forest/50 font-light italic">(Call to national mobile network)</span></div>
-                            </div>
-                        </li>
-                    </ul>
-                </div>
-            )
-        }
-    };
-
-    const content = lang === 'pt' ? ptContent : enContent;
-    const current = content[type];
-
-    return (
-        <motion.div 
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-forest/40 backdrop-blur-md z-[9999] flex items-center justify-center p-4 md:p-6"
-            onClick={onClose}
-        >
-            <motion.div 
-                initial={{ opacity: 0, y: 30, scale: 0.98 }}
-                animate={{ opacity: 1, y: 0, scale: 1 }}
-                exit={{ opacity: 0, y: 30, scale: 0.98 }}
-                transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-                className="max-w-2xl w-full bg-[#FCFBF9] text-forest rounded-xl xs:rounded-2xl md:rounded-[2rem] overflow-hidden shadow-[0_24px_50px_rgba(31,42,24,0.15)] flex flex-col max-h-[85vh] border border-forest/10"
-                onClick={(e) => e.stopPropagation()}
-            >
-                {/* Header */}
-                <div className="px-6 md:px-8 py-5 border-b border-forest/10 flex justify-between items-center bg-[#FCFBF9]">
-                    <h2 className="text-sm md:text-base font-serif uppercase tracking-[0.2em] font-medium text-forest">
-                        {current.title}
-                    </h2>
-                    <button 
-                        onClick={onClose}
-                        className="w-8 h-8 rounded-full bg-forest/5 hover:bg-forest/10 flex items-center justify-center transition-colors text-forest/70 hover:text-forest cursor-pointer"
-                        aria-label={lang === 'pt' ? 'Fechar' : 'Close'}
-                    >
-                        <X size={16} />
-                    </button>
-                </div>
-
-                {/* Body */}
-                <div data-lenis-prevent className="px-6 md:px-10 py-6 md:py-8 overflow-y-auto scrollbar-thin scrollbar-thumb-forest/10">
-                    {current.body}
-                </div>
-
-                {/* Footer */}
-                <div className="px-6 md:px-8 py-4 border-t border-forest/5 bg-forest/[0.02] flex justify-between items-center text-[10px] text-forest/40">
-                    <span className="font-mono">M★BRAVO ATELIER</span>
-                    <button 
-                        onClick={onClose}
-                        className="uppercase tracking-[0.15em] font-medium text-forest/65 hover:text-forest transition-colors cursor-pointer"
-                    >
-                        {lang === 'pt' ? 'Fechar' : 'Close'}
-                    </button>
-                </div>
-            </motion.div>
-        </motion.div>
-    );
-};
 
 const Footer = ({ onOpenLegal, onOpenAdmin }: { onOpenLegal: (type: 'envios' | 'privacidade' | 'termos') => void, onOpenAdmin?: () => void }) => {
     const { t } = useLanguage();
@@ -7466,7 +7201,9 @@ export default function App() {
 
             <AnimatePresence>
                 {activeLegal && (
-                    <LegalModal type={activeLegal} onClose={() => setActiveLegal(null)} />
+                    <React.Suspense fallback={null}>
+                        <LegalModal type={activeLegal} onClose={() => setActiveLegal(null)} />
+                    </React.Suspense>
                 )}
                 {showAdmin && (
                     <React.Suspense fallback={
