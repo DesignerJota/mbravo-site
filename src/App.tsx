@@ -1453,17 +1453,9 @@ const Hero = () => {
 
     // Automatic rotating background slideshow
     const [bgIndex, setBgIndex] = useState(0);
-    const [isFirstImageLoaded, setIsFirstImageLoaded] = useState(false);
     const { t } = useLanguage();
 
     useEffect(() => {
-        // Preload the first background image to ensure zero-lag flicker-free loading
-        const img = new Image();
-        img.src = HERO_BACKGROUNDS[0];
-        img.onload = () => {
-            setIsFirstImageLoaded(true);
-        };
-
         const timer = setInterval(() => {
             setBgIndex((prev) => (prev + 1) % HERO_BACKGROUNDS.length);
         }, 8000); // Cycle backgrounds every 8 seconds
@@ -1477,59 +1469,58 @@ const Hero = () => {
 
     return (
         <>
-            {/* Estado 0: Empty dark container with solid brand tone #1F2A18 if background image is not loaded yet */}
-            {!isFirstImageLoaded ? (
-                <section 
-                    data-background="dark" 
-                    className="relative z-20 min-h-[100dvh] lg:h-screen w-full pt-28 pb-20 md:pt-24 lg:py-0 flex flex-col items-center justify-center overflow-hidden bg-[#1F2A18]" 
-                    style={{ background: '#1F2A18' }} 
-                    id="hero-loader-placeholder"
-                />
-            ) : (
-                <section data-background="dark" className="relative z-20 min-h-[100dvh] lg:h-screen pt-28 pb-20 md:pt-24 lg:py-0 flex flex-col items-center justify-center overflow-hidden text-cream bg-[#1F2A18]" style={{ background: 'linear-gradient(to bottom, #1F2A18 0%, #1F2A18 85%, #24301d 100%)' }}>
-                    {/* Ambient Overlay Image with Parallax & Slow Animation - Revealing more texture and matter with a bottom dissolution fade matching our background gradient transition */}
-                    <div 
-                        className="absolute inset-0 z-0 select-none pointer-events-none bg-[#1F2A18]"
-                        style={{
-                            WebkitMaskImage: 'linear-gradient(to bottom, black 0%, black calc(100% - 100px), transparent 100%)',
-                            maskImage: 'linear-gradient(to bottom, black 0%, black calc(100% - 100px), transparent 100%)'
+            <section data-background="dark" className="relative z-20 min-h-[100dvh] lg:h-screen pt-28 pb-20 md:pt-24 lg:py-0 flex flex-col items-center justify-center overflow-hidden text-cream bg-[#1F2A18]" style={{ background: 'linear-gradient(to bottom, #1F2A18 0%, #1F2A18 85%, #24301d 100%)' }}>
+                {/* Ambient Overlay Image with Parallax & Slow Animation - Revealing more texture and matter with a bottom dissolution fade matching our background gradient transition */}
+                <div 
+                    className="absolute inset-0 z-0 select-none pointer-events-none bg-[#1F2A18]"
+                    style={{
+                        WebkitMaskImage: 'linear-gradient(to bottom, black 0%, black calc(100% - 100px), transparent 100%)',
+                        maskImage: 'linear-gradient(to bottom, black 0%, black calc(100% - 100px), transparent 100%)'
+                    }}
+                >
+                    {/* Estado 1: Pulsing, dreaming fade-in of the background images with breathing texture depth, merging organically with our deep brand green */}
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{
+                            opacity: [0.82, 0.90, 0.82],
                         }}
+                        transition={{
+                            duration: 8,
+                            repeat: Infinity,
+                            ease: "easeInOut"
+                        }}
+                        className="absolute inset-0"
                     >
-                        {/* Estado 1: Pulsing, dreaming fade-in of the background images with breathing texture depth, merging organically with our deep brand green */}
-                        <motion.div
-                            initial={{ opacity: 0 }}
-                            animate={{
-                                opacity: [0.82, 0.90, 0.82],
-                            }}
-                            transition={{
-                                duration: 8,
-                                repeat: Infinity,
-                                ease: "easeInOut"
-                            }}
-                            className="absolute inset-0"
-                        >
-                            {HERO_BACKGROUNDS.map((bgUrl, index) => (
-                                <motion.div 
-                                    key={bgUrl}
-                                    style={{ y: bgY, scale: bgScale }}
-                                    initial={{ opacity: 0 }}
-                                    animate={{ 
-                                        opacity: bgIndex === index ? 0.93 : 0,
-                                    }}
-                                    transition={{ duration: 2.2, ease: "easeInOut" }}
-                                    className="absolute inset-0 brightness-[0.46] contrast-[1.40] saturate-[1.05]"
-                                >
+                        {HERO_BACKGROUNDS.map((bgUrl, index) => (
+                            <motion.div 
+                                key={bgUrl}
+                                style={{ y: bgY, scale: bgScale }}
+                                initial={{ opacity: 0 }}
+                                animate={{ 
+                                    opacity: bgIndex === index ? 0.93 : 0,
+                                }}
+                                transition={{ duration: 2.2, ease: "easeInOut" }}
+                                className="absolute inset-0 brightness-[0.46] contrast-[1.40] saturate-[1.05]"
+                            >
+                                <picture className="w-full h-full block">
+                                    <source srcSet={bgUrl} type="image/png" />
                                     <img 
                                         src={bgUrl} 
                                         alt={`M★BRAVO Background ${index + 1}`}
                                         className="w-full h-full object-cover"
-                                        fetchPriority="high"
-                                        loading="eager"
+                                        fetchPriority={index === 0 ? "high" : "auto"}
+                                        loading={index === 0 ? "eager" : "lazy"}
                                         decoding="async"
+                                        style={{
+                                            WebkitBackfaceVisibility: 'hidden',
+                                            backfaceVisibility: 'hidden',
+                                            transform: 'translateZ(0)',
+                                        }}
                                     />
-                                </motion.div>
-                            ))}
-                        </motion.div>
+                                </picture>
+                            </motion.div>
+                        ))}
+                    </motion.div>
 
                         {/* Golden ambient studio lighting leak/flare overlay, adding richness and luxury with organic movement */}
                         <motion.div 
@@ -1664,7 +1655,6 @@ const Hero = () => {
                 <span className="text-[9px] uppercase tracking-[0.4em] text-cream/20 [writing-mode:vertical-rl]">HANDMADE IN PORTUGAL</span>
             </div>
                 </section>
-            )}
         </>
     );
 };
@@ -2659,22 +2649,43 @@ const ProductCard: React.FC<ProductCardProps> = ({ product: rawProduct, i, isFoc
                 ref={cardRef}
                 layoutId={`product-card-${product.id}`}
                 className="group relative flex flex-col h-full bg-white rounded-[12px] shadow-[0_4px_22px_-10px_rgba(0,0,0,0.06)] hover:shadow-[0_20px_45px_-12px_rgba(36,49,25,0.14)] hover:-translate-y-1.5 transition-all duration-500 overflow-hidden"
+                style={{
+                    WebkitBackfaceVisibility: 'hidden',
+                    backfaceVisibility: 'hidden',
+                    transform: 'translateZ(0)',
+                    contentVisibility: 'auto',
+                    containIntrinsicSize: '0 420px'
+                }}
             >
                 <div className="flex flex-col h-full">
                     {/* Image Container with Fixed Aspect Ratio */}
                     <div 
                         className="relative overflow-hidden aspect-[4/5] cursor-pointer"
                         onClick={handleToggle}
-                        style={{ borderTopLeftRadius: 'inherit', borderTopRightRadius: 'inherit' }}
+                        style={{ 
+                            borderTopLeftRadius: 'inherit', 
+                            borderTopRightRadius: 'inherit',
+                            WebkitBackfaceVisibility: 'hidden',
+                            backfaceVisibility: 'hidden',
+                            transform: 'translateZ(0)'
+                        }}
                     >
                         <div className="relative w-full h-full overflow-hidden bg-white">
                             <motion.img 
                                 layoutId={`product-img-${product.id}`}
                                 src={productImages[0]} 
                                 alt={product.name} 
-                                loading="lazy"
+                                loading={i < 4 ? "eager" : "lazy"}
+                                fetchPriority={i < 4 ? "high" : "auto"}
                                 decoding="async"
-                                style={{ imageRendering: 'crisp-edges', filter: 'none', opacity: 1 }}
+                                style={{ 
+                                    imageRendering: 'crisp-edges', 
+                                    filter: 'none', 
+                                    opacity: 1,
+                                    WebkitBackfaceVisibility: 'hidden',
+                                    backfaceVisibility: 'hidden',
+                                    transform: 'translateZ(0)'
+                                }}
                                 className="w-full h-full object-cover group-hover:scale-[1.05] transition-transform duration-700 ease-out antialiased filter-none opacity-100"
                             />
                         </div>
@@ -4240,15 +4251,26 @@ const CollectionSection = () => {
                             viewport={{ once: true }}
                             transition={{ delay: i * 0.1 }}
                             className="group relative aspect-[4/3] rounded-[12px] md:rounded-[16px] overflow-hidden bg-forest/5 cursor-pointer max-w-2xl mx-auto w-full shadow-md hover:shadow-xl transition-all duration-500"
-                            style={{ willChange: 'transform' }}
+                            style={{ 
+                                willChange: 'transform',
+                                WebkitBackfaceVisibility: 'hidden',
+                                backfaceVisibility: 'hidden',
+                                transform: 'translateZ(0)'
+                            }}
                             onClick={() => navigateTo(getCategoryUrl(cat))}
                         >
                             <img 
                                 src={cat.img} 
                                 alt={cat.name} 
-                                loading="lazy"
+                                loading={i < 2 ? "eager" : "lazy"}
+                                fetchPriority={i < 2 ? "high" : "auto"}
                                 decoding="async"
-                                style={{ imageRendering: 'crisp-edges' }}
+                                style={{ 
+                                    imageRendering: 'crisp-edges',
+                                    WebkitBackfaceVisibility: 'hidden',
+                                    backfaceVisibility: 'hidden',
+                                    transform: 'translateZ(0)'
+                                }}
                                 className="w-full h-full object-cover group-hover:scale-102 transition-transform duration-700 ease-out antialiased"
                             />
                             <div className="absolute inset-0 bg-gradient-to-t from-forest/85 via-forest/15 to-transparent flex flex-col justify-end p-4 xs:p-5 sm:p-6 md:p-8 lg:p-10 xl:p-12 transition-all duration-500">
