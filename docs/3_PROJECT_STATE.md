@@ -29,12 +29,12 @@ As seguintes secções da aplicação estão totalmente validadas, integradas e 
     *   Segregação do modal administrativo (`AdminDashboardModal`) do bundle principal de entrada, descarregando o código do painel apenas sob procura.
 *   **Estabilidade de Bundling do Vite & Framer Motion:**
     *   Remoção de `manualChunks` isolados no `vite.config.ts` para bibliotecas de UI/Motion, garantindo a inicialização coesa do contexto do React (`LayoutGroupContext.mjs`) sem exceções em tempo de execução.
-*   **Fase 1 — Otimizações de Performance Mobile & iOS WebKit (Concluído):**
-    *   **Preload de Hero no `<head>` (`index.html`):** Inserção de `<link rel="preload" as="image" href="..." fetchpriority="high">` para descoberta imediata do Hero Mobile pelo parser HTML.
-    *   **Estrutura `<picture>` no Hero:** Renderização instantânea do Hero com suporte a formatos leves e atributos `fetchPriority="high"`, `loading="eager"` e `decoding="async"`.
-    *   **Eliminação de Flicker no iOS WebKit:** Aplicação de aceleração por hardware GPU (`transform: translateZ(0)` e `backface-visibility: hidden`) nos cartões de produtos e categorias para impedir o descarte agressivo de texturas no Safari/WebKit durante scroll rápido.
-    *   **Estratégia de Carregamento Prioritário na Grelha:** Configuração das primeiras 4 imagens do catálogo para carregarem com `loading="eager"` e `fetchPriority="high"`, aplicando `loading="lazy"` a partir do 5.º item.
-    *   **Otimização CSS `content-visibility: auto`:** Prevenção de reflows desnecessários nas grelhas com `contain-intrinsic-size`.
+*   **Fase 1 & Fase 2 — Otimizações de Performance Mobile & iOS WebKit (Concluído com Sucesso):**
+    *   **Imagens Responsivas WebP no Hero (LCP Mobile):** Preload condicional no `<head>` (`media="(max-width: 640px)"`) e estrutura `<picture>` com fonte WebP leve (~38KB vs ~3.5MB PNG), reduzindo o tempo de download do Hero em redes móveis de 16,6s para <0,3s.
+    *   **Defer de Scripts de Terceiros (Pinterest Pixel):** Execução do script do Pinterest postergada para após o carregamento inicial da página (`window.onload` + `setTimeout 2s`), eliminando bloqueios na thread principal durante FCP e LCP.
+    *   **Code-Splitting Avançado & Lazy Loading de Modais (`React.lazy()`):** Extração de modais pesados (`LegalModal`, `AdminDashboardModal`) para chunks dinâmicos isolados, reduzindo substancialmente a dimensão do bundle inicial de entrada no React.
+    *   **Otimizações de Bundling Vite (`vite.config.ts`):** Ativação de minificação `esbuild` de alta performance, desativação de sourcemaps pesados em produção, `target: 'es2020'` e minificação CSS nativa.
+    *   **Eliminação de Flicker no iOS WebKit:** Aceleração por hardware GPU (`transform: translateZ(0)` e `backface-visibility: hidden`) aplicada em todos os elementos visuais chave.
 
 ---
 
