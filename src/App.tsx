@@ -805,77 +805,79 @@ const LoadingScreen = ({ onComplete }: { onComplete: () => void; key?: string })
         className="absolute inset-y-0 w-[70vw] bg-[radial-gradient(ellipse_at_center,rgba(230,198,137,0.3)_0%,rgba(230,198,137,0.08)_45%,transparent_75%)] pointer-events-none blur-3xl"
       />
 
-      {/* Fluid Handcrafted Golden Threads ("Os Fios M★BRAVO") traversing left-to-right with delicate artisan sewing lines framing the logo safely */}
+      {/* Fluid Handcrafted Golden Threads ("Os Fios M★BRAVO - Alinhavo a Mão") - Ultra-fine luxury silk sewing lines */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden flex items-center justify-center z-0">
         <svg className="w-full h-full min-w-[800px]" preserveAspectRatio="none" viewBox="0 0 1200 600" fill="none">
           <defs>
-            <linearGradient id="screenThreadGold1" x1="0%" y1="0%" x2="100%" y2="0%">
-              <stop offset="0%" stopColor="#FFF1D6" stopOpacity="0.15" />
-              <stop offset="30%" stopColor="#E6C687" stopOpacity="0.9" />
-              <stop offset="70%" stopColor="#C5A059" stopOpacity="0.95" />
-              <stop offset="100%" stopColor="#8C6B2D" stopOpacity="0.2" />
+            <linearGradient id="silkThreadGold1" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stopColor="#FFF5E1" stopOpacity="0.1" />
+              <stop offset="20%" stopColor="#E6C687" stopOpacity="0.85" />
+              <stop offset="60%" stopColor="#C5A059" stopOpacity="0.9" />
+              <stop offset="100%" stopColor="#8C6B2D" stopOpacity="0.15" />
             </linearGradient>
 
-            <linearGradient id="screenThreadGold2" x1="0%" y1="0%" x2="100%" y2="0%">
-              <stop offset="0%" stopColor="#8C6B2D" stopOpacity="0.15" />
-              <stop offset="25%" stopColor="#C5A059" stopOpacity="0.95" />
-              <stop offset="75%" stopColor="#E6C687" stopOpacity="0.9" />
-              <stop offset="100%" stopColor="#FFF1D6" stopOpacity="0.2" />
+            <linearGradient id="silkThreadGold2" x1="100%" y1="0%" x2="0%" y2="0%">
+              <stop offset="0%" stopColor="#8C6B2D" stopOpacity="0.1" />
+              <stop offset="30%" stopColor="#C5A059" stopOpacity="0.85" />
+              <stop offset="70%" stopColor="#E6C687" stopOpacity="0.9" />
+              <stop offset="100%" stopColor="#FFF5E1" stopOpacity="0.15" />
             </linearGradient>
 
-            <filter id="screenThreadGlow" x="-10%" y="-10%" width="120%" height="120%">
-              <feDropShadow dx="0" dy="1.5" stdDeviation="2.5" floodColor="#E6C687" floodOpacity="0.4" />
+            <filter id="silkThreadGlow" x="-10%" y="-10%" width="120%" height="120%">
+              <feDropShadow dx="0" dy="1" stdDeviation="2" floodColor="#E6C687" floodOpacity="0.35" />
             </filter>
           </defs>
 
-          {/* 1. Upper Thread ("Linha de Costura Superior") - Delicate, fine & sweeping high above the logo zone */}
+          {/* 1. Upper Silk Thread ("Alinhavo Superior") - Delicate hand-sewn curve flowing with needle rhythm */}
           <motion.path
-            d="M -100 120 C 180 200, 380 50, 600 45 C 820 40, 1020 220, 1300 130"
-            stroke="url(#screenThreadGold1)"
-            strokeWidth="1.3"
+            d="M -100 70 C 160 140, 360 35, 580 50 C 780 65, 960 160, 1300 80"
+            stroke="url(#silkThreadGold1)"
+            strokeWidth="0.75"
             strokeLinecap="round"
-            filter="url(#screenThreadGlow)"
+            filter="url(#silkThreadGlow)"
             initial={{ pathLength: 0, opacity: 0 }}
-            animate={{ pathLength: 1, opacity: 0.88 }}
-            transition={{ duration: 2.3, ease: "easeInOut" }}
+            animate={{ pathLength: 1, opacity: 0.75 }}
+            exit={{ opacity: 0, scale: 1.03 }}
+            transition={{ duration: 2.3, ease: [0.25, 0.1, 0.25, 1] }}
           />
 
-          {/* Upper Tactile Crochet Stitch Line */}
+          {/* Upper Tactile Hand-Stitch Lines - Fine, delicate dashed sewing dots */}
           <motion.path
-            d="M -100 120 C 180 200, 380 50, 600 45 C 820 40, 1020 220, 1300 130"
-            stroke="#FFF1D6"
-            strokeWidth="0.65"
-            strokeDasharray="4 8"
+            d="M -100 70 C 160 140, 360 35, 580 50 C 780 65, 960 160, 1300 80"
+            stroke="#FFF5E1"
+            strokeWidth="0.45"
+            strokeDasharray="2 6"
             strokeLinecap="round"
-            opacity="0.5"
             initial={{ pathLength: 0, opacity: 0 }}
-            animate={{ pathLength: 1, opacity: 0.6 }}
-            transition={{ duration: 2.3, ease: "easeInOut", delay: 0.06 }}
+            animate={{ pathLength: 1, opacity: 0.5 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 2.3, ease: [0.25, 0.1, 0.25, 1], delay: 0.05 }}
           />
 
-          {/* 2. Lower Thread ("Linha de Costura Inferior") - Asymmetric organic rhythm sweeping deep below the central brand block */}
+          {/* 2. Lower Silk Thread ("Costura Inferior em Contraponto") - Independent asymmetric counter-rhythm */}
           <motion.path
-            d="M -100 470 C 220 380, 400 550, 600 555 C 800 560, 1020 370, 1300 480"
-            stroke="url(#screenThreadGold2)"
-            strokeWidth="1.1"
+            d="M -100 540 C 200 440, 380 560, 620 545 C 820 530, 1020 420, 1300 520"
+            stroke="url(#silkThreadGold2)"
+            strokeWidth="0.7"
             strokeLinecap="round"
-            filter="url(#screenThreadGlow)"
+            filter="url(#silkThreadGlow)"
             initial={{ pathLength: 0, opacity: 0 }}
-            animate={{ pathLength: 1, opacity: 0.85 }}
-            transition={{ duration: 2.4, ease: "easeInOut", delay: 0.14 }}
+            animate={{ pathLength: 1, opacity: 0.7 }}
+            exit={{ opacity: 0, scale: 1.03 }}
+            transition={{ duration: 2.4, ease: [0.25, 0.1, 0.25, 1], delay: 0.12 }}
           />
 
-          {/* Lower Tactile Crochet Stitch Line */}
+          {/* Lower Tactile Hand-Stitch Lines */}
           <motion.path
-            d="M -100 470 C 220 380, 400 550, 600 555 C 800 560, 1020 370, 1300 480"
-            stroke="#FFF1D6"
-            strokeWidth="0.6"
-            strokeDasharray="5 11"
+            d="M -100 540 C 200 440, 380 560, 620 545 C 820 530, 1020 420, 1300 520"
+            stroke="#FFF5E1"
+            strokeWidth="0.4"
+            strokeDasharray="3 8"
             strokeLinecap="round"
-            opacity="0.5"
             initial={{ pathLength: 0, opacity: 0 }}
-            animate={{ pathLength: 1, opacity: 0.55 }}
-            transition={{ duration: 2.4, ease: "easeInOut", delay: 0.2 }}
+            animate={{ pathLength: 1, opacity: 0.45 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 2.4, ease: [0.25, 0.1, 0.25, 1], delay: 0.18 }}
           />
         </svg>
       </div>
@@ -1014,23 +1016,15 @@ const Navbar = ({ currentPage, setCurrentPage, pathname, isAppLoading = false }:
             setIsDarkBg(false);
         }
 
+        let scrollTicking = false;
         const handleScroll = () => {
-            setIsScrolled(window.scrollY > 50);
-            
-            // Fast background sensing fallback on scroll
-            const sections = document.querySelectorAll('section[data-background], div[data-background]');
-            let topBg = null;
-            sections.forEach((section) => {
-                const rect = section.getBoundingClientRect();
-                if (rect.top <= 100 && rect.bottom >= 0) {
-                    const bg = section.getAttribute('data-background');
-                    if (bg) {
-                        topBg = bg;
-                    }
-                }
-            });
-            if (topBg) {
-                setIsDarkBg(topBg === 'dark');
+            if (!scrollTicking) {
+                requestAnimationFrame(() => {
+                    const scrolled = window.scrollY > 50;
+                    setIsScrolled(prev => prev !== scrolled ? scrolled : prev);
+                    scrollTicking = false;
+                });
+                scrollTicking = true;
             }
         };
 
@@ -1072,7 +1066,7 @@ const Navbar = ({ currentPage, setCurrentPage, pathname, isAppLoading = false }:
         }, observerOptions);
 
         sections.forEach(section => observer.observe(section));
-        window.addEventListener('scroll', handleScroll);
+        window.addEventListener('scroll', handleScroll, { passive: true });
         
         const initialTimer = setTimeout(runInitialDetection, 150);
         const secondTimer = setTimeout(runInitialDetection, 400); // safety fallback after AnimatePresence finishes
@@ -1271,8 +1265,82 @@ const Navbar = ({ currentPage, setCurrentPage, pathname, isAppLoading = false }:
   );
 };
 
+// Precomputed Bezier coordinates and slope angles for O(1) frame lookup
+const FIO_STAR_Y_COORDS = [
+    40,  200, 380, 540, 700, 870, 1040, 1210, 1380, 1560, 1740, 1910, 2080, 2260, 2440, 2620, 2800, 3000,
+    3160, 3320, 3480, 3640, 3800, 3960, 4120, 4280, 4440, 4600, 4760, 4920, 5080, 5240, 5400, 5560, 5720, 5900
+];
+const FIO_STAR_X_RANGE = [
+    720, 1030, 1340, 1030, 720, 410, 100, 410, 
+    720, 1030, 1340, 1030, 720, 410, 100, 410, 
+    720, 1030, 1340, 1030, 720, 410, 100, 410, 
+    720, 1030, 1340, 1030, 720, 410, 100, 410,
+    720, 1030, 1340, 720
+];
+
+function calcBezierPointAndAngle(clampedY: number) {
+    let i = 0;
+    for (let j = 0; j < FIO_STAR_Y_COORDS.length - 1; j++) {
+        if (clampedY >= FIO_STAR_Y_COORDS[j] && clampedY <= FIO_STAR_Y_COORDS[j + 1]) {
+            i = j;
+            break;
+        }
+    }
+    const y0 = FIO_STAR_Y_COORDS[i];
+    const y1 = FIO_STAR_Y_COORDS[i + 1];
+    const x0 = FIO_STAR_X_RANGE[i];
+    const x1 = FIO_STAR_X_RANGE[i + 1];
+    const dy = y1 - y0;
+    const dx = x1 - x0;
+    if (dy === 0) return { x: x0, angle: 0 };
+    let tMin = 0;
+    let tMax = 1;
+    let t = 0.5;
+    for (let step = 0; step < 10; step++) {
+        t = (tMin + tMax) / 2;
+        const currentY = y0 + dy * (1.5 * t - 1.5 * t * t + t * t * t);
+        if (currentY < clampedY) tMin = t;
+        else tMax = t;
+    }
+    const x = x0 + dx * (3 * t * t - 2 * t * t * t);
+    const dXdT = 6 * (1 - t) * t * dx;
+    const dYdT = 1.5 * dy * ((1 - t) * (1 - t) + t * t);
+    const slope = dXdT / dYdT;
+    const angleRad = Math.atan(slope);
+    const angleDeg = (angleRad * 180) / Math.PI;
+    return { x, angle: angleDeg };
+}
+
+const FIO_STEP = 5;
+const FIO_LOOKUP: Array<{ x: number; angle: number }> = [];
+for (let y = 0; y <= 6000; y += FIO_STEP) {
+    FIO_LOOKUP.push(calcBezierPointAndAngle(y));
+}
+
+function getBezierFast(yVal: number) {
+    const idx = Math.min(FIO_LOOKUP.length - 1, Math.max(0, Math.round(yVal / FIO_STEP)));
+    return FIO_LOOKUP[idx];
+}
+
+const generateSmoothPath = (xCoords: number[], yCoords: number[]) => {
+    if (xCoords.length === 0 || yCoords.length === 0) return '';
+    let d = `M ${xCoords[0]} ${yCoords[0]}`;
+    for (let i = 0; i < xCoords.length - 1; i++) {
+        const x0 = xCoords[i];
+        const y0 = yCoords[i];
+        const x1 = xCoords[i + 1];
+        const y1 = yCoords[i + 1];
+        const cy0 = y0 + (y1 - y0) / 2;
+        const cy1 = y0 + (y1 - y0) / 2;
+        d += ` C ${x0} ${cy0}, ${x1} ${cy1}, ${x1} ${y1}`;
+    }
+    return d;
+};
+const FIO_PATH_D = generateSmoothPath(FIO_STAR_X_RANGE, FIO_STAR_Y_COORDS);
+
 const FioCondutor = () => {
     const { scrollY } = useScroll();
+    const pathD = FIO_PATH_D;
 
     // Responsive State: check if screen is mobile (width < 768px)
     const [isMobile, setIsMobile] = useState(false);
@@ -1286,7 +1354,6 @@ const FioCondutor = () => {
     }, []);
 
     // 1. Dynamic Thread Opacity based on scroll progress & page density
-    // Drops to 0.1/0.08 near dense elements (images, details, grids) and stays visible (0.4/0.45) in negative spaces
     const rawThreadOpacity = useTransform(
         scrollY,
         [0, 200, 450, 750, 1100, 1450, 1850, 2200, 2550, 2900, 3200, 3600, 4000, 4400, 4800, 5200, 5600, 6000],
@@ -1297,103 +1364,14 @@ const FioCondutor = () => {
     // Map scrollY [0, 6000] to vertical position of the star [40, 5900]
     const rawStarY = useTransform(scrollY, [0, 6000], [40, 5900], { clamp: true });
     
-    // Smooth the star's movement with a spring to simulate realistic gravity and inertia.
-    // On PC (Desktop), we use a highly damped, premium spring with higher inertia and no overshoot to perfectly match the scroll speed without jumping ahead.
     const starY = useSpring(rawStarY, {
         stiffness: isMobile ? 85 : 35,
         damping: isMobile ? 24 : 28,
         mass: isMobile ? 0.4 : 1.0
     });
-    
-    // 2. Full-screen sinuous meandering path coordinates (viewBox width: 1440)
-    const starYCoordinates = [
-        40,  200, 380, 540, 700, 870, 1040, 1210, 1380, 1560, 1740, 1910, 2080, 2260, 2440, 2620, 2800, 3000,
-        3160, 3320, 3480, 3640, 3800, 3960, 4120, 4280, 4440, 4600, 4760, 4920, 5080, 5240, 5400, 5560, 5720, 5900
-    ];
 
-    const desktopStarXRange = [
-        720, 1030, 1340, 1030, 720, 410, 100, 410, 
-        720, 1030, 1340, 1030, 720, 410, 100, 410, 
-        720, 1030, 1340, 1030, 720, 410, 100, 410, 
-        720, 1030, 1340, 1030, 720, 410, 100, 410,
-        720, 1030, 1340, 720
-    ];
-
-    const starXRange = desktopStarXRange;
-
-    // Generate smooth bezier curves dynamically
-    const generateSmoothPath = (xCoords: number[], yCoords: number[]) => {
-        if (xCoords.length === 0 || yCoords.length === 0) return '';
-        let d = `M ${xCoords[0]} ${yCoords[0]}`;
-        for (let i = 0; i < xCoords.length - 1; i++) {
-            const x0 = xCoords[i];
-            const y0 = yCoords[i];
-            const x1 = xCoords[i + 1];
-            const y1 = yCoords[i + 1];
-            const cy0 = y0 + (y1 - y0) / 2;
-            const cy1 = y0 + (y1 - y0) / 2;
-            d += ` C ${x0} ${cy0}, ${x1} ${cy1}, ${x1} ${y1}`;
-        }
-        return d;
-    };
-
-    const pathD = generateSmoothPath(starXRange, starYCoordinates);
-
-    // Calculate bezier point and exact slope/angle for organic rotation
-    const getBezierPointAndAngle = (yVal: number) => {
-        const yCoords = starYCoordinates;
-        const xCoords = starXRange;
-        
-        const minY = yCoords[0];
-        const maxY = yCoords[yCoords.length - 1];
-        const clampedY = Math.max(minY, Math.min(maxY, yVal));
-        
-        let i = 0;
-        for (let j = 0; j < yCoords.length - 1; j++) {
-            if (clampedY >= yCoords[j] && clampedY <= yCoords[j + 1]) {
-                i = j;
-                break;
-            }
-        }
-        
-        const y0 = yCoords[i];
-        const y1 = yCoords[i + 1];
-        const x0 = xCoords[i];
-        const x1 = xCoords[i + 1];
-        const dy = y1 - y0;
-        const dx = x1 - x0;
-        
-        if (dy === 0) return { x: x0, angle: 0 };
-        
-        // Binary search for parameter t (0 to 1) along the bezier segment
-        let tMin = 0;
-        let tMax = 1;
-        let t = 0.5;
-        
-        for (let step = 0; step < 10; step++) {
-            t = (tMin + tMax) / 2;
-            const currentY = y0 + dy * (1.5 * t - 1.5 * t * t + t * t * t);
-            if (currentY < clampedY) {
-                tMin = t;
-            } else {
-                tMax = t;
-            }
-        }
-        
-        // Precise position x and derivative of x with respect to t
-        const x = x0 + dx * (3 * t * t - 2 * t * t * t);
-        const dXdT = 6 * (1 - t) * t * dx;
-        const dYdT = 1.5 * dy * ((1 - t) * (1 - t) + t * t);
-        
-        const slope = dXdT / dYdT;
-        const angleRad = Math.atan(slope);
-        const angleDeg = (angleRad * 180) / Math.PI;
-        
-        return { x, angle: angleDeg };
-    };
-
-    const starX = useTransform(starY, (y) => getBezierPointAndAngle(y).x);
-    const starRotation = useTransform(starY, (y) => getBezierPointAndAngle(y).angle);
+    const starX = useTransform(starY, (y) => getBezierFast(y).x);
+    const starRotation = useTransform(starY, (y) => getBezierFast(y).angle);
 
     const starLeft = useTransform(starX, (x) => `${(x / 1440) * 100}%`);
     const starTop = useTransform(starY, (y) => `${(y / 6000) * 100}%`);
@@ -1653,7 +1631,9 @@ const Hero = () => {
                                         alt={`M★BRAVO Background ${index + 1}`}
                                         className="w-full h-full object-cover"
                                         fetchPriority={index === 0 ? "high" : "low"}
-                                        loading="eager"
+                                        loading={index === 0 ? "eager" : "lazy"}
+                                        width={1920}
+                                        height={1080}
                                         decoding="async"
                                         onError={(e) => {
                                           const target = e.currentTarget;
@@ -2390,7 +2370,7 @@ interface ProductCardProps {
     onNextProduct?: () => void;
 }
 
-const ProductCard: React.FC<ProductCardProps> = ({ product: rawProduct, i, isFocused, isSubdued, onFocus, onPrevProduct, onNextProduct }) => {
+const ProductCardComponent: React.FC<ProductCardProps> = ({ product: rawProduct, i, isFocused, isSubdued, onFocus, onPrevProduct, onNextProduct }) => {
     const { lang, t } = useLanguage();
     const product = translateProduct(rawProduct, lang);
     const n = product.name.toLowerCase();
@@ -4287,6 +4267,13 @@ const ProductCard: React.FC<ProductCardProps> = ({ product: rawProduct, i, isFoc
         </>
     );
 };
+
+const ProductCard = React.memo(ProductCardComponent, (prev, next) => (
+    prev.product.id === next.product.id &&
+    prev.isFocused === next.isFocused &&
+    prev.isSubdued === next.isSubdued &&
+    prev.i === next.i
+));
 
 const CarouselItem: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     return (
@@ -7152,6 +7139,9 @@ export default function App() {
       duration: 1.2,
       easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
       gestureOrientation: 'vertical',
+      smoothWheel: true,
+      syncTouch: false,
+      touchMultiplier: 1.5,
     });
 
     (window as any).lenis = lenis;
