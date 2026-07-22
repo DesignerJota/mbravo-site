@@ -774,14 +774,14 @@ const LoadingScreen = ({ onComplete }: { onComplete: () => void; key?: string })
   useEffect(() => {
     const timer = setTimeout(() => {
       onCompleteRef.current();
-    }, 2400);
+    }, 1400);
     return () => clearTimeout(timer);
   }, []);
 
   return (
     <motion.div
-      className="fixed inset-0 z-[100] bg-forest flex flex-col items-center justify-center overflow-hidden"
-      exit={{ y: '-100%', transition: { duration: 1.2, ease: [0.76, 0, 0.24, 1] } }}
+      className="fixed inset-0 z-[100] bg-forest flex flex-col items-center justify-center overflow-hidden pointer-events-none"
+      exit={{ opacity: 0, y: '-100%', transition: { duration: 0.8, ease: [0.76, 0, 0.24, 1] } }}
     >
       <motion.div
         initial={{ opacity: 0, scale: 0.9 }}
@@ -1512,7 +1512,7 @@ const Hero = () => {
                             <motion.div 
                                 key={bgItem.mobile}
                                 style={{ y: bgY, scale: bgScale }}
-                                initial={{ opacity: 0 }}
+                                initial={{ opacity: index === 0 ? 0.93 : 0 }}
                                 animate={{ 
                                     opacity: bgIndex === index ? 0.93 : 0,
                                 }}
@@ -1526,9 +1526,15 @@ const Hero = () => {
                                         src={bgItem.desktop} 
                                         alt={`M★BRAVO Background ${index + 1}`}
                                         className="w-full h-full object-cover"
-                                        fetchPriority={index === 0 ? "high" : "auto"}
-                                        loading={index === 0 ? "eager" : "lazy"}
+                                        fetchPriority={index === 0 ? "high" : "low"}
+                                        loading="eager"
                                         decoding="async"
+                                        onError={(e) => {
+                                          const target = e.currentTarget;
+                                          if (target.src !== bgItem.fallback) {
+                                            target.src = bgItem.fallback;
+                                          }
+                                        }}
                                         style={{
                                             WebkitBackfaceVisibility: 'hidden',
                                             backfaceVisibility: 'hidden',
@@ -7060,18 +7066,14 @@ export default function App() {
 
   return (
     <div className="relative min-h-screen bg-cream text-forest select-none">
-      <AnimatePresence mode="wait">
-        {loading ? (
+      <AnimatePresence>
+        {loading && (
           <LoadingScreen key="loading" onComplete={() => setLoading(false)} />
-        ) : (
-          <motion.main
-            key="main"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 1.5 }}
-            className="flex flex-col"
-          >
-            <Navbar currentPage={pathname === '/essencia' || pathname === '/essence' ? 'essence' : 'home'} setCurrentPage={(p) => navigateTo(p === 'essence' ? '/essencia' : '/')} pathname={pathname} />
+        )}
+      </AnimatePresence>
+
+      <main className="flex flex-col">
+        <Navbar currentPage={pathname === '/essencia' || pathname === '/essence' ? 'essence' : 'home'} setCurrentPage={(p) => navigateTo(p === 'essence' ? '/essencia' : '/')} pathname={pathname} />
             
             <AnimatePresence mode="wait">
               {pathname === '/essencia' || pathname === '/essence' ? (
@@ -7273,9 +7275,7 @@ export default function App() {
                     </motion.div>
                 )}
             </AnimatePresence>
-          </motion.main>
-        )}
-      </AnimatePresence>
+      </main>
     </div>
   );
 }
