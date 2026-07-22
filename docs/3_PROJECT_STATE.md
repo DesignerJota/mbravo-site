@@ -83,7 +83,10 @@ Respondendo às últimas solicitações de otimização de fluxo e consistência
 *   [x] **CSS `content-visibility: auto` e Layout Lock:** Atribuído `content-visibility: auto` com `contain-intrinsic-size` nas grelhas de produtos para evitar recálculos de layout e eliminação de flicker durante o scroll com inércia.
 
 ### C. Propostas Disruptivas de Inovação e Luxo E-commerce (Nível Marca Global):
-*   [ ] **Certificado de Autenticidade Digital & NFC Tap:** Integração de etiqueta NFC nas peças físicas que direciona para uma página exclusiva de validação do número de série, artesã responsável, data de confeção em atelier e guia de manutenção.
-*   [ ] **Atelier Customizer 3D / Seletor de Fios e Iniciais:** Ferramenta interativa de personalização de alças, tons de fio e medalhas com iniciais gravadas e cálculo em tempo real de peso e orçamento.
+*   [x] **Roadmap Registado em `/docs/5_FUTURE_ROADMAP.md`**:
+    *   **Passaporte Digital & Autenticidade "Tap & Verify" (NFC / QR Code):** Autenticação da peça e ficha da artesã Carolina Bravo.
+    *   **Provador Virtual / Realidade Aumentada (AR Web-based):** Projeção da peça em escala 1:1.
+    *   **Configurador de Personalização 3D:** Personalização de cores do fio de crochet, alças e iniciais em tempo real.
+    *   **Passaporte de Manutenção e Reparações (Luxury Circularity):** Portal de lavagem especializada, preservação e garantia vitalícia de pontos.
 *   [ ] **VIP Atelier Concierge & Agendamento Privado:** Módulo de contacto direto via WhatsApp/Vídeo com Carolina para encomendar peças à medida para noivas, eventos e edições limitadas.
 *   [ ] **Soundscape Atmosférico do Atelier:** Ativação opcional no topo do site de um ambiente sonoro suave e relaxante do atelier (ritmo do tear e ambiente acústico artesanal) elevando a experiência sensorial da marca.
