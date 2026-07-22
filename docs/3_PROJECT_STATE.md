@@ -29,10 +29,11 @@ As seguintes secções da aplicação estão totalmente validadas, integradas e 
     *   Segregação do modal administrativo (`AdminDashboardModal`) do bundle principal de entrada, descarregando o código do painel apenas sob procura.
 *   **Estabilidade de Bundling do Vite & Framer Motion:**
     *   Remoção de `manualChunks` isolados no `vite.config.ts` para bibliotecas de UI/Motion, garantindo a inicialização coesa do contexto do React (`LayoutGroupContext.mjs`) sem exceções em tempo de execução.
-*   **Fase 1 & Fase 2 — Restauração da Versão Estável de Alta Performance:**
-    *   **Restauração Total do Ecrã de Abertura & Animação da Marca:** Restabelecida a transição da `LoadingScreen` com animação do logótipo e revelação fluida do Hero em `App.tsx`.
-    *   **Imagens Locais Autênticas M★BRAVO em WebP:** Imagens locais otimizadas em `/public` (`/hero-bg-1-mobile.webp` de 45KB e `/hero-bg-1-desktop.webp` de 159KB) ativas e renderizadas perfeitamente no elemento `<picture>` do Hero.
-    *   **Preload no `<head>`:** Preload condicional mantido no HTML para máxima velocidade de LCP nas imagens de abertura.
+*   **Fase 1 & Fase 2 — Fusão Ativa das 4 Imagens do Hero & Otimização de Performance:**
+    *   **Crossfade Automático das 4 Imagens WebP do Hero:** Restabelecida a fusão e rotação automática das 4 imagens locais WebP (`/hero-bg-1-mobile.webp` a `/hero-bg-4-mobile.webp` e respetivas versões desktop) com transições suaves de 2.2s a cada 8 segundos.
+    *   **Carregamento Paralelo Eager & Sem Bloqueios:** Atribuição de `loading="eager"` em todas as 4 imagens da rotação e montagem imediata do componente `<main>` em paralelo com a `<LoadingScreen>` em overlay. Garante que os recursos de imagem são descarregados desde o t=0ms, eliminando esperas sequenciais de LCP.
+    *   **Tratamento de Fallbacks com `onError`:** Proteção robusta adicionada aos elementos `<img>` com redirecionamento automático para os URLs remotos de reserva em caso de falha de descodificação de rede.
+    *   **Ecrã de Abertura em Overlay Não-Bloqueante:** `<LoadingScreen>` com animação do logótipo M★BRAVO e duração otimizada para 1.4s, deslizando e desvanecendo sem bloquear a thread principal nem o tempo de FCP/LCP.
     *   **Defer de Scripts de Terceiros (Pinterest Pixel):** Execução do script do Pinterest postergada para após o carregamento inicial da página (`window.onload` + `setTimeout 2s`), eliminando bloqueios na thread principal durante FCP e LCP.
     *   **Code-Splitting Avançado & Lazy Loading de Modais (`React.lazy()`):** Extração de modais pesados (`LegalModal`, `AdminDashboardModal`) para chunks dinâmicos isolados.
     *   **Otimizações de Bundling Vite (`vite.config.ts`):** Ativação de minificação `esbuild` de alta performance, desativação de sourcemaps em produção, `target: 'es2020'` e minificação CSS nativa.
