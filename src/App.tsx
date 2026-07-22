@@ -766,6 +766,7 @@ const Logo = ({ className = "h-12", light = false }: { className?: string, light
 const LoadingScreen = ({ onComplete }: { onComplete: () => void; key?: string }) => {
   const { t } = useLanguage();
   const onCompleteRef = useRef(onComplete);
+  const [progress, setProgress] = useState(0);
   
   useEffect(() => {
     onCompleteRef.current = onComplete;
@@ -774,41 +775,165 @@ const LoadingScreen = ({ onComplete }: { onComplete: () => void; key?: string })
   useEffect(() => {
     const timer = setTimeout(() => {
       onCompleteRef.current();
-    }, 1400);
+    }, 2600);
     return () => clearTimeout(timer);
+  }, []);
+
+  // Smooth numerical percentage counter 0% -> 100%
+  useEffect(() => {
+    const startTime = Date.now();
+    const duration = 2400;
+    const interval = setInterval(() => {
+      const elapsed = Date.now() - startTime;
+      const pct = Math.min(100, Math.floor((elapsed / duration) * 100));
+      setProgress(pct);
+      if (pct >= 100) clearInterval(interval);
+    }, 25);
+    return () => clearInterval(interval);
   }, []);
 
   return (
     <motion.div
-      className="fixed inset-0 z-[100] bg-forest flex flex-col items-center justify-center overflow-hidden pointer-events-none"
+      className="fixed inset-0 z-[100] bg-[#1F2A18] flex flex-col items-center justify-center overflow-hidden select-none px-6"
       exit={{ opacity: 0, y: '-100%', transition: { duration: 0.8, ease: [0.76, 0, 0.24, 1] } }}
     >
-      <motion.div
-        initial={{ opacity: 0, scale: 0.9 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ duration: 1.5, ease: "easeOut" }}
-      >
-        <Logo light className="h-32 md:h-48" />
-      </motion.div>
+      {/* Dynamic Ambient Background Illumination - Light wave moving across forest background */}
+      <motion.div 
+        initial={{ x: "-100%", opacity: 0 }}
+        animate={{ x: ["-60%", "30%", "140%"], opacity: [0.1, 0.4, 0.1] }}
+        transition={{ duration: 2.5, ease: "easeInOut" }}
+        className="absolute inset-y-0 w-[70vw] bg-[radial-gradient(ellipse_at_center,rgba(230,198,137,0.3)_0%,rgba(230,198,137,0.08)_45%,transparent_75%)] pointer-events-none blur-3xl"
+      />
+
+      {/* Fluid Handcrafted Golden Threads ("Os Fios M★BRAVO") traversing left-to-right with delicate artisan sewing lines framing the logo safely */}
+      <div className="absolute inset-0 pointer-events-none overflow-hidden flex items-center justify-center z-0">
+        <svg className="w-full h-full min-w-[800px]" preserveAspectRatio="none" viewBox="0 0 1200 600" fill="none">
+          <defs>
+            <linearGradient id="screenThreadGold1" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stopColor="#FFF1D6" stopOpacity="0.15" />
+              <stop offset="30%" stopColor="#E6C687" stopOpacity="0.9" />
+              <stop offset="70%" stopColor="#C5A059" stopOpacity="0.95" />
+              <stop offset="100%" stopColor="#8C6B2D" stopOpacity="0.2" />
+            </linearGradient>
+
+            <linearGradient id="screenThreadGold2" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stopColor="#8C6B2D" stopOpacity="0.15" />
+              <stop offset="25%" stopColor="#C5A059" stopOpacity="0.95" />
+              <stop offset="75%" stopColor="#E6C687" stopOpacity="0.9" />
+              <stop offset="100%" stopColor="#FFF1D6" stopOpacity="0.2" />
+            </linearGradient>
+
+            <filter id="screenThreadGlow" x="-10%" y="-10%" width="120%" height="120%">
+              <feDropShadow dx="0" dy="1.5" stdDeviation="2.5" floodColor="#E6C687" floodOpacity="0.4" />
+            </filter>
+          </defs>
+
+          {/* 1. Upper Thread ("Linha de Costura Superior") - Delicate, fine & sweeping high above the logo zone */}
+          <motion.path
+            d="M -100 120 C 180 200, 380 50, 600 45 C 820 40, 1020 220, 1300 130"
+            stroke="url(#screenThreadGold1)"
+            strokeWidth="1.3"
+            strokeLinecap="round"
+            filter="url(#screenThreadGlow)"
+            initial={{ pathLength: 0, opacity: 0 }}
+            animate={{ pathLength: 1, opacity: 0.88 }}
+            transition={{ duration: 2.3, ease: "easeInOut" }}
+          />
+
+          {/* Upper Tactile Crochet Stitch Line */}
+          <motion.path
+            d="M -100 120 C 180 200, 380 50, 600 45 C 820 40, 1020 220, 1300 130"
+            stroke="#FFF1D6"
+            strokeWidth="0.65"
+            strokeDasharray="4 8"
+            strokeLinecap="round"
+            opacity="0.5"
+            initial={{ pathLength: 0, opacity: 0 }}
+            animate={{ pathLength: 1, opacity: 0.6 }}
+            transition={{ duration: 2.3, ease: "easeInOut", delay: 0.06 }}
+          />
+
+          {/* 2. Lower Thread ("Linha de Costura Inferior") - Asymmetric organic rhythm sweeping deep below the central brand block */}
+          <motion.path
+            d="M -100 470 C 220 380, 400 550, 600 555 C 800 560, 1020 370, 1300 480"
+            stroke="url(#screenThreadGold2)"
+            strokeWidth="1.1"
+            strokeLinecap="round"
+            filter="url(#screenThreadGlow)"
+            initial={{ pathLength: 0, opacity: 0 }}
+            animate={{ pathLength: 1, opacity: 0.85 }}
+            transition={{ duration: 2.4, ease: "easeInOut", delay: 0.14 }}
+          />
+
+          {/* Lower Tactile Crochet Stitch Line */}
+          <motion.path
+            d="M -100 470 C 220 380, 400 550, 600 555 C 800 560, 1020 370, 1300 480"
+            stroke="#FFF1D6"
+            strokeWidth="0.6"
+            strokeDasharray="5 11"
+            strokeLinecap="round"
+            opacity="0.5"
+            initial={{ pathLength: 0, opacity: 0 }}
+            animate={{ pathLength: 1, opacity: 0.55 }}
+            transition={{ duration: 2.4, ease: "easeInOut", delay: 0.2 }}
+          />
+        </svg>
+      </div>
+
+      {/* Central Brand Frame */}
+      <div className="relative z-10 flex flex-col items-center justify-center">
+        {/* Main Logo Container */}
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 1.2, ease: "easeOut" }}
+          className="py-2 sm:py-4 px-4"
+        >
+          <Logo light className="h-20 sm:h-28 md:h-36 landscape:h-16" />
+        </motion.div>
+      </div>
+
+      {/* Brand Slogan */}
       <motion.p
-        initial={{ opacity: 0, y: 20 }}
+        initial={{ opacity: 0, y: 15 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.8, duration: 1 }}
-        className="mt-12 text-cream/65 font-serif italic tracking-[0.15em] sm:tracking-[0.3em] text-[10px] sm:text-xs uppercase text-center px-6 max-w-[90vw] sm:max-w-none leading-relaxed"
+        transition={{ delay: 0.5, duration: 0.9 }}
+        className="mt-3 sm:mt-5 landscape:mt-2 text-cream/80 font-serif italic tracking-[0.2em] sm:tracking-[0.35em] text-[10px] sm:text-xs uppercase text-center px-4 max-w-[90vw] leading-relaxed relative z-10"
       >
         {t('loading.slogan')}
       </motion.p>
-      
-      <motion.div 
-        animate={{ scale: [1, 1.2, 1], opacity: [0.05, 0.15, 0.05] }}
-        transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
-        className="absolute w-[800px] h-[800px] border border-cream rounded-full pointer-events-none"
-      />
+
+      {/* Craft Loading Indicator with Numerical Progress (0% -> 100%) */}
+      <div className="mt-6 sm:mt-8 landscape:mt-4 flex flex-col items-center gap-2.5 relative z-10">
+        {/* Golden Progress Bar Container */}
+        <div className="w-40 sm:w-52 h-[2px] bg-[#E6C687]/20 rounded-full overflow-hidden relative">
+          <motion.div 
+            initial={{ width: "0%" }}
+            animate={{ width: "100%" }}
+            transition={{ duration: 2.3, ease: "easeInOut" }}
+            className="h-full bg-gradient-to-r from-[#C5A059] via-[#E6C687] to-[#C5A059] rounded-full shadow-[0_0_10px_rgba(230,198,137,0.7)]"
+          />
+        </div>
+
+        {/* Star & Numerical Progress Counter */}
+        <div className="flex items-center gap-2 text-[#E6C687] opacity-90">
+          <motion.span
+            animate={{ rotate: 360 }}
+            transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
+            className="text-[10px] leading-none inline-block"
+          >
+            ★
+          </motion.span>
+          <span className="text-[10px] sm:text-[11px] font-sans tracking-[0.2em] font-medium text-[#E6C687]">
+            {progress}%
+          </span>
+        </div>
+      </div>
     </motion.div>
   );
 };
 
-const Navbar = ({ currentPage, setCurrentPage, pathname }: { currentPage: 'home' | 'essence', setCurrentPage: (page: 'home' | 'essence') => void, pathname: string }) => {
+const Navbar = ({ currentPage, setCurrentPage, pathname, isAppLoading = false }: { currentPage: 'home' | 'essence', setCurrentPage: (page: 'home' | 'essence') => void, pathname: string, isAppLoading?: boolean }) => {
     const [isScrolled, setIsScrolled] = useState(false);
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const [isDarkBg, setIsDarkBg] = useState(true);
@@ -965,7 +1090,7 @@ const Navbar = ({ currentPage, setCurrentPage, pathname }: { currentPage: 'home'
     const textColor = isDarkBg ? 'text-cream' : 'text-forest';
 
   return (
-    <nav className={`fixed top-0 left-0 w-full z-[100] transition-all duration-300 ${isScrolled ? 'py-4' : 'py-8'} ${navBg}`}>
+    <nav className={`fixed top-0 left-0 w-full z-[100] transition-opacity duration-500 ${isAppLoading ? 'opacity-0 pointer-events-none' : 'opacity-100 pointer-events-auto'} ${isScrolled ? 'py-4' : 'py-8'} ${navBg}`}>
       <div className="max-w-7xl mx-auto px-6 flex justify-between items-center">
         {/* Logo with entry animation and Smart Invert */}
         <motion.a 
@@ -975,8 +1100,8 @@ const Navbar = ({ currentPage, setCurrentPage, pathname }: { currentPage: 'home'
                 navigateTo('/');
             }}
             initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 1, ease: "easeOut" }}
+            animate={isAppLoading ? { opacity: 0, y: -20 } : { opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, ease: "easeOut", delay: 0.1 }}
             className="relative"
             aria-label="M★BRAVO"
         >
@@ -995,8 +1120,8 @@ const Navbar = ({ currentPage, setCurrentPage, pathname }: { currentPage: 'home'
                 href={link.href}
                 onClick={(e) => handleLinkClick(e, link.href)}
                 initial={{ opacity: 0, y: -10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.5 + (i * 0.1), duration: 0.8 }}
+                animate={isAppLoading ? { opacity: 0, y: -10 } : { opacity: 1, y: 0 }}
+                transition={{ delay: 0.2 + (i * 0.08), duration: 0.6 }}
                 className={`text-[10px] uppercase tracking-[0.4em] font-bold transition-all duration-200 relative group ${textColor} ${
                   isHighlight 
                     ? `px-6 py-2 border rounded-full transition-all duration-200 ${
@@ -1018,8 +1143,8 @@ const Navbar = ({ currentPage, setCurrentPage, pathname }: { currentPage: 'home'
           {/* Elegant Minimalist Language Selector */}
           <motion.div 
             initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.5 + (NAV_LINKS_LIST.length * 0.1), duration: 0.8 }}
+            animate={isAppLoading ? { opacity: 0, y: -10 } : { opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 + (NAV_LINKS_LIST.length * 0.08), duration: 0.6 }}
             className={`flex items-center text-[10px] uppercase tracking-[0.2em] font-medium transition-all duration-200 pl-4 lg:pl-6 border-l ${isDarkBg ? 'border-cream/20' : 'border-forest/20'} ${textColor}`}
           >
             <button 
@@ -1042,7 +1167,8 @@ const Navbar = ({ currentPage, setCurrentPage, pathname }: { currentPage: 'home'
         {!mobileMenuOpen && (
           <motion.button 
             initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
+            animate={isAppLoading ? { opacity: 0, x: 20 } : { opacity: 1, x: 0 }}
+            transition={{ delay: 0.2, duration: 0.6 }}
             className={`md:hidden transition-colors duration-200 ${textColor}`}
             onClick={() => setMobileMenuOpen(true)}
             aria-label={lang === 'PT' ? 'Abrir Menu' : 'Open Menu'}
@@ -1531,6 +1657,11 @@ const Hero = () => {
                                         decoding="async"
                                         onError={(e) => {
                                           const target = e.currentTarget;
+                                          const parent = target.parentElement;
+                                          if (parent && parent.tagName === 'PICTURE') {
+                                            const sources = parent.querySelectorAll('source');
+                                            sources.forEach(s => s.remove());
+                                          }
                                           if (target.src !== bgItem.fallback) {
                                             target.src = bgItem.fallback;
                                           }
@@ -6975,23 +7106,10 @@ export default function App() {
     window.addEventListener('popstate', handlePopState);
     window.addEventListener('mbravo-navigate', handleCustomNav);
     
-    // Smooth scrolling to hash anchor upon initial page mount if hash exists in URL
-    if (window.location.hash) {
-      setTimeout(() => {
-        const hash = window.location.hash.replace('#', '');
-        let element = document.getElementById(hash);
-        if (!element && hash === 'colecao') {
-          element = document.getElementById('collection');
-        }
-        if (element) {
-          if (hash === 'collection' || hash === 'colecao') {
-            const targetScrollTop = getCollectionScrollTarget(element);
-            (window as any).lenis?.scrollTo(targetScrollTop, { duration: 1.2 });
-          } else {
-            (window as any).lenis?.scrollTo(element, { duration: 1.2 });
-          }
-        }
-      }, 1000);
+    // Clean scroll position reset on initial page load
+    window.scrollTo({ top: 0, behavior: 'auto' });
+    if ((window as any).lenis) {
+      (window as any).lenis.scrollTo(0, { immediate: true });
     }
 
     return () => {
@@ -7073,7 +7191,7 @@ export default function App() {
       </AnimatePresence>
 
       <main className="flex flex-col">
-        <Navbar currentPage={pathname === '/essencia' || pathname === '/essence' ? 'essence' : 'home'} setCurrentPage={(p) => navigateTo(p === 'essence' ? '/essencia' : '/')} pathname={pathname} />
+        <Navbar currentPage={pathname === '/essencia' || pathname === '/essence' ? 'essence' : 'home'} setCurrentPage={(p) => navigateTo(p === 'essence' ? '/essencia' : '/')} pathname={pathname} isAppLoading={loading} />
             
             <AnimatePresence mode="wait">
               {pathname === '/essencia' || pathname === '/essence' ? (
