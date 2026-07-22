@@ -101,10 +101,26 @@ export function suggestCorrectEmail(email: string): string | null {
 
 // Hero background images for automatic rotation
 const HERO_BACKGROUNDS = [
-  "https://i.ibb.co/KppF2KLq/Background.png",
-  "https://i.ibb.co/Z6z6D2W9/Background04.png",
-  "https://i.ibb.co/JjKC14LX/Backgrounde03.png",
-  "https://i.ibb.co/nK7Y2Rc/Background06.png"
+  {
+    mobile: "/hero-bg-1-mobile.webp",
+    desktop: "/hero-bg-1-desktop.webp",
+    fallback: "https://i.ibb.co/KppF2KLq/Background.png"
+  },
+  {
+    mobile: "/hero-bg-2-mobile.webp",
+    desktop: "/hero-bg-2-desktop.webp",
+    fallback: "https://i.ibb.co/Z6z6D2W9/Background04.png"
+  },
+  {
+    mobile: "/hero-bg-3-mobile.webp",
+    desktop: "/hero-bg-3-desktop.webp",
+    fallback: "https://i.ibb.co/JjKC14LX/Backgrounde03.png"
+  },
+  {
+    mobile: "/hero-bg-4-mobile.webp",
+    desktop: "/hero-bg-4-desktop.webp",
+    fallback: "https://i.ibb.co/nK7Y2Rc/Background06.png"
+  }
 ];
 
 // --- Constants & Types ---
@@ -1492,9 +1508,9 @@ const Hero = () => {
                         }}
                         className="absolute inset-0"
                     >
-                        {HERO_BACKGROUNDS.map((bgUrl, index) => (
+                        {HERO_BACKGROUNDS.map((bgItem, index) => (
                             <motion.div 
-                                key={bgUrl}
+                                key={bgItem.mobile}
                                 style={{ y: bgY, scale: bgScale }}
                                 initial={{ opacity: 0 }}
                                 animate={{ 
@@ -1504,10 +1520,10 @@ const Hero = () => {
                                 className="absolute inset-0 brightness-[0.46] contrast-[1.40] saturate-[1.05]"
                             >
                                 <picture className="w-full h-full block">
-                                    <source media="(max-width: 640px)" srcSet="https://images.unsplash.com/photo-1584917865442-de89df76afd3?auto=format&fit=crop&w=750&q=75&fm=webp" type="image/webp" />
-                                    <source media="(min-width: 641px)" srcSet={bgUrl} type="image/png" />
+                                    <source media="(max-width: 640px)" srcSet={bgItem.mobile} type="image/webp" />
+                                    <source media="(min-width: 641px)" srcSet={bgItem.desktop} type="image/webp" />
                                     <img 
-                                        src={bgUrl} 
+                                        src={bgItem.desktop} 
                                         alt={`M★BRAVO Background ${index + 1}`}
                                         className="w-full h-full object-cover"
                                         fetchPriority={index === 0 ? "high" : "auto"}
