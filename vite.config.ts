@@ -20,6 +20,10 @@ export default defineConfig({
   },
   build: {
     outDir: 'dist',
-    sourcemap: true,
+    sourcemap: false,
+    target: 'es2020',
+    cssMinify: true,
+    minify: 'esbuild',
+    chunkSizeWarningLimit: 1000,
   },
 })
