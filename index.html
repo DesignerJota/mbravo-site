@@ -20,19 +20,24 @@
     </noscript>
 
 
-    <!-- Preload Critical Hero Background Image for LCP Optimization -->
-    <link rel="preload" as="image" href="https://i.ibb.co/KppF2KLq/Background.png" fetchpriority="high" />
+    <!-- Preload Critical Hero Background Images (Responsive WebP for Mobile LCP) -->
+    <link rel="preload" as="image" href="https://images.unsplash.com/photo-1584917865442-de89df76afd3?auto=format&fit=crop&w=750&q=75&fm=webp" media="(max-width: 640px)" fetchpriority="high" type="image/webp" />
+    <link rel="preload" as="image" href="https://i.ibb.co/KppF2KLq/Background.png" media="(min-width: 641px)" fetchpriority="high" />
     
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     
     <!-- Pinterest Domain Verification Meta Tag -->
     <meta name="p:domain_verify" content="c32665e021fefd842c4d20a190181ba7"/>
 
-    <!-- Pinterest Tag Base Script (Pixel) -->
+    <!-- Deferred Pinterest Tag Base Script for Non-Blocking Initial Render -->
     <script>
-      !function(e){if(!window.pintrk){window.pintrk=function(){window.pintrk.queue.push(Array.prototype.slice.call(arguments))};var n=window.pintrk;n.queue=[],n.version="3.0";var t=document.createElement("script");t.async=!0,t.src=e;var r=document.getElementsByTagName("script")[0];r.parentNode.insertBefore(t,r)}}("https://s.pinterest.com/js/pintrk.js");
-      pintrk('load', '1426456723223', { em: 'handmade.mbravo@gmail.com' }); // standard base load with user's email hash or identifier
-      pintrk('page');
+      window.addEventListener('load', function() {
+        setTimeout(function() {
+          !function(e){if(!window.pintrk){window.pintrk=function(){window.pintrk.queue.push(Array.prototype.slice.call(arguments))};var n=window.pintrk;n.queue=[],n.version="3.0";var t=document.createElement("script");t.async=!0,t.src=e;var r=document.getElementsByTagName("script")[0];r.parentNode.insertBefore(t,r)}}("https://s.pinterest.com/js/pintrk.js");
+          pintrk('load', '1426456723223', { em: 'handmade.mbravo@gmail.com' });
+          pintrk('page');
+        }, 2000);
+      });
     </script>
     
     <!-- Meta Title and Brand Indexing Settings -->
