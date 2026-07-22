@@ -29,10 +29,10 @@ As seguintes secções da aplicação estão totalmente validadas, integradas e 
     *   Segregação do modal administrativo (`AdminDashboardModal`) do bundle principal de entrada, descarregando o código do painel apenas sob procura.
 *   **Estabilidade de Bundling do Vite & Framer Motion:**
     *   Remoção de `manualChunks` isolados no `vite.config.ts` para bibliotecas de UI/Motion, garantindo a inicialização coesa do contexto do React (`LayoutGroupContext.mjs`) sem exceções em tempo de execução.
-*   **Fase 1 & Fase 2 — Otimizações de Performance Mobile & Instant Render (Concluído com Sucesso):**
-    *   **Renderização Direta sem Timers Bloqueantes (`index.html` & `App.tsx`):** Remoção total do ecrã de intro artificial e do temporizador de 2,4s. O `index.html` volta a ter um `<div id="root"></div>` limpo e leve, permitindo ao React montar e pintar o Hero e a marca instantaneamente no Frame 1 (<0,3s), eliminando qualquer TBT (Total Blocking Time) ou bloqueio de FCP/LCP no Google PageSpeed Insights.
-    *   **Remoção de Links de Stock Externos & Imagens Locais Autênticas M★BRAVO:** Substituição de servidores externos por ativos WebP otimizados locais em `/public` (criados a partir do PNG original do ImgBB `Background.png`).
-    *   **Imagens Responsivas WebP no Hero (LCP Mobile & Desktop):** Preload local no `<head>` (`/hero-bg-1-mobile.webp` para `max-width: 640px` com apenas 45KB e `/hero-bg-1-desktop.webp` com 159KB), eliminando latência de servidores externos e reduzindo o peso do Hero em 98%.
+*   **Fase 1 & Fase 2 — Restauração da Versão Estável de Alta Performance:**
+    *   **Restauração Total do Ecrã de Abertura & Animação da Marca:** Restabelecida a transição da `LoadingScreen` com animação do logótipo e revelação fluida do Hero em `App.tsx`.
+    *   **Imagens Locais Autênticas M★BRAVO em WebP:** Imagens locais otimizadas em `/public` (`/hero-bg-1-mobile.webp` de 45KB e `/hero-bg-1-desktop.webp` de 159KB) ativas e renderizadas perfeitamente no elemento `<picture>` do Hero.
+    *   **Preload no `<head>`:** Preload condicional mantido no HTML para máxima velocidade de LCP nas imagens de abertura.
     *   **Defer de Scripts de Terceiros (Pinterest Pixel):** Execução do script do Pinterest postergada para após o carregamento inicial da página (`window.onload` + `setTimeout 2s`), eliminando bloqueios na thread principal durante FCP e LCP.
     *   **Code-Splitting Avançado & Lazy Loading de Modais (`React.lazy()`):** Extração de modais pesados (`LegalModal`, `AdminDashboardModal`) para chunks dinâmicos isolados.
     *   **Otimizações de Bundling Vite (`vite.config.ts`):** Ativação de minificação `esbuild` de alta performance, desativação de sourcemaps em produção, `target: 'es2020'` e minificação CSS nativa.
