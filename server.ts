@@ -88,6 +88,7 @@ function loadOrders() {
       console.error("[ORDERS DATABASE ERROR] Failed to load orders.json", err);
     }
   }
+
   return map;
 }
 
