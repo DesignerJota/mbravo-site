@@ -115,6 +115,40 @@ function saveOrders(map: Map<string, any>) {
 
 const activeOrders = loadOrders();
 
+// Persistent file-backed customer profile store (CRM)
+const getCustomersFilePath = () => {
+  const railwayPersistentDir = "/app/data";
+  try {
+    if (!fs.existsSync(railwayPersistentDir)) {
+      fs.mkdirSync(railwayPersistentDir, { recursive: true });
+    }
+    return path.join(railwayPersistentDir, "customers.json");
+  } catch (e) {
+    return path.join(process.cwd(), "customers.json");
+  }
+};
+
+const CUSTOMERS_FILE = getCustomersFilePath();
+
+function loadCustomers() {
+  if (fs.existsSync(CUSTOMERS_FILE)) {
+    try {
+      return JSON.parse(fs.readFileSync(CUSTOMERS_FILE, 'utf8'));
+    } catch (err) {
+      console.error("[CUSTOMERS DATABASE ERROR] Failed to load customers.json", err);
+    }
+  }
+  return {};
+}
+
+function saveCustomers(data: any) {
+  try {
+    fs.writeFileSync(CUSTOMERS_FILE, JSON.stringify(data, null, 2), 'utf8');
+  } catch (err) {
+    console.error("[CUSTOMERS DATABASE ERROR] Failed to save customers.json", err);
+  }
+}
+
 app.get("/robots.txt", (req, res) => {
   const host = req.headers.host || "";
   res.type("text/plain");
@@ -587,7 +621,7 @@ function abateProductStockForOrder(order: any) {
 }
 
 function restoreProductStockForOrder(order: any) {
-  if (!order || order.productStockAbated) return;
+  if (!order || !order.productStockAbated) return;
   order.productStockAbated = false;
 }
 
@@ -614,6 +648,49 @@ app.get("/api/admin/orders", verifyAdmin, (req, res) => {
   const ordersList = Array.from(currentOrders.values());
   ordersList.sort((a: any, b: any) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
   res.json({ success: true, orders: ordersList });
+});
+
+// GET CRM CUSTOMER PROFILE ENDPOINT
+app.get("/api/admin/customers/:email", verifyAdmin, (req, res) => {
+  const email = req.params.email?.toLowerCase().trim();
+  if (!email) return res.status(400).json({ error: "E-mail é obrigatório." });
+
+  const customers = loadCustomers();
+  const profile = customers[email] || {
+    email,
+    name: '',
+    phone: '',
+    instagram: '',
+    birthday: '',
+    instagramNotes: '',
+    customNotes: ''
+  };
+
+  res.json({ success: true, profile });
+});
+
+// POST CRM CUSTOMER PROFILE ENDPOINT
+app.post("/api/admin/customers/:email", verifyAdmin, (req, res) => {
+  const email = req.params.email?.toLowerCase().trim();
+  if (!email) return res.status(400).json({ error: "E-mail é obrigatório." });
+
+  const { name, phone, instagram, birthday, instagramNotes, customNotes } = req.body;
+  const customers = loadCustomers();
+
+  customers[email] = {
+    ...(customers[email] || {}),
+    email,
+    name: name || '',
+    phone: phone || '',
+    instagram: instagram || '',
+    birthday: birthday || '',
+    instagramNotes: instagramNotes || '',
+    customNotes: customNotes || '',
+    updatedAt: new Date().toISOString()
+  };
+
+  saveCustomers(customers);
+  res.json({ success: true, profile: customers[email] });
 });
 
 /**
