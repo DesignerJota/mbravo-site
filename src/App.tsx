@@ -3,8 +3,8 @@ import { createPortal } from 'react-dom';
 import { motion, AnimatePresence, useScroll, useTransform, useSpring, useVelocity, useMotionValue, animate } from 'motion/react';
 import { Menu, X, Instagram, Facebook, ArrowRight, ArrowLeft, ChevronLeft, ChevronRight, Share2, Mail, MessageCircle, Sparkles, Feather, Palette, Heart, Maximize2 } from 'lucide-react';
 import { loadStripe } from '@stripe/stripe-js';
-import { AdminDashboardModal } from './components/AdminDashboardModal';
-import { LegalModal } from './components/LegalModal';
+import Lenis from 'lenis';
+const AdminDashboardModal = React.lazy(() => import('./components/AdminDashboardModal'));
 const LegalModal = React.lazy(() => import('./components/LegalModal'));
 import { 
   useLanguage, 
@@ -942,26 +942,20 @@ const Navbar = ({ currentPage, setCurrentPage, pathname, isAppLoading = false }:
     const { lang: activeLang, t } = useLanguage();
     const lang = activeLang.toUpperCase() as 'PT' | 'EN';
 
-   useEffect(() => {
-    const lenis = (window as any).lenis;
-
-    if (mobileMenuOpen) {
-      document.body.style.overflow = 'hidden';
-      document.body.style.touchAction = 'none';
-      lenis?.stop();
-      window.dispatchEvent(new CustomEvent('mbravo-mobile-menu-open'));
-    } else {
-      document.body.style.overflow = '';
-      document.body.style.touchAction = '';
-      lenis?.start();
-    }
-
-    return () => {
-      document.body.style.overflow = '';
-      document.body.style.touchAction = '';
-      lenis?.start();
-    };
-  }, [mobileMenuOpen]);
+    useEffect(() => {
+        if (mobileMenuOpen) {
+            document.body.style.overflow = 'hidden';
+            (window as any).lenis?.stop();
+            window.dispatchEvent(new CustomEvent('mbravo-mobile-menu-open'));
+        } else {
+            document.body.style.overflow = '';
+            (window as any).lenis?.start();
+        }
+        return () => {
+            document.body.style.overflow = '';
+            (window as any).lenis?.start();
+        };
+    }, [mobileMenuOpen]);
 
     const handleLanguageChange = (newLang: 'PT' | 'EN') => {
         localStorage.setItem('mbravo_lang', newLang);
@@ -1617,49 +1611,51 @@ const Hero = () => {
                             ease: "easeInOut"
                         }}
                         className="absolute inset-0"
-                   className="absolute inset-0"
-        >
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={bgIndex}
-              initial={{ opacity: 0, scale: 1.02 }}
-              animate={{ opacity: 0.93, scale: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 2.2, ease: "easeInOut" }}
-              className="absolute inset-0 brightness-[0.46] contrast-[1.40] saturate-[1.05]"
-            >
-              <picture className="w-full h-full block">
-                <source media="(max-width: 640px)" srcSet={HERO_BACKGROUNDS[bgIndex].mobile} type="image/webp" />
-                <source media="(min-width: 641px)" srcSet={HERO_BACKGROUNDS[bgIndex].desktop} type="image/webp" />
-                <img
-                  src={HERO_BACKGROUNDS[bgIndex].desktop}
-                  alt={`M★BRAVO Background ${bgIndex + 1}`}
-                  className="w-full h-full object-cover"
-                  fetchPriority={bgIndex === 0 ? "high" : "low"}
-                  loading={bgIndex === 0 ? "eager" : "lazy"}
-                  width={1920}
-                  height={1080}
-                  decoding="async"
-                  onError={(e) => {
-                    const target = e.currentTarget;
-                    const parent = target.parentElement;
-                    if (parent && parent.tagName === 'PICTURE') {
-                      const sources = parent.querySelectorAll('source');
-                      sources.forEach((s) => s.remove());
-                    }
-                    if (target.src !== HERO_BACKGROUNDS[bgIndex].fallback) {
-                      target.src = HERO_BACKGROUNDS[bgIndex].fallback;
-                    }
-                  }}
-                  style={{
-                    WebkitBackfaceVisibility: 'hidden',
-                    backfaceVisibility: 'hidden',
-                    transform: 'translateZ(0)',
-                  }}
-                />
-              </picture>
-            </motion.div>
-          </AnimatePresence>
+                    >
+                        {HERO_BACKGROUNDS.map((bgItem, index) => (
+                            <motion.div 
+                                key={bgItem.mobile}
+                                style={{ y: bgY, scale: bgScale }}
+                                initial={{ opacity: index === 0 ? 0.93 : 0 }}
+                                animate={{ 
+                                    opacity: bgIndex === index ? 0.93 : 0,
+                                }}
+                                transition={{ duration: 2.2, ease: "easeInOut" }}
+                                className="absolute inset-0 brightness-[0.46] contrast-[1.40] saturate-[1.05]"
+                            >
+                                <picture className="w-full h-full block">
+                                    <source media="(max-width: 640px)" srcSet={bgItem.mobile} type="image/webp" />
+                                    <source media="(min-width: 641px)" srcSet={bgItem.desktop} type="image/webp" />
+                                    <img 
+                                        src={bgItem.desktop} 
+                                        alt={`M★BRAVO Background ${index + 1}`}
+                                        className="w-full h-full object-cover"
+                                        fetchPriority={index === 0 ? "high" : "low"}
+                                        loading={index === 0 ? "eager" : "lazy"}
+                                        width={1920}
+                                        height={1080}
+                                        decoding="async"
+                                        onError={(e) => {
+                                          const target = e.currentTarget;
+                                          const parent = target.parentElement;
+                                          if (parent && parent.tagName === 'PICTURE') {
+                                            const sources = parent.querySelectorAll('source');
+                                            sources.forEach(s => s.remove());
+                                          }
+                                          if (target.src !== bgItem.fallback) {
+                                            target.src = bgItem.fallback;
+                                          }
+                                        }}
+                                        style={{
+                                            WebkitBackfaceVisibility: 'hidden',
+                                            backfaceVisibility: 'hidden',
+                                            transform: 'translateZ(0)',
+                                        }}
+                                    />
+                                </picture>
+                            </motion.div>
+                        ))}
+                    </motion.div>
 
                         {/* Golden ambient studio lighting leak/flare overlay, adding richness and luxury with organic movement */}
                         <motion.div 
@@ -1704,6 +1700,7 @@ const Hero = () => {
                         {/* Radial gradient vignette and linear gradients for ultimate depth and blend - bottom is completely transparent to flow into page below */}
                         <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_30%,#243119_90%)] z-10 pointer-events-none opacity-50 [mask-image:linear-gradient(to_bottom,black_75%,transparent_100%)]" />
                         <div className="absolute inset-0 bg-gradient-to-b from-[#243119]/40 via-transparent to-transparent z-10 pointer-events-none" />
+                    </div>
          
                     {/* Cinematic Centered Editorial Content */}
                     <motion.div 
@@ -1781,6 +1778,9 @@ const Hero = () => {
                                 {t('brand.subheadline')}
                             </motion.p>
                         </motion.div>
+
+
+                    </motion.div>
  
             {/* Corner Labels (Editorial feel) */}
             <div className="absolute bottom-12 left-12 hidden lg:block z-20 pointer-events-none select-none">
@@ -1790,7 +1790,9 @@ const Hero = () => {
                 <span className="text-[9px] uppercase tracking-[0.4em] text-cream/20 [writing-mode:vertical-rl]">HANDMADE IN PORTUGAL</span>
             </div>
                 </section>
-      );
+        </>
+    );
+};
 
 const StorySection = () => {
     const containerRef = useRef(null);
@@ -1798,8 +1800,7 @@ const StorySection = () => {
         target: containerRef,
         offset: ["start end", "end start"]
     });
-    // Adicionámos 'lang' ao hook de linguagem:
-    const { t, lang } = useLanguage();
+    const { t } = useLanguage();
 
     const smoothProgress = useSpring(scrollYProgress, {
         stiffness: 100,
@@ -1905,7 +1906,7 @@ const StorySection = () => {
                                     className={`h-1 rounded-full transition-all duration-500 cursor-pointer ${
                                         currentImg === idx ? 'w-8 bg-cream' : 'w-1.5 bg-cream/40 hover:bg-cream/70'
                                     }`}
-                                    aria-label={`${t('common.slide') || (lang === 'PT' ? 'Diapositivo' : 'Slide')} ${idx + 1}`}
+                                    aria-label={`Show slide ${idx + 1}`}
                                 />
                             ))}
                         </div>
@@ -7391,3 +7392,11 @@ export default function App() {
     </div>
   );
 }
+
+Adobe Acrobat
+
+
+Resuma isto
+
+
+Perguntar ao Assistente de IA
