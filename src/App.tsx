@@ -1704,7 +1704,6 @@ const Hero = () => {
                         {/* Radial gradient vignette and linear gradients for ultimate depth and blend - bottom is completely transparent to flow into page below */}
                         <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_30%,#243119_90%)] z-10 pointer-events-none opacity-50 [mask-image:linear-gradient(to_bottom,black_75%,transparent_100%)]" />
                         <div className="absolute inset-0 bg-gradient-to-b from-[#243119]/40 via-transparent to-transparent z-10 pointer-events-none" />
-                    </div>
          
                     {/* Cinematic Centered Editorial Content */}
                     <motion.div 
@@ -1782,9 +1781,6 @@ const Hero = () => {
                                 {t('brand.subheadline')}
                             </motion.p>
                         </motion.div>
-
-
-                    </motion.div>
  
             {/* Corner Labels (Editorial feel) */}
             <div className="absolute bottom-12 left-12 hidden lg:block z-20 pointer-events-none select-none">
@@ -1794,9 +1790,8 @@ const Hero = () => {
                 <span className="text-[9px] uppercase tracking-[0.4em] text-cream/20 [writing-mode:vertical-rl]">HANDMADE IN PORTUGAL</span>
             </div>
                 </section>
-        </>
-    );
-};
+      );
+
 const StorySection = () => {
     const containerRef = useRef(null);
     const { scrollYProgress } = useScroll({
