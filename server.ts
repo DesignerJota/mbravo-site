@@ -164,11 +164,17 @@ app.post("/api/payment/create-intent", async (req, res) => {
     const isBulk = parseInt(selections.quantidade || "1") > 1;
     const priority = (isCustomSize || isBulk) ? "ALTA (Atelier Urgente)" : "NORMAL";
 
+    const stripeKey = process.env.STRIPE_SECRET_KEY || "";
+    const isTestMode = !stripeKey.startsWith("sk_live");
+
     const order: any = {
       orderId,
       productName: product.name,
       price: product.price,
-      selections,
+      selections: {
+        ...selections,
+        hasSize: selections.hasSize ?? (product.hasSize ?? (product.sizes && product.sizes.length > 0))
+      },
       customer: {
         nome: checkoutForm.nome,
         email: checkoutForm.email,
@@ -182,9 +188,23 @@ app.post("/api/payment/create-intent", async (req, res) => {
       status: "pending_payment",
       priority,
       createdAt,
+      isTestMode,
       mbwayPhone: checkoutForm.mbwayPhone?.replace(/\s+/g, ""),
       cardNumber: checkoutForm.cardNumber?.replace(/\s+/g, ""),
       emailSent: false
+    };
+
+    const commonMetadata = {
+      orderId,
+      productName: product.name || '',
+      cor: selections.cor || '',
+      tamanho: selections.tamanho || '',
+      hasSize: (selections.hasSize !== false && product.hasSize !== false && product.sizes && product.sizes.length > 0) ? 'true' : 'false',
+      quantidade: selections.quantidade || '1',
+      customerName: checkoutForm.nome || '',
+      customerEmail: checkoutForm.email || '',
+      customerPhone: checkoutForm.telefone || '',
+      nif: checkoutForm.nif || ''
     };
 
     // Process payment using Stripe if available
@@ -249,11 +269,7 @@ app.post("/api/payment/create-intent", async (req, res) => {
             payment_method_configuration: paymentMethodConfig as any,
             description: `M BRAVO - Encomenda ${orderId}`,
             receipt_email: checkoutForm.email,
-            metadata: {
-              orderId,
-              customerName: checkoutForm.nome,
-              customerEmail: checkoutForm.email
-            }
+            metadata: commonMetadata
           });
 
           console.log(`[STRIPE] PaymentIntent created status: ${paymentIntent.status}`);
@@ -336,11 +352,7 @@ app.post("/api/payment/create-intent", async (req, res) => {
             return_url: `${req.headers.origin || 'https://www.mbravobycarolina.com'}/`,
             description: `M BRAVO - Encomenda ${orderId}`,
             receipt_email: customerEmail,
-            metadata: {
-              orderId,
-              customerName,
-              customerEmail
-            }
+            metadata: commonMetadata
           });
 
           console.log(`[STRIPE MULTIBANCO] Created PaymentIntent ID: ${paymentIntent.id}, status: ${paymentIntent.status}`);
@@ -440,11 +452,7 @@ app.post("/api/payment/create-intent", async (req, res) => {
             },
             description: `M BRAVO - Encomenda ${orderId}`,
             receipt_email: checkoutForm.email,
-            metadata: {
-              orderId,
-              customerName: checkoutForm.nome,
-              customerEmail: checkoutForm.email
-            }
+            metadata: commonMetadata
           });
 
           order.stripePaymentIntentId = paymentIntent.id;
@@ -504,11 +512,7 @@ app.post("/api/payment/create-intent", async (req, res) => {
             payment_method_configuration: paymentMethodConfig as any,
             description: `M BRAVO - Encomenda ${orderId}`,
             receipt_email: checkoutForm.email,
-            metadata: {
-              orderId,
-              customerName: checkoutForm.nome,
-              customerEmail: checkoutForm.email
-            }
+            metadata: commonMetadata
           });
 
           order.stripePaymentIntentId = paymentIntent.id;
@@ -724,14 +728,21 @@ app.post("/api/payment/webhook", (req, res) => {
 
     const createdTime = stripeObj.created ? new Date(stripeObj.created * 1000).toISOString() : new Date().toISOString();
 
+    const productName = metadata.productName || "Peça M★BRAVO (Recuperada via Stripe)";
+    const cor = metadata.cor || "Única";
+    const tamanho = metadata.tamanho || "";
+    const hasSize = metadata.hasSize === 'true';
+    const quantidade = metadata.quantidade || "1";
+
     order = {
       orderId,
-      productName: "Peça M★BRAVO (Recuperada via Stripe)",
+      productName,
       price: `${priceValue} €`,
       selections: {
-        cor: "Única",
-        tamanho: "Único",
-        quantidade: "1"
+        cor,
+        tamanho,
+        quantidade,
+        hasSize
       },
       customer: {
         nome: customerName,
@@ -744,9 +755,10 @@ app.post("/api/payment/webhook", (req, res) => {
       },
       paymentMethod: method,
       status: "pending_payment",
-      priority: "normal",
+      priority: "NORMAL",
       createdAt: createdTime,
       stripePaymentIntentId: stripeIntentId || stripeObj.id || "",
+      isTestMode: stripeObj.livemode === false,
       emailSent: false
     };
 
