@@ -4,7 +4,6 @@ import fs from "fs";
 import { createServer as createViteServer } from "vite";
 import { sendTransactionEmails, sendMultibancoEmails, sendShippedEmails, OrderData } from "./src/lib/emailService";
 import Stripe from "stripe";
-import pg from "pg";
 
 const app = express();
 const PORT = process.env.PORT ? parseInt(process.env.PORT, 10) : 3000;
@@ -169,7 +168,7 @@ app.post("/api/payment/create-intent", async (req, res) => {
       senderEmail: STORE_SENDER_EMAIL,
       atelierEmail: ATELIER_PRODUCTION_EMAIL,
       paymentMethod,
-      status: "pending_payment", // Aguarda pagamento!
+      status: "pending_payment", // Aguarda confirmação do pagamento
       priority,
       createdAt,
       isTestMode,
@@ -192,7 +191,7 @@ app.post("/api/payment/create-intent", async (req, res) => {
       nif: checkoutForm.nif || ''
     };
 
-    // Robusta conversão de preço para cêntimos (Trata 35,00€ e 16,00€ de forma limpa)
+    // Robusta conversão de preço para cêntimos
     let finalAmountInCents = req.body.amountInCents;
     if (!finalAmountInCents || finalAmountInCents <= 0) {
       try {
@@ -316,6 +315,7 @@ app.post("/api/payment/create-intent", async (req, res) => {
         };
       }
 
+      // Envia APENAS o e-mail com as instruções de Multibanco (entidade e referência)
       if (order.multibancoRef) {
         try {
           const mbEmails = sendMultibancoEmails(order, order.multibancoRef);
@@ -587,7 +587,7 @@ function abateProductStockForOrder(order: any) {
 }
 
 function restoreProductStockForOrder(order: any) {
-  if (!order || !order.productStockAbated) return;
+  if (!order || order.productStockAbated) return;
   order.productStockAbated = false;
 }
 
@@ -614,6 +614,63 @@ app.get("/api/admin/orders", verifyAdmin, (req, res) => {
   const ordersList = Array.from(currentOrders.values());
   ordersList.sort((a: any, b: any) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
   res.json({ success: true, orders: ordersList });
+});
+
+/**
+ * 4. ROTA DE CRIAÇÃO MANUAL DE VENDA (ADMIN DASHBOARD)
+ */
+app.post("/api/admin/orders/create", verifyAdmin, (req, res) => {
+  try {
+    const { productName, price, selections, customer, paymentMethod, status } = req.body;
+
+    if (!productName || !customer?.nome) {
+      return res.status(400).json({ error: "Nome do produto e cliente são obrigatórios." });
+    }
+
+    const orderId = `MB-MAN-${Math.floor(1000 + Math.random() * 9000)}`;
+    const createdAt = new Date().toISOString();
+
+    const order: any = {
+      orderId,
+      productName,
+      price: typeof price === 'number' ? `${price.toFixed(2)} €` : price,
+      selections: selections || { cor: "Única", tamanho: "M", quantidade: "1" },
+      customer: {
+        nome: customer.nome,
+        email: customer.email?.trim() || STORE_SENDER_EMAIL,
+        telefone: customer.telefone || "",
+        morada: customer.morada || "",
+        codigoPostal: customer.codigoPostal || "",
+        cidade: customer.cidade || "",
+        nif: customer.nif || ""
+      },
+      senderEmail: STORE_SENDER_EMAIL,
+      atelierEmail: ATELIER_PRODUCTION_EMAIL,
+      paymentMethod: paymentMethod || "manual",
+      status: status || "paid",
+      priority: "NORMAL",
+      createdAt,
+      emailSent: false
+    };
+
+    // Se a venda for inserida já como paga, pode disparar os e-mails de confirmação
+    if (order.status === 'paid') {
+      try {
+        order.emailLinks = sendTransactionEmails(order);
+        order.emailSent = true;
+      } catch (err) {
+        console.error("[MANUAL ORDER EMAIL ERROR]", err);
+      }
+    }
+
+    activeOrders.set(orderId, order);
+    saveOrders(activeOrders);
+
+    res.json({ success: true, order });
+  } catch (error) {
+    console.error("[MANUAL ORDER CREATION ERROR]", error);
+    res.status(500).json({ error: "Erro ao criar encomenda manual." });
+  }
 });
 
 // Arranque do Servidor
