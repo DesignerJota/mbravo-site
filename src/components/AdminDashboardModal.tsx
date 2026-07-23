@@ -77,7 +77,7 @@ export default function AdminDashboardModal({ onClose, shopCategories = [] }: Ad
   const [editingMaterial, setEditingMaterial] = useState<any | null>(null);
 
   // Analytics simulation toggle state
-  const [showSimulatedData, setShowSimulatedData] = useState<boolean>(true);
+  const [showSimulatedData, setShowSimulatedData] = useState<boolean>(false);
 
   // CRM states
   const [selectedCustomerEmail, setSelectedCustomerEmail] = useState<string | null>(null);
