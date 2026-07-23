@@ -1611,51 +1611,49 @@ const Hero = () => {
                             ease: "easeInOut"
                         }}
                         className="absolute inset-0"
-                    >
-                        {HERO_BACKGROUNDS.map((bgItem, index) => (
-                            <motion.div 
-                                key={bgItem.mobile}
-                                style={{ y: bgY, scale: bgScale }}
-                                initial={{ opacity: index === 0 ? 0.93 : 0 }}
-                                animate={{ 
-                                    opacity: bgIndex === index ? 0.93 : 0,
-                                }}
-                                transition={{ duration: 2.2, ease: "easeInOut" }}
-                                className="absolute inset-0 brightness-[0.46] contrast-[1.40] saturate-[1.05]"
-                            >
-                                <picture className="w-full h-full block">
-                                    <source media="(max-width: 640px)" srcSet={bgItem.mobile} type="image/webp" />
-                                    <source media="(min-width: 641px)" srcSet={bgItem.desktop} type="image/webp" />
-                                    <img 
-                                        src={bgItem.desktop} 
-                                        alt={`M★BRAVO Background ${index + 1}`}
-                                        className="w-full h-full object-cover"
-                                        fetchPriority={index === 0 ? "high" : "low"}
-                                        loading={index === 0 ? "eager" : "lazy"}
-                                        width={1920}
-                                        height={1080}
-                                        decoding="async"
-                                        onError={(e) => {
-                                          const target = e.currentTarget;
-                                          const parent = target.parentElement;
-                                          if (parent && parent.tagName === 'PICTURE') {
-                                            const sources = parent.querySelectorAll('source');
-                                            sources.forEach(s => s.remove());
-                                          }
-                                          if (target.src !== bgItem.fallback) {
-                                            target.src = bgItem.fallback;
-                                          }
-                                        }}
-                                        style={{
-                                            WebkitBackfaceVisibility: 'hidden',
-                                            backfaceVisibility: 'hidden',
-                                            transform: 'translateZ(0)',
-                                        }}
-                                    />
-                                </picture>
-                            </motion.div>
-                        ))}
-                    </motion.div>
+                   className="absolute inset-0"
+        >
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={bgIndex}
+              initial={{ opacity: 0, scale: 1.02 }}
+              animate={{ opacity: 0.93, scale: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 2.2, ease: "easeInOut" }}
+              className="absolute inset-0 brightness-[0.46] contrast-[1.40] saturate-[1.05]"
+            >
+              <picture className="w-full h-full block">
+                <source media="(max-width: 640px)" srcSet={HERO_BACKGROUNDS[bgIndex].mobile} type="image/webp" />
+                <source media="(min-width: 641px)" srcSet={HERO_BACKGROUNDS[bgIndex].desktop} type="image/webp" />
+                <img
+                  src={HERO_BACKGROUNDS[bgIndex].desktop}
+                  alt={`M★BRAVO Background ${bgIndex + 1}`}
+                  className="w-full h-full object-cover"
+                  fetchPriority={bgIndex === 0 ? "high" : "low"}
+                  loading={bgIndex === 0 ? "eager" : "lazy"}
+                  width={1920}
+                  height={1080}
+                  decoding="async"
+                  onError={(e) => {
+                    const target = e.currentTarget;
+                    const parent = target.parentElement;
+                    if (parent && parent.tagName === 'PICTURE') {
+                      const sources = parent.querySelectorAll('source');
+                      sources.forEach((s) => s.remove());
+                    }
+                    if (target.src !== HERO_BACKGROUNDS[bgIndex].fallback) {
+                      target.src = HERO_BACKGROUNDS[bgIndex].fallback;
+                    }
+                  }}
+                  style={{
+                    WebkitBackfaceVisibility: 'hidden',
+                    backfaceVisibility: 'hidden',
+                    transform: 'translateZ(0)',
+                  }}
+                />
+              </picture>
+            </motion.div>
+          </AnimatePresence>
 
                         {/* Golden ambient studio lighting leak/flare overlay, adding richness and luxury with organic movement */}
                         <motion.div 
