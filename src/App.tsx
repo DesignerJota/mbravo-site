@@ -942,20 +942,26 @@ const Navbar = ({ currentPage, setCurrentPage, pathname, isAppLoading = false }:
     const { lang: activeLang, t } = useLanguage();
     const lang = activeLang.toUpperCase() as 'PT' | 'EN';
 
-    useEffect(() => {
-        if (mobileMenuOpen) {
-            document.body.style.overflow = 'hidden';
-            (window as any).lenis?.stop();
-            window.dispatchEvent(new CustomEvent('mbravo-mobile-menu-open'));
-        } else {
-            document.body.style.overflow = '';
-            (window as any).lenis?.start();
-        }
-        return () => {
-            document.body.style.overflow = '';
-            (window as any).lenis?.start();
-        };
-    }, [mobileMenuOpen]);
+   useEffect(() => {
+    const lenis = (window as any).lenis;
+
+    if (mobileMenuOpen) {
+      document.body.style.overflow = 'hidden';
+      document.body.style.touchAction = 'none';
+      lenis?.stop();
+      window.dispatchEvent(new CustomEvent('mbravo-mobile-menu-open'));
+    } else {
+      document.body.style.overflow = '';
+      document.body.style.touchAction = '';
+      lenis?.start();
+    }
+
+    return () => {
+      document.body.style.overflow = '';
+      document.body.style.touchAction = '';
+      lenis?.start();
+    };
+  }, [mobileMenuOpen]);
 
     const handleLanguageChange = (newLang: 'PT' | 'EN') => {
         localStorage.setItem('mbravo_lang', newLang);
