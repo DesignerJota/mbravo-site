@@ -76,9 +76,6 @@ export default function AdminDashboardModal({ onClose, shopCategories = [] }: Ad
   const [isSavingInventory, setIsSavingInventory] = useState(false);
   const [editingMaterial, setEditingMaterial] = useState<any | null>(null);
 
-  // Analytics simulation toggle state
-  const [showSimulatedData, setShowSimulatedData] = useState<boolean>(false);
-
   // CRM states
   const [selectedCustomerEmail, setSelectedCustomerEmail] = useState<string | null>(null);
   const [customerProfile, setCustomerProfile] = useState<any | null>(null);
@@ -2143,25 +2140,17 @@ export default function AdminDashboardModal({ onClose, shopCategories = [] }: Ad
             const successOrdersList = [...paidOrdersList, ...shippedOrdersList, ...deliveredOrdersList];
             const hasRealPaid = successOrdersList.length > 0;
 
-            // Determine what data to display based on showSimulatedData
-            const useSimulated = showSimulatedData && !hasRealPaid;
-
             // Counts & Values
-            const totalOrdersCount = useSimulated ? 183 : orders.length;
-            const successOrdersCount = useSimulated ? 152 : successOrdersList.length;
-            const pendingOrdersCount = useSimulated ? 18 : pendingOrdersList.length;
-            const failedOrdersCount = useSimulated ? 13 : failedOrdersList.length;
-            const paidOrdersCount = useSimulated ? 5 : paidOrdersList.length;
-            const shippedOrdersCount = useSimulated ? 12 : shippedOrdersList.length;
-            const deliveredOrdersCount = useSimulated ? 135 : deliveredOrdersList.length;
+            const totalOrdersCount = orders.length;
+            const successOrdersCount = successOrdersList.length;
+            const pendingOrdersCount = pendingOrdersList.length;
+            const failedOrdersCount = failedOrdersList.length;
+            const paidOrdersCount = paidOrdersList.length;
+            const shippedOrdersCount = shippedOrdersList.length;
+            const deliveredOrdersCount = deliveredOrdersList.length;
 
-            const successRevenue = useSimulated 
-              ? 19340 
-              : successOrdersList.reduce((sum, o) => sum + parsePrice(o.price), 0);
-              
-            const pendingRevenue = useSimulated 
-              ? 1680 
-              : pendingOrdersList.reduce((sum, o) => sum + parsePrice(o.price), 0);
+            const successRevenue = successOrdersList.reduce((sum, o) => sum + parsePrice(o.price), 0);
+            const pendingRevenue = pendingOrdersList.reduce((sum, o) => sum + parsePrice(o.price), 0);
 
             const conversionRate = totalOrdersCount > 0 
               ? Math.round((successOrdersCount / totalOrdersCount) * 100) 
@@ -2172,97 +2161,61 @@ export default function AdminDashboardModal({ onClose, shopCategories = [] }: Ad
               : 0;
 
             // Group sales by product
-            let topProducts: { name: string; count: number; revenue: number }[] = [];
-            
-            if (useSimulated) {
-              topProducts = [
-                { name: 'Alma Cardigan', count: 48, revenue: 6240 },
-                { name: 'Marea Bikini', count: 35, revenue: 3150 },
-                { name: 'African Flower Pouch', count: 29, revenue: 1160 },
-                { name: 'Coral Bikini Top', count: 22, revenue: 1540 },
-                { name: 'Classic Coasters (Set de 4)', count: 18, revenue: 630 }
-              ];
-            } else {
-              const productSales: { [name: string]: { count: number; revenue: number } } = {};
-              successOrdersList.forEach(o => {
-                const name = o.productName || 'Peça Personalizada';
-                const qty = parseInt(o.selections?.quantidade || "1") || 1;
-                const priceVal = parsePrice(o.price);
-                if (!productSales[name]) {
-                  productSales[name] = { count: 0, revenue: 0 };
-                }
-                productSales[name].count += qty;
-                productSales[name].revenue += priceVal;
-              });
+            const productSales: { [name: string]: { count: number; revenue: number } } = {};
+            successOrdersList.forEach(o => {
+              const name = o.productName || 'Peça Personalizada';
+              const qty = parseInt(o.selections?.quantidade || "1") || 1;
+              const priceVal = parsePrice(o.price);
+              if (!productSales[name]) {
+                productSales[name] = { count: 0, revenue: 0 };
+              }
+              productSales[name].count += qty;
+              productSales[name].revenue += priceVal;
+            });
 
-              topProducts = Object.entries(productSales)
-                .map(([name, data]) => ({ name, ...data }))
-                .sort((a, b) => b.count - a.count);
-            }
+            const topProducts = Object.entries(productSales)
+              .map(([name, data]) => ({ name, ...data }))
+              .sort((a, b) => b.count - a.count);
 
             // Active crafting workload: sum of crafting times of active 'paid' orders
             let totalActiveCraftingDays = 0;
-            if (useSimulated) {
-              totalActiveCraftingDays = 42; // Simulation workload
-            } else {
-              paidOrdersList.forEach(o => {
-                const qty = parseInt(o.selections?.quantidade || "1") || 1;
-                let itemCraftingTime = 10; // Default fallback
-                if (catalog && catalog.length > 0) {
-                  for (const cat of catalog) {
-                    if (cat.products) {
-                      const match = cat.products.find((p: any) => p.name.toLowerCase() === o.productName?.toLowerCase());
-                      if (match && match.craftingTime !== undefined && match.craftingTime !== null && match.craftingTime !== '') {
-                        itemCraftingTime = parseInt(match.craftingTime, 10) || 10;
-                      }
+            paidOrdersList.forEach(o => {
+              const qty = parseInt(o.selections?.quantidade || "1") || 1;
+              let itemCraftingTime = 10; // Default fallback
+              if (catalog && catalog.length > 0) {
+                for (const cat of catalog) {
+                  if (cat.products) {
+                    const match = cat.products.find((p: any) => p.name.toLowerCase() === o.productName?.toLowerCase());
+                    if (match && match.craftingTime !== undefined && match.craftingTime !== null && match.craftingTime !== '') {
+                      itemCraftingTime = parseInt(match.craftingTime, 10) || 10;
                     }
                   }
                 }
-                totalActiveCraftingDays += itemCraftingTime * qty;
-              });
-            }
+              }
+              totalActiveCraftingDays += itemCraftingTime * qty;
+            });
 
             // Monthly Trend Chart Data
             const monthsPT = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
             const currentMonthIndex = new Date().getMonth();
             
-            let activeChartData: { month: string; revenue: number; ordersCount: number }[] = [];
+            const monthlyRealData = Array(12).fill(0).map((_, i) => ({
+              month: monthsPT[i],
+              revenue: 0,
+              ordersCount: 0
+            }));
             
-            if (useSimulated) {
-              const simulatedData = [
-                { month: 'Jan', revenue: 1250, ordersCount: 10 },
-                { month: 'Fev', revenue: 1480, ordersCount: 12 },
-                { month: 'Mar', revenue: 1320, ordersCount: 11 },
-                { month: 'Abr', revenue: 1980, ordersCount: 15 },
-                { month: 'Mai', revenue: 2450, ordersCount: 19 },
-                { month: 'Jun', revenue: 2210, ordersCount: 17 },
-                { month: 'Jul', revenue: 2890, ordersCount: 22 },
-                { month: 'Ago', revenue: 2600, ordersCount: 20 },
-                { month: 'Set', revenue: 3100, ordersCount: 24 },
-                { month: 'Out', revenue: 3450, ordersCount: 27 },
-                { month: 'Nov', revenue: 3800, ordersCount: 30 },
-                { month: 'Dez', revenue: 4950, ordersCount: 38 },
-              ];
-              activeChartData = simulatedData.slice(0, currentMonthIndex + 1);
-            } else {
-              const monthlyRealData = Array(12).fill(0).map((_, i) => ({
-                month: monthsPT[i],
-                revenue: 0,
-                ordersCount: 0
-              }));
-              
-              successOrdersList.forEach(o => {
-                if (o.createdAt) {
-                  const date = new Date(o.createdAt);
-                  const mIndex = date.getMonth();
-                  if (date.getFullYear() === new Date().getFullYear()) {
-                    monthlyRealData[mIndex].revenue += parsePrice(o.price);
-                    monthlyRealData[mIndex].ordersCount += 1;
-                  }
+            successOrdersList.forEach(o => {
+              if (o.createdAt) {
+                const date = new Date(o.createdAt);
+                const mIndex = date.getMonth();
+                if (date.getFullYear() === new Date().getFullYear()) {
+                  monthlyRealData[mIndex].revenue += parsePrice(o.price);
+                  monthlyRealData[mIndex].ordersCount += 1;
                 }
-              });
-              activeChartData = monthlyRealData.slice(0, currentMonthIndex + 1);
-            }
+              }
+            });
+            const activeChartData = monthlyRealData.slice(0, currentMonthIndex + 1);
 
             const maxRevenueInChart = Math.max(...activeChartData.map(d => d.revenue), 100);
 
@@ -2332,30 +2285,20 @@ export default function AdminDashboardModal({ onClose, shopCategories = [] }: Ad
 
             return (
               <div className="space-y-6">
-                {/* SUBHEADER WITH TOGGLE */}
+                {/* SUBHEADER WITH OPERATIONAL STATUS */}
                 <div className="bg-white border border-forest/5 p-5 rounded-[16px] shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                   <div>
                     <h4 className="font-serif text-sm font-medium text-forest">Painel de Gestão e Análise de Vendas</h4>
                   </div>
                   
-                  {/* SIMULATION TOGGLE */}
-                  {!hasRealPaid && (
-                    <div className="flex items-center gap-2">
-                      <span className="text-[10px] font-medium text-forest/60">Modo de Visualização:</span>
-                      <button
-                        type="button"
-                        onClick={() => setShowSimulatedData(!showSimulatedData)}
-                        className={`px-3 py-1.5 rounded-lg text-[10px] font-bold tracking-wider uppercase transition-all flex items-center gap-1.5 cursor-pointer border ${
-                          showSimulatedData 
-                            ? 'bg-[#BACAA5]/20 text-emerald-800 border-emerald-600/20' 
-                            : 'bg-cream text-forest/70 border-forest/10'
-                        }`}
-                      >
-                        <span className={`w-1.5 h-1.5 rounded-full ${showSimulatedData ? 'bg-emerald-600 animate-pulse' : 'bg-forest/40'}`}></span>
-                        {showSimulatedData ? 'Dados de Demonstração Ativos' : 'Apenas Dados Reais'}
-                      </button>
-                    </div>
-                  )}
+                  {/* REAL-TIME PERSISTENCE BADGE */}
+                  <div className="flex items-center gap-2">
+                    <span className="text-[10px] font-medium text-forest/60">Sincronização Reativa:</span>
+                    <span className="px-3 py-1.5 rounded-lg text-[10px] font-bold tracking-wider uppercase transition-all flex items-center gap-1.5 border bg-[#BACAA5]/20 text-emerald-800 border-emerald-600/20">
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-600 animate-pulse"></span>
+                      Vendas Reais (orders.json)
+                    </span>
+                  </div>
                 </div>
 
                 {/* BENTO GRID SUMMARY */}
@@ -2405,7 +2348,7 @@ export default function AdminDashboardModal({ onClose, shopCategories = [] }: Ad
                       <h3 className="font-serif text-xl font-normal text-forest">{totalActiveCraftingDays} dias</h3>
                     </div>
                     <div className="mt-3.5 pt-2.5 border-t border-forest/5 flex justify-between text-[9px] text-forest/60">
-                      <span>Peças a produzir: {useSimulated ? 5 : paidOrdersList.length}</span>
+                      <span>Peças a produzir: {paidOrdersList.length}</span>
                     </div>
                   </div>
 
