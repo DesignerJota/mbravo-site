@@ -3,8 +3,8 @@ import { createPortal } from 'react-dom';
 import { motion, AnimatePresence, useScroll, useTransform, useSpring, useVelocity, useMotionValue, animate } from 'motion/react';
 import { Menu, X, Instagram, Facebook, ArrowRight, ArrowLeft, ChevronLeft, ChevronRight, Share2, Mail, MessageCircle, Sparkles, Feather, Palette, Heart, Maximize2 } from 'lucide-react';
 import { loadStripe } from '@stripe/stripe-js';
-import Lenis from 'lenis';
-const AdminDashboardModal = React.lazy(() => import('./components/AdminDashboardModal'));
+import { AdminDashboardModal } from './components/AdminDashboardModal';
+import { LegalModal } from './components/LegalModal';
 const LegalModal = React.lazy(() => import('./components/LegalModal'));
 import { 
   useLanguage, 
