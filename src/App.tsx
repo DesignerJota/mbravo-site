@@ -1787,16 +1787,15 @@ const Hero = () => {
                     </motion.div>
  
             {/* Corner Labels (Editorial feel) */}
-                <div className="absolute bottom-12 left-12 hidden lg:block z-20 pointer-events-none select-none">
-                    <span className="text-[9px] uppercase tracking-[0.4em] text-cream/20 [writing-mode:vertical-rl] rotate-180">EST. 2026</span>
-                </div>
-                <div className="absolute bottom-12 right-12 hidden lg:block z-20 pointer-events-none select-none">
-                    <span className="text-[9px] uppercase tracking-[0.4em] text-cream/20 [writing-mode:vertical-rl]">HANDMADE IN PORTUGAL</span>
-                </div>
+            <div className="absolute bottom-12 left-12 hidden lg:block z-20 pointer-events-none select-none">
+                <span className="text-[9px] uppercase tracking-[0.4em] text-cream/20 [writing-mode:vertical-rl] rotate-180">EST. 2026</span>
             </div>
-        </motion.div>
-    </section>
-);
+            <div className="absolute bottom-12 right-12 hidden lg:block z-20 pointer-events-none select-none">
+                <span className="text-[9px] uppercase tracking-[0.4em] text-cream/20 [writing-mode:vertical-rl]">HANDMADE IN PORTUGAL</span>
+            </div>
+                </section>
+        </>
+    );
 };
 const StorySection = () => {
     const containerRef = useRef(null);
