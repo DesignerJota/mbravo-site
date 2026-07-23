@@ -1797,14 +1797,14 @@ const Hero = () => {
         </>
     );
 };
-
 const StorySection = () => {
     const containerRef = useRef(null);
     const { scrollYProgress } = useScroll({
         target: containerRef,
         offset: ["start end", "end start"]
     });
-    const { t } = useLanguage();
+    // Adicionámos 'lang' ao hook de linguagem:
+    const { t, lang } = useLanguage();
 
     const smoothProgress = useSpring(scrollYProgress, {
         stiffness: 100,
@@ -1910,7 +1910,7 @@ const StorySection = () => {
                                     className={`h-1 rounded-full transition-all duration-500 cursor-pointer ${
                                         currentImg === idx ? 'w-8 bg-cream' : 'w-1.5 bg-cream/40 hover:bg-cream/70'
                                     }`}
-                                    aria-label={`Show slide ${idx + 1}`}
+                                    aria-label={`${t('common.slide') || (lang === 'PT' ? 'Diapositivo' : 'Slide')} ${idx + 1}`}
                                 />
                             ))}
                         </div>
