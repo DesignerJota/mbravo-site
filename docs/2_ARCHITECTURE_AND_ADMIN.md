@@ -42,7 +42,7 @@ A aplicação adota um armazenamento baseado em ficheiros locais persistentes, o
 O acesso ao Painel de Administração é efetuado através da rota `/admin` e validado por uma palavra-passe robusta encriptada por sessões (Padrão: `CarolinaM26`). O Painel divide-se em 5 abas de controlo absoluto:
 
 ### A. Insights e Contabilidade (`analytics`)
-*   **Purga Total de Dados Mock:** As abas 'analytics' e 'orders' carregam exclusivamente as encomendas reais persistidas no volume `/app/data/orders.json`. O modo de dados de demonstração/simulados foi purgado por padrão (`showSimulatedData: false`), garantindo 100% de fiabilidade contabilística.
+*   **Purga Total e Absoluta de Dados Mock/Seed:** As abas 'analytics', 'orders' e 'crm' carregam 100% de dados reais e dinâmicos persistidos no volume `/app/data/orders.json`. Quaisquer dados de demonstração, arrays estáticos ou sementes fictícias foram purgados do servidor (`server.ts`) e da interface (`AdminDashboardModal.tsx`), assegurando fiabilidade operacional absoluta.
 *   **Métricas de Desempenho:** Apresenta o Volume de Faturação Total, Número de Transações, Ticket Médio por Cliente e um indicador específico de faturas aguardando pagamento por Referência Multibanco.
 *   **Gráficos de Vendas:** Desenho dinâmico de gráficos de vendas em tempo real baseados no histórico real de encomendas.
 *   **Exportação Contabilística:** Funcionalidade nativa de exportação de dados financeiros para formato **CSV** (`Exportar Contabilidade`), permitindo o download direto das transações prontas a importar em softwares de contabilidade.
