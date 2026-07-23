@@ -23,10 +23,24 @@ export interface OrderData {
     cidade: string;
     nif?: string;
   };
-  paymentMethod: 'mbway' | 'multibanco' | 'card';
-  status: 'pending_payment' | 'paid' | 'failed';
-  priority: 'ALTA (Atelier Urgente)' | 'NORMAL';
+  paymentMethod: 'mbway' | 'multibanco' | 'card' | 'stripe' | 'manual' | string;
+  status: 'pending_payment' | 'paid' | 'failed' | string;
+  priority: 'ALTA (Atelier Urgente)' | 'NORMAL' | string;
   createdAt: string;
+}
+
+/**
+ * Função auxiliar para legibilidade do método de pagamento nos e-mails
+ */
+function formatPaymentMethod(method: string): string {
+  switch (method?.toLowerCase()) {
+    case 'mbway': return 'MB WAY';
+    case 'multibanco': return 'Referência Multibanco';
+    case 'card':
+    case 'stripe': return 'Cartão de Crédito';
+    case 'manual': return 'Venda Manual / Presencial';
+    default: return method?.toUpperCase() || 'PAGAMENTO CONFIRMADO';
+  }
 }
 
 /**
@@ -112,7 +126,7 @@ export function generateCustomerEmailHtml(order: OrderData): string {
                   </tr>
                   <tr>
                     <td style="color: rgba(36, 49, 25, 0.5); font-weight: 300; padding-top: 12px; padding-bottom: 12px; font-size: 13px; text-align: left; border-bottom: 1px dashed rgba(36, 49, 25, 0.08);">Método de Pagamento:</td>
-                    <td align="right" style="font-weight: bold; text-transform: uppercase; padding-top: 12px; padding-bottom: 12px; font-size: 13px; color: #243119; text-align: right; border-bottom: 1px dashed rgba(36, 49, 25, 0.08);">${order.paymentMethod === 'mbway' ? 'MB WAY' : order.paymentMethod === 'multibanco' ? 'Referência Multibanco' : 'Cartão de Crédito'}</td>
+                    <td align="right" style="font-weight: bold; text-transform: uppercase; padding-top: 12px; padding-bottom: 12px; font-size: 13px; color: #243119; text-align: right; border-bottom: 1px dashed rgba(36, 49, 25, 0.08);">${formatPaymentMethod(order.paymentMethod)}</td>
                   </tr>
                   ${order.customer.nif ? `
                   <tr>
@@ -275,7 +289,7 @@ export function generateAdminEmailHtml(order: OrderData): string {
       </div>
       <div class="field-row">
         <span class="label">Método Pagamento:</span>
-        <span class="value" style="text-transform: uppercase;">${order.paymentMethod}</span>
+        <span class="value" style="text-transform: uppercase;">${formatPaymentMethod(order.paymentMethod)}</span>
       </div>
       <div class="field-row">
         <span class="label">Total da Venda:</span>
