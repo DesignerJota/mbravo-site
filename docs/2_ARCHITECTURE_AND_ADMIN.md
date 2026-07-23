@@ -42,14 +42,20 @@ A aplicação adota um armazenamento baseado em ficheiros locais persistentes, o
 O acesso ao Painel de Administração é efetuado através da rota `/admin` e validado por uma palavra-passe robusta encriptada por sessões (Padrão: `CarolinaM26`). O Painel divide-se em 5 abas de controlo absoluto:
 
 ### A. Insights e Contabilidade (`analytics`)
+*   **Purga Total de Dados Mock:** As abas 'analytics' e 'orders' carregam exclusivamente as encomendas reais persistidas no volume `/app/data/orders.json`. O modo de dados de demonstração/simulados foi purgado por padrão (`showSimulatedData: false`), garantindo 100% de fiabilidade contabilística.
 *   **Métricas de Desempenho:** Apresenta o Volume de Faturação Total, Número de Transações, Ticket Médio por Cliente e um indicador específico de faturas aguardando pagamento por Referência Multibanco.
-*   **Gráficos de Vendas:** Integração com a biblioteca `recharts` para desenho dinâmico de gráficos lineares de vendas semanais/mensais.
+*   **Gráficos de Vendas:** Desenho dinâmico de gráficos de vendas em tempo real baseados no histórico real de encomendas.
 *   **Exportação Contabilística:** Funcionalidade nativa de exportação de dados financeiros para formato **CSV** (`Exportar Contabilidade`), permitindo o download direto das transações prontas a importar em softwares de contabilidade.
 
 ### B. Gestão de Encomendas & CRM (`orders`)
 *   **Estado da Encomenda:** Gestão do fluxo da transação (`pendente de pagamento`, `paga`, `enviada`, `falhada`).
+*   **Automação do Fluxo de Expedição CTT (`sendShippedEmails`):** Ao introduzir o código de rastreamento dos CTT e marcar a encomenda como "enviada" (`shipped`), o sistema executa automaticamente de forma imediata:
+    1. Atualização do estado no `orders.json` e sincronização reativa no perfil CRM do cliente.
+    2. Disparo imediato do e-mail de confirmação de expedição com o código CTT para a cliente (`sendShippedEmails`).
+    3. Registo imutável da ação nos Logs de Auditoria (`/admin` tab 'logs') sob os eventos `ctt_label_generation` e `state_change`.
 *   **Filtros Rápidos:** Pesquisa reativa por ID de encomenda ou nome de cliente.
 *   **Atribuição de Prioridade:** Identificação de encomendas de alta prioridade (*"ALTA (Atelier Urgente)"*) vs. normais.
+*   **Lógica Condicional de Tamanhos (`hasSize`):** Tratamento condicional para peças sem tamanho (ex: malas, pouches ou carteiras de tamanho único), ocultando rótulos desnecessários de tamanho nas confirmações e no painel.
 
 ### C. Catálogo de Artigos / CMS (`catalog`)
 *   **Edição em Tempo Real:** Permite alterar títulos, preços, descrições, imagens de catálogo e o tempo estimado de produção em dias úteis para cada um dos produtos listados no site.
@@ -79,7 +85,14 @@ O sistema de Gestão de Relação com Clientes (CRM) está totalmente integrado 
 
 ---
 
-## 5. Serviços de Email (`src/lib/emailService.ts`)
+## 5. Gateway Stripe, Metadados & Resiliência de Webhook
+*   **Injeção de Metadados Unificada (`commonMetadata`):** Todas as transações criadas via Stripe (Cartão, MB WAY, Multibanco) injetam metadados completos (`orderId`, `productName`, `cor`, `tamanho`, `hasSize`, `quantidade`, `customerName`, `customerEmail`, `customerPhone`, `nif`) no `PaymentIntent`.
+*   **Recuperação Reativa via Webhook:** Caso a encomenda original não esteja em memória/disco no momento do webhook de confirmação (ex: reinício de servidor ou transação iniciada noutro canal), o manipulador do webhook e o endpoint de verificação reconstroem reativamente a encomenda a partir dos metadados do Stripe, garantindo zero perda de dados.
+*   **Ambiente de Produção vs. Teste:** Deteção automática das chaves Stripe (`sk_live` vs. `sk_test`) gravando a propriedade `isTestMode` nas encomendas para transparência nos relatórios do Admin.
+
+---
+
+## 6. Serviços de Email (`src/lib/emailService.ts`)
 A lógica de envio de e-mails comunica as atualizações de forma profissional:
 *   **Origem:** `encomendas@mbravobycarolina.com`
 *   **Destino Interno (Atelier):** `handmade.mbravo@gmail.com` (recebe cópia de alertas de stock baixo e novas encomendas pagas para produção imediata).
