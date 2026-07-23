@@ -60,15 +60,37 @@ Respondendo às últimas solicitações de otimização de fluxo e consistência
 
 ---
 
-## 3. TAREFA ATUAL (Otimização Extrema de Performance & PageSpeed 90+)
-*   **Estado:** **Concluído**.
+## 3. TAREFA ATUAL (Validação de Produção: Automação CTT, Email, Stripe Metadata & Purga Mock Data)
+*   **Estado:** **Concluído com Sucesso e Validado**.
 *   **Ações Realizadas:**
-    1.  **Otimização O(1) do FioCondutor (Animação de Scroll):** Eliminação de cálculo iterativo de curvas de Bezier por frame através da criação de uma tabela de consulta pré-computada (`FIO_LOOKUP`) em escopo de topo, reduzindo o trabalho da thread principal durante o scroll em mais de 90%.
-    2.  **Otimização de LCP e Carregamento Eager no Hero:** Inversão da estratégia de descarregamento das 4 imagens de fundo do Hero (`HERO_BACKGROUNDS`). Apenas a imagem inicial (index 0) é carregada com `loading="eager"` e `fetchPriority="high"`, enquanto as restantes 3 imagens de fundo passam para `loading="lazy"` e `fetchPriority="low"`, com dimensões explícitas (`1920x1080`), desbloqueando o tempo de LCP (Largest Contentful Paint) no mobile.
-    3.  **Remoção de Reflows Forçados no `handleScroll`:** Substituição do seletor DOM `getBoundingClientRect()` executado a cada evento de scroll por uma coordenação assíncrona baseada em `requestAnimationFrame` com listener passivo (`{ passive: true }`), eliminando bloqueios de layout e *scroll-jank*.
-    4.  **Memorização do `ProductCard` & Desempenho da Grelha:** Envolvimento do componente `ProductCard` em `React.memo` com função de comparação customizada por ID e estado de foco, prevenindo re-renderizações globais em cascata dos cartões da grelha de produtos durante o scroll.
-    5.  **Aceleração Lenis para Mobile Touch:** Adição das propriedades `smoothWheel: true` e `syncTouch: false` na inicialização do Lenis, preservando a aceleração nativa por hardware em dispositivos iOS e Android para navegação fluida na grelha sem engasgos ou fricção.
-    6.  **Otimização do Threshold de Imagens de Produtos:** Ajuste no carregamento eager dos cartões da coleção de 4 para 2 itens (os únicos visíveis acima da dobra em mobile), permitindo que todos os restantes produtos sejam carregados progressivamente.
+    1.  **Purga de Dados Mock no Admin (`/admin`):** O painel do atelier (`analytics` e `orders`) carrega exclusivamente dados reais de encomendas persistidos no volume `/app/data/orders.json`. O modo de simulação foi desligado por padrão (`showSimulatedData: false`).
+    2.  **Automação do Fluxo de Expedição CTT (`sendShippedEmails`):** Ao selecionar uma encomenda no `/admin`, introduzir o código de rastreio CTT e mudar o estado para `shipped`, o sistema executa automaticamente:
+        *   Sincronização reativa e gravação no `orders.json` e no perfil do cliente no CRM.
+        *   Disparo imediato do e-mail de confirmação de expedição com o código CTT para a cliente (`sendShippedEmails`).
+        *   Registo imutável no histórico dos Logs de Auditoria (`/admin` tab 'logs') sob `ctt_label_generation` e `state_change`.
+    3.  **Injeção Integral de Metadados no Stripe & Resiliência de Webhook:** Injeção do payload unificado (`commonMetadata`) com detalhes do artigo (`orderId`, `productName`, `cor`, `tamanho`, `hasSize`, `quantidade`, `customerName`, `customerEmail`, `customerPhone`, `nif`) em todas as sessões e intents de pagamento Stripe. Reconstrução reativa automática via Webhook em caso de descontinuidade de estado.
+    4.  **Tratamento Condicional de Tamanhos (`hasSize`):** Artigos de tamanho único (ex: malas, pouches ou carteiras) deixam de exibir etiquetas desnecessárias de tamanho nas confirmações de compra e nos relatórios.
+
+---
+
+## 4. LISTA DEFINITIVA DE FICHEIROS A ATUALIZAR NO GITHUB (`DesignerJota/mbravo-site`)
+
+Para que o repositório no GitHub fique 100% sincronizado com a versão final de produção, copie e substitua os seguintes ficheiros na sua totalidade:
+
+### A. Backend & Servidor
+1. **`server.ts`** (Metadados Stripe unificados `commonMetadata`, fluxo de expedição CTT com `sendShippedEmails`, resiliência de webhook e persistência em volume `/app/data/orders.json`)
+
+### B. Interface Frontend
+2. **`src/components/AdminDashboardModal.tsx`** (Purga de dados mock, integração reativa de expedição CTT com registo de auditoria, filtros de CRM e análises reais)
+3. **`src/App.tsx`** (Tratamento condicional de tamanhos `hasSize`, tabela O(1) do FioCondutor, `React.memo` dos cartões, breakpoint `lg:` da Navbar)
+4. **`vite.config.ts`** (Code-splitting do bundle JS e `manualChunks`)
+5. **`index.html`** (Adiamento de scripts via `requestIdleCallback`, meta-tags de renderização e preloads WebP)
+6. **`src/index.css`** (Aceleração por GPU, regras de touch WebKit e otimização de renderização)
+7. **`src/translations.ts`** (Dicionário bilíngue integral sincronizado PT/EN)
+
+### C. Documentação Técnica (`/docs`)
+8. **`docs/2_ARCHITECTURE_AND_ADMIN.md`** (Arquitetura atualizada: automação CTT, e-mails de expedição, metadados Stripe e CRM)
+9. **`docs/3_PROJECT_STATE.md`** (Estado do projeto sincronizado e relatório de alterações)
 
 ---
 
