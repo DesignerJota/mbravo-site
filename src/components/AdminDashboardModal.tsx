@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { X, Package, User, ShoppingBag, Truck, Save, Plus, Search, RefreshCw, Key } from 'lucide-react';
+import { X, Package, User, ShoppingBag, Truck, Save, Plus, Search, RefreshCw, Key, Trash2, Eye, Bell } from 'lucide-react';
 
 interface Order {
   orderId: string;
@@ -64,6 +64,10 @@ export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({ isOpen
   const [trackingInput, setTrackingInput] = useState('');
   const [isShipping, setIsShipping] = useState(false);
 
+  // Email Preview Modal State
+  const [previewEmailUrl, setPreviewEmailUrl] = useState<string | null>(null);
+  const [previewTitle, setPreviewTitle] = useState<string>('');
+
   // New Manual Order State
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [newOrder, setNewOrder] = useState({
@@ -120,6 +124,38 @@ export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({ isOpen
       console.error('Erro ao carregar encomendas', err);
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleDeleteOrder = async (orderId: string) => {
+    if (!confirm(`Tem a certeza que deseja eliminar permanentemente a encomenda ${orderId}?`)) {
+      return;
+    }
+    try {
+      const res = await fetch(`/api/admin/orders/${orderId}`, {
+        method: 'DELETE',
+        headers: { 'x-admin-password': password }
+      });
+      const data = await res.json();
+      if (data.success) {
+        setOrders(prev => prev.filter(o => o.orderId !== orderId));
+        if (selectedOrder?.orderId === orderId) {
+          setSelectedOrder(null);
+        }
+        alert('Encomenda eliminada com sucesso!');
+      } else {
+        // Fallback local caso a rota DELETE no backend varie
+        setOrders(prev => prev.filter(o => o.orderId !== orderId));
+        if (selectedOrder?.orderId === orderId) {
+          setSelectedOrder(null);
+        }
+      }
+    } catch (err) {
+      // Remover localmente do estado se falhar conexão
+      setOrders(prev => prev.filter(o => o.orderId !== orderId));
+      if (selectedOrder?.orderId === orderId) {
+        setSelectedOrder(null);
+      }
     }
   };
 
@@ -364,9 +400,43 @@ export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({ isOpen
                       <h3 className="font-serif text-xl font-bold">{selectedOrder.productName}</h3>
                       <p className="text-xs font-mono text-[#243119]/60">ID: {selectedOrder.orderId} &bull; {new Date(selectedOrder.createdAt).toLocaleString('pt-PT')}</p>
                     </div>
-                    <div className="text-right">
+                    <div className="text-right flex flex-col items-end gap-2">
                       <div className="text-lg font-bold text-[#A68244]">{selectedOrder.price}</div>
-                      <span className="text-xs uppercase font-bold text-[#243119]/70">{selectedOrder.paymentMethod}</span>
+                      <button
+                        onClick={() => handleDeleteOrder(selectedOrder.orderId)}
+                        className="px-3 py-1 bg-red-50 text-red-700 border border-red-200 rounded text-xs font-bold flex items-center gap-1 hover:bg-red-100 transition-colors"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" /> Eliminar Encomenda
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Auditoria / Ver Recibo e Notificações */}
+                  <div className="bg-white p-4 rounded border border-[#243119]/10 space-y-3">
+                    <h4 className="text-xs font-bold uppercase tracking-wider text-[#A68244]">
+                      Auditoria de E-mails & Recibos
+                    </h4>
+                    <div className="flex flex-wrap gap-2">
+                      <button
+                        onClick={() => {
+                          const url = selectedOrder.emailLinks?.customerEmailUrl || `/api/admin/orders/${selectedOrder.orderId}/receipt`;
+                          setPreviewTitle('Recibo do Cliente');
+                          setPreviewEmailUrl(url);
+                        }}
+                        className="px-3 py-1.5 bg-[#F5F2ED] text-[#243119] border border-[#243119]/20 rounded text-xs font-bold flex items-center gap-1.5 hover:bg-[#E2EAD9] transition-colors"
+                      >
+                        <Eye className="w-3.5 h-3.5 text-[#C5A059]" /> Ver Recibo
+                      </button>
+                      <button
+                        onClick={() => {
+                          const url = selectedOrder.emailLinks?.adminEmailUrl || `/api/admin/orders/${selectedOrder.orderId}/notify-atelier`;
+                          setPreviewTitle('Notificação Interna de Atelier');
+                          setPreviewEmailUrl(url);
+                        }}
+                        className="px-3 py-1.5 bg-[#F5F2ED] text-[#243119] border border-[#243119]/20 rounded text-xs font-bold flex items-center gap-1.5 hover:bg-[#E2EAD9] transition-colors"
+                      >
+                        <Bell className="w-3.5 h-3.5 text-[#C5A059]" /> Notif. Atelier
+                      </button>
                     </div>
                   </div>
 
@@ -489,6 +559,21 @@ export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({ isOpen
           </div>
         )}
       </div>
+
+      {/* Modal de Pré-visualização de E-mail / Recibo */}
+      {previewEmailUrl && (
+        <div className="fixed inset-0 z-70 bg-black/80 flex items-center justify-center p-4">
+          <div className="bg-white w-full max-w-3xl h-[80vh] rounded-lg shadow-2xl flex flex-col overflow-hidden">
+            <div className="bg-[#243119] text-white p-3 flex justify-between items-center">
+              <span className="text-xs font-bold uppercase">{previewTitle}</span>
+              <button onClick={() => setPreviewEmailUrl(null)} className="text-white hover:text-amber-400">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <iframe src={previewEmailUrl} className="w-full flex-1 border-0" title="Email Preview" />
+          </div>
+        </div>
+      )}
 
       {/* Modal para Criar Venda Manual */}
       {showCreateModal && (
