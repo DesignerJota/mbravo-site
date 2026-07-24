@@ -7327,7 +7327,7 @@ export default function App() {
               )}
             </AnimatePresence>
             
-         <Footer onOpenLegal={(type) => setActiveLegal(type)} onOpenAdmin={() => navigateTo('/admin')} />
+          <Footer onOpenLegal={(type) => setActiveLegal(type)} onOpenAdmin={() => navigateTo('/admin')} />
 
             <AnimatePresence>
                 {activeLegal && (
