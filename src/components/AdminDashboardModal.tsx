@@ -481,10 +481,10 @@ export default function AdminDashboardModal({ onClose, shopCategories = [] }: Ad
 
     const rows = filteredOrders.map(o => {
       const selections = o.selections || {};
-      const cor = selections.cor || "Padrao";
-      const tamanho = selections.tamanho || "Unico";
+      const cor = selections.cor || "Padrão";
+      const hasSize = selections.hasSize !== false && Boolean(selections.tamanho) && !['n/a', 'na', 'único', 'unico', 'padrão', 'padrao', ''].includes(String(selections.tamanho).toLowerCase().trim());
       const quantidade = selections.quantidade || "1";
-      const itemDetails = `Cor: ${cor}, Tam: ${tamanho}, Qtd: ${quantidade}`;
+      const itemDetails = `Cor: ${cor}${hasSize ? `, Tam: ${selections.tamanho}` : ''}, Qtd: ${quantidade}`;
       
       const priceVal = parsePrice(String(o.price));
       const formattedSubtotal = priceVal.toFixed(2).replace('.', ',');
@@ -1457,10 +1457,12 @@ export default function AdminDashboardModal({ onClose, shopCategories = [] }: Ad
                                   <span className="text-forest/40">Cor:</span>
                                   <span className="font-semibold">{order.selections?.cor}</span>
                                 </div>
-                                <div className="flex justify-between">
-                                  <span className="text-forest/40">Tamanho:</span>
-                                  <span className="font-semibold">{order.selections?.tamanho || 'Manual/Sob Medida'}</span>
-                                </div>
+                                 {(order.selections?.hasSize !== false && Boolean(order.selections?.tamanho) && !['n/a', 'na', 'único', 'unico', 'padrão', 'padrao', ''].includes(String(order.selections.tamanho).toLowerCase().trim())) && (
+                                   <div className="flex justify-between">
+                                     <span className="text-forest/40">Tamanho:</span>
+                                     <span className="font-semibold">{order.selections.tamanho}</span>
+                                   </div>
+                                 )}
                                 <div className="flex justify-between">
                                   <span className="text-forest/40">Quantidade:</span>
                                   <span className="font-semibold">{order.selections?.quantidade || '1'}</span>
