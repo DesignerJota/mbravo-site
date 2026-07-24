@@ -331,7 +331,6 @@ app.post("/api/payment/create-intent", async (req, res) => {
             confirm: true,
             return_url: `${req.headers.origin || 'https://www.mbravobycarolina.com'}/`,
             payment_method_types: ['card'],
-            payment_method_configuration: paymentMethodConfig as any,
             description: `M BRAVO - Encomenda ${orderId}`,
             receipt_email: checkoutForm.email,
             metadata: commonMetadata
