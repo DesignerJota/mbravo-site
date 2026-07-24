@@ -76,8 +76,16 @@ Respondendo às últimas solicitações de otimização de fluxo e consistência
         *   Removida a atribuição automática de `@carolina_mbravo` na Ficha de Cliente do CRM. O campo inicia 100% limpo com o placeholder discreto `@utilizador`, permitindo o registo manual do utilizador real do cliente.
     5.  **Limpeza Visual e Gestão de Encomendas (`/api/admin/orders/delete`):**
         *   Inclusão das ações de **Cancelar** e **Eliminar** (com janela de confirmação) para gerir encomendas manuais ou de teste com recalculo automático das métricas no Admin.
-    6.  **Atualização Integral da Documentação Técnica (`/docs`):**
-        *   Ficheiros `2_ARCHITECTURE_AND_ADMIN.md` e `3_PROJECT_STATE.md` atualizados para espelhar a arquitetura final.
+    6.  **Confirmação Estrita e Exclusiva de Pagamento via Webhook Stripe:**
+        *   Refatorado o fluxo de pagamentos no `server.ts`. O endpoint `/api/payment/create-intent` cria o registo da encomenda exclusivamente com o estado `pending_payment`.
+        *   A alteração do estado para `paid` e a emissão automática de e-mails de confirmação de encomenda ocorrem ESTRITAMENTE e EXCLUSIVAMENTE após a receção e validação do evento `payment_intent.succeeded` enviado pelo Webhook do Stripe (ou consulta verificada de status `succeeded`).
+        *   Zero tolerância para assunção otimista de pagamentos ou marcadores de "PAGO & LIQUIDADO" em transações não liquidadas no Stripe. Fallbacks e exceções registam o estado como `failed` ou mantêm em `pending_payment`.
+    7.  **Eliminação Total de Dados Fantasma ("Tamanho: M"):**
+        *   Purga total da atribuição automática do tamanho por defeito `"M"` em artigos sem variação de tamanho (malas, bolsas, African Flower Pouch, Mini Pouches, Coasters e artigos de casa).
+        *   Garantida a passagem de `tamanho = ""` e `hasSize = false` quando o produto não possui opção de tamanho.
+        *   Tratamento condicional no `emailService.ts` e no Painel Admin (`AdminDashboardModal.tsx`), omitindo totalmente o rótulo de tamanho para peças sem variação.
+    8.  **Atualização Integral da Documentação Técnica (`/docs`):**
+        *   Ficheiros `2_ARCHITECTURE_AND_ADMIN.md` e `3_PROJECT_STATE.md` atualizados para espelhar a arquitetura final de produção de luxo.
 
 ---
 
