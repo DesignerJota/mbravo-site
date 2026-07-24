@@ -31,6 +31,40 @@ export interface OrderData {
 }
 
 /**
+ * Formats phone numbers into a clean, human-readable masked format (e.g., +351 917 827 458).
+ */
+export function formatPhoneReadable(phone?: string): string {
+  if (!phone) return '';
+  const trimmed = phone.trim();
+  if (!trimmed) return '';
+
+  const hasPlus = trimmed.startsWith('+');
+  const digits = trimmed.replace(/\D/g, '');
+  if (!digits) return trimmed;
+
+  if (digits.startsWith('351') && digits.length === 12) {
+    return `+351 ${digits.slice(3, 6)} ${digits.slice(6, 9)} ${digits.slice(9)}`;
+  } else if (digits.length === 9) {
+    return `+351 ${digits.slice(0, 3)} ${digits.slice(3, 6)} ${digits.slice(6)}`;
+  } else if (digits.startsWith('351') && digits.length > 9) {
+    const rest = digits.slice(3);
+    if (rest.length === 9) {
+      return `+351 ${rest.slice(0, 3)} ${rest.slice(3, 6)} ${rest.slice(6)}`;
+    }
+    return `+351 ${rest}`;
+  } else if (hasPlus) {
+    if (digits.length <= 10) {
+      return `+${digits.slice(0, 3)} ${digits.slice(3, 6)} ${digits.slice(6)}`;
+    }
+    return `+${digits}`;
+  } else if (digits.length === 10) {
+    return `${digits.slice(0, 3)} ${digits.slice(3, 6)} ${digits.slice(6)}`;
+  }
+
+  return trimmed;
+}
+
+/**
  * Helper to determine if a product has a valid explicit sizing selection
  */
 export function hasValidSize(tamanho?: string, hasSizeFlag?: boolean): boolean {
@@ -188,7 +222,7 @@ export function generateCustomerEmailHtml(order: OrderData): string {
             <div style="font-weight: 300; color: #243119;">
               ${order.customer.morada}<br>
               ${order.customer.codigoPostal}, ${order.customer.cidade}<br>
-              Telemóvel: ${order.customer.telefone}
+              Telemóvel: ${formatPhoneReadable(order.customer.telefone)}
             </div>
           </div>
 
@@ -361,7 +395,7 @@ export function generateAdminEmailHtml(order: OrderData): string {
       </div>
       <div class="field-row">
         <span class="label">Contacto:</span>
-        <span class="value">${order.customer.telefone}</span>
+        <span class="value">${formatPhoneReadable(order.customer.telefone)}</span>
       </div>
       <div class="field-row" style="margin-bottom: 2px;">
         <span class="label">Morada:</span>
@@ -737,7 +771,7 @@ export function generateShippedEmailHtml(order: OrderData, trackingCode: string)
               <strong>${order.customer.nome}</strong><br>
               ${order.customer.morada}<br>
               ${order.customer.codigoPostal}, ${order.customer.cidade}<br>
-              Telemóvel: ${order.customer.telefone}
+              Telemóvel: ${formatPhoneReadable(order.customer.telefone)}
             </div>
           </div>
 
