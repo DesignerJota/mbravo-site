@@ -60,7 +60,8 @@ A aplicação adota um armazenamento baseado em ficheiros locais persistentes, o
     3. Registo imutável da ação nos Logs de Auditoria (`/admin` tab 'logs') sob os eventos `ctt_label_generation` e `state_change`.
 *   **Filtros Rápidos:** Pesquisa reativa por ID de encomenda ou nome de cliente.
 *   **Atribuição de Prioridade:** Identificação de encomendas de alta prioridade (*"ALTA (Atelier Urgente)"*) vs. normais.
-*   **Lógica Condicional de Tamanhos (`hasSize`):** Tratamento condicional para peças sem tamanho (ex: malas, pouches ou carteiras de tamanho único), ocultando rótulos desnecessários de tamanho nas confirmações e no painel.
+*   **Lógica Condicional de Tamanhos (`hasSize`):** Tratamento condicional para peças sem variação de tamanho (ex: malas, pouches, carteiras ou bases/coasters como Daisy Coasters), omitindo o rótulo de tamanho nas confirmações, nos e-mails e nos registos do painel.
+*   **Sincronização de Histórico Real:** Registos históricos de produção/testes (ex: encomenda `MB-2026-3147` de Paulo António Lima Macedo de Queirós em 23/07/2026) encontram-se totalmente persistidos no `orders.json` com cálculo correto do volume de faturação (16,00€) e visualização limpa de especificações.
 
 ### C. Catálogo de Artigos / CMS (`catalog`)
 *   **Edição em Tempo Real:** Permite alterar títulos, preços, descrições, imagens de catálogo e o tempo estimado de produção em dias úteis para cada um dos produtos listados no site.
@@ -103,13 +104,24 @@ A lógica de envio de e-mails comunica as atualizações de forma profissional c
 *   **Proteção Nativa no Código:** O `emailService.ts` contém uma verificação de segurança estrita em `sendTransactionEmails` que aborta imediatamente o envio de e-mail de confirmação se o estado da encomenda for diferente de `'paid'`.
 *   **Instruções de Pagamento Multibanco:** No caso de pagamento por Multibanco, o sistema envia exclusivamente o e-mail de instruções com a Entidade, Referência e Montante (`sendMultibancoEmails`). O e-mail de confirmação de encomenda só é gerado no momento em que o webhook do Stripe notifica a liquidação efetiva da referência pelo cliente.
 *   **Atributos Dinâmicos e Limpos (`formatOrderSpecifications`):** As especificações de produtos nos e-mails (Cor, Tamanho, Quantidade) são desenhadas dinamicamente. Atributos não aplicáveis ou ausentes (ex: tamanho em malas ou peças sem variação) são omitidos de forma inteligente, evitando etiquetas irrelevantes.
-*   **Limpeza Total de Produção:** Todos os avisos de sandbox, notas de teste, placeholders e chaves de simulação foram removidos dos templates de e-mail, garantindo um aspeto 100% profissional e limpo no domínio de produção `mbravobycarolina.com`.
+*   **Limpeza Total e Absoluta de Termos de Teste/Sandbox:** Todos os avisos de sandbox, rótulos como `AUDITORIA SANDBOX`, notas de teste e chaves de simulação foram terminantemente purgados dos templates de e-mail (`emailService.ts`), das traduções (`translations.ts`) e do Painel Admin (`AdminDashboardModal.tsx`). Os e-mails utilizam exclusivamente uma nomenclatura de produção de luxo (`Comprovativos de Encomenda`, `Recibo do Cliente`, `Notificação de Envio`, etc.), garantindo uma comunicação de marca 100% impecável e profissional no domínio de produção `mbravobycarolina.com`.
 *   **Origem:** `encomendas@mbravobycarolina.com`
 *   **Destino Interno (Atelier):** `handmade.mbravo@gmail.com` (recebe cópia de alertas de stock baixo e novas encomendas pagas para produção imediata).
 *   **Modelos de Email (HTML/CSS Embutido):**
-    *   `generateCustomerEmailHtml`: Envia um recibo de pagamento luxuoso em tons de creme e verde floresta, com os detalhes da peça comprada, especificações dinâmicas de cor e tamanho, e uma mensagem personalizada que valoriza o processo de produção artesanal.
+    *   `generateCustomerEmailHtml`: Envia um recibo de pagamento luxuoso em tons de creme e verde floresta, com os detalhes da peça comprada, especificações dinâmicas de cor e tamanho, formatação de telemóvel legível humana (`+351 917 827 458`) e uma mensagem personalizada que valoriza o processo de produção artesanal.
     *   `sendMultibancoEmails`: Instruções detalhadas com Entidade, Referência e Montante.
     *   `sendShippedEmails`: Confirmação de expedição com o respetivo código de registo CTT da transportadora para rastreamento.
+
+---
+
+## 7. Validação Estrita, Sanitização de Dados & Formatação de Leitura
+
+Para assegurar integridade absoluta de dados e facilidade de leitura operacional no Atelier, a aplicação implementa validação estrita no Frontend e no Backend (`server.ts`):
+*   **Validação Estrita de E-mail (`isValidEmailStrict` / `isValidEmail`):** Verificação por expressão regular (`/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/`) exigindo rigorosamente o formato de e-mail padrão (`utilizador@dominio.com`) tanto no checkout de cliente como na criação manual de encomendas no Admin.
+*   **Auto-Máscara de Código Postal Português (`formatPostalCodePT` / `formatPostalCode`):** Formatação automática no formato standard `XXXX-XXX` (ex: `1000-123`), higienizando caracteres não numéricos.
+*   **Máscara de Leitura Humana para Telemóveis (`formatPhoneReadable`):** Aplicação de espaçamento visual legível em todos os números de telemóvel apresentados no Painel Admin e nos e-mails de confirmação e expedição (ex: `+351 917 827 458` em vez de `+351917827458`).
+*   **Higienização e Limpeza de Texto (`sanitizeText` & `sanitizeNumber`):** Todos os campos de formulário e criação de encomendas são processados com remoção de espaços em branco antes e depois (`trim()`), filtragem de carateres inválidos em NIF/telefones e conversão segura de valores monetários.
+*   **Limpeza do Campo Instagram na Ficha de Cliente CRM (Pilar 1):** O campo "Utilizador de Instagram" no Pilar 1 da Ficha do Cliente inicia totalmente vazio por defeito (sem a sugestão estática de `@carolina_mbravo`), apresentando apenas o placeholder discreto `@utilizador` para permitir o preenchimento manual e exclusivo dos dados reais de cada cliente.
 
 ---
 
