@@ -1,9 +1,8 @@
 import fs from 'fs';
 import path from 'path';
 
-// DEFINIÇÃO OFICIAL DOS E-MAILS DA M★BRAVO
 const FROM_EMAIL = process.env.FROM_EMAIL || 'encomendas@mbravobycarolina.com';
-const NOTIFICATION_EMAIL = process.env.NOTIFICATION_EMAIL || 'handmade@mbravobycarolina.com';
+const NOTIFICATION_EMAIL = process.env.NOTIFICATION_EMAIL || 'handmade.mbravo@gmail.com';
 
 export interface OrderData {
   orderId: string;
@@ -13,6 +12,7 @@ export interface OrderData {
     cor: string;
     tamanho?: string;
     quantidade?: string;
+    hasSize?: boolean;
   };
   customer: {
     nome: string;
@@ -23,30 +23,56 @@ export interface OrderData {
     cidade: string;
     nif?: string;
   };
-  paymentMethod: 'mbway' | 'multibanco' | 'card' | 'stripe' | 'manual' | string;
+  paymentMethod: 'mbway' | 'multibanco' | 'card' | string;
   status: 'pending_payment' | 'paid' | 'failed' | string;
   priority: 'ALTA (Atelier Urgente)' | 'NORMAL' | string;
   createdAt: string;
+  isTestMode?: boolean;
 }
 
 /**
- * Função auxiliar para legibilidade do método de pagamento nos e-mails
+ * Helper to determine if a product has a valid explicit sizing selection
  */
-function formatPaymentMethod(method: string): string {
-  switch (method?.toLowerCase()) {
-    case 'mbway': return 'MB WAY';
-    case 'multibanco': return 'Referência Multibanco';
-    case 'card':
-    case 'stripe': return 'Cartão de Crédito';
-    case 'manual': return 'Venda Manual / Presencial';
-    default: return method?.toUpperCase() || 'PAGAMENTO CONFIRMADO';
+export function hasValidSize(tamanho?: string, hasSizeFlag?: boolean): boolean {
+  if (hasSizeFlag === false) return false;
+  if (!tamanho) return false;
+  const clean = tamanho.trim().toLowerCase();
+  const invalidValues = [
+    'n/a', 'na', 'none', 'não aplicável', 'nao aplicavel',
+    'único', 'unico', 'padrão', 'padrao', 'nenhum', '-', ''
+  ];
+  return !invalidValues.includes(clean);
+}
+
+/**
+ * Dynamically formats product specification attributes (Color, Size, Quantity)
+ * rendering only attributes actually selected by the customer.
+ */
+export function formatOrderSpecifications(selections: OrderData['selections']): string {
+  const parts: string[] = [];
+  
+  if (selections?.cor && selections.cor.trim() !== '' && !['n/a', 'na', 'nenhum', 'padrão', 'padrao', '-'].includes(selections.cor.trim().toLowerCase())) {
+    parts.push(`Cor: ${selections.cor.trim()}`);
   }
+  
+  if (hasValidSize(selections?.tamanho, selections?.hasSize)) {
+    parts.push(`Tam. ${selections.tamanho!.trim()}`);
+  }
+  
+  if (selections?.quantidade && selections.quantidade.trim() !== '') {
+    parts.push(`Qtd. ${selections.quantidade.trim()}`);
+  }
+  
+  return parts.length > 0 ? parts.join(' | ') : 'Padrão Atelier';
 }
 
 /**
  * Generates the elegant cream & forest green customer purchase confirmation HTML email template.
  */
 export function generateCustomerEmailHtml(order: OrderData): string {
+  const specsText = formatOrderSpecifications(order.selections);
+  const footerNotice = 'Esta é uma mensagem automática de confirmação de encomenda M★BRAVO.';
+
   return `<!DOCTYPE html>
 <html>
 <head>
@@ -112,32 +138,39 @@ export function generateCustomerEmailHtml(order: OrderData): string {
             <tr>
               <td style="padding: 25px;">
                 <table width="100%" cellpadding="0" cellspacing="0" style="border-collapse: collapse;">
+                  <!-- Row: ID -->
                   <tr>
                     <td style="color: rgba(36, 49, 25, 0.5); font-weight: 300; padding-bottom: 12px; font-size: 13px; text-align: left; border-bottom: 1px dashed rgba(36, 49, 25, 0.08);">ID da Encomenda:</td>
                     <td align="right" style="font-weight: bold; font-family: monospace; padding-bottom: 12px; font-size: 13px; color: #243119; text-align: right; border-bottom: 1px dashed rgba(36, 49, 25, 0.08);">${order.orderId}</td>
                   </tr>
+                  <!-- Row: Peça -->
                   <tr>
                     <td style="color: rgba(36, 49, 25, 0.5); font-weight: 300; padding-top: 12px; padding-bottom: 12px; font-size: 13px; text-align: left; border-bottom: 1px dashed rgba(36, 49, 25, 0.08);">Peça Selecionada:</td>
                     <td align="right" style="font-weight: bold; padding-top: 12px; padding-bottom: 12px; font-size: 13px; color: #243119; text-align: right; border-bottom: 1px dashed rgba(36, 49, 25, 0.08);">${order.productName}</td>
                   </tr>
+                  <!-- Row: Especificações -->
                   <tr>
                     <td style="color: rgba(36, 49, 25, 0.5); font-weight: 300; padding-top: 12px; padding-bottom: 12px; font-size: 13px; text-align: left; border-bottom: 1px dashed rgba(36, 49, 25, 0.08);">Especificações:</td>
-                    <td align="right" style="font-weight: bold; padding-top: 12px; padding-bottom: 12px; font-size: 13px; color: #243119; text-align: right; border-bottom: 1px dashed rgba(36, 49, 25, 0.08);">${order.selections.cor} ${order.selections.tamanho ? `| Tam. ${order.selections.tamanho}` : ''} ${order.selections.quantidade ? `| Qtd. ${order.selections.quantidade}` : ''}</td>
+                    <td align="right" style="font-weight: bold; padding-top: 12px; padding-bottom: 12px; font-size: 13px; color: #243119; text-align: right; border-bottom: 1px dashed rgba(36, 49, 25, 0.08);">${specsText}</td>
                   </tr>
+                  <!-- Row: Método de Pagamento -->
                   <tr>
                     <td style="color: rgba(36, 49, 25, 0.5); font-weight: 300; padding-top: 12px; padding-bottom: 12px; font-size: 13px; text-align: left; border-bottom: 1px dashed rgba(36, 49, 25, 0.08);">Método de Pagamento:</td>
-                    <td align="right" style="font-weight: bold; text-transform: uppercase; padding-top: 12px; padding-bottom: 12px; font-size: 13px; color: #243119; text-align: right; border-bottom: 1px dashed rgba(36, 49, 25, 0.08);">${formatPaymentMethod(order.paymentMethod)}</td>
+                    <td align="right" style="font-weight: bold; text-transform: uppercase; padding-top: 12px; padding-bottom: 12px; font-size: 13px; color: #243119; text-align: right; border-bottom: 1px dashed rgba(36, 49, 25, 0.08);">${order.paymentMethod === 'mbway' ? 'MB WAY' : order.paymentMethod === 'multibanco' ? 'Referência Multibanco' : 'Cartão de Crédito'}</td>
                   </tr>
                   ${order.customer.nif ? `
+                  <!-- Row: NIF -->
                   <tr>
                     <td style="color: rgba(36, 49, 25, 0.5); font-weight: 300; padding-top: 12px; padding-bottom: 12px; font-size: 13px; text-align: left; border-bottom: 1px dashed rgba(36, 49, 25, 0.08);">NIF do Adquirente:</td>
                     <td align="right" style="font-weight: bold; padding-top: 12px; padding-bottom: 12px; font-size: 13px; color: #243119; text-align: right; border-bottom: 1px dashed rgba(36, 49, 25, 0.08);">${order.customer.nif}</td>
                   </tr>
                   ` : ''}
+                  <!-- Row: Estado Pagamento -->
                   <tr>
                     <td style="color: rgba(36, 49, 25, 0.5); font-weight: 300; padding-top: 12px; padding-bottom: 15px; font-size: 13px; text-align: left; border-bottom: 1px solid rgba(36, 49, 25, 0.05);">Estado da Transação:</td>
                     <td align="right" style="font-weight: bold; text-transform: uppercase; padding-top: 12px; padding-bottom: 15px; font-size: 13px; color: #243119; text-align: right; border-bottom: 1px solid rgba(36, 49, 25, 0.05);">LIQUIDADO / CONFIRMADO</td>
                   </tr>
+                  <!-- Row: Total -->
                   <tr>
                     <td style="color: #243119; font-weight: bold; padding-top: 15px; font-size: 15px; text-align: left;">Total Recebido:</td>
                     <td align="right" style="color: #A68244; font-weight: bold; padding-top: 15px; font-size: 16px; text-align: right;">${order.price}</td>
@@ -170,7 +203,8 @@ export function generateCustomerEmailHtml(order: OrderData): string {
           <!-- FOOTER -->
           <div style="text-align: center; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 10px; text-transform: uppercase; letter-spacing: 0.15em; color: rgba(36, 49, 25, 0.4); line-height: 1.8;">
             M★BRAVO ATELIER &bull; PORTUGAL<br>
-            <a href="mailto:${FROM_EMAIL}" style="color: #C5A059; text-decoration: none;">${FROM_EMAIL}</a>
+            <a href="mailto:${FROM_EMAIL}" style="color: #C5A059; text-decoration: none;">${FROM_EMAIL}</a><br>
+            <span style="font-size: 8px; margin-top: 15px; display: block; color: rgba(36, 49, 25, 0.25); text-transform: none; letter-spacing: normal;">${footerNotice}</span>
           </div>
         </td>
       </tr>
@@ -185,12 +219,28 @@ export function generateCustomerEmailHtml(order: OrderData): string {
  */
 export function generateAdminEmailHtml(order: OrderData): string {
   const priorityColor = order.priority.includes('ALTA') ? '#922B21' : '#243119';
+  const showSize = hasValidSize(order.selections.tamanho, order.selections.hasSize);
+  const corText = order.selections?.cor && order.selections.cor.trim() && !['n/a', 'na', 'nenhum', 'padrão', 'padrao', '-'].includes(order.selections.cor.trim().toLowerCase()) 
+    ? order.selections.cor.trim() 
+    : null;
   
+  const paymentStatusText = order.status === 'paid'
+    ? 'PAGO & LIQUIDADO (Confirmado via Stripe)'
+    : order.status.toUpperCase();
+
+  const instructionStep1 = showSize
+    ? `1. Validar as dimensões do molde para o tamanho <strong>${order.selections.tamanho}</strong>.<br>`
+    : `1. Preparar a base do modelo <strong>${order.productName}</strong>${corText ? ` na cor <strong>${corText}</strong>` : ''}.<br>`;
+
+  const instructionStep2 = corText
+    ? `2. Reservar o novelo de fio de cor <strong>${corText}</strong> no stock.<br>`
+    : `2. Separar os materiais de confecção correspondentes.<br>`;
+
   return `<!DOCTYPE html>
 <html>
 <head>
   <meta charset="utf-8">
-  <title>[NOVO PEDIDO CONFIRMADO] M★BRAVO - ${order.orderId}</title>
+  <title>[NOVO PEDIDO] M BRAVO - ${order.orderId}</title>
   <style>
     body {
       background-color: #f4f4f4;
@@ -264,7 +314,7 @@ export function generateAdminEmailHtml(order: OrderData): string {
       <div class="priority-badge">Prioridade: ${order.priority}</div>
     </div>
     <div class="content">
-      <p style="font-size: 14px; margin-top: 0;">Novo pedido recebido e pago com sucesso. Pagamento verificado em sistema.</p>
+      <p style="font-size: 14px; margin-top: 0;">Novo pedido recebido e processado com sucesso. Status do pagamento: <strong>${paymentStatusText}</strong>.</p>
       
       <div class="section-title">Dados de Produção</div>
       <div class="field-row">
@@ -275,21 +325,25 @@ export function generateAdminEmailHtml(order: OrderData): string {
         <span class="label">Modelo:</span>
         <span class="value">${order.productName}</span>
       </div>
+      ${corText ? `
       <div class="field-row">
         <span class="label">Cor Selecionada:</span>
-        <span class="value">${order.selections.cor}</span>
+        <span class="value">${corText}</span>
       </div>
+      ` : ''}
+      ${showSize ? `
       <div class="field-row">
         <span class="label">Tamanho:</span>
-        <span class="value">${order.selections.tamanho || 'Customizado'}</span>
+        <span class="value">${order.selections.tamanho}</span>
       </div>
+      ` : ''}
       <div class="field-row">
         <span class="label">Quantidade:</span>
         <span class="value">${order.selections.quantidade || '1'}</span>
       </div>
       <div class="field-row">
         <span class="label">Método Pagamento:</span>
-        <span class="value" style="text-transform: uppercase;">${formatPaymentMethod(order.paymentMethod)}</span>
+        <span class="value" style="text-transform: uppercase;">${order.paymentMethod === 'mbway' ? 'MB WAY' : order.paymentMethod === 'multibanco' ? 'Multibanco' : 'Cartão de Crédito'}</span>
       </div>
       <div class="field-row">
         <span class="label">Total da Venda:</span>
@@ -320,8 +374,8 @@ export function generateAdminEmailHtml(order: OrderData): string {
 
       <div class="section-title">Instruções Próximas Horas</div>
       <p style="font-size: 12px; color: #555; line-height: 1.5; margin-bottom: 0;">
-        1. Validar as dimensões do molde para o tamanho <strong>${order.selections.tamanho || 'Sob Medida'}</strong>.<br>
-        2. Reservar o novelo de fio de cor <strong>${order.selections.cor}</strong> no stock.<br>
+        ${instructionStep1}
+        ${instructionStep2}
         3. Emitir a etiqueta em couro M★BRAVO correspondente ao pedido.
       </p>
     </div>
@@ -331,9 +385,16 @@ export function generateAdminEmailHtml(order: OrderData): string {
 }
 
 /**
- * Main service method that handles emails.
+ * Main service method that log-creates visual template previews on-disk,
+ * triggers terminal logs, and integrates actual email gateways when keys are provided.
  */
 export function sendTransactionEmails(order: OrderData): { customerEmailUrl: string; adminEmailUrl: string } {
+  // STRICT PAYMENT GUARD: Never send transaction/confirmation emails unless order status is explicitly 'paid'
+  if (order.status !== 'paid') {
+    console.warn(`[M.BRAVO EMAIL SYSTEM GUARD] Order ${order.orderId} status is '${order.status}' (NOT 'paid'). Confirmation email dispatch aborted.`);
+    return { customerEmailUrl: '', adminEmailUrl: '' };
+  }
+
   const customerHtml = generateCustomerEmailHtml(order);
   const adminHtml = generateAdminEmailHtml(order);
 
@@ -349,6 +410,10 @@ export function sendTransactionEmails(order: OrderData): { customerEmailUrl: str
   fs.writeFileSync(path.join(publicEmailsDir, custFileName), customerHtml, 'utf-8');
   fs.writeFileSync(path.join(publicEmailsDir, adminFileName), adminHtml, 'utf-8');
 
+  console.log(`[M.BRAVO EMAIL SYSTEM] Emails generated for order ${order.orderId}!`);
+  console.log(`  - Customer confirmation: /emails/${custFileName}`);
+  console.log(`  - Admin Atelier Notification: /emails/${adminFileName}`);
+
   const hasSendGridKey = process.env.SENDGRID_API_KEY && 
                         process.env.SENDGRID_API_KEY !== "" && 
                         process.env.SENDGRID_API_KEY.startsWith("SG.") &&
@@ -358,15 +423,31 @@ export function sendTransactionEmails(order: OrderData): { customerEmailUrl: str
                         !process.env.SENDGRID_API_KEY.includes("test");
 
   if (hasSendGridKey) {
+    console.log(`[M.BRAVO EMAIL SYSTEM] SendGrid API Key detected! Dispatched live email requests in background...`);
+    
     const customerEmail = (order.customer.email || "").trim();
     if (customerEmail && customerEmail.includes('@')) {
-      sendViaSendGrid(process.env.SENDGRID_API_KEY!, customerEmail, `M★BRAVO | Encomenda Confirmada - ${order.orderId}`, customerHtml)
-        .catch(err => console.warn(`[EMAIL SYSTEM] SendGrid Error (Customer): ${err.message}`));
+      sendViaSendGrid(process.env.SENDGRID_API_KEY!, customerEmail, `M BRAVO | Encomenda Confirmada - ${order.orderId}`, customerHtml)
+        .then(() => console.log(`[M.BRAVO EMAIL SYSTEM] Customer email sent successfully via SendGrid to ${customerEmail}.`))
+        .catch(err => {
+          console.warn(`\n[M.BRAVO EMAIL SYSTEM WARNING] Could not send Customer email via SendGrid:`);
+          console.warn(`  - Logged Detail: ${err.message}`);
+          console.warn(`  - Local Preview: /emails/${custFileName}\n`);
+        });
+    } else {
+      console.log(`[M.BRAVO EMAIL SYSTEM] Skipping customer email dispatch because customer email address is absent or invalid.`);
     }
 
-    const adminEmail = NOTIFICATION_EMAIL; // handmade@mbravobycarolina.com
-    sendViaSendGrid(process.env.SENDGRID_API_KEY!, adminEmail, `[NOVA ENCOMENDA PAGA] ${order.orderId} - Prioridade Atelier`, adminHtml)
-      .catch(err => console.warn(`[EMAIL SYSTEM] SendGrid Error (Admin): ${err.message}`));
+    const adminEmail = NOTIFICATION_EMAIL;
+    sendViaSendGrid(process.env.SENDGRID_API_KEY!, adminEmail, `[NOVO PEDIDO] ${order.orderId} - Prioridade Atelier`, adminHtml)
+      .then(() => console.log(`[M.BRAVO EMAIL SYSTEM] Admin notification email sent successfully via SendGrid.`))
+      .catch(err => {
+        console.warn(`\n[M.BRAVO EMAIL SYSTEM WARNING] Could not send Admin notification email via SendGrid:`);
+        console.warn(`  - Logged Detail: ${err.message}`);
+        console.warn(`  - Local Preview: /emails/${adminFileName}\n`);
+      });
+  } else {
+    console.log(`[M.BRAVO EMAIL SYSTEM] SendGrid key unconfigured. Local Previews saved.`);
   }
 
   return {
@@ -376,9 +457,11 @@ export function sendTransactionEmails(order: OrderData): { customerEmailUrl: str
 }
 
 /**
- * Generates Multibanco payment instruction HTML.
+ * Generates the elegant Multibanco payment instruction HTML email template.
  */
 export function generateMultibancoEmailHtml(order: OrderData, multibancoRef: { entidade: string; referencia: string }): string {
+  const footerNotice = 'Esta é uma mensagem de instruções de pagamento automático para encomenda M★BRAVO.';
+
   return `<!DOCTYPE html>
 <html>
 <head>
@@ -386,60 +469,84 @@ export function generateMultibancoEmailHtml(order: OrderData, multibancoRef: { e
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Dados de Pagamento Multibanco - M★BRAVO</title>
 </head>
-<body style="margin: 0; padding: 0; background-color: #F5F2ED; color: #243119; font-family: 'Georgia', 'Garamond', serif;">
-  <div class="wrapper" style="width: 100%; background-color: #F5F2ED; padding: 40px 0;">
-    <table align="center" border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 600px; background-color: #FCFBF9; border: 1px solid rgba(36, 49, 25, 0.08); border-radius: 4px; margin: 0 auto;">
+<body style="margin: 0; padding: 0; background-color: #F5F2ED; color: #243119; font-family: 'Georgia', 'Garamond', serif; -webkit-font-smoothing: antialiased;">
+  <div class="wrapper" style="width: 100%; background-color: #F5F2ED; padding: 40px 0; font-family: 'Georgia', 'Garamond', serif;">
+    <table align="center" border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 600px; background-color: #FCFBF9; border: 1px solid rgba(36, 49, 25, 0.08); border-radius: 4px; box-shadow: 0 10px 30px rgba(36, 49, 25, 0.02); margin: 0 auto;">
       <tr>
         <td style="padding: 50px 40px;">
+          <!-- HEADER -->
           <table align="center" border="0" cellpadding="0" cellspacing="0" style="margin: 0 auto 40px auto; text-align: center;">
             <tr>
-              <td align="center" style="border-bottom: 1px solid #C5A059; padding-bottom: 5px; font-size: 24px; letter-spacing: 0.3em; font-weight: bold; color: #243119; text-transform: uppercase;">
-                M★BRAVO
+              <td align="center">
+                <table align="center" border="0" cellpadding="0" cellspacing="0" style="margin: 0 auto;">
+                  <tr>
+                    <td align="center" style="border-bottom: 1px solid #C5A059; padding-bottom: 5px; font-size: 24px; letter-spacing: 0.3em; font-weight: bold; color: #243119; text-transform: uppercase; font-family: 'Georgia', 'Garamond', serif;">
+                      M★BRAVO
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+            <tr>
+              <td align="center" style="font-size: 9px; text-transform: uppercase; letter-spacing: 0.4em; color: #C5A059; font-weight: bold; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; padding-top: 10px;">
+                Handmade with Love
               </td>
             </tr>
           </table>
 
+          <!-- GREETING -->
           <div style="font-size: 20px; line-height: 1.5; font-style: italic; text-align: center; margin-bottom: 30px; font-weight: 300; color: #243119;">
             Olá, ${order.customer.nome}.<br>A sua referência Multibanco foi gerada.
           </div>
 
-          <div style="font-size: 14px; line-height: 1.8; color: rgba(36, 49, 25, 0.85); text-align: center; margin-bottom: 30px;">
+          <!-- INSTRUCTION TEXT -->
+          <div style="font-size: 14px; line-height: 1.8; color: rgba(36, 49, 25, 0.85); text-align: center; margin-bottom: 30px; font-weight: 300;">
             Para concluir a sua encomenda M★BRAVO, efetue o pagamento com os dados abaixo através de Homebanking ou caixa ATM (Pagamento de Serviços).
           </div>
 
-          <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #FCF8F2; border: 1px solid #C5A059; border-radius: 12px; margin-bottom: 30px;">
+          <!-- PAYMENT BOX TABLE -->
+          <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #FCF8F2; border: 1px solid #C5A059; border-radius: 12px; border-collapse: separate; border-spacing: 0; font-family: 'Georgia', 'Garamond', serif; margin-bottom: 30px;">
             <tr>
               <td style="padding: 25px;">
-                <table width="100%" cellpadding="0" cellspacing="0">
+                <table width="100%" cellpadding="0" cellspacing="0" style="border-collapse: collapse;">
                   <tr>
-                    <td colspan="2" align="center" style="font-family: sans-serif; font-size: 11px; text-transform: uppercase; letter-spacing: 0.2em; color: #A68244; font-weight: bold; padding-bottom: 20px;">
+                    <td colspan="2" align="center" style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 11px; text-transform: uppercase; letter-spacing: 0.2em; color: #A68244; font-weight: bold; padding-bottom: 20px; text-align: center;">
                       Dados para Pagamento
                     </td>
                   </tr>
+                  <!-- Row: Entidade -->
                   <tr>
-                    <td style="color: rgba(36, 49, 25, 0.6); padding-bottom: 12px; font-size: 14px;">Entidade:</td>
-                    <td align="right" style="font-weight: bold; font-family: monospace; font-size: 15px; padding-bottom: 12px; color: #243119;">${multibancoRef.entidade}</td>
+                    <td style="color: rgba(36, 49, 25, 0.6); font-weight: 300; padding-bottom: 12px; font-size: 14px; text-align: left; border-bottom: 1px dashed rgba(36, 49, 25, 0.08);">Entidade:</td>
+                    <td align="right" style="font-weight: bold; font-family: monospace; font-size: 15px; padding-bottom: 12px; color: #243119; text-align: right; border-bottom: 1px dashed rgba(36, 49, 25, 0.08);">${multibancoRef.entidade}</td>
                   </tr>
+                  <!-- Row: Referência -->
                   <tr>
-                    <td style="color: rgba(36, 49, 25, 0.6); padding-top: 12px; padding-bottom: 12px; font-size: 14px;">Referência:</td>
-                    <td align="right" style="font-weight: bold; font-family: monospace; font-size: 15px; padding-top: 12px; padding-bottom: 12px; color: #243119;">${multibancoRef.referencia}</td>
+                    <td style="color: rgba(36, 49, 25, 0.6); font-weight: 300; padding-top: 12px; padding-bottom: 12px; font-size: 14px; text-align: left; border-bottom: 1px dashed rgba(36, 49, 25, 0.08);">Referência:</td>
+                    <td align="right" style="font-weight: bold; font-family: monospace; font-size: 15px; padding-top: 12px; padding-bottom: 12px; color: #243119; text-align: right; border-bottom: 1px dashed rgba(36, 49, 25, 0.08);">${multibancoRef.referencia}</td>
                   </tr>
+                  <!-- Row: Montante -->
                   <tr>
-                    <td style="color: rgba(36, 49, 25, 0.6); padding-top: 12px; font-size: 14px;">Montante:</td>
-                    <td align="right" style="font-weight: bold; color: #A68244; font-size: 16px; padding-top: 12px;">Total: ${order.price}</td>
+                    <td style="color: rgba(36, 49, 25, 0.6); font-weight: 300; padding-top: 12px; font-size: 14px; text-align: left;">Montante:</td>
+                    <td align="right" style="font-weight: bold; color: #A68244; font-size: 16px; padding-top: 12px; text-align: right;">Total: ${order.price}</td>
                   </tr>
                 </table>
               </td>
             </tr>
           </table>
 
-          <div style="font-size: 12px; font-style: italic; color: rgba(36, 49, 25, 0.6); text-align: center; line-height: 1.6; margin-bottom: 30px;">
-            Nota: Assim que efetuar o pagamento, receberá um e-mail de confirmação automático e iniciaremos a confeção da sua peça.
+          <!-- NOTE TEXT -->
+          <div style="font-size: 12px; font-style: italic; color: rgba(36, 49, 25, 0.6); text-align: center; line-height: 1.6; margin-bottom: 30px; font-weight: 300;">
+            Nota: O prazo limite para pagamento desta referência é de 3 dias. Assim que efetuar o pagamento, receberá um e-mail de confirmação automático e iniciaremos a confecção da sua peça.
           </div>
 
-          <div style="text-align: center; font-family: sans-serif; font-size: 10px; text-transform: uppercase; letter-spacing: 0.15em; color: rgba(36, 49, 25, 0.4);">
+          <!-- DIVIDER -->
+          <div style="height: 1px; background-color: rgba(36, 49, 25, 0.08); margin: 30px 0;"></div>
+
+          <!-- FOOTER -->
+          <div style="text-align: center; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 10px; text-transform: uppercase; letter-spacing: 0.15em; color: rgba(36, 49, 25, 0.4); line-height: 1.8;">
             M★BRAVO ATELIER &bull; PORTUGAL<br>
-            <a href="mailto:${FROM_EMAIL}" style="color: #C5A059; text-decoration: none;">${FROM_EMAIL}</a>
+            <a href="mailto:${FROM_EMAIL}" style="color: #C5A059; text-decoration: none;">${FROM_EMAIL}</a><br>
+            <span style="font-size: 8px; margin-top: 15px; display: block; color: rgba(36, 49, 25, 0.25); text-transform: none; letter-spacing: normal;">${footerNotice}</span>
           </div>
         </td>
       </tr>
@@ -460,16 +567,27 @@ export function sendMultibancoEmails(order: OrderData, multibancoRef: { entidade
   const custFileName = `multibanco-instruction-${order.orderId}.html`;
   fs.writeFileSync(path.join(publicEmailsDir, custFileName), customerHtml, 'utf-8');
 
+  console.log(`[M.BRAVO EMAIL SYSTEM] Multibanco Instruction Email generated for ${order.orderId}`);
+
   const hasSendGridKey = process.env.SENDGRID_API_KEY && 
                         process.env.SENDGRID_API_KEY !== "" && 
-                        process.env.SENDGRID_API_KEY.startsWith("SG.");
+                        process.env.SENDGRID_API_KEY.startsWith("SG.") &&
+                        !process.env.SENDGRID_API_KEY.includes("INSERT_") &&
+                        !process.env.SENDGRID_API_KEY.includes("YOUR_") &&
+                        !process.env.SENDGRID_API_KEY.includes("mock") &&
+                        !process.env.SENDGRID_API_KEY.includes("test");
 
   if (hasSendGridKey) {
-    sendViaSendGrid(process.env.SENDGRID_API_KEY!, order.customer.email, `M★BRAVO | Dados para Pagamento Multibanco - Encomenda ${order.orderId}`, customerHtml)
-      .catch(err => console.warn(`[EMAIL SYSTEM] SendGrid Error (Multibanco): ${err.message}`));
+    sendViaSendGrid(process.env.SENDGRID_API_KEY!, order.customer.email, `M BRAVO | Dados para Pagamento Multibanco - Encomenda ${order.orderId}`, customerHtml)
+      .then(() => console.log(`[M.BRAVO EMAIL SYSTEM] Multibanco instructions email sent successfully via SendGrid.`))
+      .catch(err => {
+        console.warn(`[M.BRAVO EMAIL SYSTEM WARNING] Could not send Multibanco instructions email via SendGrid: ${err.message}`);
+      });
   }
 
-  return { customerEmailUrl: `/emails/${custFileName}` };
+  return {
+    customerEmailUrl: `/emails/${custFileName}`
+  };
 }
 
 async function sendViaSendGrid(apiKey: string, toEmail: string, subject: string, htmlContent: string) {
@@ -482,7 +600,7 @@ async function sendViaSendGrid(apiKey: string, toEmail: string, subject: string,
     },
     body: JSON.stringify({
       personalizations: [{ to: [{ email: toEmail }] }],
-      from: { email: FROM_EMAIL, name: 'M BRAVO' },
+      from: { email: process.env.FROM_EMAIL || 'encomendas@mbravobycarolina.com', name: 'M BRAVO' },
       subject: subject,
       content: [{ type: 'text/html', value: htmlContent }]
     })
@@ -494,50 +612,164 @@ async function sendViaSendGrid(apiKey: string, toEmail: string, subject: string,
   }
 }
 
+/**
+ * Generates the elegant cream & forest green customer order shipped HTML email template.
+ */
 export function generateShippedEmailHtml(order: OrderData, trackingCode: string): string {
   const trackingUrl = `https://www.ctt.pt/feapl_2/app/open/objectSearch/objectSearch.jspx?lang=def&objects=${trackingCode}`;
+  const specsText = formatOrderSpecifications(order.selections);
+  const footerNotice = 'Esta é uma mensagem automática de aviso de expedição M★BRAVO.';
+
   return `<!DOCTYPE html>
 <html>
 <head>
   <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>A sua Encomenda foi Enviada! - M★BRAVO</title>
 </head>
-<body style="margin: 0; padding: 0; background-color: #F5F2ED; color: #243119; font-family: 'Georgia', 'Garamond', serif;">
-  <div class="wrapper" style="width: 100%; background-color: #F5F2ED; padding: 40px 0;">
-    <table align="center" border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 600px; background-color: #FCFBF9; border: 1px solid rgba(36, 49, 25, 0.08); border-radius: 4px; margin: 0 auto;">
+<body style="margin: 0; padding: 0; background-color: #F5F2ED; color: #243119; font-family: 'Georgia', 'Garamond', serif; -webkit-font-smoothing: antialiased;">
+  <div class="wrapper" style="width: 100%; background-color: #F5F2ED; padding: 40px 0; font-family: 'Georgia', 'Garamond', serif;">
+    <table align="center" border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 600px; background-color: #FCFBF9; border: 1px solid rgba(36, 49, 25, 0.08); border-radius: 4px; box-shadow: 0 10px 30px rgba(36, 49, 25, 0.02); margin: 0 auto;">
       <tr>
         <td style="padding: 50px 40px;">
+          <!-- HEADER -->
           <table align="center" border="0" cellpadding="0" cellspacing="0" style="margin: 0 auto 40px auto; text-align: center;">
             <tr>
-              <td align="center" style="border-bottom: 1px solid #C5A059; padding-bottom: 5px; font-size: 24px; letter-spacing: 0.3em; font-weight: bold; color: #243119; text-transform: uppercase;">
-                M★BRAVO
+              <td align="center">
+                <table align="center" border="0" cellpadding="0" cellspacing="0" style="margin: 0 auto;">
+                  <tr>
+                    <td align="center" style="border-bottom: 1px solid #C5A059; padding-bottom: 5px; font-size: 24px; letter-spacing: 0.3em; font-weight: bold; color: #243119; text-transform: uppercase; font-family: 'Georgia', 'Garamond', serif;">
+                      M★BRAVO
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+            <tr>
+              <td align="center" style="font-size: 9px; text-transform: uppercase; letter-spacing: 0.4em; color: #C5A059; font-weight: bold; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; padding-top: 10px;">
+                Handmade with Love
               </td>
             </tr>
           </table>
 
+          <!-- GREETING -->
           <div style="font-size: 20px; line-height: 1.5; font-style: italic; text-align: center; margin-bottom: 30px; font-weight: 300; color: #243119;">
             Olá, ${order.customer.nome}.<br>A sua peça M★BRAVO já está a caminho!
           </div>
 
-          <div style="font-size: 14px; line-height: 1.8; color: rgba(36, 49, 25, 0.85); text-align: justify; margin-bottom: 30px;">
-            A sua peça foi tecida à mão no nosso atelier com todo o afeto e dedicação. A sua encomenda foi carinhosamente embalada e entregue aos CTT para envio.
+          <!-- SHIPPED STORY TEXT -->
+          <div style="font-size: 14px; line-height: 1.8; color: rgba(36, 49, 25, 0.85); text-align: justify; margin-bottom: 30px; font-weight: 300;">
+            A sua peça foi tecida à mão no nosso atelier com todo o afeto, cuidado e dedicação. O processo de confecção manual está agora concluído e a sua encomenda foi carinhosamente embalada e entregue aos CTT para envio.
           </div>
 
-          <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #FCF8F2; border: 1px solid #C5A059; border-radius: 12px; margin-bottom: 30px;">
+          <!-- TRACKING BOX TABLE -->
+          <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #FCF8F2; border: 1px solid #C5A059; border-radius: 12px; border-collapse: separate; border-spacing: 0; font-family: 'Georgia', 'Garamond', serif; margin-bottom: 30px;">
+            <tr>
+              <td style="padding: 25px;">
+                <table width="100%" cellpadding="0" cellspacing="0" style="border-collapse: collapse;">
+                  <tr>
+                    <td colspan="2" align="center" style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 11px; text-transform: uppercase; letter-spacing: 0.2em; color: #A68244; font-weight: bold; padding-bottom: 20px; text-align: center;">
+                      Acompanhamento do Envio
+                    </td>
+                  </tr>
+                  <!-- Row: Transportadora -->
+                  <tr>
+                    <td style="color: rgba(36, 49, 25, 0.6); font-weight: 300; padding-bottom: 12px; font-size: 14px; text-align: left; border-bottom: 1px dashed rgba(36, 49, 25, 0.08);">Transportadora:</td>
+                    <td align="right" style="font-weight: bold; font-size: 14px; padding-bottom: 12px; color: #243119; text-align: right; border-bottom: 1px dashed rgba(36, 49, 25, 0.08);">CTT - Correios de Portugal</td>
+                  </tr>
+                  <!-- Row: Código de Rastreamento -->
+                  <tr>
+                    <td style="color: rgba(36, 49, 25, 0.6); font-weight: 300; padding-top: 12px; padding-bottom: 20px; font-size: 14px; text-align: left; border-bottom: 1px solid rgba(36, 49, 25, 0.05);">Código de Rastreio (Tracking):</td>
+                    <td align="right" style="font-weight: bold; font-family: monospace; font-size: 15px; padding-top: 12px; padding-bottom: 20px; color: #A68244; text-align: right; border-bottom: 1px solid rgba(36, 49, 25, 0.05);">${trackingCode}</td>
+                  </tr>
+                  <!-- Row: Button -->
+                  <tr>
+                    <td colspan="2" align="center" style="padding-top: 20px; text-align: center;">
+                      <a href="${trackingUrl}" target="_blank" style="display: inline-block; background-color: #243119; color: #F5F2ED; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: 0.15em; text-decoration: none; padding: 14px 28px; border-radius: 50px; transition: all 0.2s ease;">
+                        Rastrear nos CTT
+                      </a>
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+          </table>
+
+          <!-- DIVIDER -->
+          <div style="height: 1px; background-color: rgba(36, 49, 25, 0.08); margin: 30px 0;"></div>
+
+          <!-- ORDER DETAILS TITLE -->
+          <div style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 10px; text-transform: uppercase; letter-spacing: 0.2em; color: #A68244; font-weight: bold; margin-bottom: 15px;">
+            Artigos Enviados
+          </div>
+
+          <!-- ORDER DETAILS TABLE -->
+          <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #FBF9F6; border: 1px solid rgba(197, 160, 89, 0.15); border-radius: 8px; border-collapse: separate; border-spacing: 0; font-family: 'Georgia', 'Garamond', serif; margin-bottom: 30px;">
+            <tr>
+              <td style="padding: 25px;">
+                <table width="100%" cellpadding="0" cellspacing="0" style="border-collapse: collapse;">
+                  <!-- Row: ID -->
+                  <tr>
+                    <td style="color: rgba(36, 49, 25, 0.5); font-weight: 300; padding-bottom: 12px; font-size: 13px; text-align: left; border-bottom: 1px dashed rgba(36, 49, 25, 0.08);">ID da Encomenda:</td>
+                    <td align="right" style="font-weight: bold; font-family: monospace; padding-bottom: 12px; font-size: 13px; color: #243119; text-align: right; border-bottom: 1px dashed rgba(36, 49, 25, 0.08);">${order.orderId}</td>
+                  </tr>
+                  <!-- Row: Peça -->
+                  <tr>
+                    <td style="color: rgba(36, 49, 25, 0.5); font-weight: 300; padding-top: 12px; padding-bottom: 12px; font-size: 13px; text-align: left; border-bottom: 1px dashed rgba(36, 49, 25, 0.08);">Peça:</td>
+                    <td align="right" style="font-weight: bold; padding-top: 12px; padding-bottom: 12px; font-size: 13px; color: #243119; text-align: right; border-bottom: 1px dashed rgba(36, 49, 25, 0.08);">${order.productName}</td>
+                  </tr>
+                  <!-- Row: Especificações -->
+                  <tr>
+                    <td style="color: rgba(36, 49, 25, 0.5); font-weight: 300; padding-top: 12px; padding-bottom: 12px; font-size: 13px; text-align: left; border-bottom: 1px dashed rgba(36, 49, 25, 0.08);">Especificações:</td>
+                    <td align="right" style="font-weight: bold; padding-top: 12px; padding-bottom: 12px; font-size: 13px; color: #243119; text-align: right; border-bottom: 1px dashed rgba(36, 49, 25, 0.08);">${specsText}</td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+          </table>
+
+          <!-- SHIPPING BOX -->
+          <div style="font-size: 13px; line-height: 1.6; color: rgba(36, 49, 25, 0.8); margin-bottom: 30px;">
+            <div style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 10px; text-transform: uppercase; letter-spacing: 0.2em; color: rgba(36, 49, 25, 0.5); font-weight: bold; margin-bottom: 8px;">
+              Destinatário & Morada de Entrega
+            </div>
+            <div style="font-weight: 300; color: #243119;">
+              <strong>${order.customer.nome}</strong><br>
+              ${order.customer.morada}<br>
+              ${order.customer.codigoPostal}, ${order.customer.cidade}<br>
+              Telemóvel: ${order.customer.telefone}
+            </div>
+          </div>
+
+          <!-- SHIPPED NOTE -->
+          <div style="background-color: #FDFBF7; border-left: 3px solid #C5A059; padding: 15px; font-size: 12px; line-height: 1.6; font-style: italic; color: rgba(36, 49, 25, 0.8); margin-bottom: 35px;">
+            <strong>Nota de Entrega:</strong> O tempo estimado para entrega em Portugal Continental é de 1 a 3 dias úteis. Caso se trate de um envio para as Ilhas (Açores e Madeira) ou Internacional, o prazo poderá estender-se até 5 a 10 dias úteis. Acompanhe o estado do envio usando o botão acima.
+          </div>
+
+          <!-- GOOGLE REVIEWS REQUEST -->
+          <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #FAF8F5; border: 1px solid rgba(197, 160, 89, 0.25); border-radius: 12px; font-family: 'Georgia', 'Garamond', serif; margin-top: 30px; margin-bottom: 30px; text-align: center;">
             <tr>
               <td style="padding: 25px; text-align: center;">
-                <div style="font-size: 14px; margin-bottom: 8px;">Código de Rastreio (CTT):</div>
-                <div style="font-family: monospace; font-size: 18px; font-weight: bold; color: #A68244; margin-bottom: 15px;">${trackingCode}</div>
-                <a href="${trackingUrl}" target="_blank" style="display: inline-block; background-color: #243119; color: #F5F2ED; font-family: sans-serif; font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: 0.15em; text-decoration: none; padding: 12px 24px; border-radius: 50px;">
-                  Rastrear nos CTT
+                <div style="color: #C5A059; font-size: 16px; margin-bottom: 8px; letter-spacing: 0.1em;">★ ★ ★ ★ ★</div>
+                <div style="font-size: 16px; font-style: italic; font-weight: bold; color: #243119; margin-bottom: 10px;">Partilhe a sua experiência M★BRAVO!</div>
+                <div style="font-size: 13px; line-height: 1.6; color: rgba(36, 49, 25, 0.8); margin-bottom: 18px; font-weight: 300;">
+                  Como uma marca artesanal e independente, cada opinião é imensamente valiosa para nós. Se adorou o seu atendimento e a sua nova peça tecida à mão, significaria o mundo para nós se nos pudesse deixar uma breve crítica de 5 estrelas no Google.
+                </div>
+                <a href="https://g.page/r/Cdo7JGP_Xpc3EBM/review" target="_blank" style="display: inline-block; background-color: #243119; color: #F5F2ED; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: 0.15em; text-decoration: none; padding: 12px 24px; border-radius: 50px; transition: all 0.2s ease;">
+                  Deixar Crítica no Google
                 </a>
               </td>
             </tr>
           </table>
 
-          <div style="text-align: center; font-family: sans-serif; font-size: 10px; text-transform: uppercase; letter-spacing: 0.15em; color: rgba(36, 49, 25, 0.4);">
+          <!-- DIVIDER -->
+          <div style="height: 1px; background-color: rgba(36, 49, 25, 0.08); margin: 30px 0;"></div>
+
+          <!-- FOOTER -->
+          <div style="text-align: center; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 10px; text-transform: uppercase; letter-spacing: 0.15em; color: rgba(36, 49, 25, 0.4); line-height: 1.8;">
             M★BRAVO ATELIER &bull; PORTUGAL<br>
-            <a href="mailto:${FROM_EMAIL}" style="color: #C5A059; text-decoration: none;">${FROM_EMAIL}</a>
+            <a href="mailto:${FROM_EMAIL}" style="color: #C5A059; text-decoration: none;">${FROM_EMAIL}</a><br>
+            <span style="font-size: 8px; margin-top: 15px; display: block; color: rgba(36, 49, 25, 0.25); text-transform: none; letter-spacing: normal;">${footerNotice}</span>
           </div>
         </td>
       </tr>
@@ -558,14 +790,25 @@ export function sendShippedEmails(order: OrderData, trackingCode: string): { shi
   const custFileName = `shipped-notification-${order.orderId}.html`;
   fs.writeFileSync(path.join(publicEmailsDir, custFileName), customerHtml, 'utf-8');
 
+  console.log(`[M.BRAVO EMAIL SYSTEM] Shipped Notification Email generated for ${order.orderId}`);
+
   const hasSendGridKey = process.env.SENDGRID_API_KEY && 
                         process.env.SENDGRID_API_KEY !== "" && 
-                        process.env.SENDGRID_API_KEY.startsWith("SG.");
+                        process.env.SENDGRID_API_KEY.startsWith("SG.") &&
+                        !process.env.SENDGRID_API_KEY.includes("INSERT_") &&
+                        !process.env.SENDGRID_API_KEY.includes("YOUR_") &&
+                        !process.env.SENDGRID_API_KEY.includes("mock") &&
+                        !process.env.SENDGRID_API_KEY.includes("test");
 
   if (hasSendGridKey) {
-    sendViaSendGrid(process.env.SENDGRID_API_KEY!, order.customer.email, `M★BRAVO | A sua Encomenda foi Enviada! - ${order.orderId}`, customerHtml)
-      .catch(err => console.warn(`[EMAIL SYSTEM] SendGrid Error (Shipped): ${err.message}`));
+    sendViaSendGrid(process.env.SENDGRID_API_KEY!, order.customer.email, `M BRAVO | A sua Encomenda foi Enviada! - ${order.orderId}`, customerHtml)
+      .then(() => console.log(`[M.BRAVO EMAIL SYSTEM] Shipped Notification email sent successfully via SendGrid.`))
+      .catch(err => {
+        console.warn(`[M.BRAVO EMAIL SYSTEM WARNING] Could not send Shipped Notification email via SendGrid: ${err.message}`);
+      });
   }
 
-  return { shippedEmailUrl: `/emails/${custFileName}` };
+  return {
+    shippedEmailUrl: `/emails/${custFileName}`
+  };
 }
