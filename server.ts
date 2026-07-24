@@ -1423,7 +1423,7 @@ app.post("/api/admin/orders/update", verifyAdmin, (req, res) => {
 });
 
 // Endpoint to manually register/add an order (e.g. past manual purchases or recovery)
-app.post("/api/admin/orders/create", verifyAdmin, (req, res) => {
+app.post("/api/admin/orders/create", verifyAdmin, async (req, res) => {
   const { productName, price, selections, customer, paymentMethod, status, priority, createdAt } = req.body;
 
   const cleanCustomerNome = sanitizeText(customer?.nome);
