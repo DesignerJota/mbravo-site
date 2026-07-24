@@ -60,16 +60,17 @@ Respondendo às últimas solicitações de otimização de fluxo e consistência
 
 ---
 
-## 3. TAREFA ATUAL (Ajustes Finais de Produção: Acesso Discreto ao Admin, E-mails Dinâmicos Limpos & Purga Real de Dados)
+## 3. TAREFA ATUAL (Polimento Final do Painel de Administração & Gestão Avançada de Encomendas)
 *   **Estado:** **Concluído com Sucesso e Validado para Produção**.
 *   **Ações Realizadas:**
-    1.  **Acesso Discreto ao Admin (Footer):** Removido o botão visível "Painel Atelier" da barra de navegação do rodapé. Restaurado o acesso discreto e exclusivo através do clique sobre o texto do copyright (`© 2026 M★BRAVO`), mantendo ativas a rota URL `/admin` e a validação por palavra-passe.
-    2.  **Painel de Administração 100% Real (Sem Dados Fictícios):** Garantida a ligação direta do `AdminDashboardModal` e `server.ts` aos dados reais de encomendas persistidos no volume `/app/data/orders.json`. Dados mock/dummy, simulações ou arrays estáticos foram purgados.
-    3.  **Templates de E-mail Dinâmicos e Limpos (`emailService.ts`):**
-        *   Nova função `formatOrderSpecifications` que formata dinamicamente os atributos da encomenda (Cor, Tamanho, Quantidade). Atributos omissos ou irrelevantes (ex: tamanho em produtos de tamanho único/malas) não são desenhados nos e-mails.
-        *   Remoção integral de avisos de teste, caixas de sandbox, placeholders e referências a ambientes de desenvolvimento em todos os templates de e-mail (`generateCustomerEmailHtml`, `generateAdminEmailHtml`, `generateMultibancoEmailHtml`, `generateShippedEmailHtml`).
-    4.  **Blindagem do Disparo de E-mails de Confirmação:** Mantida a verificação de segurança estrita em `sendTransactionEmails` (`src/lib/emailService.ts`) que impede o disparo de e-mails de confirmação de compra antes da confirmação efetiva do pagamento pelo Stripe (`succeeded` / Webhook).
-    5.  **Atualização Integral da Documentação Técnica:** Atualizados os ficheiros `/docs/2_ARCHITECTURE_AND_ADMIN.md` e `/docs/3_PROJECT_STATE.md` com a especificação final da arquitetura.
+    1.  **Limpeza Visual do Painel de Vendas:** Removida a etiqueta técnica `VENDAS REAIS (ORDERS.JSON)` do painel de análises do atelier. Substituída por um indicador discreto e elegante: `● Sincronizado em tempo real`, eliminando quaisquer termos técnicos do ecossistema visível da marca.
+    2.  **Gestão, Cancelamento e Eliminação de Encomendas (`/api/admin/orders/delete`):**
+        *   Adicionada ação de **Cancelar** em cada cartão de encomenda para marcar o estado como `failed` (Cancelada).
+        *   Criado o novo endpoint de servidor `/api/admin/orders/delete` e ação **Eliminar** (com janela de confirmação de segurança) em cada cartão de encomenda. Permite apagar registos manuais ou criados por engano, atualizando automaticamente em tempo real as métricas de faturação do painel e o ficheiro de persistência.
+    3.  **Acesso Discreto ao Admin (Footer):** Acesso ao Painel de Administração exclusivamente no clique sobre o copyright (`© 2026 M★BRAVO`) ou pela rota URL `/admin`.
+    4.  **Templates de E-mail Dinâmicos e Limpos (`emailService.ts`):** Formatação dinâmica de especificações (Cor, Tamanho, Quantidade) sem avisos de sandbox ou placeholders.
+    5.  **Blindagem de Disparo de E-mails:** Verificação estrita que garante que e-mails de confirmação de compra só são disparados após confirmação efetiva do pagamento pelo Stripe.
+    6.  **Atualização Integral da Documentação Técnica:** Atualizados os ficheiros em `/docs` para registo da arquitetura final.
 
 ---
 
