@@ -49,7 +49,11 @@ A aplicação adota um armazenamento baseado em ficheiros locais persistentes, o
 *   **Exportação Contabilística:** Funcionalidade nativa de exportação de dados financeiros para formato **CSV** (`Exportar Contabilidade`), permitindo o download direto das transações prontas a importar em softwares de contabilidade.
 
 ### B. Gestão de Encomendas & CRM (`orders`)
-*   **Estado da Encomenda:** Gestão do fluxo da transação (`pendente de pagamento`, `paga`, `enviada`, `falhada`).
+*   **Estado da Encomenda:** Gestão do fluxo da transação (`pendente de pagamento`, `paga`, `enviada`, `entregue`, `cancelada`).
+*   **Gestão e Apagar/Cancelar Encomendas Manuais:**
+    *   **Cancelamento:** Ação rápida para cancelar qualquer encomenda (`Cancelar`), alterando o estado para `failed` (Cancelada).
+    *   **Eliminação Definitiva (`/api/admin/orders/delete`):** Ação direta para apagar/eliminar registos de encomendas criadas manualmente ou por engano (`Eliminar`), removendo o registo da base de dados e recalculando instantaneamente os totais de faturação e métricas da contabilidade.
+*   **Indicador de Sincronização Limpo:** Badge discreto de estado na interface (`● Sincronizado em tempo real`), livre de referências a nomes de ficheiros ou termos técnicos do servidor.
 *   **Automação do Fluxo de Expedição CTT (`sendShippedEmails`):** Ao introduzir o código de rastreamento dos CTT e marcar a encomenda como "enviada" (`shipped`), o sistema executa automaticamente de forma imediata:
     1. Atualização do estado no `orders.json` e sincronização reativa no perfil CRM do cliente.
     2. Disparo imediato do e-mail de confirmação de expedição com o código CTT para a cliente (`sendShippedEmails`).
