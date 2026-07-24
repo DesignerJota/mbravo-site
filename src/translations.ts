@@ -303,14 +303,14 @@ export const translations = {
     "checkout.card_expiry": "MM/AA",
     "checkout.card_cvv": "CVV",
     
-    // Sandbox
-    "sandbox.title": "Consola de Teste Sandbox",
-    "sandbox.email_sim": "Simulações de E-mail (Sandbox)",
-    "sandbox.email_desc": "Clique para abrir em nova aba os e-mails minimalistas de confirmação e alerta de atelier gerados em tempo real:",
-    "sandbox.view_client": "Ver E-mail Cliente",
-    "sandbox.view_admin": "Ver Alerta Atelier",
-    "sandbox.ship_order": "Despachar Encomenda (CTT)",
-    "sandbox.view_shipped": "Ver E-mail Envio (CTT)",
+    // Order Receipts & Communication Hub
+    "sandbox.title": "Comprovativos de Encomenda",
+    "sandbox.email_sim": "Comprovativos & E-mails de Confirmação",
+    "sandbox.email_desc": "Aceda aos comprovativos digitais e notificações de atelier gerados em tempo real:",
+    "sandbox.view_client": "Ver Recibo do Cliente",
+    "sandbox.view_admin": "Ver Notificação Atelier",
+    "sandbox.ship_order": "Expedir Encomenda (CTT)",
+    "sandbox.view_shipped": "Ver Notificação de Envio",
     "sandbox.mbway_fast": "Aprovação Rápida",
     "sandbox.mbway_rej": "Rejeição de MB WAY",
     "sandbox.mbway_timeout": "Expiração/Timeout",
@@ -532,14 +532,14 @@ export const translations = {
     "checkout.card_expiry": "MM/YY",
     "checkout.card_cvv": "CVV",
     
-    // Sandbox
-    "sandbox.title": "Sandbox Test Console",
-    "sandbox.email_sim": "Email Simulations (Sandbox)",
-    "sandbox.email_desc": "Click to open the minimalist confirmation and workshop alert emails generated in real-time in a new tab:",
-    "sandbox.view_client": "View Client Email",
-    "sandbox.view_admin": "View Workshop Alert",
+    // Order Receipts & Communication Hub
+    "sandbox.title": "Order Confirmation Hub",
+    "sandbox.email_sim": "Order Receipts & Notifications",
+    "sandbox.email_desc": "Access the digital receipts and workshop notifications generated in real-time:",
+    "sandbox.view_client": "View Customer Receipt",
+    "sandbox.view_admin": "View Workshop Notification",
     "sandbox.ship_order": "Dispatch Order (CTT)",
-    "sandbox.view_shipped": "View Shipped Email (CTT)",
+    "sandbox.view_shipped": "View Dispatch Notification",
     "sandbox.mbway_fast": "Fast Approval",
     "sandbox.mbway_rej": "MB WAY Rejection",
     "sandbox.mbway_timeout": "Expiration/Timeout",
@@ -646,9 +646,11 @@ export function translateSize(size: string, lang: 'pt' | 'en'): string {
   return size;
 }
 
-export function translateQuantity(qty: string, lang: 'pt' | 'en'): string {
-  if (lang === 'pt') return qty;
-  return qty.replace('und.', ' pcs');
+export function translateQuantity(qty: any, lang: 'pt' | 'en'): string {
+  if (!qty) return '';
+  const str = String(qty);
+  if (lang === 'pt') return str;
+  return str.replace('und.', ' pcs');
 }
 
 export const translatedCategories = {
