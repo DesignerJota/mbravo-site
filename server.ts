@@ -2,7 +2,7 @@ import express from "express";
 import path from "path";
 import fs from "fs";
 import { createServer as createViteServer } from "vite";
-import { sendTransactionEmails, sendMultibancoEmails, sendShippedEmails, OrderData } from "./src/lib/emailService";
+import { sendTransactionEmails, sendMultibancoEmails, sendShippedEmails } from "./src/lib/emailService";
 import Stripe from "stripe";
 import pg from "pg";
 
@@ -157,6 +157,18 @@ function isValidEmailStrict(email: any): boolean {
   if (!email) return false;
   const str = String(email).trim();
   return /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(str);
+}
+
+// Administrative Middleware Verification
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'CarolinaM26';
+
+function verifyAdmin(req: any, res: any, next: any) {
+  const auth = req.headers['x-admin-password'] || req.headers['authorization'];
+  if (auth === ADMIN_PASSWORD) {
+    next();
+  } else {
+    res.status(401).json({ error: "Acesso administrativo não autorizado. Palavra-passe incorreta." });
+  }
 }
 
 // Serve dynamic robots.txt depending on whether the request accesses the brand site or the API subdomain
@@ -356,7 +368,6 @@ app.post("/api/payment/create-intent", async (req, res) => {
           console.log(`[STRIPE] Creating Multibanco PaymentIntent for order ${orderId} with amount ${finalAmountInCents} cents`);
           
           const customerName = checkoutForm.nome?.trim() || "M BRAVO Cliente";
-          // CORREÇÃO: Removido o fallback para o gmail antigo
           const customerEmail = checkoutForm.email?.trim() || "encomendas@mbravobycarolina.com";
 
           const paymentIntent = await stripe.paymentIntents.create({
@@ -1306,16 +1317,6 @@ app.post("/api/admin/inventory/update", verifyAdmin, (req, res) => {
 /**
  * 6. ADMINISTRATIVE DASHBOARD ENDPOINTS
  */
-const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'CarolinaM26';
-
-function verifyAdmin(req: any, res: any, next: any) {
-  const auth = req.headers['x-admin-password'] || req.headers['authorization'];
-  if (auth === ADMIN_PASSWORD) {
-    next();
-  } else {
-    res.status(401).json({ error: "Acesso administrativo não autorizado. Palavra-passe incorreta." });
-  }
-}
 
 // Endpoint to verify password
 app.post("/api/admin/login", (req, res) => {
