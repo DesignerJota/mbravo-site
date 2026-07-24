@@ -4554,7 +4554,7 @@ const Footer = ({ onOpenLegal, onOpenAdmin }: { onOpenLegal: (type: 'envios' | '
                     </div>
                 </div>
                 
-                <div className="flex flex-col sm:flex-row gap-6 sm:gap-12 text-[10px] uppercase tracking-[0.2em] font-medium text-cream/65 text-center lg:text-left">
+                <div className="flex flex-col sm:flex-row gap-6 sm:gap-12 text-[10px] uppercase tracking-[0.2em] font-medium text-cream/65 text-center lg:text-left items-center">
                     <button onClick={() => onOpenLegal('envios')} className="hover:text-cream transition-colors cursor-pointer text-center lg:text-left uppercase tracking-[0.2em]">{t('footer.legal_shipping')}</button>
                     <button onClick={() => onOpenLegal('privacidade')} className="hover:text-cream transition-colors cursor-pointer text-center lg:text-left uppercase tracking-[0.2em]">{t('footer.legal_privacy')}</button>
                     <button onClick={() => onOpenLegal('termos')} className="hover:text-cream transition-colors cursor-pointer text-center lg:text-left uppercase tracking-[0.2em]">{t('footer.legal_terms')}</button>
@@ -4567,7 +4567,8 @@ const Footer = ({ onOpenLegal, onOpenAdmin }: { onOpenLegal: (type: 'envios' | '
                     <div className="text-cream/45 mt-2 whitespace-pre-line text-center lg:text-right">
                         <span 
                             onClick={onOpenAdmin}
-                            className="cursor-default select-none active:opacity-80"
+                            className="cursor-pointer transition-colors hover:text-cream/80 select-none active:opacity-80"
+                            title="M★BRAVO Atelier"
                         >
                             {t('footer.made_in').split('\n')[0]}
                         </span>
@@ -7327,7 +7328,7 @@ export default function App() {
               )}
             </AnimatePresence>
             
-          <Footer onOpenLegal={(type) => setActiveLegal(type)} onOpenAdmin={() => navigateTo('/admin')} />
+            <Footer onOpenLegal={(type) => setActiveLegal(type)} onOpenAdmin={() => navigateTo('/admin')} />
 
             <AnimatePresence>
                 {activeLegal && (
