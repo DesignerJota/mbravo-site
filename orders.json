@@ -1,0 +1,27 @@
+{
+  "MB-2026-3147": {
+    "orderId": "MB-2026-3147",
+    "productName": "Daisy Coasters",
+    "price": 16,
+    "selections": {
+      "cor": "Verde Musgo",
+      "tamanho": "",
+      "hasSize": false,
+      "quantidade": "4"
+    },
+    "customer": {
+      "nome": "Paulo António Lima Macedo de Queirós",
+      "email": "pqueiros.arg@gmail.com",
+      "telefone": "+351917827458",
+      "morada": "Rua D. Cristóvão da Gama 200",
+      "codigoPostal": "4150-249",
+      "cidade": "Porto",
+      "nif": ""
+    },
+    "paymentMethod": "mbway",
+    "status": "paid",
+    "priority": "NORMAL",
+    "createdAt": "2026-07-23T12:00:00.000Z",
+    "emailSent": true
+  }
+}
