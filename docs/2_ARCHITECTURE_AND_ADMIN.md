@@ -39,7 +39,8 @@ A aplicação adota um armazenamento baseado em ficheiros locais persistentes, o
 ---
 
 ## 3. Painel de Administração (Admin Dashboard)
-O acesso ao Painel de Administração é efetuado através da rota `/admin` e validado por uma palavra-passe robusta encriptada por sessões (Padrão: `CarolinaM26`). O Painel divide-se em 5 abas de controlo absoluto:
+*   **Acesso Discreto e Rota Segura:** O Painel de Administração pode ser acedido diretamente pela rota URL `/admin` ou mediante um clique discreto sobre a nota de copyright no rodapé da página (`© 2026 M★BRAVO`). O botão visível público foi removido para manter a estética minimalista e exclusiva da marca em ambiente de produção final. O acesso é protegido por palavra-passe encriptada por sessões (Padrão: `CarolinaM26`).
+*   **Purga Total e Absoluta de Dados Mock/Seed:** As abas 'analytics', 'orders' e 'crm' carregam 100% de dados reais e dinâmicos persistidos no volume `/app/data/orders.json`. Quaisquer dados de demonstração, arrays estáticos ou sementes fictícias foram purgados do servidor (`server.ts`) e da interface (`AdminDashboardModal.tsx`), assegurando fiabilidade operacional absoluta.
 
 ### A. Insights e Contabilidade (`analytics`)
 *   **Purga Total e Absoluta de Dados Mock/Seed:** As abas 'analytics', 'orders' e 'crm' carregam 100% de dados reais e dinâmicos persistidos no volume `/app/data/orders.json`. Quaisquer dados de demonstração, arrays estáticos ou sementes fictícias foram purgados do servidor (`server.ts`) e da interface (`AdminDashboardModal.tsx`), assegurando fiabilidade operacional absoluta.
@@ -92,14 +93,19 @@ O sistema de Gestão de Relação com Clientes (CRM) está totalmente integrado 
 
 ---
 
-## 6. Serviços de Email (`src/lib/emailService.ts`)
-A lógica de envio de e-mails comunica as atualizações de forma profissional:
+## 6. Serviços de Email & Regra de Ouro do Disparo de Confirmações (`src/lib/emailService.ts`)
+A lógica de envio de e-mails comunica as atualizações de forma profissional com uma **Regra de Ouro de Segurança**:
+*   **Regra de Ouro (Blindagem de Pagamento):** Nenhum e-mail de confirmação de encomenda (`generateCustomerEmailHtml`) é disparado nem qualquer processamento de venda é assumido antes de o pagamento ser efetivamente confirmado pelo gateway Stripe via Webhook (`payment_intent.succeeded` / `checkout.session.completed`) ou status verificado `succeeded`.
+*   **Proteção Nativa no Código:** O `emailService.ts` contém uma verificação de segurança estrita em `sendTransactionEmails` que aborta imediatamente o envio de e-mail de confirmação se o estado da encomenda for diferente de `'paid'`.
+*   **Instruções de Pagamento Multibanco:** No caso de pagamento por Multibanco, o sistema envia exclusivamente o e-mail de instruções com a Entidade, Referência e Montante (`sendMultibancoEmails`). O e-mail de confirmação de encomenda só é gerado no momento em que o webhook do Stripe notifica a liquidação efetiva da referência pelo cliente.
+*   **Atributos Dinâmicos e Limpos (`formatOrderSpecifications`):** As especificações de produtos nos e-mails (Cor, Tamanho, Quantidade) são desenhadas dinamicamente. Atributos não aplicáveis ou ausentes (ex: tamanho em malas ou peças sem variação) são omitidos de forma inteligente, evitando etiquetas irrelevantes.
+*   **Limpeza Total de Produção:** Todos os avisos de sandbox, notas de teste, placeholders e chaves de simulação foram removidos dos templates de e-mail, garantindo um aspeto 100% profissional e limpo no domínio de produção `mbravobycarolina.com`.
 *   **Origem:** `encomendas@mbravobycarolina.com`
 *   **Destino Interno (Atelier):** `handmade.mbravo@gmail.com` (recebe cópia de alertas de stock baixo e novas encomendas pagas para produção imediata).
 *   **Modelos de Email (HTML/CSS Embutido):**
-    *   `generateCustomerEmailHtml`: Envia um recibo de pagamento luxuoso em tons de creme e verde floresta, com os detalhes da peça comprada, especificações de cor e tamanho, e uma mensagem personalizada que valoriza o processo de produção artesanal.
+    *   `generateCustomerEmailHtml`: Envia um recibo de pagamento luxuoso em tons de creme e verde floresta, com os detalhes da peça comprada, especificações dinâmicas de cor e tamanho, e uma mensagem personalizada que valoriza o processo de produção artesanal.
     *   `sendMultibancoEmails`: Instruções detalhadas com Entidade, Referência e Montante.
-    *   `sendShippedEmails`: Confirmação de expedição com o respetivo código de registo da transportadora para rastreamento.
+    *   `sendShippedEmails`: Confirmação de expedição com o respetivo código de registo CTT da transportadora para rastreamento.
 
 ---
 
