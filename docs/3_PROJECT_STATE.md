@@ -60,17 +60,24 @@ Respondendo às últimas solicitações de otimização de fluxo e consistência
 
 ---
 
-## 3. TAREFA ATUAL (Polimento Final do Painel de Administração & Gestão Avançada de Encomendas)
-*   **Estado:** **Concluído com Sucesso e Validado para Produção**.
+## 3. TAREFA ATUAL (Polimento Final, Sanitização Estrita & Purga de Sandbox de Produção)
+*   **Estado:** **Concluído com Sucesso, Auditado e Validado para Produção de Luxo**.
 *   **Ações Realizadas:**
-    1.  **Limpeza Visual do Painel de Vendas:** Removida a etiqueta técnica `VENDAS REAIS (ORDERS.JSON)` do painel de análises do atelier. Substituída por um indicador discreto e elegante: `● Sincronizado em tempo real`, eliminando quaisquer termos técnicos do ecossistema visível da marca.
-    2.  **Gestão, Cancelamento e Eliminação de Encomendas (`/api/admin/orders/delete`):**
-        *   Adicionada ação de **Cancelar** em cada cartão de encomenda para marcar o estado como `failed` (Cancelada).
-        *   Criado o novo endpoint de servidor `/api/admin/orders/delete` e ação **Eliminar** (com janela de confirmação de segurança) em cada cartão de encomenda. Permite apagar registos manuais ou criados por engano, atualizando automaticamente em tempo real as métricas de faturação do painel e o ficheiro de persistência.
-    3.  **Acesso Discreto ao Admin (Footer):** Acesso ao Painel de Administração exclusivamente no clique sobre o copyright (`© 2026 M★BRAVO`) ou pela rota URL `/admin`.
-    4.  **Templates de E-mail Dinâmicos e Limpos (`emailService.ts`):** Formatação dinâmica de especificações (Cor, Tamanho, Quantidade) sem avisos de sandbox ou placeholders.
-    5.  **Blindagem de Disparo de E-mails:** Verificação estrita que garante que e-mails de confirmação de compra só são disparados após confirmação efetiva do pagamento pelo Stripe.
-    6.  **Atualização Integral da Documentação Técnica:** Atualizados os ficheiros em `/docs` para registo da arquitetura final.
+    1.  **Validação Estrita & Sanitização de Dados (Frontend e Backend):**
+        *   **Máscara de Código Postal Português (`formatPostalCodePT` / `formatPostalCode`):** Auto-formatação no padrão `XXXX-XXX` tanto na criação manual de encomendas no Admin como nas rotas de servidor.
+        *   **Validação Estrita de E-mail (`isValidEmailStrict` / `isValidEmail`):** Verificação por expressão regular (`/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/`) rejeitando e-mails inválidos.
+        *   **Sanitização de Texto & Números (`sanitizeText`, `sanitizeNumber`):** Higienização de campos com remoção de espaços extra (`trim()`), filtragem de carateres em telefones/NIFs e conversão robusta de preços.
+    2.  **Formatação de Telemóvel para Leitura Humana (`formatPhoneReadable`):**
+        *   Criada a função `formatPhoneReadable` que aplica a máscara visual de leitura (ex: `+351 917 827 458`) em todos os pontos de apresentação do Admin e nos templates de e-mail do `emailService.ts`.
+    3.  **Purga Absoluta de Termos de Teste/Sandbox:**
+        *   Remoção rigorosa de rótulos como `AUDITORIA SANDBOX DE E-MAILS`, `[TESTE]`, `[SANDBOX]` e simulações técnicas nas traduções (`translations.ts`), no Admin (`AdminDashboardModal.tsx`), nos botões do site (`App.tsx`) e em todos os templates de e-mail do `emailService.ts`.
+        *   Atualizada a nomenclatura para termos de alta-costura e e-commerce de luxo (`Comprovativos de Encomenda`, `Recibo do Cliente`, `Notificação de Envio`, etc.).
+    4.  **Remoção do Valor por Defeito do Instagram no CRM (Pilar 1):**
+        *   Removida a atribuição automática de `@carolina_mbravo` na Ficha de Cliente do CRM. O campo inicia 100% limpo com o placeholder discreto `@utilizador`, permitindo o registo manual do utilizador real do cliente.
+    5.  **Limpeza Visual e Gestão de Encomendas (`/api/admin/orders/delete`):**
+        *   Inclusão das ações de **Cancelar** e **Eliminar** (com janela de confirmação) para gerir encomendas manuais ou de teste com recalculo automático das métricas no Admin.
+    6.  **Atualização Integral da Documentação Técnica (`/docs`):**
+        *   Ficheiros `2_ARCHITECTURE_AND_ADMIN.md` e `3_PROJECT_STATE.md` atualizados para espelhar a arquitetura final.
 
 ---
 
@@ -79,19 +86,20 @@ Respondendo às últimas solicitações de otimização de fluxo e consistência
 Para que o repositório no GitHub fique 100% sincronizado com a versão final de produção, copie e substitua os seguintes ficheiros na sua totalidade:
 
 ### A. Backend & Servidor
-1. **`server.ts`** (Metadados Stripe unificados `commonMetadata`, fluxo de expedição CTT com `sendShippedEmails`, resiliência de webhook e persistência em volume `/app/data/orders.json`)
+1. **`server.ts`** (Sanitização estrita, validação de e-mail, máscara de código postal, metadados Stripe unificados, fluxo CTT e remoção de logs de sandbox)
+2. **`src/lib/emailService.ts`** (Templates de e-mail de luxo limpos, `formatPhoneReadable`, especificações dinâmicas de produto)
 
 ### B. Interface Frontend
-2. **`src/components/AdminDashboardModal.tsx`** (Purga de dados mock, integração reativa de expedição CTT com registo de auditoria, filtros de CRM e análises reais)
-3. **`src/App.tsx`** (Tratamento condicional de tamanhos `hasSize`, tabela O(1) do FioCondutor, `React.memo` dos cartões, breakpoint `lg:` da Navbar)
-4. **`vite.config.ts`** (Code-splitting do bundle JS e `manualChunks`)
-5. **`index.html`** (Adiamento de scripts via `requestIdleCallback`, meta-tags de renderização e preloads WebP)
-6. **`src/index.css`** (Aceleração por GPU, regras de touch WebKit e otimização de renderização)
-7. **`src/translations.ts`** (Dicionário bilíngue integral sincronizado PT/EN)
+3. **`src/components/AdminDashboardModal.tsx`** (Máscara `formatPhoneReadable`, auto-código postal, purga de termos sandbox, CRM Instagram limpo, ações de cancelamento e eliminação)
+4. **`src/App.tsx`** (Checkout com validações limpas, remoção de rótulos sandbox nos botões de pagamento, tratamento condicional de tamanhos `hasSize`)
+5. **`src/translations.ts`** (Dicionário bilíngue PT/EN higienizado e livre de termos de sandbox)
+6. **`vite.config.ts`** (Code-splitting e estratégia de bundling estável)
+7. **`index.html`** (Preload de imagens WebP e otimizações LCP)
+8. **`src/index.css`** (Aceleração GPU e regras WebKit iOS)
 
 ### C. Documentação Técnica (`/docs`)
-8. **`docs/2_ARCHITECTURE_AND_ADMIN.md`** (Arquitetura atualizada: automação CTT, e-mails de expedição, metadados Stripe e CRM)
-9. **`docs/3_PROJECT_STATE.md`** (Estado do projeto sincronizado e relatório de alterações)
+9. **`docs/2_ARCHITECTURE_AND_ADMIN.md`** (Arquitetura atualizada: validação estrita, formatação de telemóvel, e-mails de luxo e CRM)
+10. **`docs/3_PROJECT_STATE.md`** (Estado do projeto sincronizado e relatório de alterações)
 
 ---
 
