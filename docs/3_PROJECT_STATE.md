@@ -60,16 +60,16 @@ Respondendo às últimas solicitações de otimização de fluxo e consistência
 
 ---
 
-## 3. TAREFA ATUAL (Validação de Produção: Automação CTT, Email, Stripe Metadata & Purga Mock Data)
-*   **Estado:** **Concluído com Sucesso e Validado**.
+## 3. TAREFA ATUAL (Ajustes Finais de Produção: Acesso Discreto ao Admin, E-mails Dinâmicos Limpos & Purga Real de Dados)
+*   **Estado:** **Concluído com Sucesso e Validado para Produção**.
 *   **Ações Realizadas:**
-    1.  **Purga de Dados Mock no Admin (`/admin`):** O painel do atelier (`analytics` e `orders`) carrega exclusivamente dados reais de encomendas persistidos no volume `/app/data/orders.json`. O modo de simulação foi desligado por padrão (`showSimulatedData: false`).
-    2.  **Automação do Fluxo de Expedição CTT (`sendShippedEmails`):** Ao selecionar uma encomenda no `/admin`, introduzir o código de rastreio CTT e mudar o estado para `shipped`, o sistema executa automaticamente:
-        *   Sincronização reativa e gravação no `orders.json` e no perfil do cliente no CRM.
-        *   Disparo imediato do e-mail de confirmação de expedição com o código CTT para a cliente (`sendShippedEmails`).
-        *   Registo imutável no histórico dos Logs de Auditoria (`/admin` tab 'logs') sob `ctt_label_generation` e `state_change`.
-    3.  **Injeção Integral de Metadados no Stripe & Resiliência de Webhook:** Injeção do payload unificado (`commonMetadata`) com detalhes do artigo (`orderId`, `productName`, `cor`, `tamanho`, `hasSize`, `quantidade`, `customerName`, `customerEmail`, `customerPhone`, `nif`) em todas as sessões e intents de pagamento Stripe. Reconstrução reativa automática via Webhook em caso de descontinuidade de estado.
-    4.  **Tratamento Condicional de Tamanhos (`hasSize`):** Artigos de tamanho único (ex: malas, pouches ou carteiras) deixam de exibir etiquetas desnecessárias de tamanho nas confirmações de compra e nos relatórios.
+    1.  **Acesso Discreto ao Admin (Footer):** Removido o botão visível "Painel Atelier" da barra de navegação do rodapé. Restaurado o acesso discreto e exclusivo através do clique sobre o texto do copyright (`© 2026 M★BRAVO`), mantendo ativas a rota URL `/admin` e a validação por palavra-passe.
+    2.  **Painel de Administração 100% Real (Sem Dados Fictícios):** Garantida a ligação direta do `AdminDashboardModal` e `server.ts` aos dados reais de encomendas persistidos no volume `/app/data/orders.json`. Dados mock/dummy, simulações ou arrays estáticos foram purgados.
+    3.  **Templates de E-mail Dinâmicos e Limpos (`emailService.ts`):**
+        *   Nova função `formatOrderSpecifications` que formata dinamicamente os atributos da encomenda (Cor, Tamanho, Quantidade). Atributos omissos ou irrelevantes (ex: tamanho em produtos de tamanho único/malas) não são desenhados nos e-mails.
+        *   Remoção integral de avisos de teste, caixas de sandbox, placeholders e referências a ambientes de desenvolvimento em todos os templates de e-mail (`generateCustomerEmailHtml`, `generateAdminEmailHtml`, `generateMultibancoEmailHtml`, `generateShippedEmailHtml`).
+    4.  **Blindagem do Disparo de E-mails de Confirmação:** Mantida a verificação de segurança estrita em `sendTransactionEmails` (`src/lib/emailService.ts`) que impede o disparo de e-mails de confirmação de compra antes da confirmação efetiva do pagamento pelo Stripe (`succeeded` / Webhook).
+    5.  **Atualização Integral da Documentação Técnica:** Atualizados os ficheiros `/docs/2_ARCHITECTURE_AND_ADMIN.md` e `/docs/3_PROJECT_STATE.md` com a especificação final da arquitetura.
 
 ---
 
