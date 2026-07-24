@@ -10,6 +10,53 @@ import {
 } from 'lucide-react';
 const API_BASE_URL = import.meta.env.VITE_API_URL || '';
 
+// Strict email validation checking standard format
+function isValidEmail(email: string): boolean {
+  if (!email) return false;
+  const trimmed = email.trim();
+  return /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(trimmed);
+}
+
+// Portuguese Postal Code Auto-Masking (XXXX-XXX)
+function formatPostalCodePT(val: string): string {
+  if (!val) return '';
+  const digits = val.replace(/\D/g, '').slice(0, 7);
+  if (digits.length <= 4) return digits;
+  return `${digits.slice(0, 4)}-${digits.slice(4)}`;
+}
+
+// Phone spacing mask for human readability (+351 917 827 458)
+function formatPhoneReadable(phone?: string): string {
+  if (!phone) return '';
+  const trimmed = phone.trim();
+  if (!trimmed) return '';
+
+  const hasPlus = trimmed.startsWith('+');
+  const digits = trimmed.replace(/\D/g, '');
+  if (!digits) return trimmed;
+
+  if (digits.startsWith('351') && digits.length === 12) {
+    return `+351 ${digits.slice(3, 6)} ${digits.slice(6, 9)} ${digits.slice(9)}`;
+  } else if (digits.length === 9) {
+    return `+351 ${digits.slice(0, 3)} ${digits.slice(3, 6)} ${digits.slice(6)}`;
+  } else if (digits.startsWith('351') && digits.length > 9) {
+    const rest = digits.slice(3);
+    if (rest.length === 9) {
+      return `+351 ${rest.slice(0, 3)} ${rest.slice(3, 6)} ${rest.slice(6)}`;
+    }
+    return `+351 ${rest}`;
+  } else if (hasPlus) {
+    if (digits.length <= 10) {
+      return `+${digits.slice(0, 3)} ${digits.slice(3, 6)} ${digits.slice(6)}`;
+    }
+    return `+${digits}`;
+  } else if (digits.length === 10) {
+    return `${digits.slice(0, 3)} ${digits.slice(3, 6)} ${digits.slice(6)}`;
+  }
+
+  return trimmed;
+}
+
 interface AdminDashboardModalProps {
   onClose: () => void;
   shopCategories?: any[];
@@ -163,10 +210,23 @@ export default function AdminDashboardModal({ onClose, shopCategories = [] }: Ad
 
   const handleCreateManualOrder = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!manualForm.productName || !manualForm.customerNome) {
+    
+    const cleanProdName = manualForm.productName.trim();
+    const cleanCustomerNome = manualForm.customerNome.trim();
+    const cleanCustomerEmail = manualForm.customerEmail.trim();
+
+    if (!cleanProdName || !cleanCustomerNome) {
       alert("Nome do Produto e Nome do Cliente são obrigatórios.");
       return;
     }
+
+    if (cleanCustomerEmail && !isValidEmail(cleanCustomerEmail)) {
+      alert("Por favor introduza um e-mail válido no formato utilizador@dominio.com.");
+      return;
+    }
+
+    const priceVal = parseFloat(String(manualForm.price).replace(/[^0-9.,]/g, '').replace(',', '.')) || 0;
+    const qtdVal = manualForm.quantidade.replace(/\D/g, '') || '1';
 
     setIsCreatingManual(true);
     try {
@@ -177,21 +237,21 @@ export default function AdminDashboardModal({ onClose, shopCategories = [] }: Ad
           'x-admin-password': password
         },
         body: JSON.stringify({
-          productName: manualForm.productName,
-          price: parseFloat(manualForm.price) || 0,
+          productName: cleanProdName,
+          price: priceVal,
           selections: {
-            cor: manualForm.cor || 'Padrão',
-            tamanho: manualForm.tamanho || 'Único',
-            quantidade: manualForm.quantidade || '1'
+            cor: manualForm.cor.trim() || 'Padrão',
+            tamanho: manualForm.tamanho.trim(),
+            quantidade: qtdVal
           },
           customer: {
-            nome: manualForm.customerNome,
-            email: manualForm.customerEmail,
-            telefone: manualForm.customerTelefone,
-            morada: manualForm.customerMorada,
-            codigoPostal: manualForm.customerCodigoPostal,
-            cidade: manualForm.customerCidade,
-            nif: manualForm.customerNif
+            nome: cleanCustomerNome,
+            email: cleanCustomerEmail,
+            telefone: manualForm.customerTelefone.replace(/[^0-9+]/g, ''),
+            morada: manualForm.customerMorada.trim(),
+            codigoPostal: formatPostalCodePT(manualForm.customerCodigoPostal),
+            cidade: manualForm.customerCidade.trim(),
+            nif: manualForm.customerNif.replace(/\D/g, '')
           },
           paymentMethod: manualForm.paymentMethod,
           status: manualForm.status,
@@ -451,7 +511,7 @@ export default function AdminDashboardModal({ onClose, shopCategories = [] }: Ad
         o.createdAt ? new Date(o.createdAt).toLocaleString('pt-PT') : "",
         o.customer?.nome || "",
         o.customer?.email || "",
-        o.customer?.telefone || "",
+        formatPhoneReadable(o.customer?.telefone || ""),
         o.customer?.nif || "",
         o.productName || "",
         itemDetails,
@@ -614,10 +674,11 @@ export default function AdminDashboardModal({ onClose, shopCategories = [] }: Ad
     }
   };
 
-  // Helper to parse price string like "50.00€" or "50€" to number
-  const parsePrice = (priceStr: string): number => {
-    if (!priceStr) return 0;
-    const clean = priceStr.replace(/[^0-9,.]/g, '').replace(',', '.');
+  // Helper to parse price string or number (e.g. "50.00€", "50€", or 16) to number
+  const parsePrice = (priceVal: any): number => {
+    if (priceVal === null || priceVal === undefined || priceVal === '') return 0;
+    if (typeof priceVal === 'number') return isNaN(priceVal) ? 0 : priceVal;
+    const clean = String(priceVal).replace(/[^0-9,.]/g, '').replace(',', '.');
     return parseFloat(clean) || 0;
   };
 
@@ -1020,11 +1081,10 @@ export default function AdminDashboardModal({ onClose, shopCategories = [] }: Ad
                     <div className="space-y-1">
                       <label className="font-bold uppercase tracking-wider text-[10px] text-forest/50">Preço (€) *</label>
                       <input 
-                        type="number" 
-                        step="0.01" 
+                        type="text" 
                         placeholder="Ex: 24.00" 
                         value={manualForm.price}
-                        onChange={(e) => setManualForm(prev => ({ ...prev, price: e.target.value }))}
+                        onChange={(e) => setManualForm(prev => ({ ...prev, price: e.target.value.replace(/[^0-9.,]/g, '') }))}
                         className="w-full bg-white border border-forest/15 rounded-xl px-3 py-2.5 focus:outline-none focus:border-[#C5A059]"
                         required
                       />
@@ -1058,7 +1118,7 @@ export default function AdminDashboardModal({ onClose, shopCategories = [] }: Ad
                           type="text" 
                           placeholder="1" 
                           value={manualForm.quantidade}
-                          onChange={(e) => setManualForm(prev => ({ ...prev, quantidade: e.target.value }))}
+                          onChange={(e) => setManualForm(prev => ({ ...prev, quantidade: e.target.value.replace(/\D/g, '') }))}
                           className="w-full bg-white border border-forest/15 rounded-xl px-3 py-2.5 focus:outline-none"
                         />
                       </div>
@@ -1098,7 +1158,7 @@ export default function AdminDashboardModal({ onClose, shopCategories = [] }: Ad
                         type="text" 
                         placeholder="Ex: 912345678" 
                         value={manualForm.customerTelefone}
-                        onChange={(e) => setManualForm(prev => ({ ...prev, customerTelefone: e.target.value }))}
+                        onChange={(e) => setManualForm(prev => ({ ...prev, customerTelefone: e.target.value.replace(/[^0-9+]/g, '') }))}
                         className="w-full bg-white border border-forest/15 rounded-xl px-3 py-2.5 focus:outline-none focus:border-[#C5A059]"
                       />
                     </div>
@@ -1123,8 +1183,9 @@ export default function AdminDashboardModal({ onClose, shopCategories = [] }: Ad
                       <input 
                         type="text" 
                         placeholder="Ex: 1000-123" 
+                        maxLength={8}
                         value={manualForm.customerCodigoPostal}
-                        onChange={(e) => setManualForm(prev => ({ ...prev, customerCodigoPostal: e.target.value }))}
+                        onChange={(e) => setManualForm(prev => ({ ...prev, customerCodigoPostal: formatPostalCodePT(e.target.value) }))}
                         className="w-full bg-white border border-forest/15 rounded-xl px-3 py-2.5 focus:outline-none focus:border-[#C5A059]"
                       />
                     </div>
@@ -1149,8 +1210,9 @@ export default function AdminDashboardModal({ onClose, shopCategories = [] }: Ad
                       <input 
                         type="text" 
                         placeholder="Ex: 123456789" 
+                        maxLength={9}
                         value={manualForm.customerNif}
-                        onChange={(e) => setManualForm(prev => ({ ...prev, customerNif: e.target.value }))}
+                        onChange={(e) => setManualForm(prev => ({ ...prev, customerNif: e.target.value.replace(/\D/g, '') }))}
                         className="w-full bg-white border border-forest/15 rounded-xl px-3 py-2.5 focus:outline-none focus:border-[#C5A059]"
                       />
                     </div>
@@ -1345,7 +1407,7 @@ export default function AdminDashboardModal({ onClose, shopCategories = [] }: Ad
                                 </div>
                                 <div className="flex items-center gap-1.5">
                                   <Phone className="w-3.5 h-3.5 text-forest/35" />
-                                  <a href={`tel:${order.customer?.telefone}`} className="hover:underline text-forest/80 font-mono">{order.customer?.telefone}</a>
+                                  <a href={`tel:${order.customer?.telefone}`} className="hover:underline text-forest/80 font-mono">{formatPhoneReadable(order.customer?.telefone)}</a>
                                 </div>
                                 <div className="flex items-start gap-1.5 pt-1">
                                   <MapPin className="w-3.5 h-3.5 text-forest/35 mt-0.5 shrink-0" />
@@ -1514,7 +1576,7 @@ export default function AdminDashboardModal({ onClose, shopCategories = [] }: Ad
 
                             {/* Email Previews Hub */}
                             <div className="pt-3 border-t border-forest/5 space-y-1.5">
-                              <span className="text-[9px] font-bold text-forest/35 uppercase tracking-wider block">Auditoria Sandbox de E-mails</span>
+                              <span className="text-[9px] font-bold text-forest/35 uppercase tracking-wider block">Comprovativos de E-mail</span>
                               <div className="grid grid-cols-2 gap-1.5 text-[9px]">
                                 {order.emailLinks?.customerEmailUrl && (
                                   <a 
@@ -3053,6 +3115,7 @@ export default function AdminDashboardModal({ onClose, shopCategories = [] }: Ad
                         <label className="font-bold text-forest/50 block">Telefone</label>
                         <input
                           type="text"
+                          placeholder="+351 9xx xxx xxx"
                           value={crmFields.phone}
                           onChange={(e) => setCrmFields(prev => ({ ...prev, phone: e.target.value }))}
                           className="w-full bg-[#FCFBF9] border border-forest/10 focus:border-[#C5A059] focus:outline-none rounded-lg px-2.5 py-1.5 text-forest font-mono"
@@ -3076,9 +3139,9 @@ export default function AdminDashboardModal({ onClose, shopCategories = [] }: Ad
                         <span className="px-2.5 py-1.5 bg-forest/5 border-r border-forest/10 text-forest/55 font-medium">@</span>
                         <input
                           type="text"
-                          placeholder="carolina_mbravo"
+                          placeholder="utilizador"
                           value={crmFields.instagram}
-                          onChange={(e) => setCrmFields(prev => ({ ...prev, instagram: e.target.value }))}
+                          onChange={(e) => setCrmFields(prev => ({ ...prev, instagram: e.target.value.replace(/^@/, '') }))}
                           className="flex-1 bg-transparent focus:outline-none px-2.5 py-1.5 text-forest"
                         />
                       </div>
