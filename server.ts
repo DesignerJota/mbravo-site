@@ -1485,16 +1485,49 @@ app.post("/api/admin/orders/create", verifyAdmin, (req, res) => {
   activeOrders.set(orderId, newOrder);
   saveOrders(activeOrders);
 
-  // Trigger audit log for manual order registration
-  addAuditLog(
-    'manual_order_creation',
-    `Encomenda manual registada: ${orderId} para o cliente ${customer.nome} (${productName})`,
-    orderId,
-    { customerName: customer.nome, productName }
-  );
+    // Trigger audit log for manual order registration
+    addAuditLog(
+      'manual_order_creation',
+      `Encomenda manual registada: ${orderId} para o cliente ${customer.nome} (${productName})`,
+      orderId,
+      { customerName: customer.nome, productName }
+    );
 
-  res.json({ success: true, order: newOrder });
-});
+    // Enviar e-mail de notificação apenas para a Carolina / Atelier
+    try {
+      if (process.env.RESEND_API_KEY) {
+        const { Resend } = await import('resend');
+        const resend = new Resend(process.env.RESEND_API_KEY);
+
+        const priorityTag = priority === 'HIGH' 
+          ? '<span style="background:#8b0000;color:#fff;padding:2px 6px;border-radius:4px;font-weight:bold;">PRIORIDADE: ALTA (ATELIER URGENTE)</span>'
+          : '<span style="background:#555;color:#fff;padding:2px 6px;border-radius:4px;">PRIORIDADE: NORMAL</span>';
+
+        await resend.emails.send({
+          from: 'M BRAVO <encomendas@mbravobycarolina.com>',
+          to: ['encomendas@mbravobycarolina.com'],
+          subject: `[NOVO PEDIDO MANUAL] ${orderId} - Prioridade Atelier`,
+          html: `
+            <div style="font-family: sans-serif; padding: 20px; color: #333;">
+              <h2>M★BRAVO • NOTIFICAÇÃO DE ATELIER (REGISTO MANUAL)</h2>
+              <p>${priorityTag}</p>
+              <hr />
+              <p><b>ID Encomenda:</b> ${orderId}</p>
+              <p><b>Produto:</b> ${productName}</p>
+              <p><b>Preço:</b> ${price}€</p>
+              <p><b>Cliente:</b> ${customer.nome} (${customer.email})</p>
+              <p><b>Telefone:</b> ${customer.telefone}</p>
+              <p><b>Morada:</b> ${customer.morada}, ${customer.codigoPostal} ${customer.cidade}</p>
+            </div>
+          `
+        });
+      }
+    } catch (emailErr) {
+      console.error("[MANUAL ORDER EMAIL ERROR]", emailErr);
+    }
+
+    res.json({ success: true, order: newOrder });
+  });
 
 // Endpoint to delete/remove an order permanently
 app.post("/api/admin/orders/delete", verifyAdmin, (req, res) => {
