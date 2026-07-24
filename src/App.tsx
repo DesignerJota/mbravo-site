@@ -7392,11 +7392,3 @@ export default function App() {
     </div>
   );
 }
-
-Adobe Acrobat
-
-
-Resuma isto
-
-
-Perguntar ao Assistente de IA
