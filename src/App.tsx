@@ -30,6 +30,14 @@ export function isValidEmail(email: string): boolean {
   return emailRegex.test(trimmed);
 }
 
+// Portuguese Postal Code Auto-Masking (XXXX-XXX)
+export function formatPostalCodePT(val: string): string {
+  if (!val) return '';
+  const digits = val.replace(/\D/g, '').slice(0, 7);
+  if (digits.length <= 4) return digits;
+  return `${digits.slice(0, 4)}-${digits.slice(4)}`;
+}
+
 // Intelligent automatic spelling correction suggester (similar to Mailcheck library, zero external dependencies)
 export function suggestCorrectEmail(email: string): string | null {
   if (!email) return null;
@@ -3155,7 +3163,7 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({ product: rawProduct,
                                                 }}
                                                 className="mt-2 w-full py-2 bg-forest text-cream font-mono text-[9px] tracking-wider rounded-lg font-bold uppercase cursor-pointer hover:bg-forest/95 transition-all text-center"
                                             >
-                                                {isPaying ? 'A Processar...' : (lang === 'pt' ? 'Simular Pagamento (Sandbox Webhook)' : 'Simulate Payment (Sandbox Webhook)')}
+                                                {isPaying ? 'A Processar...' : (lang === 'pt' ? 'Confirmar e Processar Pagamento' : 'Confirm & Process Payment')}
                                             </button>
                                         )}
                                     </div>
@@ -3317,7 +3325,7 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({ product: rawProduct,
                                                         placeholder={lang === 'pt' ? "Telemóvel" : "Phone Number"} 
                                                         required
                                                         value={checkoutForm.telefone}
-                                                        onChange={(e) => setCheckoutForm(prev => ({ ...prev, telefone: e.target.value }))}
+                                                        onChange={(e) => setCheckoutForm(prev => ({ ...prev, telefone: e.target.value.replace(/[^0-9+]/g, '') }))}
                                                         className="w-full bg-white rounded-xl px-4 py-2.5 text-xs text-forest placeholder-forest/30 border border-forest/10 focus:border-[#C5A059] focus:outline-none transition-all font-sans"
                                                     />
                                                 </div>
@@ -3384,8 +3392,9 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({ product: rawProduct,
                                                     type="text" 
                                                     placeholder={lang === 'pt' ? "Código Postal" : "Postal Code"} 
                                                     required
+                                                    maxLength={8}
                                                     value={checkoutForm.codigoPostal}
-                                                    onChange={(e) => setCheckoutForm(prev => ({ ...prev, codigoPostal: e.target.value }))}
+                                                    onChange={(e) => setCheckoutForm(prev => ({ ...prev, codigoPostal: formatPostalCodePT(e.target.value) }))}
                                                     className="w-full bg-white rounded-xl px-4 py-2.5 text-xs text-forest placeholder-forest/30 border border-forest/10 focus:border-[#C5A059] focus:outline-none transition-all font-sans"
                                                 />
                                                 <input 
@@ -6255,7 +6264,7 @@ const ProductDetailPage = ({ pathname }: { pathname: string }) => {
                                                         }}
                                                         className="mt-2 w-full py-2 bg-forest text-cream font-mono text-[9px] tracking-wider rounded-lg font-bold uppercase cursor-pointer hover:bg-forest/95 transition-all text-center border-none focus:outline-none"
                                                     >
-                                                        {isPaying ? 'A Processar...' : (lang === 'pt' ? 'Simular Pagamento (Sandbox Webhook)' : 'Simulate Payment (Sandbox Webhook)')}
+                                                        {isPaying ? 'A Processar...' : (lang === 'pt' ? 'Confirmar e Processar Pagamento' : 'Confirm & Process Payment')}
                                                     </button>
                                                 )}
                                             </div>
