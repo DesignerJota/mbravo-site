@@ -129,6 +129,36 @@ function saveOrders(map: Map<string, any>) {
 
 const activeOrders = loadOrders();
 
+// Helper sanitization and validation functions for strict data integrity
+function sanitizeText(val: any): string {
+  if (val === null || val === undefined) return "";
+  return String(val).trim();
+}
+
+function sanitizeNumber(val: any, defaultVal: number = 0): number {
+  if (val === null || val === undefined || val === "") return defaultVal;
+  if (typeof val === "number") return isNaN(val) ? defaultVal : val;
+  const clean = String(val).replace(/[^0-9.,]/g, "").replace(",", ".");
+  const parsed = parseFloat(clean);
+  return isNaN(parsed) ? defaultVal : parsed;
+}
+
+function formatPostalCode(val: any): string {
+  if (!val) return "";
+  const str = String(val).trim();
+  const digits = str.replace(/\D/g, "");
+  if (digits.length === 7) {
+    return `${digits.slice(0, 4)}-${digits.slice(4)}`;
+  }
+  return str;
+}
+
+function isValidEmailStrict(email: any): boolean {
+  if (!email) return false;
+  const str = String(email).trim();
+  return /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(str);
+}
+
 // Serve dynamic robots.txt depending on whether the request accesses the brand site or the API subdomain
 app.get("/robots.txt", (req, res) => {
   const host = req.headers.host || "";
@@ -156,42 +186,60 @@ app.post("/api/payment/create-intent", async (req, res) => {
       return res.status(400).json({ error: "Missing required transaction fields" });
     }
 
+    const emailClean = sanitizeText(checkoutForm.email);
+    if (!emailClean || !isValidEmailStrict(emailClean)) {
+      return res.status(400).json({ error: "O e-mail fornecido é inválido. Por favor introduza um e-mail com formato válido (utilizador@dominio.com)." });
+    }
+
+    const nameClean = sanitizeText(checkoutForm.nome);
+    if (!nameClean) {
+      return res.status(400).json({ error: "O nome do cliente é obrigatório." });
+    }
+
     // Generate distinctive Portuguese order code for M.BRAVO
     const orderId = `MB-2026-${Math.floor(1000 + Math.random() * 9000)}`;
     const createdAt = new Date().toISOString();
 
+    const priceNum = sanitizeNumber(product.price, 0);
+
     // Determine production priority: custom sizing or quantity > 1 flags high priority
-    const isCustomSize = selections.tamanho === "Sob Medida" || selections.tamanho === "Customizado" || !selections.tamanho;
-    const isBulk = parseInt(selections.quantidade || "1") > 1;
+    const isCustomSize = selections?.tamanho === "Sob Medida" || selections?.tamanho === "Customizado" || !selections?.tamanho;
+    const isBulk = parseInt(selections?.quantidade || "1") > 1;
     const priority = (isCustomSize || isBulk) ? "ALTA (Atelier Urgente)" : "NORMAL";
 
     const stripeKey = process.env.STRIPE_SECRET_KEY || "";
     const isTestMode = !stripeKey.startsWith("sk_live");
 
+    const sanitizedCustomer = {
+      nome: nameClean,
+      email: emailClean,
+      telefone: sanitizeText(checkoutForm.telefone).replace(/[^0-9+]/g, ""),
+      morada: sanitizeText(checkoutForm.morada),
+      codigoPostal: formatPostalCode(checkoutForm.codigoPostal),
+      cidade: sanitizeText(checkoutForm.cidade),
+      nif: sanitizeText(checkoutForm.nif).replace(/\D/g, "")
+    };
+
+    const sanitizedSelections = {
+      cor: sanitizeText(selections?.cor) || "Padrão",
+      tamanho: sanitizeText(selections?.tamanho),
+      quantidade: sanitizeText(selections?.quantidade).replace(/\D/g, "") || "1",
+      hasSize: selections?.hasSize ?? (product.hasSize ?? (product.sizes && product.sizes.length > 0))
+    };
+
     const order: any = {
       orderId,
-      productName: product.name,
-      price: product.price,
-      selections: {
-        ...selections,
-        hasSize: selections.hasSize ?? (product.hasSize ?? (product.sizes && product.sizes.length > 0))
-      },
-      customer: {
-        nome: checkoutForm.nome,
-        email: checkoutForm.email,
-        telefone: checkoutForm.telefone,
-        morada: checkoutForm.morada,
-        codigoPostal: checkoutForm.codigoPostal,
-        cidade: checkoutForm.cidade,
-        nif: checkoutForm.nif
-      },
+      productName: sanitizeText(product.name),
+      price: priceNum,
+      selections: sanitizedSelections,
+      customer: sanitizedCustomer,
       paymentMethod,
       status: "pending_payment",
       priority,
       createdAt,
       isTestMode,
-      mbwayPhone: checkoutForm.mbwayPhone?.replace(/\s+/g, ""),
-      cardNumber: checkoutForm.cardNumber?.replace(/\s+/g, ""),
+      mbwayPhone: sanitizeText(checkoutForm.mbwayPhone).replace(/\D/g, ""),
+      cardNumber: sanitizeText(checkoutForm.cardNumber).replace(/\D/g, ""),
       emailSent: false
     };
 
@@ -898,7 +946,7 @@ function saveLogs(list: any[]) {
 
 let activeLogs = loadLogs();
 
-function addAuditLog(event: 'state_change' | 'manual_order_creation' | 'ctt_label_generation' | 'crm_customer_update', description: string, orderId?: string, details?: any) {
+function addAuditLog(event: 'state_change' | 'manual_order_creation' | 'ctt_label_generation' | 'crm_customer_update' | 'order_deletion', description: string, orderId?: string, details?: any) {
   const logEntry = {
     id: `LOG-${Math.floor(100000 + Math.random() * 900000)}`,
     timestamp: new Date().toISOString(),
@@ -1427,26 +1475,47 @@ app.post("/api/admin/orders/update", verifyAdmin, (req, res) => {
 app.post("/api/admin/orders/create", verifyAdmin, (req, res) => {
   const { productName, price, selections, customer, paymentMethod, status, priority, createdAt } = req.body;
 
-  if (!productName || !customer || !customer.nome) {
+  const cleanCustomerNome = sanitizeText(customer?.nome);
+  const cleanProductName = sanitizeText(productName);
+  const cleanCustomerEmail = sanitizeText(customer?.email);
+
+  if (!cleanProductName || !cleanCustomerNome) {
     return res.status(400).json({ error: "Nome do produto e Nome do cliente são obrigatórios" });
   }
+
+  if (cleanCustomerEmail && !isValidEmailStrict(cleanCustomerEmail)) {
+    return res.status(400).json({ error: "Por favor introduza um e-mail com formato válido (utilizador@dominio.com)." });
+  }
+
+  const priceNum = sanitizeNumber(price, 0);
+  const selCor = sanitizeText(selections?.cor) || "Padrão";
+  const selTam = sanitizeText(selections?.tamanho);
+  const selQtd = sanitizeText(selections?.quantidade).replace(/\D/g, "") || "1";
+
+  const noSizeTerms = ["", "único", "única", "padrão", "sem tamanho", "n/a", "na"];
+  const hasSize = selTam ? !noSizeTerms.includes(selTam.toLowerCase()) : false;
 
   // Generate distinctive order ID
   const orderId = `MB-2026-${Math.floor(1000 + Math.random() * 9000)}`;
   
   const newOrder = {
     orderId,
-    productName,
-    price: price || 0,
-    selections: selections || { cor: "Padrão", tamanho: "M", quantidade: "1" },
+    productName: cleanProductName,
+    price: priceNum,
+    selections: {
+      cor: selCor,
+      tamanho: selTam,
+      hasSize,
+      quantidade: selQtd
+    },
     customer: {
-      nome: customer.nome,
-      email: customer.email || "",
-      telefone: customer.telefone || "",
-      morada: customer.morada || "",
-      codigoPostal: customer.codigoPostal || "",
-      cidade: customer.cidade || "",
-      nif: customer.nif || ""
+      nome: cleanCustomerNome,
+      email: cleanCustomerEmail,
+      telefone: sanitizeText(customer?.telefone).replace(/[^0-9+]/g, ""),
+      morada: sanitizeText(customer?.morada),
+      codigoPostal: formatPostalCode(customer?.codigoPostal),
+      cidade: sanitizeText(customer?.cidade),
+      nif: sanitizeText(customer?.nif).replace(/\D/g, "")
     },
     paymentMethod: paymentMethod || "manual",
     status: status || "paid",
