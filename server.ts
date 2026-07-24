@@ -220,11 +220,15 @@ app.post("/api/payment/create-intent", async (req, res) => {
       nif: sanitizeText(checkoutForm.nif).replace(/\D/g, "")
     };
 
+    const productHasSize = (selections?.hasSize !== false) && 
+                          (product?.hasSize !== false) && 
+                          (product?.sizes && Array.isArray(product.sizes) && product.sizes.length > 0);
+
     const sanitizedSelections = {
       cor: sanitizeText(selections?.cor) || "Padrão",
-      tamanho: sanitizeText(selections?.tamanho),
+      tamanho: productHasSize ? sanitizeText(selections?.tamanho) : "",
       quantidade: sanitizeText(selections?.quantidade).replace(/\D/g, "") || "1",
-      hasSize: selections?.hasSize ?? (product.hasSize ?? (product.sizes && product.sizes.length > 0))
+      hasSize: productHasSize
     };
 
     const order: any = {
@@ -246,10 +250,10 @@ app.post("/api/payment/create-intent", async (req, res) => {
     const commonMetadata = {
       orderId,
       productName: product.name || '',
-      cor: selections.cor || '',
-      tamanho: selections.tamanho || '',
-      hasSize: (selections.hasSize !== false && product.hasSize !== false && product.sizes && product.sizes.length > 0) ? 'true' : 'false',
-      quantidade: selections.quantidade || '1',
+      cor: selections?.cor || '',
+      tamanho: productHasSize ? (selections?.tamanho || '') : '',
+      hasSize: productHasSize ? 'true' : 'false',
+      quantidade: selections?.quantidade || '1',
       customerName: checkoutForm.nome || '',
       customerEmail: checkoutForm.email || '',
       customerPhone: checkoutForm.telefone || '',
@@ -338,44 +342,13 @@ app.post("/api/payment/create-intent", async (req, res) => {
           }
         } catch (stripeErr: any) {
           console.error("[STRIPE ERROR]", stripeErr);
-          if (stripeErr.type === 'StripeAuthenticationError' || stripeErr.statusCode === 401 || (stripeErr.message && (stripeErr.message.includes('Invalid API Key') || stripeErr.message.includes('API key provided')))) {
-            console.warn("[STRIPE WARNING] Invalid Stripe API key provided or auth failed. Falling back gracefully to sandbox simulation...");
-            const cardNum = checkoutForm.cardNumber || '';
-            if (cardNum.endsWith('5001')) {
-              order.status = 'failed';
-              order.errorMessage = 'Declined by credit card gateway (Simulation Error 5001 - Insufficient Funds)';
-            } else if (cardNum.endsWith('5002')) {
-              order.status = 'failed';
-              order.errorMessage = 'Credit card transaction timeout/expired (Simulation Error 5002)';
-            } else {
-              order.status = 'paid';
-              const emailLinks = sendTransactionEmails(order);
-              order.emailSent = true;
-              order.emailLinks = emailLinks;
-            }
-          } else {
-            order.status = 'failed';
-            order.errorMessage = stripeErr.message || 'Erro no processamento com o Stripe';
-          }
+          order.status = 'failed';
+          order.errorMessage = stripeErr.message || 'Erro no processamento do pagamento com o Stripe.';
         }
       } else {
-        // Fallback simulation if no real Stripe configuration is present (keeps sandbox testing working)
-        const cardNum = order.cardNumber || '';
-        if (cardNum.endsWith('5001')) {
-          // Immediate failure test card
-          order.status = 'failed';
-          order.errorMessage = 'Declined by credit card gateway (Simulation Error 5001 - Insufficient Funds)';
-        } else if (cardNum.endsWith('5002')) {
-          // Immediate expiration / fraud test card
-          order.status = 'failed';
-          order.errorMessage = 'Credit card transaction timeout/expired (Simulation Error 5002)';
-        } else {
-          // Successful card transaction
-          order.status = 'paid';
-          const emailLinks = sendTransactionEmails(order);
-          order.emailSent = true;
-          order.emailLinks = emailLinks;
-        }
+        // Stripe credentials not set or missing form data
+        order.status = 'failed';
+        order.errorMessage = 'A gateway de pagamentos Stripe não está configurada ou faltam dados do cartão.';
       }
     } else if (paymentMethod === 'multibanco') {
       if (stripe && checkoutForm) {
@@ -574,11 +547,9 @@ app.post("/api/payment/create-intent", async (req, res) => {
           order.errorMessage = stripeErr.message || 'Erro ao inicializar carteira com Stripe';
         }
       } else {
-        // Fallback simulation for local sandbox / testing
-        order.status = 'paid';
-        const emailLinks = sendTransactionEmails(order);
-        order.emailSent = true;
-        order.emailLinks = emailLinks;
+        // Stripe unconfigured for wallet payments
+        order.status = 'failed';
+        order.errorMessage = 'A gateway de pagamentos Stripe não está configurada no servidor.';
       }
     }
 
@@ -627,34 +598,14 @@ app.get("/api/payment/status/:orderId", async (req, res) => {
             order.emailLinks = sendTransactionEmails(order);
             order.emailSent = true;
           }
+          saveOrders(activeOrders);
         } else if (intent.status === 'canceled' || (intent.last_payment_error && intent.status !== 'requires_action')) {
           order.status = 'failed';
           order.errorMessage = intent.last_payment_error?.message || `Stripe payment failed with status: ${intent.status}`;
+          saveOrders(activeOrders);
         }
       } catch (err: any) {
         console.error("[STRIPE STATUS POLL ERROR]", err);
-      }
-    }
-  }
-
-  // Simulate gateway latency (MBWAY user checking app and confirming)
-  const secondsElapsed = (Date.now() - new Date(order.createdAt).getTime()) / 1000;
-
-  if (order.status === 'pending_payment') {
-    if (order.paymentMethod === 'mbway') {
-      // Async MBWAY Simulation
-      if (order.simulatedOutcome === 'failed' && secondsElapsed >= 3) {
-        order.status = 'failed';
-        order.errorMessage = 'MB WAY user rejected the push authorization request.';
-      } else if (order.simulatedOutcome === 'expired' && secondsElapsed >= 5) {
-        order.status = 'failed';
-        order.errorMessage = 'MB WAY payment expired. The 5-minute confirmation window elapsed.';
-      } else if (order.simulatedOutcome === 'paid' && secondsElapsed >= 4) {
-        order.status = 'paid';
-        if (!order.emailSent) {
-          order.emailLinks = sendTransactionEmails(order);
-          order.emailSent = true;
-        }
       }
     }
   }
