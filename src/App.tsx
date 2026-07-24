@@ -2389,7 +2389,8 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({ product: rawProduct,
     const hasSize = isVestuario && 
                     !n.includes('dragonfly bandana') && 
                     !n.includes('classic bandana') && 
-                    !n.includes('dragonfly headband');
+                    !n.includes('dragonfly headband') &&
+                    Boolean(product.sizes && product.sizes.length > 0);
     const hasQuantity = isHomeSet;
     const rawPrice = getApprovedPrice(product.name);
     const isAfricanFlowerPouch = product.name.toLowerCase().includes('african flower pouch');
@@ -2404,7 +2405,7 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({ product: rawProduct,
     const initialColor = isDualColor 
         ? 'Azul Água & Branco' 
         : 'Verde Musgo';
-    const defaultSize = product.sizes ? product.sizes[0] : 'M';
+    const defaultSize = (hasSize && product.sizes && product.sizes.length > 0) ? product.sizes[0] : '';
     const [selections, setSelections] = useState({
         tamanho: defaultSize,
         cor: initialColor,
@@ -2693,20 +2694,20 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({ product: rawProduct,
 
     const currentPrice = calculatePrice();
 
-    const selectedSize = hasSize ? selections.tamanho : 'Não aplicável';
+    const selectedSize = hasSize ? selections.tamanho : '';
     const selectedColor = (isCoaster && !isClassicCoasters) ? 'Padrão' : selections.cor;
     const quantity = hasQuantity ? selections.quantidade : '1';
 
     const messageText = lang === 'pt'
-        ? `Olá Carolina! Quero encomendar uma peça M★BRAVO.\n\nProduto: ${product.name}\nTamanho: ${selectedSize}\n${(isCoaster && !isClassicCoasters) ? '' : (isMiniPouches ? `Cor do Saquinho: ${selectedColor}\nCor do Fio: ${selections.corFio}\n` : `Cor: ${selectedColor}\n`)}Quantidade: ${quantity}\n\nValor Total: ${totalPrice}€\n\nFico a aguardar os detalhes para combinarmos o envio e o pagamento. Obrigada!`
-        : `Hello Carolina! I would like to order an M★BRAVO piece.\n\nProduct: ${product.name}\nSize: ${translateSize(selectedSize, lang)}\n${(isCoaster && !isClassicCoasters) ? '' : (isMiniPouches ? `Pouch Color: ${translateColor(selectedColor, lang)}\nYarn Color: ${translateColor(selections.corFio, lang)}\n` : `Color: ${translateColor(selectedColor, lang)}\n`)}Quantity: ${translateQuantity(quantity, lang)}\n\nTotal Price: ${totalPrice}€\n\nI look forward to details on shipping and payment. Thank you!`;
+        ? `Olá Carolina! Quero encomendar uma peça M★BRAVO.\n\nProduto: ${product.name}\n${selectedSize ? `Tamanho: ${selectedSize}\n` : ''}${(isCoaster && !isClassicCoasters) ? '' : (isMiniPouches ? `Cor do Saquinho: ${selectedColor}\nCor do Fio: ${selections.corFio}\n` : `Cor: ${selectedColor}\n`)}Quantidade: ${quantity}\n\nValor Total: ${totalPrice}€\n\nFico a aguardar os detalhes para combinarmos o envio e o pagamento. Obrigada!`
+        : `Hello Carolina! I would like to order an M★BRAVO piece.\n\nProduct: ${product.name}\n${selectedSize ? `Size: ${translateSize(selectedSize, lang)}\n` : ''}${(isCoaster && !isClassicCoasters) ? '' : (isMiniPouches ? `Pouch Color: ${translateColor(selectedColor, lang)}\nYarn Color: ${translateColor(selections.corFio, lang)}\n` : `Color: ${translateColor(selectedColor, lang)}\n`)}Quantity: ${translateQuantity(quantity, lang)}\n\nTotal Price: ${totalPrice}€\n\nI look forward to details on shipping and payment. Thank you!`;
 
     const whatsappUrl = `https://wa.me/351912828182?text=${encodeURIComponent(messageText)}`;
 
     useEffect(() => {
         if (!isFocused) {
             setSelections({ 
-                tamanho: product.sizes ? product.sizes[0] : 'M', 
+                tamanho: (hasSize && product.sizes && product.sizes.length > 0) ? product.sizes[0] : '', 
                 cor: initialColor, 
                 corFio: isMiniPouches ? 'Branco Creme' : '',
                 quantidade: product.name.toLowerCase().includes('coasters') ? '4und.' : '2und.', 
@@ -5509,7 +5510,8 @@ const ProductDetailPage = ({ pathname }: { pathname: string }) => {
     const hasSize = isVestuario && 
                     !n.includes('dragonfly bandana') && 
                     !n.includes('classic bandana') && 
-                    !n.includes('dragonfly headband');
+                    !n.includes('dragonfly headband') &&
+                    Boolean(productTranslated.sizes && productTranslated.sizes.length > 0);
     const hasQuantity = isHomeSet;
     const rawPrice = getApprovedPrice(productTranslated.name);
     const isAfricanFlowerPouch = productTranslated.name.toLowerCase().includes('african flower pouch');
@@ -5524,7 +5526,7 @@ const ProductDetailPage = ({ pathname }: { pathname: string }) => {
     const initialColor = isDualColor 
         ? 'Azul Água & Branco' 
         : 'Verde Musgo';
-    const defaultSize = productTranslated.sizes ? productTranslated.sizes[0] : 'M';
+    const defaultSize = (hasSize && productTranslated.sizes && productTranslated.sizes.length > 0) ? productTranslated.sizes[0] : '';
 
     const [selections, setSelections] = useState({
         tamanho: defaultSize,
@@ -5567,7 +5569,7 @@ const ProductDetailPage = ({ pathname }: { pathname: string }) => {
     // Reset page states when product selection shifts
     useEffect(() => {
         setSelections({
-            tamanho: productTranslated.sizes ? productTranslated.sizes[0] : 'M',
+            tamanho: (hasSize && productTranslated.sizes && productTranslated.sizes.length > 0) ? productTranslated.sizes[0] : '',
             cor: initialColor,
             corFio: isMiniPouches ? 'Branco Creme' : '',
             quantidade: productTranslated.name.toLowerCase().includes('coasters') ? '4und.' : '2und.',
@@ -5617,7 +5619,7 @@ const ProductDetailPage = ({ pathname }: { pathname: string }) => {
         }
     };
 
-    const selectedSize = hasSize ? selections.tamanho : 'Não aplicável';
+    const selectedSize = hasSize ? selections.tamanho : '';
     const selectedColor = (isCoaster && !isClassicCoasters) ? 'Padrão' : selections.cor;
     const quantity = hasQuantity ? selections.quantidade : '1';
 
