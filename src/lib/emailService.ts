@@ -646,6 +646,80 @@ async function sendViaSendGrid(apiKey: string, toEmail: string, subject: string,
   }
 }
 
+async function sendViaResend(apiKey: string, toEmail: string, subject: string, htmlContent: string) {
+  const url = 'https://api.resend.com/emails';
+  const response = await fetch(url, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${apiKey}`
+    },
+    body: JSON.stringify({
+      from: `M BRAVO <${process.env.FROM_EMAIL || 'encomendas@mbravobycarolina.com'}>`,
+      to: [toEmail],
+      subject: subject,
+      html: htmlContent
+    })
+  });
+
+  if (!response.ok) {
+    const errText = await response.text();
+    throw new Error(`Resend API failure: ${response.status} - ${errText}`);
+  }
+}
+
+/**
+ * Sends a notification exclusively to the Atelier (encomendas@mbravobycarolina.com)
+ * for manual orders registered via Admin Dashboard. No email is sent to the customer.
+ */
+export async function sendAtelierNotificationOnly(order: OrderData): Promise<{ adminEmailUrl: string }> {
+  const adminHtml = generateAdminEmailHtml(order);
+
+  const publicEmailsDir = path.join(process.cwd(), 'public', 'emails');
+  if (!fs.existsSync(publicEmailsDir)) {
+    fs.mkdirSync(publicEmailsDir, { recursive: true });
+  }
+
+  const adminFileName = `admin-manual-${order.orderId}.html`;
+  fs.writeFileSync(path.join(publicEmailsDir, adminFileName), adminHtml, 'utf-8');
+
+  console.log(`[M.BRAVO EMAIL SYSTEM] Manual Order Atelier Notification generated for ${order.orderId}`);
+  console.log(`  - Admin Atelier Notification preview: /emails/${adminFileName}`);
+
+  const atelierEmail = 'encomendas@mbravobycarolina.com';
+  const subject = `[NOVA ENCOMENDA MANUAL] ${order.orderId} - Prioridade: ${order.priority || 'NORMAL'}`;
+
+  const resendKey = process.env.RESEND_API_KEY && 
+                    process.env.RESEND_API_KEY !== "" && 
+                    !process.env.RESEND_API_KEY.includes("INSERT_") &&
+                    !process.env.RESEND_API_KEY.includes("YOUR_");
+
+  const sendGridKey = process.env.SENDGRID_API_KEY && 
+                      process.env.SENDGRID_API_KEY !== "" && 
+                      process.env.SENDGRID_API_KEY.startsWith("SG.") &&
+                      !process.env.SENDGRID_API_KEY.includes("INSERT_");
+
+  if (resendKey) {
+    try {
+      await sendViaResend(process.env.RESEND_API_KEY!, atelierEmail, subject, adminHtml);
+      console.log(`[M.BRAVO EMAIL SYSTEM] Atelier notification sent successfully via Resend to ${atelierEmail}.`);
+    } catch (err: any) {
+      console.warn(`[M.BRAVO EMAIL SYSTEM WARNING] Could not send Atelier notification via Resend: ${err.message}`);
+    }
+  } else if (sendGridKey) {
+    try {
+      await sendViaSendGrid(process.env.SENDGRID_API_KEY!, atelierEmail, subject, adminHtml);
+      console.log(`[M.BRAVO EMAIL SYSTEM] Atelier notification sent successfully via SendGrid to ${atelierEmail}.`);
+    } catch (err: any) {
+      console.warn(`[M.BRAVO EMAIL SYSTEM WARNING] Could not send Atelier notification via SendGrid: ${err.message}`);
+    }
+  } else {
+    console.log(`[M.BRAVO EMAIL SYSTEM] No live email gateway configured. Local preview saved at /emails/${adminFileName}`);
+  }
+
+  return { adminEmailUrl: `/emails/${adminFileName}` };
+}
+
 /**
  * Generates the elegant cream & forest green customer order shipped HTML email template.
  */
