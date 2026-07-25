@@ -156,7 +156,7 @@ export default function AdminDashboardModal({ onClose, shopCategories = [] }: Ad
         setCustomerProfile(data.profile);
         setCrmFields({
           name: data.profile.name || '',
-          phone: data.profile.phone || '',
+          phone: formatPhoneReadable(data.profile.phone || ''),
           instagram: data.profile.instagram || '',
           birthday: data.profile.birthday || '',
           instagramNotes: data.profile.instagramNotes || '',
@@ -3056,7 +3056,10 @@ export default function AdminDashboardModal({ onClose, shopCategories = [] }: Ad
             </div>
 
             {/* Drawer Body - Scrollable */}
-            <div className="flex-1 overflow-y-auto p-6 space-y-6 text-left">
+            <div 
+              className="flex-1 overflow-y-auto overscroll-contain touch-pan-y p-6 space-y-6 text-left min-h-0"
+              style={{ WebkitOverflowScrolling: 'touch' }}
+            >
               {loadingCustomerProfile ? (
                 <div className="py-20 flex flex-col items-center justify-center space-y-3">
                   <RefreshCw className="w-6 h-6 animate-spin text-[#C5A059]" />
@@ -3120,6 +3123,7 @@ export default function AdminDashboardModal({ onClose, shopCategories = [] }: Ad
                           placeholder="+351 9xx xxx xxx"
                           value={crmFields.phone}
                           onChange={(e) => setCrmFields(prev => ({ ...prev, phone: e.target.value }))}
+                          onBlur={(e) => setCrmFields(prev => ({ ...prev, phone: formatPhoneReadable(e.target.value) }))}
                           className="w-full bg-[#FCFBF9] border border-forest/10 focus:border-[#C5A059] focus:outline-none rounded-lg px-2.5 py-1.5 text-forest font-mono"
                         />
                       </div>
