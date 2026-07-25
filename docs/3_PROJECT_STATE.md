@@ -84,7 +84,10 @@ Respondendo às últimas solicitações de otimização de fluxo e consistência
         *   Purga total da atribuição automática do tamanho por defeito `"M"` em artigos sem variação de tamanho (malas, bolsas, African Flower Pouch, Mini Pouches, Coasters e artigos de casa).
         *   Garantida a passagem de `tamanho = ""` e `hasSize = false` quando o produto não possui opção de tamanho.
         *   Tratamento condicional no `emailService.ts` e no Painel Admin (`AdminDashboardModal.tsx`), omitindo totalmente o rótulo de tamanho para peças sem variação.
-    8.  **Atualização Integral da Documentação Técnica (`/docs`):**
+    8.  **Notificação de Encomenda Manual no Admin (server.ts / emailService.ts):**
+        *   Atualizada a rota `/api/admin/orders/create` para ser 100% assíncrona (`async`).
+        *   Criada a função `sendAtelierNotificationOnly` no `emailService.ts` que envia a notificação por e-mail via Resend exclusivamente para o Atelier (`encomendas@mbravobycarolina.com`) com a tag de prioridade, sem enviar qualquer mensagem para o cliente.
+    9.  **Atualização Integral da Documentação Técnica (`/docs`):**
         *   Ficheiros `2_ARCHITECTURE_AND_ADMIN.md` e `3_PROJECT_STATE.md` atualizados para espelhar a arquitetura final de produção de luxo.
 
 ---
