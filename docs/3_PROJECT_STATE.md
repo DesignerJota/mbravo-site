@@ -88,7 +88,12 @@ Respondendo às últimas solicitações de otimização de fluxo e consistência
         *   Atualizada a rota `/api/admin/orders/create` para ser 100% assíncrona (`async`).
         *   Removida qualquer tentativa de ligação a bases de dados PostgreSQL/externas nesta rota, garantindo a gravação exclusiva no Volume/Ficheiro JSON local (`loadOrders()` / `saveOrders()`), prevenindo erros de rede `ENETUNREACH` na Railway.
         *   Mantida a função `sendAtelierNotificationOnly` no `emailService.ts` que envia a notificação por e-mail em segundo plano via Resend exclusivamente para o Atelier (`encomendas@mbravobycarolina.com`) com a tag de prioridade, sem enviar qualquer mensagem para o cliente.
-    9.  **Atualização Integral da Documentação Técnica (`/docs`):**
+    9.  **Blindagem CORS e Preflight OPTIONS no Backend (`server.ts`):**
+        *   Configurado o middleware CORS em `server.ts` para permitir explicitamente a origem de produção `https://mbravobycarolina.com`, aceitando os cabeçalhos `X-Admin-Password`, `Authorization`, `Content-Type` e respondendo com status 200 OK em requisições `OPTIONS` (preflight).
+    10. **Melhorias de UX, Scroll Nativo e Formatação de Telemóvel no CRM Drawer (`AdminDashboardModal.tsx`):**
+        *   Adicionada navegação por scroll vertical fluida e nativa ao corpo do Drawer (Ficha de Cliente) com `-webkit-overflow-scrolling: touch` e `touch-pan-y` para roda do rato e gestos tátil.
+        *   Ajustado o campo de telefone no CRM Drawer para apresentar a máscara de leitura humana `+351 9xx xxx xxx` (`formatPhoneReadable`), mantendo a consistência visual com o cartão principal de encomenda.
+    11. **Atualização Integral da Documentação Técnica (`/docs`):**
         *   Ficheiros `2_ARCHITECTURE_AND_ADMIN.md` e `3_PROJECT_STATE.md` atualizados para espelhar a arquitetura final de produção de luxo.
 
 ---
