@@ -27,17 +27,17 @@ function getStripeInstance(): Stripe | null {
   }
 }
 
-// CORS Middleware to allow requests from any frontend domain dynamically
+// CORS Middleware to allow requests from https://mbravobycarolina.com and any frontend domain
 app.use((req, res, next) => {
   const origin = req.headers.origin;
   if (origin) {
     res.setHeader("Access-Control-Allow-Origin", origin);
     res.setHeader("Access-Control-Allow-Credentials", "true");
   } else {
-    res.setHeader("Access-Control-Allow-Origin", "*");
+    res.setHeader("Access-Control-Allow-Origin", "https://mbravobycarolina.com");
   }
-  res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
-  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization, Accept");
+  res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, PATCH, OPTIONS");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization, Accept, X-Admin-Password, X-Requested-With");
 
   // Prevent Google and search crawlers from indexing any requests directed to the API subdomain or raw API endpoints
   const host = req.headers.host || "";
