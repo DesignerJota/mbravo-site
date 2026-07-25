@@ -22,7 +22,8 @@ A aplicação está desenhada num modelo **Full-Stack integrado**:
 *   **Frontend SPA:** Construído em React 18 utilizando Vite como ferramenta de compilação.
 *   **Backend Server:** Express rodando em Node.js. O mesmo contentor de execução serve a SPA compilada no diretório `/dist` (em ambiente de produção) e expõe as rotas de API em `/api/*`.
 *   **Porta e Host:** Vinculado à porta `3000` na interface `0.0.0.0` para conformidade com o encaminhamento de tráfego do Cloud Run e Railway.
-*   **Isolamento de Subdomínio (API) & SEO:**
+*   **Isolamento de Subdomínio (API), CORS & SEO:**
+    *   **Blindagem do Middleware CORS (`server.ts`):** O middleware de CORS em `server.ts` foi rigorosamente atualizado para suportar requisições do domínio de produção `https://mbravobycarolina.com`, permitindo explicitamente os métodos `GET, POST, PUT, DELETE, PATCH, OPTIONS` e os cabeçalhos `Content-Type, Authorization, Accept, X-Admin-Password, X-Requested-With`. As requisições de preflight (`OPTIONS`) respondem de forma imediata e transparente com o código de estado `200 OK`.
     *   Todas as respostas a requisições dirigidas ao subdomínio `api.` ou rotas de `/api/` recebem automaticamente o cabeçalho `X-Robots-Tag: noindex, nofollow` para impedir a sua indexação por motores de pesquisa.
     *   O endpoint `/robots.txt` responde dinamicamente com diretrizes de exclusão total se o host de origem for o subdomínio da API.
 
@@ -121,7 +122,8 @@ A lógica de envio de e-mails comunica as atualizações de forma profissional c
 Para assegurar integridade absoluta de dados e facilidade de leitura operacional no Atelier, a aplicação implementa validação estrita no Frontend e no Backend (`server.ts`):
 *   **Validação Estrita de E-mail (`isValidEmailStrict` / `isValidEmail`):** Verificação por expressão regular (`/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/`) exigindo rigorosamente o formato de e-mail padrão (`utilizador@dominio.com`) tanto no checkout de cliente como na criação manual de encomendas no Admin.
 *   **Auto-Máscara de Código Postal Português (`formatPostalCodePT` / `formatPostalCode`):** Formatação automática no formato standard `XXXX-XXX` (ex: `1000-123`), higienizando caracteres não numéricos.
-*   **Máscara de Leitura Humana para Telemóveis (`formatPhoneReadable`):** Aplicação de espaçamento visual legível em todos os números de telemóvel apresentados no Painel Admin e nos e-mails de confirmação e expedição (ex: `+351 917 827 458` em vez de `+351917827458`).
+*   **Máscara de Leitura Humana para Telemóveis (`formatPhoneReadable`):** Aplicação de espaçamento visual legível em todos os números de telemóvel apresentados no Painel Admin, na Ficha de Cliente do CRM Drawer e nos e-mails de confirmação e expedição (ex: `+351 917 827 458` em vez de `+351917827458`).
+*   **Acessibilidade e Scroll Nativo no Drawer de CRM (Ficha de Cliente):** O corpo do painel lateral deslizante do CRM foi otimizado com `-webkit-overflow-scrolling: touch`, `overflow-y-auto` e `touch-pan-y`, garantindo navegação por scroll vertical fluida e nativa via roda do rato (mouse wheel) e gestos tátil em dispositivos móveis/desktop.
 *   **Higienização e Limpeza de Texto (`sanitizeText` & `sanitizeNumber`):** Todos os campos de formulário e criação de encomendas são processados com remoção de espaços em branco antes e depois (`trim()`), filtragem de carateres inválidos em NIF/telefones e conversão segura de valores monetários.
 *   **Limpeza do Campo Instagram na Ficha de Cliente CRM (Pilar 1):** O campo "Utilizador de Instagram" no Pilar 1 da Ficha do Cliente inicia totalmente vazio por defeito (sem a sugestão estática de `@carolina_mbravo`), apresentando apenas o placeholder discreto `@utilizador` para permitir o preenchimento manual e exclusivo dos dados reais de cada cliente.
 
