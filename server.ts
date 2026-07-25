@@ -2,7 +2,7 @@ import express from "express";
 import path from "path";
 import fs from "fs";
 import { createServer as createViteServer } from "vite";
-import { sendTransactionEmails, sendMultibancoEmails, sendShippedEmails } from "./src/lib/emailService";
+import { sendTransactionEmails, sendMultibancoEmails, sendShippedEmails, sendAtelierNotificationOnly, OrderData } from "./src/lib/emailService";
 import Stripe from "stripe";
 import pg from "pg";
 
@@ -37,7 +37,7 @@ app.use((req, res, next) => {
     res.setHeader("Access-Control-Allow-Origin", "*");
   }
   res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
-  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization, Accept, x-admin-password");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization, Accept");
 
   // Prevent Google and search crawlers from indexing any requests directed to the API subdomain or raw API endpoints
   const host = req.headers.host || "";
@@ -157,18 +157,6 @@ function isValidEmailStrict(email: any): boolean {
   if (!email) return false;
   const str = String(email).trim();
   return /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(str);
-}
-
-// Administrative Middleware Verification
-const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'CarolinaM26';
-
-function verifyAdmin(req: any, res: any, next: any) {
-  const auth = req.headers['x-admin-password'] || req.headers['authorization'];
-  if (auth === ADMIN_PASSWORD) {
-    next();
-  } else {
-    res.status(401).json({ error: "Acesso administrativo não autorizado. Palavra-passe incorreta." });
-  }
 }
 
 // Serve dynamic robots.txt depending on whether the request accesses the brand site or the API subdomain
@@ -331,6 +319,7 @@ app.post("/api/payment/create-intent", async (req, res) => {
             confirm: true,
             return_url: `${req.headers.origin || 'https://www.mbravobycarolina.com'}/`,
             payment_method_types: ['card'],
+            payment_method_configuration: paymentMethodConfig as any,
             description: `M BRAVO - Encomenda ${orderId}`,
             receipt_email: checkoutForm.email,
             metadata: commonMetadata
@@ -367,6 +356,7 @@ app.post("/api/payment/create-intent", async (req, res) => {
           console.log(`[STRIPE] Creating Multibanco PaymentIntent for order ${orderId} with amount ${finalAmountInCents} cents`);
           
           const customerName = checkoutForm.nome?.trim() || "M BRAVO Cliente";
+          // CORREÇÃO: Removido o fallback para o gmail antigo
           const customerEmail = checkoutForm.email?.trim() || "encomendas@mbravobycarolina.com";
 
           const paymentIntent = await stripe.paymentIntents.create({
@@ -1316,6 +1306,16 @@ app.post("/api/admin/inventory/update", verifyAdmin, (req, res) => {
 /**
  * 6. ADMINISTRATIVE DASHBOARD ENDPOINTS
  */
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'CarolinaM26';
+
+function verifyAdmin(req: any, res: any, next: any) {
+  const auth = req.headers['x-admin-password'] || req.headers['authorization'];
+  if (auth === ADMIN_PASSWORD) {
+    next();
+  } else {
+    res.status(401).json({ error: "Acesso administrativo não autorizado. Palavra-passe incorreta." });
+  }
+}
 
 // Endpoint to verify password
 app.post("/api/admin/login", (req, res) => {
@@ -1449,7 +1449,7 @@ app.post("/api/admin/orders/create", verifyAdmin, async (req, res) => {
   // Generate distinctive order ID
   const orderId = `MB-2026-${Math.floor(1000 + Math.random() * 9000)}`;
   
-  const newOrder = {
+  const newOrder: any = {
     orderId,
     productName: cleanProductName,
     price: priceNum,
@@ -1482,52 +1482,27 @@ app.post("/api/admin/orders/create", verifyAdmin, async (req, res) => {
     activeOrders.set(id, ord);
   }
 
+  // Dispatch notification EXCLUSIVELY to Atelier (encomendas@mbravobycarolina.com) via Resend/SendGrid
+  try {
+    const { adminEmailUrl } = await sendAtelierNotificationOnly(newOrder);
+    newOrder.emailLinks = { adminEmailUrl };
+  } catch (emailErr: any) {
+    console.error("[ADMIN MANUAL ORDER ATELIER EMAIL ERROR]", emailErr);
+  }
+
   activeOrders.set(orderId, newOrder);
   saveOrders(activeOrders);
 
-    // Trigger audit log for manual order registration
-    addAuditLog(
-      'manual_order_creation',
-      `Encomenda manual registada: ${orderId} para o cliente ${customer.nome} (${productName})`,
-      orderId,
-      { customerName: customer.nome, productName }
-    );
+  // Trigger audit log for manual order registration
+  addAuditLog(
+    'manual_order_creation',
+    `Encomenda manual registada: ${orderId} para o cliente ${customer.nome} (${productName})`,
+    orderId,
+    { customerName: customer.nome, productName }
+  );
 
-    // Enviar e-mail de notificação apenas para a Carolina / Atelier
-    try {
-      if (process.env.RESEND_API_KEY) {
-        const { Resend } = await import('resend');
-        const resend = new Resend(process.env.RESEND_API_KEY);
-
-        const priorityTag = priority === 'HIGH' 
-          ? '<span style="background:#8b0000;color:#fff;padding:2px 6px;border-radius:4px;font-weight:bold;">PRIORIDADE: ALTA (ATELIER URGENTE)</span>'
-          : '<span style="background:#555;color:#fff;padding:2px 6px;border-radius:4px;">PRIORIDADE: NORMAL</span>';
-
-        await resend.emails.send({
-          from: 'M BRAVO <encomendas@mbravobycarolina.com>',
-          to: ['encomendas@mbravobycarolina.com'],
-          subject: `[NOVO PEDIDO MANUAL] ${orderId} - Prioridade Atelier`,
-          html: `
-            <div style="font-family: sans-serif; padding: 20px; color: #333;">
-              <h2>M★BRAVO • NOTIFICAÇÃO DE ATELIER (REGISTO MANUAL)</h2>
-              <p>${priorityTag}</p>
-              <hr />
-              <p><b>ID Encomenda:</b> ${orderId}</p>
-              <p><b>Produto:</b> ${productName}</p>
-              <p><b>Preço:</b> ${price}€</p>
-              <p><b>Cliente:</b> ${customer.nome} (${customer.email})</p>
-              <p><b>Telefone:</b> ${customer.telefone}</p>
-              <p><b>Morada:</b> ${customer.morada}, ${customer.codigoPostal} ${customer.cidade}</p>
-            </div>
-          `
-        });
-      }
-    } catch (emailErr) {
-      console.error("[MANUAL ORDER EMAIL ERROR]", emailErr);
-    }
-
-    res.json({ success: true, order: newOrder });
-  });
+  res.json({ success: true, order: newOrder });
+});
 
 // Endpoint to delete/remove an order permanently
 app.post("/api/admin/orders/delete", verifyAdmin, (req, res) => {
