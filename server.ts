@@ -1422,7 +1422,7 @@ app.post("/api/admin/orders/update", verifyAdmin, (req, res) => {
   res.json({ success: true, order });
 });
 
-// Endpoint to manually register/add an order (e.g. past manual purchases or recovery)
+// Endpoint to manually register/add an order (pure local Volume/JSON storage, no PostgreSQL/external DB to prevent ENETUNREACH errors)
 app.post("/api/admin/orders/create", verifyAdmin, async (req, res) => {
   const { productName, price, selections, customer, paymentMethod, status, priority, createdAt } = req.body;
 
@@ -1475,14 +1475,14 @@ app.post("/api/admin/orders/create", verifyAdmin, async (req, res) => {
     emailSent: false
   };
 
-  // Reload current orders to stay perfectly synchronized
+  // 1. Reload current orders from local JSON volume (no PostgreSQL/external DB call)
   const currentOrders = loadOrders();
   activeOrders.clear();
   for (const [id, ord] of currentOrders.entries()) {
     activeOrders.set(id, ord);
   }
 
-  // Dispatch notification EXCLUSIVELY to Atelier (encomendas@mbravobycarolina.com) via Resend/SendGrid
+  // 2. Dispatch notification EXCLUSIVELY to Atelier (encomendas@mbravobycarolina.com) in background via Resend
   try {
     const { adminEmailUrl } = await sendAtelierNotificationOnly(newOrder);
     newOrder.emailLinks = { adminEmailUrl };
@@ -1490,10 +1490,11 @@ app.post("/api/admin/orders/create", verifyAdmin, async (req, res) => {
     console.error("[ADMIN MANUAL ORDER ATELIER EMAIL ERROR]", emailErr);
   }
 
+  // 3. Save order to persistent Volume JSON storage (ORDERS_FILE)
   activeOrders.set(orderId, newOrder);
   saveOrders(activeOrders);
 
-  // Trigger audit log for manual order registration
+  // 4. Trigger audit log for manual order registration
   addAuditLog(
     'manual_order_creation',
     `Encomenda manual registada: ${orderId} para o cliente ${customer.nome} (${productName})`,
