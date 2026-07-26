@@ -120,8 +120,11 @@ Respondendo às últimas solicitações de otimização de fluxo e consistência
         *   **Modal de Edição do Produto**: adicionado o painel "Consumo de Matéria-Prima por Cor Selecionada (por Peça)", onde o Admin/Carolina pode especificar individualmente o consumo de fio (em novelos ou gramas, ex: `0.5` ou `0.25` novelos) por cada cor ativa de matéria-prima.
         *   **Estrutura do Modelo de Dados**: atualizado o objeto de produto com o dicionário `colorConsumptions: Record<string, number>` que mapeia a cor ao consumo unitário correspondente, mantendo total retrocompatibilidade com produtos existentes em `/app/data/catalog.json`.
         *   **Calculadora de Necessidades de Stock**: atualizado o cálculo em `getMaterialsNeededForProduct` em `server.ts` para multiplicar o consumo personalizado unitário pela quantidade da encomenda (`customConsumption * quantity`). Se um produto não tiver consumo definido, assume por defeito `1.0` novelo/unidade por segurança.
-    18. **Atualização Integral da Documentação Técnica (`/docs`):**
-        *   Ficheiros `2_ARCHITECTURE_AND_ADMIN.md`, `3_PROJECT_STATE.md` e `5_FUTURE_ROADMAP.md` atualizados para espelhar a estrutura exclusiva de `/app/data/`, a regra de Smart Upsert de matérias-primas, o consumo de fio por cor e a resiliência em produção.
+    18. **Execução Imediata de Smart Upsert no Arranque do Servidor (`server.ts`):**
+        *   Invocação direta da função `loadInventory()` dentro de `startServer()` durante o arranque do contentor em produção.
+        *   Análise dual por ID (`id`) e nome normalizado (`name`), detetando e intercalando autonomamente as novas referências de matérias-primas (`rm_paris_17_natural` e `rm_safran_76_azul_po`) na base viva de `/app/data/inventory.json` logo no arranque do servidor, preservando a 100% todo o stock e registos introduzidos pela Carolina.
+    19. **Atualização Integral da Documentação Técnica (`/docs`):**
+        *   Ficheiros `2_ARCHITECTURE_AND_ADMIN.md`, `3_PROJECT_STATE.md` e `5_FUTURE_ROADMAP.md` atualizados para espelhar a estrutura exclusiva de `/app/data/`, a regra de Smart Upsert de matérias-primas no boot, o consumo de fio por cor e a resiliência em produção.
 
 ---
 
