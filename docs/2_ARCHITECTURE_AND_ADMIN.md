@@ -31,12 +31,12 @@ A aplicação está desenhada num modelo **Full-Stack integrado**:
 
 ## 2. Persistência de Dados (JSON Database)
 A aplicação adota um armazenamento baseado em ficheiros locais persistentes, otimizados para volumes persistentes na cloud:
-*   **Diretório de Volumes e Soberania do Estado:** Caso o servidor detete a presença do diretório `/app/data/` (Volume Persistente na Railway), utiliza-o como fonte primária e soberana de dados. O estado gravado no Volume em produção é inviolável e NUNCA é sobrescrito por ficheiros estáticos do repositório.
-*   **Motor de Fusão Inteligente Não-Destrutiva no Arranque (AtLeastOnce Sync & Deep Merge):**
-    *   No boot do servidor (`server.ts`), o motor de persistência carrega os registos ativos presentes no Volume `/app/data/`.
-    *   Executa um *Deep Merge* chave-a-chave (por ID de encomenda, email de cliente ou ID de matéria-prima) cruzando com os ficheiros `.json` de fallback/semente do repositório workspace.
-    *   Registos históricos estáticos (ex: encomenda histórica `MB-2026-3147`) ausentes no Volume são fundidos sem sobrescrever nenhuma alteração ou nova encomenda gravada via API.
-    *   Após a consolidação em memória, o resultado é imediatamente persistido de forma atómica no Volume `/app/data/`.
+*   **Diretório de Volumes e Soberania do Estado (REGRA DE OURO / Pilar 10):** O Volume Persistente na Railway montado em `/app/data/` é a fonte soberana e inviolável de dados em produção. O estado gravado no Volume é imune a deploys do GitHub e NUNCA é sobrescrito ou modificado durante o arranque do servidor.
+*   **Protocolo de Arranque Estritamente Read-Only (`server.ts`):**
+    *   No boot do servidor (`server.ts`), as funções de carregamento de dados (`loadOrders`, `loadCustomers`, `loadInventory`, `loadCatalog`, `loadLogs`, `loadTestimonials`) limitam-se a ler em memória os ficheiros `.json` existentes em `/app/data/`.
+    *   **Zero Write On Boot:** Foram totalmente removidas lógicas de fusão (*Deep Merge*), cópias automáticas ou execuções de `writeFileSync` no arranque do servidor.
+    *   **Fallback In-Memory:** Caso um ficheiro do Volume ainda não exista na primeira execução, o servidor lê o ficheiro estático de fallback do workspace workspace diretamente para a memória, sem gravar nem modificar o disco durante o arranque.
+    *   **Mutação Exclusiva por API:** A escrita física em disco (`writeFileSync`) ocorre exclusivamente por via de requisições explícitas de mutação sentidas pelas rotas de API (`POST`, `PUT`, `DELETE`) no Painel Admin ou durante o Checkout.
 *   **Ficheiros de Banco de Dados Persistidos:**
     *   `orders.json`: Armazena todas as encomendas registadas e o seu estado de pagamento.
     *   `customers.json`: Armazena fichas consolidadas do CRM e dados específicos de clientes.
