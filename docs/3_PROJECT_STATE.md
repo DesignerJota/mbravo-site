@@ -110,8 +110,11 @@ Respondendo às últimas solicitações de otimização de fluxo e consistência
         *   Integração do componente `YarnSwatch` e tabela de mapeamento de cores exatas (`YARN_COLOR_MAP`) com os tons e texturas autênticos extraídos diretamente do PDF da Encomenda #18241 do Armazém das Manualidades.
         *   **Tabela de Stock de Matérias-Primas**: exibe amostragem visual de 28x28px (`w-7 h-7`) com cantos arredondados, gradiente e textura tátil de fio ao lado de cada referência (ex: `[Swatch Visual] Ref. 18 - Natural`).
         *   **CMS de Edição de Produtos**: exibe amostragem miniatura discreta de 20x20px (`w-5 h-5`) dentro de cada badge interativo de seleção de cor, mantendo a janela do CMS limpa, legível e altamente funcional.
-    15. **Atualização Integral da Documentação Técnica (`/docs`):**
-        *   Ficheiros `2_ARCHITECTURE_AND_ADMIN.md`, `3_PROJECT_STATE.md` e `5_FUTURE_ROADMAP.md` atualizados para espelhar a arquitetura de arranque Read-Only, alta disponibilidade em 3 camadas para testemunhos, inventário real de matérias-primas e resiliência em produção.
+    15. **Consolidação de Ficheiros JSON em `/app/data/` & Lógica de Smart Upsert no Boot (`server.ts`):**
+        *   Eliminação total de ficheiros JSON duplicados ou soltos na raiz (`inventory.json`, `orders.json`), consolidando 100% das bases de dados vivas (`inventory.json`, `orders.json`, `catalog.json`, `customers.json`, `audit_logs.json`, `testimonials.json`) exclusivamente no volume persistente `/app/data/`.
+        *   Implementação da **Lógica de Fusão Inteligente (Smart Upsert)** em `loadInventory()` no arranque do servidor: deteta e injeta autonomamente quaisquer novas referências de matérias-primas introduzidas em código sem nunca sobrescrever nem alterar as quantidades reais atualizadas pelo Admin em produção.
+    16. **Atualização Integral da Documentação Técnica (`/docs`):**
+        *   Ficheiros `2_ARCHITECTURE_AND_ADMIN.md`, `3_PROJECT_STATE.md` e `5_FUTURE_ROADMAP.md` atualizados para espelhar a estrutura exclusiva de `/app/data/`, a regra de Smart Upsert de matérias-primas, miniatura de amostras visuais da Encomenda #18241 e a resiliência em produção.
 
 ---
 
