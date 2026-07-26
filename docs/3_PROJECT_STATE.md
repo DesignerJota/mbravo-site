@@ -113,8 +113,15 @@ Respondendo às últimas solicitações de otimização de fluxo e consistência
     15. **Consolidação de Ficheiros JSON em `/app/data/` & Lógica de Smart Upsert no Boot (`server.ts`):**
         *   Eliminação total de ficheiros JSON duplicados ou soltos na raiz (`inventory.json`, `orders.json`), consolidando 100% das bases de dados vivas (`inventory.json`, `orders.json`, `catalog.json`, `customers.json`, `audit_logs.json`, `testimonials.json`) exclusivamente no volume persistente `/app/data/`.
         *   Implementação da **Lógica de Fusão Inteligente (Smart Upsert)** em `loadInventory()` no arranque do servidor: deteta e injeta autonomamente quaisquer novas referências de matérias-primas introduzidas em código sem nunca sobrescrever nem alterar as quantidades reais atualizadas pelo Admin em produção.
-    16. **Atualização Integral da Documentação Técnica (`/docs`):**
-        *   Ficheiros `2_ARCHITECTURE_AND_ADMIN.md`, `3_PROJECT_STATE.md` e `5_FUTURE_ROADMAP.md` atualizados para espelhar a estrutura exclusiva de `/app/data/`, a regra de Smart Upsert de matérias-primas, miniatura de amostras visuais da Encomenda #18241 e a resiliência em produção.
+    16. **Inclusão de 2 Novas Cores de Matéria-Prima — DROPS Paris #17 & DROPS Safran #76 (`server.ts` & `AdminDashboardModal.tsx`):**
+        *   Adição de **DROPS Paris #17 Natural** (Hex `#F3EBE1`, ID `rm_paris_17_natural`) e **DROPS Safran #76 Azul Pó** (Hex `#B8D8EB`, ID `rm_safran_76_azul_po`) ao `DEFAULT_INVENTORY` e ao mapa de amostras visuais `YARN_COLOR_MAP`.
+        *   Garantida a preservação integral e inviolável de 100% dos dados de catálogo e produtos da Carolina na Railway via Smart Upsert automático, sem tocar nem sobrescrever o ficheiro `catalog.json`.
+    17. **Novo Campo de Consumo de Matéria-Prima por Cor Selecionada no CMS (`AdminDashboardModal.tsx` & `server.ts`):**
+        *   **Modal de Edição do Produto**: adicionado o painel "Consumo de Matéria-Prima por Cor Selecionada (por Peça)", onde o Admin/Carolina pode especificar individualmente o consumo de fio (em novelos ou gramas, ex: `0.5` ou `0.25` novelos) por cada cor ativa de matéria-prima.
+        *   **Estrutura do Modelo de Dados**: atualizado o objeto de produto com o dicionário `colorConsumptions: Record<string, number>` que mapeia a cor ao consumo unitário correspondente, mantendo total retrocompatibilidade com produtos existentes em `/app/data/catalog.json`.
+        *   **Calculadora de Necessidades de Stock**: atualizado o cálculo em `getMaterialsNeededForProduct` em `server.ts` para multiplicar o consumo personalizado unitário pela quantidade da encomenda (`customConsumption * quantity`). Se um produto não tiver consumo definido, assume por defeito `1.0` novelo/unidade por segurança.
+    18. **Atualização Integral da Documentação Técnica (`/docs`):**
+        *   Ficheiros `2_ARCHITECTURE_AND_ADMIN.md`, `3_PROJECT_STATE.md` e `5_FUTURE_ROADMAP.md` atualizados para espelhar a estrutura exclusiva de `/app/data/`, a regra de Smart Upsert de matérias-primas, o consumo de fio por cor e a resiliência em produção.
 
 ---
 
