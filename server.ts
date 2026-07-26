@@ -1013,24 +1013,30 @@ const getInventoryFilePath = () => {
 const INVENTORY_FILE = getInventoryFilePath();
 
 const DEFAULT_INVENTORY = [
-  // Fios Principais e de Pormenor (Alinhados com a paleta M★BRAVO)
-  { id: 'rm_fio_algodao_cru', name: 'Novelo de Fio de Algodão Cru', quantity: 25.0, unit: 'novelos', minSafety: 5.0 },
-  { id: 'rm_fio_algodao_cacau', name: 'Novelo de Fio de Algodão Cacau Escuro', quantity: 15.0, unit: 'novelos', minSafety: 3.0 },
-  { id: 'rm_fio_algodao_oliva', name: 'Novelo de Fio de Algodão Oliva Suave', quantity: 18.0, unit: 'novelos', minSafety: 4.0 },
-  { id: 'rm_fio_algodao_verde_musgo', name: 'Novelo de Fio de Algodão Verde Musgo', quantity: 20.0, unit: 'novelos', minSafety: 5.0 },
-  { id: 'rm_fio_algodao_azul_noite', name: 'Novelo de Fio de Algodão Azul Noite', quantity: 22.0, unit: 'novelos', minSafety: 4.0 },
-  { id: 'rm_fio_algodao_baunilha', name: 'Novelo de Fio de Algodão Amarelo Baunilha', quantity: 15.0, unit: 'novelos', minSafety: 3.0 },
-  { id: 'rm_fio_algodao_terracota', name: 'Novelo de Fio de Algodão Terracota', quantity: 16.0, unit: 'novelos', minSafety: 3.0 },
-  { id: 'rm_fio_algodao_branco_creme', name: 'Novelo de Fio de Algodão Branco Creme', quantity: 25.0, unit: 'novelos', minSafety: 5.0 },
-  { id: 'rm_fio_algodao_rosa_quartzo', name: 'Novelo de Fio de Algodão Rosa Quartzo Subtil', quantity: 18.0, unit: 'novelos', minSafety: 4.0 },
-  { id: 'rm_fio_algodao_hortela', name: 'Novelo de Fio de Algodão Hortelã-Pimenta', quantity: 20.0, unit: 'novelos', minSafety: 4.0 },
-  { id: 'rm_fio_algodao_petroleo', name: 'Novelo de Fio de Algodão Petróleo', quantity: 15.0, unit: 'novelos', minSafety: 3.0 },
-  { id: 'rm_fio_algodao_azul_glaciar', name: 'Novelo de Fio de Algodão Azul Glaciar', quantity: 18.0, unit: 'novelos', minSafety: 4.0 },
-  { id: 'rm_fio_algodao_sorvete_limao', name: 'Novelo de Fio de Algodão Sorvete Limão', quantity: 12.0, unit: 'novelos', minSafety: 3.0 },
-  { id: 'rm_fio_algodao_creme', name: 'Novelo de Fio de Algodão Creme', quantity: 25.0, unit: 'novelos', minSafety: 5.0 },
-  { id: 'rm_fio_algodao_bege', name: 'Novelo de Fio de Algodão Bege Claro', quantity: 20.0, unit: 'novelos', minSafety: 4.0 },
-  { id: 'rm_fio_algodao_rosa_ternura', name: 'Novelo de Fio de Algodão Rosa Ternura', quantity: 18.0, unit: 'novelos', minSafety: 4.0 },
-  
+  // Linha DROPS Safran (Total: 37 novelos) - Encomenda #18241
+  { id: 'rm_safran_18_natural', name: 'DROPS Safran 18 (Natural)', quantity: 10.0, unit: 'novelos', minSafety: 3.0 },
+  { id: 'rm_safran_17_branco', name: 'DROPS Safran 17 (Branco)', quantity: 8.0, unit: 'novelos', minSafety: 2.0 },
+  { id: 'rm_safran_68_cafe', name: 'DROPS Safran 68 (Café)', quantity: 5.0, unit: 'novelos', minSafety: 2.0 },
+  { id: 'rm_safran_01_rosa_deserto', name: 'DROPS Safran 01 (Rosa do Deserto)', quantity: 3.0, unit: 'novelos', minSafety: 1.0 },
+  { id: 'rm_safran_78_verde_floresta', name: 'DROPS Safran 78 (Verde Floresta)', quantity: 3.0, unit: 'novelos', minSafety: 1.0 },
+  { id: 'rm_safran_60_verde_musgo', name: 'DROPS Safran 60 (Verde Musgo)', quantity: 3.0, unit: 'novelos', minSafety: 1.0 },
+  { id: 'rm_safran_73_azul_cobalto', name: 'DROPS Safran 73 (Azul Cobalto)', quantity: 3.0, unit: 'novelos', minSafety: 1.0 },
+  { id: 'rm_safran_50_menta', name: 'DROPS Safran 50 (Menta)', quantity: 3.0, unit: 'novelos', minSafety: 1.0 },
+  { id: 'rm_safran_19_vermelho', name: 'DROPS Safran 19 (Vermelho)', quantity: 1.0, unit: 'novelos', minSafety: 1.0 },
+
+  // Linha DROPS Paris (Total: 58 novelos) - Encomenda #18241
+  { id: 'rm_paris_16_branco', name: 'DROPS Paris 16 (Branco)', quantity: 10.0, unit: 'novelos', minSafety: 3.0 },
+  { id: 'rm_paris_43_verde', name: 'DROPS Paris 43 (Verde)', quantity: 5.0, unit: 'novelos', minSafety: 2.0 },
+  { id: 'rm_paris_25_verde_musgo', name: 'DROPS Paris 25 (Verde Musgo)', quantity: 5.0, unit: 'novelos', minSafety: 2.0 },
+  { id: 'rm_paris_48_petroleo', name: 'DROPS Paris 48 (Petróleo)', quantity: 5.0, unit: 'novelos', minSafety: 2.0 },
+  { id: 'rm_paris_76_azul_ternura', name: 'DROPS Paris 76 (Azul Ternura)', quantity: 5.0, unit: 'novelos', minSafety: 2.0 },
+  { id: 'rm_paris_57_rosa_clarissimo', name: 'DROPS Paris 57 (Rosa Claríssimo)', quantity: 5.0, unit: 'novelos', minSafety: 2.0 },
+  { id: 'rm_paris_35_baunilha', name: 'DROPS Paris 35 (Baunilha)', quantity: 5.0, unit: 'novelos', minSafety: 2.0 },
+  { id: 'rm_paris_19_amarelo_claro', name: 'DROPS Paris 19 (Amarelo Claro)', quantity: 5.0, unit: 'novelos', minSafety: 2.0 },
+  { id: 'rm_paris_44_castanho', name: 'DROPS Paris 44 (Castanho)', quantity: 5.0, unit: 'novelos', minSafety: 2.0 },
+  { id: 'rm_paris_12_vermelho', name: 'DROPS Paris 12 (Vermelho)', quantity: 5.0, unit: 'novelos', minSafety: 2.0 },
+  { id: 'rm_paris_15_preto', name: 'DROPS Paris 15 (Preto)', quantity: 3.0, unit: 'novelos', minSafety: 1.0 },
+
   // Acessórios e Embalagem
   { id: 'rm_fecho_correr', name: 'Fecho de Correr (Zipper)', quantity: 45.0, unit: 'unidades', minSafety: 10.0 },
   { id: 'rm_botao_madeira', name: 'Botão de Madeira M★BRAVO', quantity: 60.0, unit: 'unidades', minSafety: 15.0 },
@@ -1087,24 +1093,33 @@ function getMaterialsNeededForProduct(productName: string, selections: any = {})
   // Helper to resolve yarn bobbin ID by color name
   function getYarnIdForColor(colorName: string) {
     const norm = colorName.toLowerCase();
-    if (norm.includes('cru') || norm.includes('natural')) return 'rm_fio_algodao_cru';
-    if (norm.includes('cacau')) return 'rm_fio_algodao_cacau';
-    if (norm.includes('oliva')) return 'rm_fio_algodao_oliva';
-    if (norm.includes('musgo') || norm.includes('verde musgo')) return 'rm_fio_algodao_verde_musgo';
-    if (norm.includes('noite') || norm.includes('azul noite')) return 'rm_fio_algodao_azul_noite';
-    if (norm.includes('baunilha') || norm.includes('amarelo baunilha')) return 'rm_fio_algodao_baunilha';
-    if (norm.includes('terracota')) return 'rm_fio_algodao_terracota';
-    if (norm.includes('creme') || norm.includes('branco creme')) return 'rm_fio_algodao_branco_creme';
-    if (norm.includes('rosa quartzo') || norm.includes('quartzo')) return 'rm_fio_algodao_rosa_quartzo';
-    if (norm.includes('hortelã') || norm.includes('hortela')) return 'rm_fio_algodao_hortela';
-    if (norm.includes('petróleo') || norm.includes('petroleo')) return 'rm_fio_algodao_petroleo';
-    if (norm.includes('glaciar') || norm.includes('azul glaciar')) return 'rm_fio_algodao_azul_glaciar';
-    if (norm.includes('limão') || norm.includes('limao')) return 'rm_fio_algodao_sorvete_limao';
-    if (norm.includes('rosa ternura') || norm.includes('rosa')) return 'rm_fio_algodao_rosa_ternura';
-    if (norm.includes('bege') || norm.includes('bege claro')) return 'rm_fio_algodao_bege';
     
+    // DROPS Safran
+    if (norm.includes('18') || norm.includes('natural') || norm.includes('cru')) return 'rm_safran_18_natural';
+    if (norm.includes('17') || norm.includes('safran branco')) return 'rm_safran_17_branco';
+    if (norm.includes('68') || norm.includes('café') || norm.includes('cafe')) return 'rm_safran_68_cafe';
+    if (norm.includes('01') || norm.includes('deserto')) return 'rm_safran_01_rosa_deserto';
+    if (norm.includes('78') || norm.includes('floresta')) return 'rm_safran_78_verde_floresta';
+    if (norm.includes('60') || norm.includes('safran verde musgo')) return 'rm_safran_60_verde_musgo';
+    if (norm.includes('73') || norm.includes('cobalto')) return 'rm_safran_73_azul_cobalto';
+    if (norm.includes('50') || norm.includes('menta')) return 'rm_safran_50_menta';
+    if (norm.includes('19') || norm.includes('safran vermelho')) return 'rm_safran_19_vermelho';
+
+    // DROPS Paris
+    if (norm.includes('16') || norm.includes('paris branco') || norm.includes('branco')) return 'rm_paris_16_branco';
+    if (norm.includes('43') || norm.includes('paris verde')) return 'rm_paris_43_verde';
+    if (norm.includes('25') || norm.includes('paris verde musgo') || norm.includes('musgo')) return 'rm_paris_25_verde_musgo';
+    if (norm.includes('48') || norm.includes('petróleo') || norm.includes('petroleo')) return 'rm_paris_48_petroleo';
+    if (norm.includes('76') || norm.includes('ternura')) return 'rm_paris_76_azul_ternura';
+    if (norm.includes('57') || norm.includes('rosa claríssimo') || norm.includes('rosa clarissimo')) return 'rm_paris_57_rosa_clarissimo';
+    if (norm.includes('35') || norm.includes('baunilha')) return 'rm_paris_35_baunilha';
+    if (norm.includes('amarelo claro') || norm.includes('amarelo')) return 'rm_paris_19_amarelo_claro';
+    if (norm.includes('44') || norm.includes('castanho') || norm.includes('cacau')) return 'rm_paris_44_castanho';
+    if (norm.includes('12') || norm.includes('paris vermelho')) return 'rm_paris_12_vermelho';
+    if (norm.includes('15') || norm.includes('preto')) return 'rm_paris_15_preto';
+
     // Default fallback
-    return 'rm_fio_algodao_cru';
+    return 'rm_safran_18_natural';
   }
 
   const yarnId = getYarnIdForColor(color);
@@ -1119,27 +1134,27 @@ function getMaterialsNeededForProduct(productName: string, selections: any = {})
     materials.push({ id: 'rm_fecho_correr', quantityNeeded: 1 * quantity });
   }
   else if (nameLower.includes('mini shell pouch')) {
-    materials.push({ id: 'rm_fio_algodao_cru', quantityNeeded: 0.1 * quantity });
+    materials.push({ id: yarnId, quantityNeeded: 0.1 * quantity });
     materials.push({ id: 'rm_botao_madeira', quantityNeeded: 1 * quantity });
   }
   else if (nameLower.includes('airpods case')) {
-    materials.push({ id: 'rm_fio_algodao_cru', quantityNeeded: 0.05 * quantity });
+    materials.push({ id: yarnId, quantityNeeded: 0.05 * quantity });
   }
   else if (nameLower.includes('daisy coasters') || nameLower.includes('coasters') || nameLower.includes('coaster')) {
-    materials.push({ id: 'rm_fio_algodao_branco_creme', quantityNeeded: 0.05 * quantity });
-    materials.push({ id: 'rm_fio_algodao_cru', quantityNeeded: 0.02 * quantity });
+    materials.push({ id: 'rm_safran_17_branco', quantityNeeded: 0.05 * quantity });
+    materials.push({ id: 'rm_safran_18_natural', quantityNeeded: 0.02 * quantity });
   }
   else if (nameLower.includes('bikini') || nameLower.includes('top')) {
     materials.push({ id: yarnId, quantityNeeded: 0.3 * quantity });
   }
   else if (nameLower.includes('cardigan') || nameLower.includes('poncho')) {
-    materials.push({ id: 'rm_fio_algodao_cru', quantityNeeded: 1.2 * quantity });
+    materials.push({ id: yarnId, quantityNeeded: 1.2 * quantity });
   }
   else if (nameLower.includes('bandana') || nameLower.includes('headband')) {
-    materials.push({ id: 'rm_fio_algodao_cru', quantityNeeded: 0.2 * quantity });
+    materials.push({ id: yarnId, quantityNeeded: 0.2 * quantity });
   }
   else {
-    materials.push({ id: 'rm_fio_algodao_cru', quantityNeeded: 0.15 * quantity });
+    materials.push({ id: yarnId, quantityNeeded: 0.15 * quantity });
   }
   
   return materials;
