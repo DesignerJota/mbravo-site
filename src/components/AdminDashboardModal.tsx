@@ -69,9 +69,11 @@ const YARN_COLOR_MAP: Record<string, { bg: string; border?: string }> = {
   'rm_safran_73_azul_cobalto': { bg: '#1152B3' },
   'rm_safran_50_menta': { bg: '#B0C8BF', border: '#92B0A6' },
   'rm_safran_19_vermelho': { bg: '#E22634' },
+  'rm_safran_76_azul_po': { bg: '#B8D8EB', border: '#9DC1D8' },
 
   // DROPS Paris
   'rm_paris_16_branco': { bg: '#FFFFFF', border: '#DCD6CD' },
+  'rm_paris_17_natural': { bg: '#F3EBE1', border: '#DDD2C3' },
   'rm_paris_43_verde': { bg: '#536D43' },
   'rm_paris_25_verde_musgo': { bg: '#828453' },
   'rm_paris_48_petroleo': { bg: '#496E8E' },
@@ -96,7 +98,8 @@ function getYarnSwatchColor(id?: string, name?: string) {
     return YARN_COLOR_MAP[id];
   }
   const norm = `${id || ''} ${name || ''}`.toLowerCase();
-  if (norm.includes('18') || norm.includes('natural')) return { bg: '#F5EBE0', border: '#D8C3A5' };
+  if (norm.includes('18') || (norm.includes('natural') && !norm.includes('paris'))) return { bg: '#F5EBE0', border: '#D8C3A5' };
+  if (norm.includes('17') && norm.includes('paris')) return { bg: '#F3EBE1', border: '#DDD2C3' };
   if (norm.includes('17') || norm.includes('safran branco')) return { bg: '#FAF8F5', border: '#E2DDD5' };
   if (norm.includes('16') || norm.includes('paris branco') || (norm.includes('branco') && !norm.includes('safran'))) return { bg: '#FFFFFF', border: '#DCD6CD' };
   if (norm.includes('68') || norm.includes('café') || norm.includes('cafe')) return { bg: '#5C3A21' };
@@ -108,6 +111,7 @@ function getYarnSwatchColor(id?: string, name?: string) {
   if (norm.includes('43') || norm.includes('paris verde')) return { bg: '#536D43' };
   if (norm.includes('25') || norm.includes('musgo')) return { bg: '#828453' };
   if (norm.includes('48') || norm.includes('petróleo') || norm.includes('petroleo')) return { bg: '#496E8E' };
+  if (norm.includes('azul pó') || norm.includes('azul po') || norm.includes('safran 76')) return { bg: '#B8D8EB', border: '#9DC1D8' };
   if (norm.includes('76') || norm.includes('ternura')) return { bg: '#B0D0E4', border: '#92B7CF' };
   if (norm.includes('57') || norm.includes('claríssimo') || norm.includes('clarissimo')) return { bg: '#F8C3CD', border: '#E7AAB6' };
   if (norm.includes('35') || norm.includes('baunilha')) return { bg: '#F8C53A', border: '#D9AA2B' };
@@ -2125,7 +2129,8 @@ export default function AdminDashboardModal({ onClose, shopCategories = [] }: Ad
 
                         const finalProd = {
                           ...prodForm,
-                          availableColors: parsedColors
+                          availableColors: parsedColors,
+                          colorConsumptions: prodForm.colorConsumptions || {}
                         };
 
                         const updatedCatalog = catalog.map(c => {
@@ -2459,6 +2464,68 @@ export default function AdminDashboardModal({ onClose, shopCategories = [] }: Ad
                                 placeholder="Ex: 18 - Natural, 16 - Branco"
                               />
                             </div>
+
+                            {/* Consumo de Matéria-Prima por Cor Selecionada */}
+                            {currentColors.length > 0 && (
+                              <div className="pt-3 border-t border-forest/10 space-y-2">
+                                <div className="flex justify-between items-center">
+                                  <div>
+                                    <label className="font-serif text-[11px] font-bold text-forest block">
+                                      Consumo de Matéria-Prima por Cor Selecionada (por Peça)
+                                    </label>
+                                    <p className="text-[9px] text-forest/60">
+                                      Quantidade de fio gasta por cada peça fabricada nesta cor (ex: 0.5 novelos ou 25g)
+                                    </p>
+                                  </div>
+                                  <span className="text-[9px] bg-forest/5 text-forest/60 px-2 py-0.5 rounded-md font-mono shrink-0">
+                                    Padrão: 1.0 nov/peça
+                                  </span>
+                                </div>
+
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-40 overflow-y-auto pr-1">
+                                  {currentColors.map((colorName: string) => {
+                                    const val = editingProduct.product.colorConsumptions?.[colorName];
+                                    return (
+                                      <div key={colorName} className="flex items-center justify-between bg-white border border-forest/15 rounded-xl p-2 shadow-2xs">
+                                        <div className="flex items-center gap-1.5 min-w-0 pr-1">
+                                          <YarnSwatch name={colorName} size="w-4 h-4 rounded-full shrink-0" />
+                                          <span className="text-[10px] font-semibold text-forest truncate" title={colorName}>
+                                            {colorName}
+                                          </span>
+                                        </div>
+                                        <div className="flex items-center gap-1 shrink-0">
+                                          <input
+                                            type="number"
+                                            step="0.05"
+                                            min="0.01"
+                                            placeholder="1.0"
+                                            value={val !== undefined && val !== null ? val : ''}
+                                            onChange={(e) => {
+                                              const numVal = e.target.value === '' ? undefined : parseFloat(e.target.value);
+                                              const updatedConsumptions = { ...(editingProduct.product.colorConsumptions || {}) };
+                                              if (numVal === undefined || isNaN(numVal)) {
+                                                delete updatedConsumptions[colorName];
+                                              } else {
+                                                updatedConsumptions[colorName] = numVal;
+                                              }
+                                              setEditingProduct({
+                                                ...editingProduct,
+                                                product: {
+                                                  ...editingProduct.product,
+                                                  colorConsumptions: updatedConsumptions
+                                                }
+                                              });
+                                            }}
+                                            className="w-16 bg-cream/30 border border-forest/20 focus:border-[#C5A059] focus:outline-none rounded-lg px-2 py-1 text-[10px] text-forest font-mono text-right font-bold"
+                                          />
+                                          <span className="text-[9px] text-forest/60 font-mono">nov</span>
+                                        </div>
+                                      </div>
+                                    );
+                                  })}
+                                </div>
+                              </div>
+                            )}
                           </div>
                         );
                       })()}
