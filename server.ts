@@ -1046,29 +1046,67 @@ const DEFAULT_INVENTORY = [
 ];
 
 function loadInventory() {
+  let list: any[] = [];
+  let loadedFromStore = false;
+
+  // 1. Primary Read from Persistent Volume /app/data/inventory.json
   if (fs.existsSync(INVENTORY_FILE)) {
     try {
       const data = JSON.parse(fs.readFileSync(INVENTORY_FILE, 'utf8'));
       if (Array.isArray(data) && data.length > 0) {
-        console.log(`[INVENTORY DATABASE READ-ONLY BOOT] Loaded ${data.length} inventory items from persistent store (${INVENTORY_FILE})`);
-        return data;
+        list = data;
+        loadedFromStore = true;
       }
     } catch (err) {
-      console.error("[INVENTORY DATABASE ERROR] Failed to load inventory.json", err);
+      console.error("[INVENTORY DATABASE ERROR] Failed to load inventory.json from persistent store", err);
     }
   }
 
-  const localFallbackPath = path.join(process.cwd(), "inventory.json");
-  if (fs.existsSync(localFallbackPath)) {
-    try {
-      const fileData = JSON.parse(fs.readFileSync(localFallbackPath, 'utf8'));
-      if (Array.isArray(fileData) && fileData.length > 0) return fileData;
-    } catch (e) {
-      // fallback to DEFAULT_INVENTORY
+  // 2. Fallback read from local workspace file if persistent store does not exist yet
+  if (!loadedFromStore) {
+    const localFallbackPath = path.join(process.cwd(), "inventory.json");
+    if (fs.existsSync(localFallbackPath)) {
+      try {
+        const fileData = JSON.parse(fs.readFileSync(localFallbackPath, 'utf8'));
+        if (Array.isArray(fileData) && fileData.length > 0) {
+          list = fileData;
+          loadedFromStore = true;
+        }
+      } catch (e) {
+        // ignore
+      }
     }
   }
 
-  return DEFAULT_INVENTORY;
+  // 3. If neither file exists, initialize with DEFAULT_INVENTORY
+  if (!loadedFromStore) {
+    list = DEFAULT_INVENTORY.map(item => ({ ...item }));
+    saveInventory(list);
+    console.log(`[INVENTORY DATABASE INITIALIZED] Initialized ${list.length} inventory items to persistent store (${INVENTORY_FILE})`);
+    return list;
+  }
+
+  // 4. SMART UPSERT: Check if any new raw material declared in DEFAULT_INVENTORY is missing from list
+  const existingIds = new Set(list.map((item: any) => item.id));
+  let modified = false;
+
+  for (const defaultItem of DEFAULT_INVENTORY) {
+    if (!existingIds.has(defaultItem.id)) {
+      list.push({ ...defaultItem });
+      existingIds.add(defaultItem.id);
+      modified = true;
+      console.log(`[INVENTORY SMART UPSERT] Automatically added new raw material '${defaultItem.name}' (${defaultItem.id}) to persistent inventory`);
+    }
+  }
+
+  if (modified) {
+    saveInventory(list);
+    console.log(`[INVENTORY SMART UPSERT COMPLETE] Preserved existing stock and saved updated ${list.length} items to ${INVENTORY_FILE}`);
+  } else {
+    console.log(`[INVENTORY DATABASE READ-ONLY BOOT] Loaded ${list.length} inventory items from persistent store (${INVENTORY_FILE})`);
+  }
+
+  return list;
 }
 
 function saveInventory(list: any[]) {
