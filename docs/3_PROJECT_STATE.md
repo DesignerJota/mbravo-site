@@ -102,8 +102,12 @@ Respondendo às últimas solicitações de otimização de fluxo e consistência
         *   Adicionado o parâmetro `connectionTimeoutMillis: 3000` no `pg.Pool` de PostgreSQL com listener não-bloqueante para `error` e suporte a falhas de rede/DNS IPv4.
         *   Construído o motor `fetchTestimonials3Layers()` de alta disponibilidade com fallback transparente: Nível 1 (PostgreSQL DB) -> Nível 2 (Google Places API direto) -> Nível 3 (Volume Persistente `testimonials.json`).
         *   Garantido o isolamento absoluto da rota e tabelas de testemunhos para que falhas de conexão de base de dados relacional emitam apenas avisos informativos (`console.warn`) sem nunca afetar o arranque, o checkout ou o catálogo de produtos.
-    13. **Atualização Integral da Documentação Técnica (`/docs`):**
-        *   Ficheiros `2_ARCHITECTURE_AND_ADMIN.md`, `3_PROJECT_STATE.md` e `5_FUTURE_ROADMAP.md` atualizados para espelhar a arquitetura de arranque Read-Only, alta disponibilidade em 3 camadas para testemunhos e resiliência em produção.
+    13. **Atualização de Inventário Real de Matérias-Primas — Encomenda #18241 & Organização por Abas (`inventory.json` & `AdminDashboardModal.tsx`):**
+        *   Substituição integral do stock de matérias-primas pelo lote real recebido do Armazém das Manualidades (Encomenda #18241): **37 novelos DROPS Safran** (18 Natural, 17 Branco, 68 Café, 01 Rosa do Deserto, 78 Verde Floresta, 60 Verde Musgo, 73 Azul Cobalto, 50 Menta, 19 Vermelho) e **58 novelos DROPS Paris** (16 Branco, 43 Verde, 25 Verde Musgo, 48 Petróleo, 76 Azul Ternura, 57 Rosa Claríssimo, 35 Baunilha, 19 Amarelo Claro, 44 Castanho, 12 Vermelho, 15 Preto), preservando a linha de embalamento e acessórios.
+        *   Atualização da interface do Admin Dashboard (`/admin` -> `AdminDashboardModal.tsx`) para exibir os nomes autênticos das matérias-primas e organização por abas/separadores elegantes: **DROPS Safran** (37 nov.), **DROPS Paris** (58 nov.), **Acessórios & Embalamento** e **Ver Tudo**.
+        *   Atualização da função `getYarnIdForColor()` e regras de dedução no servidor (`server.ts`) para associação automática entre as cores do catálogo e os novos novelos DROPS Safran / DROPS Paris.
+    14. **Atualização Integral da Documentação Técnica (`/docs`):**
+        *   Ficheiros `2_ARCHITECTURE_AND_ADMIN.md`, `3_PROJECT_STATE.md` e `5_FUTURE_ROADMAP.md` atualizados para espelhar a arquitetura de arranque Read-Only, alta disponibilidade em 3 camadas para testemunhos, inventário real de matérias-primas e resiliência em produção.
 
 ---
 
