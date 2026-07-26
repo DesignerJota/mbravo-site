@@ -98,8 +98,12 @@ Respondendo às últimas solicitações de otimização de fluxo e consistência
         *   Garantida a **Soberania do Volume Persistente (`/app/data/`)**: o estado ativo de produção no Volume é a fonte soberana de verdade e nunca é modificado nem sobrescrito durante o boot por ficheiros estáticos do repositório.
         *   Removidas todas as execuções de `writeFileSync` ou fusão em disco no arranque.
         *   Qualquer mutação física de dados em disco ocorre exclusivamente por via de requisições explícitas às rotas de API (`POST`, `PUT`, `DELETE`).
-    12. **Atualização Integral da Documentação Técnica (`/docs`):**
-        *   Ficheiros `2_ARCHITECTURE_AND_ADMIN.md`, `3_PROJECT_STATE.md` e `5_FUTURE_ROADMAP.md` atualizados para espelhar a arquitetura de arranque Read-Only e resiliência em produção.
+    12. **Arquitetura Resiliente de Testemunhos em 3 Camadas (`server.ts`):**
+        *   Adicionado o parâmetro `connectionTimeoutMillis: 3000` no `pg.Pool` de PostgreSQL com listener não-bloqueante para `error` e suporte a falhas de rede/DNS IPv4.
+        *   Construído o motor `fetchTestimonials3Layers()` de alta disponibilidade com fallback transparente: Nível 1 (PostgreSQL DB) -> Nível 2 (Google Places API direto) -> Nível 3 (Volume Persistente `testimonials.json`).
+        *   Garantido o isolamento absoluto da rota e tabelas de testemunhos para que falhas de conexão de base de dados relacional emitam apenas avisos informativos (`console.warn`) sem nunca afetar o arranque, o checkout ou o catálogo de produtos.
+    13. **Atualização Integral da Documentação Técnica (`/docs`):**
+        *   Ficheiros `2_ARCHITECTURE_AND_ADMIN.md`, `3_PROJECT_STATE.md` e `5_FUTURE_ROADMAP.md` atualizados para espelhar a arquitetura de arranque Read-Only, alta disponibilidade em 3 camadas para testemunhos e resiliência em produção.
 
 ---
 
