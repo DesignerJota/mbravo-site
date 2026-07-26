@@ -1023,9 +1023,11 @@ const DEFAULT_INVENTORY = [
   { id: 'rm_safran_73_azul_cobalto', name: 'DROPS Safran 73 (Azul Cobalto)', quantity: 3.0, unit: 'novelos', minSafety: 1.0 },
   { id: 'rm_safran_50_menta', name: 'DROPS Safran 50 (Menta)', quantity: 3.0, unit: 'novelos', minSafety: 1.0 },
   { id: 'rm_safran_19_vermelho', name: 'DROPS Safran 19 (Vermelho)', quantity: 1.0, unit: 'novelos', minSafety: 1.0 },
+  { id: 'rm_safran_76_azul_po', name: 'DROPS Safran 76 (Azul Pó)', quantity: 5.0, unit: 'novelos', minSafety: 2.0 },
 
   // Linha DROPS Paris (Total: 58 novelos) - Encomenda #18241
   { id: 'rm_paris_16_branco', name: 'DROPS Paris 16 (Branco)', quantity: 10.0, unit: 'novelos', minSafety: 3.0 },
+  { id: 'rm_paris_17_natural', name: 'DROPS Paris 17 (Natural)', quantity: 5.0, unit: 'novelos', minSafety: 2.0 },
   { id: 'rm_paris_43_verde', name: 'DROPS Paris 43 (Verde)', quantity: 5.0, unit: 'novelos', minSafety: 2.0 },
   { id: 'rm_paris_25_verde_musgo', name: 'DROPS Paris 25 (Verde Musgo)', quantity: 5.0, unit: 'novelos', minSafety: 2.0 },
   { id: 'rm_paris_48_petroleo', name: 'DROPS Paris 48 (Petróleo)', quantity: 5.0, unit: 'novelos', minSafety: 2.0 },
@@ -1117,8 +1119,41 @@ function saveInventory(list: any[]) {
   }
 }
 
+function getProductCustomConsumption(productName: string, selectedColor: string): number | null {
+  try {
+    const catalogData = loadCatalog();
+    if (!catalogData || !Array.isArray(catalogData)) return null;
+    
+    const normProdName = (productName || '').toLowerCase().trim();
+    const normColor = (selectedColor || '').toLowerCase().trim();
+
+    for (const cat of catalogData) {
+      if (!cat.products || !Array.isArray(cat.products)) continue;
+      for (const prod of cat.products) {
+        const prodName = (prod.name || prod.title || '').toLowerCase().trim();
+        if (prodName && (prodName === normProdName || normProdName.includes(prodName) || prodName.includes(normProdName))) {
+          const map = prod.colorConsumptions || prod.colorConsumption;
+          if (map && typeof map === 'object') {
+            for (const [colorKey, val] of Object.entries(map)) {
+              if (typeof val === 'number' && !isNaN(val)) {
+                const normKey = colorKey.toLowerCase().trim();
+                if (normKey === normColor || (normColor && normKey && (normColor.includes(normKey) || normKey.includes(normColor)))) {
+                  return val;
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  } catch (err) {
+    console.error("[CATALOG CONSUMPTION LOOKUP ERROR]", err);
+  }
+  return null;
+}
+
 function getMaterialsNeededForProduct(productName: string, selections: any = {}) {
-  const nameLower = productName.toLowerCase();
+  const nameLower = (productName || '').toLowerCase();
   const quantity = parseInt(selections.quantidade || "1", 10) || 1;
   const color = (selections.cor || selections.corFio || "").toLowerCase().trim();
   
@@ -1142,9 +1177,11 @@ function getMaterialsNeededForProduct(productName: string, selections: any = {})
     if (norm.includes('73') || norm.includes('cobalto')) return 'rm_safran_73_azul_cobalto';
     if (norm.includes('50') || norm.includes('menta')) return 'rm_safran_50_menta';
     if (norm.includes('19') || norm.includes('safran vermelho')) return 'rm_safran_19_vermelho';
+    if (norm.includes('safran 76') || norm.includes('azul pó') || norm.includes('azul po')) return 'rm_safran_76_azul_po';
 
     // DROPS Paris
     if (norm.includes('16') || norm.includes('paris branco') || norm.includes('branco')) return 'rm_paris_16_branco';
+    if (norm.includes('paris 17') || norm.includes('paris natural')) return 'rm_paris_17_natural';
     if (norm.includes('43') || norm.includes('paris verde')) return 'rm_paris_43_verde';
     if (norm.includes('25') || norm.includes('paris verde musgo') || norm.includes('musgo')) return 'rm_paris_25_verde_musgo';
     if (norm.includes('48') || norm.includes('petróleo') || norm.includes('petroleo')) return 'rm_paris_48_petroleo';
@@ -1162,7 +1199,12 @@ function getMaterialsNeededForProduct(productName: string, selections: any = {})
 
   const yarnId = getYarnIdForColor(color);
 
-  if (nameLower.includes('african flower pouch')) {
+  // Check if product has explicit custom color consumption specified in catalog.json
+  const customConsumption = getProductCustomConsumption(productName, color);
+
+  if (customConsumption !== null) {
+    materials.push({ id: yarnId, quantityNeeded: customConsumption * quantity });
+  } else if (nameLower.includes('african flower pouch')) {
     materials.push({ id: yarnId, quantityNeeded: 0.15 * quantity });
     materials.push({ id: 'rm_fecho_correr', quantityNeeded: 1 * quantity });
     materials.push({ id: 'rm_forro_tecido', quantityNeeded: 0.2 * quantity });
@@ -1192,7 +1234,8 @@ function getMaterialsNeededForProduct(productName: string, selections: any = {})
     materials.push({ id: yarnId, quantityNeeded: 0.2 * quantity });
   }
   else {
-    materials.push({ id: yarnId, quantityNeeded: 0.15 * quantity });
+    // Default fallback: 1.0 novelo por peça por segurança se não houver regra específica
+    materials.push({ id: yarnId, quantityNeeded: 1.0 * quantity });
   }
   
   return materials;
