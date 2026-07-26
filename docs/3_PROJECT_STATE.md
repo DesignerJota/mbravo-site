@@ -93,8 +93,13 @@ Respondendo às últimas solicitações de otimização de fluxo e consistência
     10. **Melhorias de UX, Scroll Nativo e Formatação de Telemóvel no CRM Drawer (`AdminDashboardModal.tsx`):**
         *   Adicionada navegação por scroll vertical fluida e nativa ao corpo do Drawer (Ficha de Cliente) com `-webkit-overflow-scrolling: touch` e `touch-pan-y` para roda do rato e gestos tátil.
         *   Ajustado o campo de telefone no CRM Drawer para apresentar a máscara de leitura humana `+351 9xx xxx xxx` (`formatPhoneReadable`), mantendo a consistência visual com o cartão principal de encomenda.
-    11. **Atualização Integral da Documentação Técnica (`/docs`):**
-        *   Ficheiros `2_ARCHITECTURE_AND_ADMIN.md` e `3_PROJECT_STATE.md` atualizados para espelhar a arquitetura final de produção de luxo.
+    11. **Refatoração do Motor de Persistência e Fusão Inteligente no Boot (`server.ts`):**
+        *   Implementado o motor de *AtLeastOnce Sync* e *Deep Merge* não-destrutivo chave-a-chave em todas as funções de carregamento de dados do servidor (`loadOrders`, `loadCustomers`, `loadInventory`, `loadCatalog`, `loadLogs`, `loadTestimonials`).
+        *   Garantida a **Soberania do Volume Persistente (`/app/data/`)**: o estado ativo de produção no Volume é a fonte soberana de verdade e nunca é sobrescrito por ficheiros estáticos locais do repositório.
+        *   Ficheiros e registos estáticos de fallback do repositório (ex: encomenda histórica `MB-2026-3147`) ausentes no Volume são fundidos automaticamente sem apagar nem alterar quaisquer vendas ou mutações efetuadas via API.
+        *   O resultado consolidado em memória é imediatamente escrito de forma atómica no Volume no arranque do servidor.
+    12. **Atualização Integral da Documentação Técnica (`/docs`):**
+        *   Ficheiros `2_ARCHITECTURE_AND_ADMIN.md` e `3_PROJECT_STATE.md` atualizados para espelhar a arquitetura final de persistência e sincronização em produção.
 
 ---
 
