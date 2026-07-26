@@ -93,13 +93,13 @@ Respondendo às últimas solicitações de otimização de fluxo e consistência
     10. **Melhorias de UX, Scroll Nativo e Formatação de Telemóvel no CRM Drawer (`AdminDashboardModal.tsx`):**
         *   Adicionada navegação por scroll vertical fluida e nativa ao corpo do Drawer (Ficha de Cliente) com `-webkit-overflow-scrolling: touch` e `touch-pan-y` para roda do rato e gestos tátil.
         *   Ajustado o campo de telefone no CRM Drawer para apresentar a máscara de leitura humana `+351 9xx xxx xxx` (`formatPhoneReadable`), mantendo a consistência visual com o cartão principal de encomenda.
-    11. **Refatoração do Motor de Persistência e Fusão Inteligente no Boot (`server.ts`):**
-        *   Implementado o motor de *AtLeastOnce Sync* e *Deep Merge* não-destrutivo chave-a-chave em todas as funções de carregamento de dados do servidor (`loadOrders`, `loadCustomers`, `loadInventory`, `loadCatalog`, `loadLogs`, `loadTestimonials`).
-        *   Garantida a **Soberania do Volume Persistente (`/app/data/`)**: o estado ativo de produção no Volume é a fonte soberana de verdade e nunca é sobrescrito por ficheiros estáticos locais do repositório.
-        *   Ficheiros e registos estáticos de fallback do repositório (ex: encomenda histórica `MB-2026-3147`) ausentes no Volume são fundidos automaticamente sem apagar nem alterar quaisquer vendas ou mutações efetuadas via API.
-        *   O resultado consolidado em memória é imediatamente escrito de forma atómica no Volume no arranque do servidor.
+    11. **Refatoração do Motor de Persistência e Boot Read-Only (`server.ts`):**
+        *   Implementado o protocolo de **Boot Estritamente Read-Only** em todas as funções de carregamento de dados do servidor (`loadOrders`, `loadCustomers`, `loadInventory`, `loadCatalog`, `loadLogs`, `loadTestimonials`).
+        *   Garantida a **Soberania do Volume Persistente (`/app/data/`)**: o estado ativo de produção no Volume é a fonte soberana de verdade e nunca é modificado nem sobrescrito durante o boot por ficheiros estáticos do repositório.
+        *   Removidas todas as execuções de `writeFileSync` ou fusão em disco no arranque.
+        *   Qualquer mutação física de dados em disco ocorre exclusivamente por via de requisições explícitas às rotas de API (`POST`, `PUT`, `DELETE`).
     12. **Atualização Integral da Documentação Técnica (`/docs`):**
-        *   Ficheiros `2_ARCHITECTURE_AND_ADMIN.md` e `3_PROJECT_STATE.md` atualizados para espelhar a arquitetura final de persistência e sincronização em produção.
+        *   Ficheiros `2_ARCHITECTURE_AND_ADMIN.md`, `3_PROJECT_STATE.md` e `5_FUTURE_ROADMAP.md` atualizados para espelhar a arquitetura de arranque Read-Only e resiliência em produção.
 
 ---
 
@@ -108,7 +108,7 @@ Respondendo às últimas solicitações de otimização de fluxo e consistência
 Para que o repositório no GitHub fique 100% sincronizado com a versão final de produção, copie e substitua os seguintes ficheiros na sua totalidade:
 
 ### A. Backend & Servidor
-1. **`server.ts`** (Sanitização estrita, validação de e-mail, máscara de código postal, metadados Stripe unificados, fluxo CTT e remoção de logs de sandbox)
+1. **`server.ts`** (Boot Read-Only estrito em `/app/data/`, sanitização estrita, validação de e-mail, máscara de código postal, metadados Stripe unificados, fluxo CTT)
 2. **`src/lib/emailService.ts`** (Templates de e-mail de luxo limpos, `formatPhoneReadable`, especificações dinâmicas de produto)
 
 ### B. Interface Frontend
@@ -120,8 +120,9 @@ Para que o repositório no GitHub fique 100% sincronizado com a versão final de
 8. **`src/index.css`** (Aceleração GPU e regras WebKit iOS)
 
 ### C. Documentação Técnica (`/docs`)
-9. **`docs/2_ARCHITECTURE_AND_ADMIN.md`** (Arquitetura atualizada: validação estrita, formatação de telemóvel, e-mails de luxo e CRM)
+9. **`docs/2_ARCHITECTURE_AND_ADMIN.md`** (Arquitetura atualizada: boot Read-Only, validação estrita, formatação de telemóvel, e-mails de luxo e CRM)
 10. **`docs/3_PROJECT_STATE.md`** (Estado do projeto sincronizado e relatório de alterações)
+11. **`docs/5_FUTURE_ROADMAP.md`** (Roteiro futuro de infraestrutura, backups automatizados e observabilidade)
 
 ---
 
@@ -130,7 +131,7 @@ Para que o repositório no GitHub fique 100% sincronizado com a versão final de
 ### A. Validação de Transição de Repositório & Persistência:
 *   [x] **Ficheiros Atualizados e Validados no Editor:** Cópia dos ficheiros alterados (`server.ts`, `src/App.tsx`, `src/translations.ts`, `src/components/AdminDashboardModal.tsx`, `src/lib/emailService.ts`, `docs/`) pronta para commit no GitHub (`DesignerJota/mbravo-site`).
 *   [x] **Blindagem CORS e Preflight OPTIONS:** Middleware verificado em `server.ts` garantindo suporte a `https://mbravobycarolina.com`, cabeçalho `X-Admin-Password` e resposta 200 OK no preflight.
-*   [x] **Soberania e Motor de Fusão no Boot:** Volume Persistente `/app/data/` configurado na Railway como fonte soberana com algoritmo de Deep Merge por ID em `server.ts` para preservação integral de dados.
+*   [x] **Soberania do Volume Persistente e Arranque Read-Only:** Volume Persistente `/app/data/` configurado na Railway como fonte soberana com boot 100% Read-Only em `server.ts` para preservação integral e imutável de dados durante deploys.
 
 ### B. Roteiro Técnico de Otimização Mobile & iOS WebKit (Meta: PageSpeed >90 - FASE 1 CONCLUÍDA):
 *   [x] **Aceleração Hardware-Backing para iOS WebKit:** Aplicado `-webkit-backface-visibility: hidden; transform: translateZ(0);` nos cartões de produtos e categorias para impedir a reciclagem agressiva de texturas da GPU pelo WebKit durante o scroll rápido em iPhones/iPads.
