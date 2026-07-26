@@ -190,12 +190,33 @@ function getAccessoryIconConfig(id?: string, name?: string) {
 }
 
 function YarnSwatch({ id, name, size = 'w-7 h-7' }: { id?: string; name?: string; size?: string }) {
+  const norm = `${id || ''} ${name || ''}`.toLowerCase();
+  const isButton = id === 'rm_botao_madeira' || norm.includes('botão de madeira') || norm.includes('botao de madeira') || (norm.includes('botão') && norm.includes('madeira')) || (norm.includes('botao') && norm.includes('madeira'));
+
+  const radiusClass = size.includes('rounded-') ? '' : 'rounded-lg';
+
+  if (isButton) {
+    return (
+      <span
+        className={`${size} ${radiusClass} shrink-0 inline-flex items-center justify-center align-middle shadow-2xs border border-[#C5A059]/30 bg-[#FAF7F2] p-0.5 overflow-hidden`}
+        title={name || 'Botão de Madeira M★BRAVO'}
+      >
+        <img
+          src="https://i.ibb.co/gL2FL6LW/Botao-M-BRAVO-3.png"
+          alt={name || 'Botão de Madeira M★BRAVO'}
+          className="w-full h-full object-contain rounded-md"
+          referrerPolicy="no-referrer"
+        />
+      </span>
+    );
+  }
+
   if (isAccessoryItem(id, name)) {
     const config = getAccessoryIconConfig(id, name);
     const IconComp = config.icon;
     return (
       <span
-        className={`${size} rounded-lg shrink-0 inline-flex items-center justify-center align-middle shadow-2xs border ${config.bg} ${config.border} ${config.text}`}
+        className={`${size} ${radiusClass} shrink-0 inline-flex items-center justify-center align-middle shadow-2xs border ${config.bg} ${config.border} ${config.text}`}
         title={name || id}
       >
         <IconComp className="w-[55%] h-[55%]" />
@@ -206,7 +227,7 @@ function YarnSwatch({ id, name, size = 'w-7 h-7' }: { id?: string; name?: string
   const swatch = getYarnSwatchColor(id, name);
   return (
     <span
-      className={`${size} rounded-md shrink-0 inline-block align-middle shadow-sm relative overflow-hidden border`}
+      className={`${size} ${radiusClass} shrink-0 inline-block align-middle shadow-sm relative overflow-hidden border`}
       style={{
         backgroundColor: swatch.bg,
         borderColor: swatch.border || 'rgba(0,0,0,0.15)',
@@ -3394,9 +3415,9 @@ export default function AdminDashboardModal({ onClose, shopCategories = [] }: Ad
 
                                 return (
                                   <tr key={item.id} className={`transition-colors ${isLow ? 'bg-amber-50/20 hover:bg-amber-50/45' : 'hover:bg-cream/10'}`}>
-                                    <td className="px-6 py-4">
-                                      <div className="flex items-center gap-3">
-                                        <YarnSwatch id={item.id} name={item.name} size="w-7 h-7" />
+                                    <td className="px-6 py-3.5">
+                                      <div className="flex items-center gap-3.5">
+                                        <YarnSwatch id={item.id} name={item.name} size="w-12 h-12" />
                                         <div>
                                           <div className="font-semibold text-forest flex items-center gap-1.5">
                                             {isLow && <AlertTriangle className="w-3.5 h-3.5 text-amber-500 shrink-0" />}
