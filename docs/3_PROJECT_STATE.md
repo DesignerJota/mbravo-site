@@ -102,11 +102,15 @@ Respondendo às últimas solicitações de otimização de fluxo e consistência
         *   Adicionado o parâmetro `connectionTimeoutMillis: 3000` no `pg.Pool` de PostgreSQL com listener não-bloqueante para `error` e suporte a falhas de rede/DNS IPv4.
         *   Construído o motor `fetchTestimonials3Layers()` de alta disponibilidade com fallback transparente: Nível 1 (PostgreSQL DB) -> Nível 2 (Google Places API direto) -> Nível 3 (Volume Persistente `testimonials.json`).
         *   Garantido o isolamento absoluto da rota e tabelas de testemunhos para que falhas de conexão de base de dados relacional emitam apenas avisos informativos (`console.warn`) sem nunca afetar o arranque, o checkout ou o catálogo de produtos.
-    13. **Atualização de Inventário Real de Matérias-Primas — Encomenda #18241 & Organização por Abas (`inventory.json` & `AdminDashboardModal.tsx`):**
-        *   Substituição integral do stock de matérias-primas pelo lote real recebido do Armazém das Manualidades (Encomenda #18241): **37 novelos DROPS Safran** (18 Natural, 17 Branco, 68 Café, 01 Rosa do Deserto, 78 Verde Floresta, 60 Verde Musgo, 73 Azul Cobalto, 50 Menta, 19 Vermelho) e **58 novelos DROPS Paris** (16 Branco, 43 Verde, 25 Verde Musgo, 48 Petróleo, 76 Azul Ternura, 57 Rosa Claríssimo, 35 Baunilha, 19 Amarelo Claro, 44 Castanho, 12 Vermelho, 15 Preto), preservando a linha de embalamento e acessórios.
-        *   Atualização da interface do Admin Dashboard (`/admin` -> `AdminDashboardModal.tsx`) para exibir os nomes autênticos das matérias-primas e organização por abas/separadores elegantes: **DROPS Safran** (37 nov.), **DROPS Paris** (58 nov.), **Acessórios & Embalamento** e **Ver Tudo**.
-        *   Atualização da função `getYarnIdForColor()` e regras de dedução no servidor (`server.ts`) para associação automática entre as cores do catálogo e os novos novelos DROPS Safran / DROPS Paris.
-    14. **Atualização Integral da Documentação Técnica (`/docs`):**
+    13. **Atualização de Inventário Real de Matérias-Primas — Encomenda #18241, Abas & Seletor Inteligente (`inventory.json` & `AdminDashboardModal.tsx`):**
+        *   Substituição integral do stock de matérias-primas pelo lote real recebido do Armazém das Manualidades (Encomenda #18241): **37 novelos DROPS Safran** e **58 novelos DROPS Paris**, preservando a linha de embalamento e acessórios.
+        *   Atualização da interface do Admin Dashboard (`/admin` -> `AdminDashboardModal.tsx`) com filtragem limpa por prefixos de ID (`rm_safran_`, `rm_paris_` e acessórios) e exibição do número de referência com nome limpo (ex: `Ref. 18 - Natural`).
+        *   Criação do **Seletor Inteligente de Cores no CMS do Catálogo**: substituição do input de texto livre por badges interativos dinâmicos com contagem de stock em tempo real de novelos Safran e Paris, botões de atalho ("Selecionar Todas", "Limpar") e campo de edição direta, garantindo alinhamento perfeito de 100% no abatimento automático de stock do Atelier.
+    14. **Miniaturas de Amostras Visuais (Swatches 28x28px & 20x20px) extraídas da Encomenda #18241 (`AdminDashboardModal.tsx`):**
+        *   Integração do componente `YarnSwatch` e tabela de mapeamento de cores exatas (`YARN_COLOR_MAP`) com os tons e texturas autênticos extraídos diretamente do PDF da Encomenda #18241 do Armazém das Manualidades.
+        *   **Tabela de Stock de Matérias-Primas**: exibe amostragem visual de 28x28px (`w-7 h-7`) com cantos arredondados, gradiente e textura tátil de fio ao lado de cada referência (ex: `[Swatch Visual] Ref. 18 - Natural`).
+        *   **CMS de Edição de Produtos**: exibe amostragem miniatura discreta de 20x20px (`w-5 h-5`) dentro de cada badge interativo de seleção de cor, mantendo a janela do CMS limpa, legível e altamente funcional.
+    15. **Atualização Integral da Documentação Técnica (`/docs`):**
         *   Ficheiros `2_ARCHITECTURE_AND_ADMIN.md`, `3_PROJECT_STATE.md` e `5_FUTURE_ROADMAP.md` atualizados para espelhar a arquitetura de arranque Read-Only, alta disponibilidade em 3 camadas para testemunhos, inventário real de matérias-primas e resiliência em produção.
 
 ---
