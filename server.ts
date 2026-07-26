@@ -1088,16 +1088,22 @@ function loadInventory() {
     return list;
   }
 
-  // 4. SMART UPSERT: Check if any new raw material declared in DEFAULT_INVENTORY is missing from list
-  const existingIds = new Set(list.map((item: any) => item.id));
+  // 4. SMART UPSERT: Check if any raw material declared in DEFAULT_INVENTORY is missing from list
+  const existingIds = new Set(list.map((item: any) => item.id).filter(Boolean));
+  const existingNames = new Set(list.map((item: any) => (item.name || '').toLowerCase().trim()).filter(Boolean));
   let modified = false;
 
   for (const defaultItem of DEFAULT_INVENTORY) {
-    if (!existingIds.has(defaultItem.id)) {
+    const normName = (defaultItem.name || '').toLowerCase().trim();
+    const hasId = existingIds.has(defaultItem.id);
+    const hasName = existingNames.has(normName);
+
+    if (!hasId && !hasName) {
       list.push({ ...defaultItem });
       existingIds.add(defaultItem.id);
+      existingNames.add(normName);
       modified = true;
-      console.log(`[INVENTORY SMART UPSERT] Automatically added new raw material '${defaultItem.name}' (${defaultItem.id}) to persistent inventory`);
+      console.log(`[INVENTORY SMART UPSERT] Automatically added missing raw material '${defaultItem.name}' (${defaultItem.id}) to persistent store (${INVENTORY_FILE})`);
     }
   }
 
@@ -2215,6 +2221,14 @@ app.get("/api/write-review", (req, res) => {
 
 // Configure Vite middleware in development or serve production build
 async function startServer() {
+  // Boot persistent inventory check & smart upsert immediately on server start
+  try {
+    const bootInventory = loadInventory();
+    console.log(`[M.BRAVO INVENTORY BOOT] Persistent inventory synchronized successfully (${bootInventory.length} raw materials available in /app/data/inventory.json)`);
+  } catch (err) {
+    console.error("[M.BRAVO INVENTORY BOOT ERROR] Failed to synchronize inventory on boot:", err);
+  }
+
   const isProduction = process.env.NODE_ENV === "production" || 
                        !!process.env.RAILWAY_ENVIRONMENT || 
                        process.env.CF_PAGES === "1";
