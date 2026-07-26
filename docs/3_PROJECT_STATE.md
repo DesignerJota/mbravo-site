@@ -126,8 +126,9 @@ Respondendo às últimas solicitações de otimização de fluxo e consistência
     19. **Sanitização de Decimais com Vírgula para iPad / Teclados PT e Toast Banner (`AdminDashboardModal.tsx`):**
         *   **Compatibilidade iPad & Teclados Portugueses**: alterado o campo de input de consumo por cor para `type="text"` com `inputMode="decimal"`. Na submissão do formulário (`onSubmit`), todas as entradas de consumo são automaticamente higienizadas (`replace(',', '.')`) e convertidas com segurança para números `float`.
         *   **Notificação Visual Toast Reativada**: adicionado o banner flutuante de confirmação `saveNotification` com animação e ícone de sucesso, que é ativado automaticamente ao confirmar qualquer peça ou ao guardar o catálogo no servidor.
-    20. **Atualização Integral da Documentação Técnica (`/docs`):**
-        *   Ficheiros `2_ARCHITECTURE_AND_ADMIN.md`, `3_PROJECT_STATE.md` e `5_FUTURE_ROADMAP.md` atualizados para espelhar a estrutura exclusiva de `/app/data/`, a regra de Smart Upsert de matérias-primas no boot, a sanitização de vírgulas no iPad e o banner toast visual.
+    20. **Ícones Genéricos para Acessórios & Sincronização de Inventário (`AdminDashboardModal.tsx` & `server.ts`):**
+        *   **Ícones Lucide na Categoria Acessórios & Embalamento**: os elementos da categoria de Acessórios deixaram de apresentar o quadrado/swatch de lã de cor e passaram a exibir ícones visuais dedicados (`Tag` para Etiquetas em Couro M★BRAVO, `Package` para Caixas Premium, `Scissors` para Fechos de Correr, `Disc` para Botões de Madeira, e `Layers` para Tecido de Forro).
+        *   **Purga de Matérias-Primas Obsoletas**: o carregamento e arranque do servidor (`loadInventory()` em `server.ts`) assim como o filtro do painel frontal em `AdminDashboardModal.tsx` purgam automaticamente quaisquer referências antigas a fios de algodão (`rm_fio_algodao`, `algodão cru`, `cacau escuro`), mantendo a categoria de Acessórios & Embalamento estritamente limitada aos 5 itens reais e oficiais.
 
 ---
 
