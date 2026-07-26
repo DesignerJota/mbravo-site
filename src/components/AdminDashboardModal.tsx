@@ -57,6 +57,86 @@ function formatPhoneReadable(phone?: string): string {
   return trimmed;
 }
 
+// Map of exact yarn swatch colors from Encomenda #18241 (Armazém das Manualidades PDF)
+const YARN_COLOR_MAP: Record<string, { bg: string; border?: string }> = {
+  // DROPS Safran
+  'rm_safran_18_natural': { bg: '#F5EBE0', border: '#D8C3A5' },
+  'rm_safran_17_branco': { bg: '#FAF8F5', border: '#E2DDD5' },
+  'rm_safran_68_cafe': { bg: '#5C3A21' },
+  'rm_safran_01_rosa_deserto': { bg: '#F4B3BA', border: '#E39DA5' },
+  'rm_safran_78_verde_floresta': { bg: '#416335' },
+  'rm_safran_60_verde_musgo': { bg: '#7B7E50' },
+  'rm_safran_73_azul_cobalto': { bg: '#1152B3' },
+  'rm_safran_50_menta': { bg: '#B0C8BF', border: '#92B0A6' },
+  'rm_safran_19_vermelho': { bg: '#E22634' },
+
+  // DROPS Paris
+  'rm_paris_16_branco': { bg: '#FFFFFF', border: '#DCD6CD' },
+  'rm_paris_43_verde': { bg: '#536D43' },
+  'rm_paris_25_verde_musgo': { bg: '#828453' },
+  'rm_paris_48_petroleo': { bg: '#496E8E' },
+  'rm_paris_76_azul_ternura': { bg: '#B0D0E4', border: '#92B7CF' },
+  'rm_paris_57_rosa_clarissimo': { bg: '#F8C3CD', border: '#E7AAB6' },
+  'rm_paris_35_baunilha': { bg: '#F8C53A', border: '#D9AA2B' },
+  'rm_paris_19_amarelo_claro': { bg: '#F3E2B8', border: '#DBC796' },
+  'rm_paris_44_castanho': { bg: '#542C13' },
+  'rm_paris_12_vermelho': { bg: '#DE1A27' },
+  'rm_paris_15_preto': { bg: '#1C1C1C' },
+
+  // Accessories & Packaging
+  'rm_fecho_correr': { bg: '#C5A059' },
+  'rm_botao_madeira': { bg: '#B38053' },
+  'rm_forro_tecido': { bg: '#EAE4D9', border: '#D0C8B8' },
+  'rm_caixa_embalamento': { bg: '#D4C5B0', border: '#BDB09B' },
+  'rm_etiqueta_couro': { bg: '#946342' }
+};
+
+function getYarnSwatchColor(id?: string, name?: string) {
+  if (id && YARN_COLOR_MAP[id]) {
+    return YARN_COLOR_MAP[id];
+  }
+  const norm = `${id || ''} ${name || ''}`.toLowerCase();
+  if (norm.includes('18') || norm.includes('natural')) return { bg: '#F5EBE0', border: '#D8C3A5' };
+  if (norm.includes('17') || norm.includes('safran branco')) return { bg: '#FAF8F5', border: '#E2DDD5' };
+  if (norm.includes('16') || norm.includes('paris branco') || (norm.includes('branco') && !norm.includes('safran'))) return { bg: '#FFFFFF', border: '#DCD6CD' };
+  if (norm.includes('68') || norm.includes('café') || norm.includes('cafe')) return { bg: '#5C3A21' };
+  if (norm.includes('01') || norm.includes('deserto')) return { bg: '#F4B3BA', border: '#E39DA5' };
+  if (norm.includes('78') || norm.includes('floresta')) return { bg: '#416335' };
+  if (norm.includes('60') || norm.includes('safran verde musgo')) return { bg: '#7B7E50' };
+  if (norm.includes('73') || norm.includes('cobalto')) return { bg: '#1152B3' };
+  if (norm.includes('50') || norm.includes('menta')) return { bg: '#B0C8BF', border: '#92B0A6' };
+  if (norm.includes('43') || norm.includes('paris verde')) return { bg: '#536D43' };
+  if (norm.includes('25') || norm.includes('musgo')) return { bg: '#828453' };
+  if (norm.includes('48') || norm.includes('petróleo') || norm.includes('petroleo')) return { bg: '#496E8E' };
+  if (norm.includes('76') || norm.includes('ternura')) return { bg: '#B0D0E4', border: '#92B7CF' };
+  if (norm.includes('57') || norm.includes('claríssimo') || norm.includes('clarissimo')) return { bg: '#F8C3CD', border: '#E7AAB6' };
+  if (norm.includes('35') || norm.includes('baunilha')) return { bg: '#F8C53A', border: '#D9AA2B' };
+  if (norm.includes('19') && (norm.includes('amarelo') || norm.includes('paris'))) return { bg: '#F3E2B8', border: '#DBC796' };
+  if (norm.includes('19') && (norm.includes('vermelho') || norm.includes('safran'))) return { bg: '#E22634' };
+  if (norm.includes('44') || norm.includes('castanho')) return { bg: '#542C13' };
+  if (norm.includes('12') || norm.includes('vermelho')) return { bg: '#DE1A27' };
+  if (norm.includes('15') || norm.includes('preto')) return { bg: '#1C1C1C' };
+  
+  return { bg: '#C5A059' };
+}
+
+function YarnSwatch({ id, name, size = 'w-7 h-7' }: { id?: string; name?: string; size?: string }) {
+  const swatch = getYarnSwatchColor(id, name);
+  return (
+    <span
+      className={`${size} rounded-md shrink-0 inline-block align-middle shadow-sm relative overflow-hidden border`}
+      style={{
+        backgroundColor: swatch.bg,
+        borderColor: swatch.border || 'rgba(0,0,0,0.15)',
+        backgroundImage: 'linear-gradient(135deg, rgba(255,255,255,0.35) 0%, rgba(0,0,0,0.15) 100%)'
+      }}
+      title={name || id}
+    >
+      <span className="absolute inset-0 opacity-25 bg-[radial-gradient(#000_1px,transparent_1px)] [background-size:3px_3px] pointer-events-none" />
+    </span>
+  );
+}
+
 interface AdminDashboardModalProps {
   onClose: () => void;
   shopCategories?: any[];
@@ -1924,8 +2004,9 @@ export default function AdminDashboardModal({ onClose, shopCategories = [] }: Ad
                                   <div className="flex flex-wrap gap-1 pt-1">
                                     {prod.availableColors && Array.isArray(prod.availableColors) ? (
                                       prod.availableColors.map((col: string, idx: number) => (
-                                        <span key={idx} className="bg-cream/40 border border-forest/5 px-1.5 py-0.5 rounded text-[8px] font-medium text-forest/60">
-                                          {col}
+                                        <span key={idx} className="bg-white/80 border border-forest/10 px-1.5 py-0.5 rounded text-[9px] font-medium text-forest/70 flex items-center gap-1 shadow-2xs">
+                                          <YarnSwatch name={col} size="w-3.5 h-3.5 rounded-sm" />
+                                          <span>{col}</span>
                                         </span>
                                       ))
                                     ) : (
@@ -2192,25 +2273,195 @@ export default function AdminDashboardModal({ onClose, shopCategories = [] }: Ad
                         </div>
                       </div>
 
-                      <div className="space-y-1">
-                        <label className="font-bold text-forest/70 block">
-                          Cores Disponíveis (separadas por vírgula, ex: Natural, Rosa Pálido, Verde Musgo)
-                        </label>
-                        <input
-                          type="text"
-                          value={
-                            Array.isArray(editingProduct.product.availableColors)
-                              ? editingProduct.product.availableColors.join(', ')
-                              : editingProduct.product.availableColors || ''
+                      {/* SELETOR INTELIGENTE DE CORES DE MATÉRIAS-PRIMAS */}
+                      {(() => {
+                        const safranYarns = inventory.filter(i => 
+                          (i.id || '').toLowerCase().startsWith('rm_safran_') || 
+                          (i.id || '').toLowerCase().includes('safran') || 
+                          (i.name || '').toLowerCase().includes('safran')
+                        );
+
+                        const parisYarns = inventory.filter(i => 
+                          (i.id || '').toLowerCase().startsWith('rm_paris_') || 
+                          (i.id || '').toLowerCase().includes('paris') || 
+                          (i.name || '').toLowerCase().includes('paris')
+                        );
+
+                        const currentColors: string[] = Array.isArray(editingProduct.product.availableColors)
+                          ? editingProduct.product.availableColors
+                          : typeof editingProduct.product.availableColors === 'string' && editingProduct.product.availableColors.trim()
+                          ? (editingProduct.product.availableColors as string).split(',').map(s => s.trim()).filter(Boolean)
+                          : [];
+
+                        const getShortColorName = (item: any) => {
+                          const name = item.name || '';
+                          if (name.startsWith('DROPS Safran ')) {
+                            return name.replace('DROPS Safran ', '').replace('(', '- ').replace(')', '');
                           }
-                          onChange={(e) => setEditingProduct({
+                          if (name.startsWith('DROPS Paris ')) {
+                            return name.replace('DROPS Paris ', '').replace('(', '- ').replace(')', '');
+                          }
+                          return name;
+                        };
+
+                        const toggleColor = (colorName: string) => {
+                          let updated: string[];
+                          const exists = currentColors.some(c => c.toLowerCase() === colorName.toLowerCase());
+                          if (exists) {
+                            updated = currentColors.filter(c => c.toLowerCase() !== colorName.toLowerCase());
+                          } else {
+                            updated = [...currentColors, colorName];
+                          }
+                          setEditingProduct({
                             ...editingProduct,
-                            product: { ...editingProduct.product, availableColors: e.target.value }
-                          })}
-                          className="w-full bg-cream/20 border border-forest/10 focus:border-[#C5A059] focus:outline-none rounded-xl px-3 py-2"
-                          placeholder="Natural, Rosa Pálido, Verde Musgo"
-                        />
-                      </div>
+                            product: { ...editingProduct.product, availableColors: updated }
+                          });
+                        };
+
+                        const isColorSelected = (colorName: string) => {
+                          return currentColors.some(c => c.toLowerCase() === colorName.toLowerCase() || c.toLowerCase().includes(colorName.toLowerCase()));
+                        };
+
+                        return (
+                          <div className="space-y-3 bg-cream/20 p-4 rounded-2xl border border-forest/10 text-left">
+                            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                              <div>
+                                <label className="font-serif text-xs font-bold text-forest block">
+                                  Seletor Inteligente de Cores de Matérias-Primas
+                                </label>
+                                <p className="text-[10px] text-forest/60">
+                                  Sincronizado com o stock real do Atelier (DROPS Safran & DROPS Paris)
+                                </p>
+                              </div>
+                              <div className="flex gap-1.5 shrink-0">
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    const allStockColors = [
+                                      ...safranYarns.map(i => getShortColorName(i)),
+                                      ...parisYarns.map(i => getShortColorName(i))
+                                    ];
+                                    setEditingProduct({
+                                      ...editingProduct,
+                                      product: { ...editingProduct.product, availableColors: Array.from(new Set(allStockColors)) }
+                                    });
+                                  }}
+                                  className="text-[10px] font-semibold text-[#243119] bg-white border border-forest/10 hover:bg-cream px-2 py-1 rounded-lg cursor-pointer transition-colors"
+                                >
+                                  Selecionar Todas
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    setEditingProduct({
+                                      ...editingProduct,
+                                      product: { ...editingProduct.product, availableColors: [] }
+                                    });
+                                  }}
+                                  className="text-[10px] font-semibold text-red-700 bg-white border border-red-200 hover:bg-red-50 px-2 py-1 rounded-lg cursor-pointer transition-colors"
+                                >
+                                  Limpar
+                                </button>
+                              </div>
+                            </div>
+
+                            {/* DROPS Safran Colors */}
+                            {safranYarns.length > 0 && (
+                              <div className="space-y-1.5">
+                                <div className="flex items-center gap-1.5">
+                                  <span className="w-2 h-2 rounded-full bg-[#C5A059]"></span>
+                                  <span className="text-[10px] font-bold text-forest uppercase tracking-wider">
+                                    DROPS Safran ({safranYarns.length} Cores)
+                                  </span>
+                                </div>
+                                <div className="flex flex-wrap gap-1.5">
+                                  {safranYarns.map(y => {
+                                    const shortName = getShortColorName(y);
+                                    const selected = isColorSelected(shortName) || isColorSelected(y.name);
+                                    return (
+                                      <button
+                                        key={y.id}
+                                        type="button"
+                                        onClick={() => toggleColor(shortName)}
+                                        className={`px-2 py-1 rounded-xl text-[11px] font-medium border transition-all flex items-center gap-1.5 cursor-pointer ${
+                                          selected
+                                            ? 'bg-[#243119] text-cream border-[#243119] shadow-sm font-semibold'
+                                            : 'bg-white text-forest/70 border-forest/15 hover:border-[#C5A059] hover:bg-cream/40'
+                                        }`}
+                                      >
+                                        <YarnSwatch id={y.id} name={y.name} size="w-5 h-5" />
+                                        <span>{selected ? '✓' : '+'}</span>
+                                        <span>{shortName}</span>
+                                        <span className={`text-[9px] px-1 rounded font-mono ${selected ? 'bg-cream/20 text-cream' : 'bg-forest/5 text-forest/50'}`}>
+                                          {y.quantity} nov
+                                        </span>
+                                      </button>
+                                    );
+                                  })}
+                                </div>
+                              </div>
+                            )}
+
+                            {/* DROPS Paris Colors */}
+                            {parisYarns.length > 0 && (
+                              <div className="space-y-1.5 pt-1">
+                                <div className="flex items-center gap-1.5">
+                                  <span className="w-2 h-2 rounded-full bg-[#243119]"></span>
+                                  <span className="text-[10px] font-bold text-forest uppercase tracking-wider">
+                                    DROPS Paris ({parisYarns.length} Cores)
+                                  </span>
+                                </div>
+                                <div className="flex flex-wrap gap-1.5">
+                                  {parisYarns.map(y => {
+                                    const shortName = getShortColorName(y);
+                                    const selected = isColorSelected(shortName) || isColorSelected(y.name);
+                                    return (
+                                      <button
+                                        key={y.id}
+                                        type="button"
+                                        onClick={() => toggleColor(shortName)}
+                                        className={`px-2 py-1 rounded-xl text-[11px] font-medium border transition-all flex items-center gap-1.5 cursor-pointer ${
+                                          selected
+                                            ? 'bg-[#243119] text-cream border-[#243119] shadow-sm font-semibold'
+                                            : 'bg-white text-forest/70 border-forest/15 hover:border-[#C5A059] hover:bg-cream/40'
+                                        }`}
+                                      >
+                                        <YarnSwatch id={y.id} name={y.name} size="w-5 h-5" />
+                                        <span>{selected ? '✓' : '+'}</span>
+                                        <span>{shortName}</span>
+                                        <span className={`text-[9px] px-1 rounded font-mono ${selected ? 'bg-cream/20 text-cream' : 'bg-forest/5 text-forest/50'}`}>
+                                          {y.quantity} nov
+                                        </span>
+                                      </button>
+                                    );
+                                  })}
+                                </div>
+                              </div>
+                            )}
+
+                            {/* Manual Text Fallback */}
+                            <div className="pt-2 border-t border-forest/10 space-y-1">
+                              <div className="flex justify-between items-center text-[10px] text-forest/60 font-semibold">
+                                <span>Cores Ativas ({currentColors.length}):</span>
+                                <span>Edição em texto (separada por vírgula)</span>
+                              </div>
+                              <input
+                                type="text"
+                                value={currentColors.join(', ')}
+                                onChange={(e) => setEditingProduct({
+                                  ...editingProduct,
+                                  product: { 
+                                    ...editingProduct.product, 
+                                    availableColors: e.target.value.split(',').map(s => s.trim()).filter(Boolean)
+                                  }
+                                })}
+                                className="w-full bg-white border border-forest/15 focus:border-[#C5A059] focus:outline-none rounded-xl px-3 py-1.5 text-xs text-forest"
+                                placeholder="Ex: 18 - Natural, 16 - Branco"
+                              />
+                            </div>
+                          </div>
+                        );
+                      })()}
 
                       <div className="flex items-center gap-2 pt-2">
                         <input
@@ -2909,15 +3160,43 @@ export default function AdminDashboardModal({ onClose, shopCategories = [] }: Ad
                             ) : (
                               displayedItems.map((item) => {
                                 const isLow = item.quantity < item.minSafety;
+                                const getDisplayTitleAndSub = (m: any) => {
+                                  const name = m.name || '';
+                                  if (name.startsWith('DROPS Safran ')) {
+                                    const refColor = name.replace('DROPS Safran ', '').replace('(', '- ').replace(')', '');
+                                    return {
+                                      title: `Ref. ${refColor}`,
+                                      sub: `${name} · ID: ${m.id}`
+                                    };
+                                  }
+                                  if (name.startsWith('DROPS Paris ')) {
+                                    const refColor = name.replace('DROPS Paris ', '').replace('(', '- ').replace(')', '');
+                                    return {
+                                      title: `Ref. ${refColor}`,
+                                      sub: `${name} · ID: ${m.id}`
+                                    };
+                                  }
+                                  return {
+                                    title: name,
+                                    sub: `ID: ${m.id}`
+                                  };
+                                };
+                                const displayInfo = getDisplayTitleAndSub(item);
+
                                 return (
                                   <tr key={item.id} className={`transition-colors ${isLow ? 'bg-amber-50/20 hover:bg-amber-50/45' : 'hover:bg-cream/10'}`}>
                                     <td className="px-6 py-4">
-                                      <div className="font-semibold text-forest flex items-center gap-2">
-                                        {isLow && <AlertTriangle className="w-4 h-4 text-amber-500 shrink-0" />}
-                                        <span>{item.name}</span>
-                                      </div>
-                                      <div className="text-[10px] text-forest/40 font-mono mt-0.5">
-                                        ID: {item.id}
+                                      <div className="flex items-center gap-3">
+                                        <YarnSwatch id={item.id} name={item.name} size="w-7 h-7" />
+                                        <div>
+                                          <div className="font-semibold text-forest flex items-center gap-1.5">
+                                            {isLow && <AlertTriangle className="w-3.5 h-3.5 text-amber-500 shrink-0" />}
+                                            <span className="font-sans text-xs font-bold text-forest">{displayInfo.title}</span>
+                                          </div>
+                                          <div className="text-[10px] text-forest/50 font-mono mt-0.5">
+                                            {displayInfo.sub}
+                                          </div>
+                                        </div>
                                       </div>
                                     </td>
                                   <td className="px-6 py-4 text-center font-mono">
