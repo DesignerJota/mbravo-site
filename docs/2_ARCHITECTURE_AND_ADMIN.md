@@ -147,7 +147,22 @@ Para assegurar integridade absoluta de dados e facilidade de leitura operacional
 
 ---
 
-## 7. Roteiro Técnico de Solução iOS WebKit & Otimização Mobile (FASE 1 APLICADA)
+## 8. Arquitetura Resiliente de Testemunhos & Avaliações (PostgreSQL High Availability - 3 Camadas)
+
+A gestão e apresentação de testemunhos no e-commerce adota uma arquitetura de alta disponibilidade (HA) em 3 camadas e tolerante a falhas de rede:
+1. **Configuração Defensiva da Conexão PostgreSQL (`pg.Pool`):**
+   * Parâmetro `connectionTimeoutMillis: 3000` em `server.ts` para garantir o *fail fast* defensivo em 3 segundos em caso de problemas de rede ou DNS IPv4/IPv6 no servidor de base de dados.
+   * Event listener `dbPool.on('error', ...)` registado para capturar avisos de ligações inativas sem emitir exceções não tratadas ou interromper o processo Node.js.
+2. **Padrão Fallback de Alta Disponibilidade (3 Camadas Nativas):**
+   * **Nível 1 (PostgreSQL):** Tenta consultar em primeira instância os testemunhos registados na tabela `testimonials` da base de dados relacional PostgreSQL (`SELECT ... ORDER BY id DESC LIMIT 100`).
+   * **Nível 2 (Google Places API Direto):** Caso o Nível 1 falhe ou a base de dados relacional esteja indisponível, o servidor realiza um *fetch* direto e assíncrono utilizando a `GOOGLE_PLACES_API_KEY` (ou `GOOGLE_API_KEY`) e o `GOOGLE_PLACE_ID` das variáveis de ambiente na API oficial do Google Places (`https://maps.googleapis.com/maps/api/place/details/json`).
+   * **Nível 3 (Ficheiro de Volume Persistente `testimonials.json`):** Caso o Nível 2 falhe ou as chaves da Google API não estejam configuradas, o sistema serve de forma transparente os testemunhos armazenados no ficheiro local persistente do Volume `/app/data/testimonials.json` (`loadTestimonials()`).
+3. **Garantia de Isolamento Absoluto & Não-Bloqueio:**
+   * Quaisquer falhas de conexão ou erros de tabela no PostgreSQL emitem unicamente avisos informativos de aviso (`console.warn`) nos registos e **NUNCA** afetam o arranque do servidor, o processo de checkout, a atualização de stock ou a leitura do catálogo de produtos.
+
+---
+
+## 9. Roteiro Técnico de Solução iOS WebKit & Otimização Mobile (FASE 1 APLICADA)
 
 ### A. Diagnóstico & Solução de Flicker de Imagens no iOS (Safari/WebKit) — [IMPLEMENTADO]
 *   **Causa Raiz no WebKit:** O motor Safari/WebKit em iOS impõe limites rigorosos de alocação de memória gráfica por aba. Durante o scroll rápido com inércia em grelhas de imagens, o WebKit descarta ativamente texturas descodificadas em memória GPU para evitar estoiros de memória (*tab crash*), resultando no efeito de piscar (*flicker*) quando as imagens voltam a ser compostas.
