@@ -77,15 +77,46 @@ const ORDERS_FILE = getOrdersFilePath();
 
 function loadOrders() {
   const map = new Map<string, any>();
+  let modified = false;
+
+  // 1. Primary & Sovereign Load from Volume / Persistent Store (/app/data/orders.json)
   if (fs.existsSync(ORDERS_FILE)) {
     try {
       const data = JSON.parse(fs.readFileSync(ORDERS_FILE, 'utf8'));
       for (const [id, ord] of Object.entries(data)) {
         map.set(id, ord);
       }
-      console.log(`[ORDERS DATABASE] Loaded ${map.size} orders from persistent orders.json`);
+      console.log(`[ORDERS DATABASE] Loaded ${map.size} orders from persistent Volume store (${ORDERS_FILE})`);
     } catch (err) {
-      console.error("[ORDERS DATABASE ERROR] Failed to load orders.json", err);
+      console.error("[ORDERS DATABASE ERROR] Failed to load orders.json from persistent store", err);
+    }
+  }
+
+  // 2. Non-Destructive Deep Merge from local workspace fallback (e.g. ./orders.json) for missing historical records
+  const localFallbackPath = path.join(process.cwd(), "orders.json");
+  if (localFallbackPath !== ORDERS_FILE && fs.existsSync(localFallbackPath)) {
+    try {
+      const localData = JSON.parse(fs.readFileSync(localFallbackPath, 'utf8'));
+      for (const [id, ord] of Object.entries(localData)) {
+        if (!map.has(id)) {
+          map.set(id, ord);
+          modified = true;
+          console.log(`[ORDERS DATABASE MERGE] Merged historical order ${id} from workspace fallback into Volume.`);
+        }
+      }
+    } catch (err) {
+      console.warn("[ORDERS DATABASE MERGE WARNING] Could not parse local workspace orders.json", err);
+    }
+  }
+
+  // 3. Atomic Write back to Volume if new historical items were merged or if Volume file didn't exist yet
+  if (modified || (!fs.existsSync(ORDERS_FILE) && map.size > 0)) {
+    try {
+      const obj = Object.fromEntries(map);
+      fs.writeFileSync(ORDERS_FILE, JSON.stringify(obj, null, 2), 'utf8');
+      console.log(`[ORDERS DATABASE ATOMIC WRITE] Consolidated ${map.size} orders persisted to Volume (${ORDERS_FILE})`);
+    } catch (err) {
+      console.error("[ORDERS DATABASE ATOMIC WRITE ERROR]", err);
     }
   }
 
@@ -876,15 +907,42 @@ const getLogsFilePath = () => {
 const LOGS_FILE = getLogsFilePath();
 
 function loadLogs(): any[] {
+  let list: any[] = [];
+  let modified = false;
+
   if (fs.existsSync(LOGS_FILE)) {
     try {
       const data = JSON.parse(fs.readFileSync(LOGS_FILE, 'utf8'));
-      if (Array.isArray(data)) return data;
+      if (Array.isArray(data)) list = data;
     } catch (err) {
       console.error("[LOGS DATABASE ERROR] Failed to load audit_logs.json", err);
     }
   }
-  return [];
+
+  const localFallbackPath = path.join(process.cwd(), "audit_logs.json");
+  if (localFallbackPath !== LOGS_FILE && fs.existsSync(localFallbackPath)) {
+    try {
+      const localData = JSON.parse(fs.readFileSync(localFallbackPath, 'utf8'));
+      if (Array.isArray(localData)) {
+        const existingIds = new Set(list.map(item => item.id));
+        for (const item of localData) {
+          if (item && item.id && !existingIds.has(item.id)) {
+            list.push(item);
+            existingIds.add(item.id);
+            modified = true;
+          }
+        }
+      }
+    } catch (err) {
+      console.warn("[LOGS DATABASE MERGE WARNING]", err);
+    }
+  }
+
+  if (modified || (!fs.existsSync(LOGS_FILE) && list.length > 0)) {
+    saveLogs(list);
+  }
+
+  return list;
 }
 
 function saveLogs(list: any[]) {
@@ -934,15 +992,42 @@ const getCatalogFilePath = () => {
 const CATALOG_FILE = getCatalogFilePath();
 
 function loadCatalog() {
+  let catalog: any[] = [];
+  let modified = false;
+
   if (fs.existsSync(CATALOG_FILE)) {
     try {
       const data = JSON.parse(fs.readFileSync(CATALOG_FILE, 'utf8'));
-      if (Array.isArray(data)) return data;
+      if (Array.isArray(data)) catalog = data;
     } catch (err) {
       console.error("[CATALOG DATABASE ERROR] Failed to load catalog.json", err);
     }
   }
-  return null;
+
+  const localFallbackPath = path.join(process.cwd(), "catalog.json");
+  if (localFallbackPath !== CATALOG_FILE && fs.existsSync(localFallbackPath)) {
+    try {
+      const localData = JSON.parse(fs.readFileSync(localFallbackPath, 'utf8'));
+      if (Array.isArray(localData)) {
+        const existingIds = new Set(catalog.map(item => item.id));
+        for (const item of localData) {
+          if (item && item.id && !existingIds.has(item.id)) {
+            catalog.push(item);
+            existingIds.add(item.id);
+            modified = true;
+          }
+        }
+      }
+    } catch (err) {
+      console.warn("[CATALOG DATABASE MERGE WARNING]", err);
+    }
+  }
+
+  if (modified && catalog.length > 0) {
+    saveCatalog(catalog);
+  }
+
+  return catalog.length > 0 ? catalog : null;
 }
 
 function saveCatalog(catalog: any[]) {
@@ -995,25 +1080,64 @@ const DEFAULT_INVENTORY = [
 ];
 
 function loadInventory() {
+  let inventoryList: any[] = [];
+  let modified = false;
+
   if (fs.existsSync(INVENTORY_FILE)) {
     try {
       const data = JSON.parse(fs.readFileSync(INVENTORY_FILE, 'utf8'));
       if (Array.isArray(data)) {
-        // Se for o inventário antigo (que não tem os novos fios alinhados ou ainda usa Bobina), migramos automaticamente
-        const hasNewFio = data.some(item => item.id === 'rm_fio_algodao_cru');
-        const hasBobina = data.some(item => item.name && (item.name.includes('Bobina') || item.unit === 'bobinas'));
-        if (!hasNewFio || hasBobina) {
-          saveInventory(DEFAULT_INVENTORY);
-          return DEFAULT_INVENTORY;
-        }
-        return data;
+        inventoryList = data;
       }
     } catch (err) {
       console.error("[INVENTORY DATABASE ERROR] Failed to load inventory.json", err);
     }
   }
-  saveInventory(DEFAULT_INVENTORY);
-  return DEFAULT_INVENTORY;
+
+  const existingIds = new Set(inventoryList.map(item => item.id));
+
+  // Check fallback inventory.json in workspace if distinct from Volume INVENTORY_FILE
+  const localFallbackPath = path.join(process.cwd(), "inventory.json");
+  let fallbackItems = DEFAULT_INVENTORY;
+  if (localFallbackPath !== INVENTORY_FILE && fs.existsSync(localFallbackPath)) {
+    try {
+      const fileData = JSON.parse(fs.readFileSync(localFallbackPath, 'utf8'));
+      if (Array.isArray(fileData)) {
+        fallbackItems = [...fileData, ...DEFAULT_INVENTORY];
+      }
+    } catch (e) {
+      // fallback to DEFAULT_INVENTORY
+    }
+  }
+
+  for (const item of fallbackItems) {
+    if (item && item.id && !existingIds.has(item.id)) {
+      inventoryList.push(item);
+      existingIds.add(item.id);
+      modified = true;
+      console.log(`[INVENTORY DATABASE MERGE] Merged raw material ${item.id} into Volume.`);
+    }
+  }
+
+  // Automatic legacy migration if needed
+  const hasNewFio = inventoryList.some(item => item.id === 'rm_fio_algodao_cru');
+  const hasBobina = inventoryList.some(item => item.name && (item.name.includes('Bobina') || item.unit === 'bobinas'));
+  if (!hasNewFio || hasBobina) {
+    for (const defItem of DEFAULT_INVENTORY) {
+      const idx = inventoryList.findIndex(i => i.id === defItem.id);
+      if (idx === -1) {
+        inventoryList.push(defItem);
+      }
+    }
+    inventoryList = inventoryList.filter(item => !(item.name && item.name.includes('Bobina') && item.unit === 'bobinas'));
+    modified = true;
+  }
+
+  if (modified || !fs.existsSync(INVENTORY_FILE)) {
+    saveInventory(inventoryList);
+  }
+
+  return inventoryList;
 }
 
 function saveInventory(list: any[]) {
@@ -1556,16 +1680,41 @@ const CUSTOMERS_FILE = getCustomersFilePath();
 
 function loadCustomers() {
   const map = new Map<string, any>();
+  let modified = false;
+
   if (fs.existsSync(CUSTOMERS_FILE)) {
     try {
       const data = JSON.parse(fs.readFileSync(CUSTOMERS_FILE, 'utf8'));
       for (const [email, cust] of Object.entries(data)) {
         map.set(email.toLowerCase().trim(), cust);
       }
+      console.log(`[CRM DATABASE] Loaded ${map.size} customer profiles from persistent store (${CUSTOMERS_FILE})`);
     } catch (err) {
       console.error("[CRM DATABASE] Failed to load customers.json", err);
     }
   }
+
+  const localFallbackPath = path.join(process.cwd(), "customers.json");
+  if (localFallbackPath !== CUSTOMERS_FILE && fs.existsSync(localFallbackPath)) {
+    try {
+      const localData = JSON.parse(fs.readFileSync(localFallbackPath, 'utf8'));
+      for (const [email, cust] of Object.entries(localData)) {
+        const key = email.toLowerCase().trim();
+        if (!map.has(key)) {
+          map.set(key, cust);
+          modified = true;
+          console.log(`[CRM DATABASE MERGE] Merged customer ${key} from workspace fallback into Volume.`);
+        }
+      }
+    } catch (err) {
+      console.warn("[CRM DATABASE MERGE WARNING]", err);
+    }
+  }
+
+  if (modified || (!fs.existsSync(CUSTOMERS_FILE) && map.size > 0)) {
+    saveCustomers(map);
+  }
+
   return map;
 }
 
@@ -1904,15 +2053,42 @@ const getTestimonialsFilePath = () => {
 const TESTIMONIALS_FILE = getTestimonialsFilePath();
 
 function loadTestimonials() {
+  let list: any[] = [];
+  let modified = false;
+
   if (fs.existsSync(TESTIMONIALS_FILE)) {
     try {
       const data = JSON.parse(fs.readFileSync(TESTIMONIALS_FILE, 'utf8'));
-      if (Array.isArray(data)) return data;
+      if (Array.isArray(data)) list = data;
     } catch (err) {
       console.error("[TESTIMONIALS DATABASE ERROR] Failed to load testimonials.json", err);
     }
   }
-  return [];
+
+  const localFallbackPath = path.join(process.cwd(), "testimonials.json");
+  if (localFallbackPath !== TESTIMONIALS_FILE && fs.existsSync(localFallbackPath)) {
+    try {
+      const localData = JSON.parse(fs.readFileSync(localFallbackPath, 'utf8'));
+      if (Array.isArray(localData)) {
+        const existingTexts = new Set(list.map(item => item.text));
+        for (const item of localData) {
+          if (item && item.text && !existingTexts.has(item.text)) {
+            list.push(item);
+            existingTexts.add(item.text);
+            modified = true;
+          }
+        }
+      }
+    } catch (err) {
+      console.warn("[TESTIMONIALS DATABASE MERGE WARNING]", err);
+    }
+  }
+
+  if (modified && list.length > 0) {
+    saveTestimonials(list);
+  }
+
+  return list;
 }
 
 function saveTestimonials(list: any[]) {
