@@ -31,11 +31,18 @@ A aplicação está desenhada num modelo **Full-Stack integrado**:
 
 ## 2. Persistência de Dados (JSON Database)
 A aplicação adota um armazenamento baseado em ficheiros locais persistentes, otimizados para volumes persistentes na cloud:
-*   **Diretório de Volumes:** Caso o servidor detete que está a correr na plataforma Railway (presença do diretório `/app/data`), ele grava automaticamente os dados na pasta `/app/data/` para garantir durabilidade persistente através de reinícios do contentor. Caso contrário, faz fallback para o diretório de execução local.
-*   **Ficheiros de Banco de Dados:**
+*   **Diretório de Volumes e Soberania do Estado:** Caso o servidor detete a presença do diretório `/app/data/` (Volume Persistente na Railway), utiliza-o como fonte primária e soberana de dados. O estado gravado no Volume em produção é inviolável e NUNCA é sobrescrito por ficheiros estáticos do repositório.
+*   **Motor de Fusão Inteligente Não-Destrutiva no Arranque (AtLeastOnce Sync & Deep Merge):**
+    *   No boot do servidor (`server.ts`), o motor de persistência carrega os registos ativos presentes no Volume `/app/data/`.
+    *   Executa um *Deep Merge* chave-a-chave (por ID de encomenda, email de cliente ou ID de matéria-prima) cruzando com os ficheiros `.json` de fallback/semente do repositório workspace.
+    *   Registos históricos estáticos (ex: encomenda histórica `MB-2026-3147`) ausentes no Volume são fundidos sem sobrescrever nenhuma alteração ou nova encomenda gravada via API.
+    *   Após a consolidação em memória, o resultado é imediatamente persistido de forma atómica no Volume `/app/data/`.
+*   **Ficheiros de Banco de Dados Persistidos:**
     *   `orders.json`: Armazena todas as encomendas registadas e o seu estado de pagamento.
     *   `customers.json`: Armazena fichas consolidadas do CRM e dados específicos de clientes.
-    *   `inventory.json`: Armazena o inventário de matérias-primas e fio físico em armazém.
+    *   `inventory.json`: Armazena o inventário de matérias-primas e fios físicos em armazém.
+    *   `catalog.json`: Armazena alterações do catálogo de artigos do e-commerce.
+    *   `audit_logs.json`: Armazena os registos imutáveis de auditoria administrativa.
 
 ---
 
