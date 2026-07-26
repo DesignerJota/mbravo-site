@@ -43,4 +43,13 @@ Este documento regista a visão estratégica de futuro para a evolução tecnol�
 
 ---
 
+## 5. Infraestrutura Técnica & Escalabilidade Backend (Railway & Persistent Data)
+*   **Conceito:** Aumentar a resiliência e a capacidade de observabilidade do servidor em ambiente de produção contínua.
+*   **Especificações Técnicas:**
+    *   **Snapshots de Backup Automáticos (`/app/data/backups/`):** Rotina diária/semanal automatizada que gera cópias de segurança comprimidas e rotativas de `orders.json`, `customers.json`, `inventory.json` e `catalog.json` na pasta `/app/data/backups/` antes de cada escrita atómica no Volume Persistente da Railway.
+    *   **Monitorização de Erros & Observabilidade (Sentry / Logtail / Winston):** Captura e alerta automático de exceções não tratadas em rotas críticas (como Webhooks do Stripe, emissão de e-mails via Resend e falhas de sincronização do Volume) com relatórios no Telegram/Email do Atelier.
+    *   **Migração Transparente para Base de Dados Relacional (PostgreSQL / SQLite na Railway):** Transição arquitetural do armazenamento baseado em ficheiros `.json` para uma instância PostgreSQL dedicada na Railway assim que o volume diário de vendas e acessos simultâneos assim o exigir, mantendo os modelos de dados e schemas unificados.
+
+---
+
 *M★BRAVO Atelier — Onde o tempo do artesanato de luxo se cruza com a engenharia do futuro.*
