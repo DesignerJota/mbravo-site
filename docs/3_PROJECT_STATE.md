@@ -123,8 +123,11 @@ Respondendo às últimas solicitações de otimização de fluxo e consistência
     18. **Execução Imediata de Smart Upsert no Arranque do Servidor (`server.ts`):**
         *   Invocação direta da função `loadInventory()` dentro de `startServer()` durante o arranque do contentor em produção.
         *   Análise dual por ID (`id`) e nome normalizado (`name`), detetando e intercalando autonomamente as novas referências de matérias-primas (`rm_paris_17_natural` e `rm_safran_76_azul_po`) na base viva de `/app/data/inventory.json` logo no arranque do servidor, preservando a 100% todo o stock e registos introduzidos pela Carolina.
-    19. **Atualização Integral da Documentação Técnica (`/docs`):**
-        *   Ficheiros `2_ARCHITECTURE_AND_ADMIN.md`, `3_PROJECT_STATE.md` e `5_FUTURE_ROADMAP.md` atualizados para espelhar a estrutura exclusiva de `/app/data/`, a regra de Smart Upsert de matérias-primas no boot, o consumo de fio por cor e a resiliência em produção.
+    19. **Sanitização de Decimais com Vírgula para iPad / Teclados PT e Toast Banner (`AdminDashboardModal.tsx`):**
+        *   **Compatibilidade iPad & Teclados Portugueses**: alterado o campo de input de consumo por cor para `type="text"` com `inputMode="decimal"`. Na submissão do formulário (`onSubmit`), todas as entradas de consumo são automaticamente higienizadas (`replace(',', '.')`) e convertidas com segurança para números `float`.
+        *   **Notificação Visual Toast Reativada**: adicionado o banner flutuante de confirmação `saveNotification` com animação e ícone de sucesso, que é ativado automaticamente ao confirmar qualquer peça ou ao guardar o catálogo no servidor.
+    20. **Atualização Integral da Documentação Técnica (`/docs`):**
+        *   Ficheiros `2_ARCHITECTURE_AND_ADMIN.md`, `3_PROJECT_STATE.md` e `5_FUTURE_ROADMAP.md` atualizados para espelhar a estrutura exclusiva de `/app/data/`, a regra de Smart Upsert de matérias-primas no boot, a sanitização de vírgulas no iPad e o banner toast visual.
 
 ---
 
