@@ -127,10 +127,10 @@ Para que o repositório no GitHub fique 100% sincronizado com a versão final de
 
 ## 4. Próximos Passos Recomendados & Roteiro de Otimização Mobile
 
-### A. Validação de Transição de Repositório:
-*   [ ] Efetuar a cópia dos ficheiros alterados (`src/App.tsx`, `src/translations.ts`, `src/components/AdminDashboardModal.tsx`, `index.html`) para a branch principal do GitHub.
-*   [ ] Solicitar a inspeção e reindexação de URLs na Google Search Console para reavaliar as páginas após a otimização dos termos ortográficos.
-*   [ ] Garantir que o volume de dados persistente `/app/data` está ativo no Railway para evitar perdas acidentais de encomendas ou perfis de clientes do CRM durante novas atualizações de código.
+### A. Validação de Transição de Repositório & Persistência:
+*   [x] **Ficheiros Atualizados e Validados no Editor:** Cópia dos ficheiros alterados (`server.ts`, `src/App.tsx`, `src/translations.ts`, `src/components/AdminDashboardModal.tsx`, `src/lib/emailService.ts`, `docs/`) pronta para commit no GitHub (`DesignerJota/mbravo-site`).
+*   [x] **Blindagem CORS e Preflight OPTIONS:** Middleware verificado em `server.ts` garantindo suporte a `https://mbravobycarolina.com`, cabeçalho `X-Admin-Password` e resposta 200 OK no preflight.
+*   [x] **Soberania e Motor de Fusão no Boot:** Volume Persistente `/app/data/` configurado na Railway como fonte soberana com algoritmo de Deep Merge por ID em `server.ts` para preservação integral de dados.
 
 ### B. Roteiro Técnico de Otimização Mobile & iOS WebKit (Meta: PageSpeed >90 - FASE 1 CONCLUÍDA):
 *   [x] **Aceleração Hardware-Backing para iOS WebKit:** Aplicado `-webkit-backface-visibility: hidden; transform: translateZ(0);` nos cartões de produtos e categorias para impedir a reciclagem agressiva de texturas da GPU pelo WebKit durante o scroll rápido em iPhones/iPads.
