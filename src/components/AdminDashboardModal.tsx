@@ -199,6 +199,14 @@ export default function AdminDashboardModal({ onClose, shopCategories = [] }: Ad
   const [editingProduct, setEditingProduct] = useState<any | null>(null);
   const [selectedCategoryId, setSelectedCategoryId] = useState<string>('home');
   const [isSavingCatalog, setIsSavingCatalog] = useState(false);
+  const [saveNotification, setSaveNotification] = useState<string | null>(null);
+
+  const triggerNotification = (msg: string) => {
+    setSaveNotification(msg);
+    setTimeout(() => {
+      setSaveNotification(null);
+    }, 4500);
+  };
 
   // CMS Physical Inventory states
   const [inventory, setInventory] = useState<any[]>([]);
@@ -906,7 +914,21 @@ export default function AdminDashboardModal({ onClose, shopCategories = [] }: Ad
             </div>
           ) : (
             /* ADMIN DASHBOARD */
-            <div className="p-8 space-y-8 font-sans">
+            <div className="p-8 space-y-8 font-sans relative">
+              
+              {/* TOAST NOTIFICATION BANNER */}
+              {saveNotification && (
+                <div className="fixed top-6 right-6 z-[250] bg-[#243119] text-cream px-5 py-3.5 rounded-2xl shadow-2xl border border-[#C5A059]/40 flex items-center gap-3 animate-slide-down">
+                  <CheckCircle className="w-5 h-5 text-[#C5A059] shrink-0" />
+                  <div>
+                    <p className="font-serif font-bold text-xs text-cream">{saveNotification}</p>
+                    <p className="text-[10px] text-cream/70">Alterações sincronizadas no servidor M★BRAVO (Railway)</p>
+                  </div>
+                  <button onClick={() => setSaveNotification(null)} className="ml-2 text-cream/50 hover:text-cream cursor-pointer p-1">
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+              )}
               
               {/* STATS HIGHLIGHT PANEL */}
               <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
@@ -1880,9 +1902,9 @@ export default function AdminDashboardModal({ onClose, shopCategories = [] }: Ad
                         });
                         const data = await res.json();
                         if (res.ok && data.success) {
-                          alert("Catálogo do Atelier guardado e publicado com sucesso!");
                           setCatalog(data.categories || []);
                           window.dispatchEvent(new CustomEvent('catalog-updated'));
+                          triggerNotification("Catálogo do Atelier guardado e publicado com sucesso!");
                         } else {
                           alert(data.error || "Erro ao guardar catálogo.");
                         }
@@ -2114,7 +2136,7 @@ export default function AdminDashboardModal({ onClose, shopCategories = [] }: Ad
                     </div>
 
                     <form
-                      onSubmit={(e) => {
+                      onSubmit={async (e) => {
                         e.preventDefault();
                         const prodForm = editingProduct.product;
                         
@@ -2127,10 +2149,24 @@ export default function AdminDashboardModal({ onClose, shopCategories = [] }: Ad
                             .filter(Boolean);
                         }
 
+                        // Sanitize colorConsumptions: convert commas (,) to dots (.) and parse as numeric float
+                        const rawConsumptions = prodForm.colorConsumptions || {};
+                        const sanitizedConsumptions: Record<string, number> = {};
+
+                        for (const [cName, cVal] of Object.entries(rawConsumptions)) {
+                          if (cVal !== undefined && cVal !== null && cVal !== '') {
+                            const strVal = String(cVal).replace(',', '.').trim();
+                            const numVal = parseFloat(strVal);
+                            if (!isNaN(numVal) && numVal > 0) {
+                              sanitizedConsumptions[cName] = numVal;
+                            }
+                          }
+                        }
+
                         const finalProd = {
                           ...prodForm,
                           availableColors: parsedColors,
-                          colorConsumptions: prodForm.colorConsumptions || {}
+                          colorConsumptions: sanitizedConsumptions
                         };
 
                         const updatedCatalog = catalog.map(c => {
@@ -2148,6 +2184,28 @@ export default function AdminDashboardModal({ onClose, shopCategories = [] }: Ad
 
                         setCatalog(updatedCatalog);
                         setEditingProduct(null);
+
+                        // Auto-save catalog to backend server and display success toast notification
+                        try {
+                          const res = await fetch(`${API_BASE_URL}/api/admin/catalog/save`, {
+                            method: 'POST',
+                            headers: {
+                              'Content-Type': 'application/json',
+                              'x-admin-password': password
+                            },
+                            body: JSON.stringify({ categories: updatedCatalog })
+                          });
+                          const data = await res.json();
+                          if (res.ok && data.success) {
+                            if (data.categories) setCatalog(data.categories);
+                            window.dispatchEvent(new CustomEvent('catalog-updated'));
+                            triggerNotification(`Produto "${finalProd.name}" guardado e publicado no catálogo com sucesso!`);
+                          } else {
+                            triggerNotification(`Produto "${finalProd.name}" guardado no rascunho.`);
+                          }
+                        } catch (err) {
+                          triggerNotification(`Produto "${finalProd.name}" guardado no rascunho.`);
+                        }
                       }}
                       className="space-y-4 text-xs text-left"
                     >
@@ -2495,18 +2553,17 @@ export default function AdminDashboardModal({ onClose, shopCategories = [] }: Ad
                                         </div>
                                         <div className="flex items-center gap-1 shrink-0">
                                           <input
-                                            type="number"
-                                            step="0.05"
-                                            min="0.01"
+                                            type="text"
+                                            inputMode="decimal"
                                             placeholder="1.0"
                                             value={val !== undefined && val !== null ? val : ''}
                                             onChange={(e) => {
-                                              const numVal = e.target.value === '' ? undefined : parseFloat(e.target.value);
+                                              const rawInput = e.target.value;
                                               const updatedConsumptions = { ...(editingProduct.product.colorConsumptions || {}) };
-                                              if (numVal === undefined || isNaN(numVal)) {
+                                              if (rawInput.trim() === '') {
                                                 delete updatedConsumptions[colorName];
                                               } else {
-                                                updatedConsumptions[colorName] = numVal;
+                                                updatedConsumptions[colorName] = rawInput;
                                               }
                                               setEditingProduct({
                                                 ...editingProduct,
