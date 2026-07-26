@@ -1807,13 +1807,20 @@ const dbPool = connectionString ? new pg.Pool({
   ssl: {
     rejectUnauthorized: false
   },
-  connectionTimeoutMillis: 5000 // fail fast if wrong credentials or unreachable
+  connectionTimeoutMillis: 3000, // 3s defensive timeout for fast fallback
+  idleTimeoutMillis: 10000
 }) : null;
 
-// Create table if not exists on startup
+if (dbPool) {
+  dbPool.on('error', (err) => {
+    console.warn("[POSTGRESQL POOL WARN] Non-blocking network or idle client connection warning:", err.message || err);
+  });
+}
+
+// Create table if not exists on startup (non-blocking)
 async function initDatabase() {
   if (!dbPool) {
-    console.log("[DATABASE INFO] DATABASE_URL is not set. Operating in local JSON fallback mode.");
+    console.log("[DATABASE INFO] DATABASE_URL is not set. Operating in 3-layer High Availability fallback mode.");
     return;
   }
   try {
@@ -1877,8 +1884,8 @@ async function initDatabase() {
 
     // Attempt Google Places API reviews sync if configured
     await syncGoogleReviews();
-  } catch (err) {
-    console.error("[DATABASE ERROR] Failed to initialize testimonials table. Check credentials.", err);
+  } catch (err: any) {
+    console.warn("[DATABASE WARN] Non-blocking PostgreSQL initialization warning (seamless 3-layer fallback active):", err.message || err);
   }
 }
 
@@ -1947,13 +1954,13 @@ async function syncGoogleReviews() {
       saveTestimonials(activeTestimonials);
     }
   } catch (err: any) {
-    console.error("[GOOGLE REVIEWS SYNC ERROR] Failed to fetch or save Google Reviews:", err.message || err);
+    console.warn("[GOOGLE REVIEWS SYNC WARN] Non-blocking Google Reviews sync issue:", err.message || err);
   }
 }
 
 initDatabase();
 
-// Persistent file-backed Testimonials store (used as fallback)
+// Persistent file-backed Testimonials store (used as Level 3 fallback)
 const getTestimonialsFilePath = () => {
   const railwayPersistentDir = "/app/data";
   try {
@@ -1977,7 +1984,7 @@ function loadTestimonials() {
         return data;
       }
     } catch (err) {
-      console.error("[TESTIMONIALS DATABASE ERROR] Failed to load testimonials.json", err);
+      console.warn("[TESTIMONIALS DATABASE WARN] Failed to load testimonials.json", err);
     }
   }
 
@@ -1987,7 +1994,7 @@ function loadTestimonials() {
       const localData = JSON.parse(fs.readFileSync(localFallbackPath, 'utf8'));
       if (Array.isArray(localData)) return localData;
     } catch (err) {
-      console.warn("[TESTIMONIALS DATABASE FALLBACK ERROR]", err);
+      console.warn("[TESTIMONIALS DATABASE FALLBACK WARN]", err);
     }
   }
 
@@ -1998,24 +2005,71 @@ function saveTestimonials(list: any[]) {
   try {
     fs.writeFileSync(TESTIMONIALS_FILE, JSON.stringify(list, null, 2), 'utf8');
   } catch (err) {
-    console.error("[TESTIMONIALS DATABASE ERROR] Failed to save testimonials.json", err);
+    console.warn("[TESTIMONIALS DATABASE WARN] Failed to save testimonials.json", err);
   }
 }
 
 let activeTestimonials = loadTestimonials();
 
-// Testimonials Endpoints with Direct database sync + fallback
+// 3-Layer Enterprise High-Availability Testimonials Fetcher
+async function fetchTestimonials3Layers(): Promise<any[]> {
+  // Nível 1: PostgreSQL Database
+  if (dbPool) {
+    try {
+      const result = await dbPool.query(
+        `SELECT name, text, product, rating, created_at AS "createdAt" FROM testimonials ORDER BY id DESC LIMIT 100`
+      );
+      if (result.rows && result.rows.length > 0) {
+        console.log(`[TESTIMONIALS HA - LEVEL 1 SUCCESS] Retrieved ${result.rows.length} reviews from PostgreSQL.`);
+        return result.rows;
+      }
+    } catch (err: any) {
+      console.warn(`[TESTIMONIALS HA - LEVEL 1 WARN] PostgreSQL unavailable (${err.message || err}). Escalating to Level 2 (Google Places API)...`);
+    }
+  }
+
+  // Nível 2: Direct Google Places API Fetch
+  const apiKey = process.env.GOOGLE_PLACES_API_KEY || process.env.GOOGLE_API_KEY;
+  const placeId = process.env.GOOGLE_PLACE_ID;
+  if (apiKey && placeId) {
+    try {
+      console.log(`[TESTIMONIALS HA - LEVEL 2] Fetching live Google Places reviews for Place ID: ${placeId}...`);
+      const url = `https://maps.googleapis.com/maps/api/place/details/json?place_id=${placeId}&fields=reviews&key=${apiKey}&language=pt`;
+      const response = await fetch(url);
+      if (response.ok) {
+        const data: any = await response.json();
+        if (data.status === "OK" && data.result?.reviews?.length > 0) {
+          const googleReviews = data.result.reviews.map((r: any) => ({
+            name: r.author_name || "Cliente Google",
+            text: r.text || "",
+            product: "Avaliação Google",
+            rating: r.rating ? parseInt(r.rating, 10) : 5,
+            createdAt: r.time ? new Date(r.time * 1000).toISOString() : new Date().toISOString()
+          })).filter((item: any) => item.text.trim().length > 0);
+
+          if (googleReviews.length > 0) {
+            console.log(`[TESTIMONIALS HA - LEVEL 2 SUCCESS] Retrieved ${googleReviews.length} reviews directly from Google Places API.`);
+            return googleReviews;
+          }
+        }
+      }
+    } catch (err: any) {
+      console.warn(`[TESTIMONIALS HA - LEVEL 2 WARN] Google Places API fetch issue (${err.message || err}). Escalating to Level 3 (Persistent JSON Volume)...`);
+    }
+  }
+
+  // Nível 3: Local Persistent Volume JSON Store (testimonials.json)
+  console.log("[TESTIMONIALS HA - LEVEL 3] Serving testimonials from persistent Volume JSON store.");
+  return loadTestimonials();
+}
+
+// Testimonials Endpoints with 3-Layer HA Fallback Pattern
 app.get("/api/testimonials", async (req, res) => {
   try {
-    if (!dbPool) {
-      throw new Error("DATABASE_URL is not set.");
-    }
-    const result = await dbPool.query(
-      `SELECT name, text, product, rating, created_at AS "createdAt" FROM testimonials ORDER BY id DESC LIMIT 100`
-    );
-    res.json(result.rows);
-  } catch (err) {
-    console.error("[DATABASE READ ERROR] Falling back to file storage.", err);
+    const list = await fetchTestimonials3Layers();
+    res.json(list);
+  } catch (err: any) {
+    console.warn("[TESTIMONIALS API WARN] Safe fallback to local memory:", err.message || err);
     res.json(activeTestimonials);
   }
 });
@@ -2029,28 +2083,28 @@ app.post("/api/testimonials", async (req, res) => {
     const cleanRating = rating ? parseInt(rating, 10) : 5;
     const cleanProduct = product || "";
 
-    try {
-      if (!dbPool) {
-        throw new Error("DATABASE_URL is not set.");
+    if (dbPool) {
+      try {
+        const result = await dbPool.query(
+          `INSERT INTO testimonials (name, text, product, rating) VALUES ($1, $2, $3, $4) RETURNING name, text, product, rating, created_at AS "createdAt"`,
+          [name, text, cleanProduct, cleanRating]
+        );
+        return res.json({ success: true, testimonial: result.rows[0] });
+      } catch (dbErr: any) {
+        console.warn("[DATABASE WRITE WARN] PostgreSQL write non-blocking issue. Persisting to Volume JSON fallback:", dbErr.message || dbErr);
       }
-      const result = await dbPool.query(
-        `INSERT INTO testimonials (name, text, product, rating) VALUES ($1, $2, $3, $4) RETURNING name, text, product, rating, created_at AS "createdAt"`,
-        [name, text, cleanProduct, cleanRating]
-      );
-      res.json({ success: true, testimonial: result.rows[0] });
-    } catch (dbErr) {
-      console.error("[DATABASE WRITE ERROR] Falling back to file storage.", dbErr);
-      const testimonial = {
-        name,
-        text,
-        product: cleanProduct,
-        rating: cleanRating,
-        createdAt: new Date().toISOString()
-      };
-      activeTestimonials.unshift(testimonial); // Add newest first
-      saveTestimonials(activeTestimonials);
-      res.json({ success: true, testimonial });
     }
+
+    const testimonial = {
+      name,
+      text,
+      product: cleanProduct,
+      rating: cleanRating,
+      createdAt: new Date().toISOString()
+    };
+    activeTestimonials.unshift(testimonial);
+    saveTestimonials(activeTestimonials);
+    res.json({ success: true, testimonial });
   } catch (err: any) {
     res.status(500).json({ error: err.message });
   }
