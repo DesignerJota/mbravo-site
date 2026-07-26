@@ -129,6 +129,9 @@ Respondendo às últimas solicitações de otimização de fluxo e consistência
     20. **Ícones Genéricos para Acessórios & Sincronização de Inventário (`AdminDashboardModal.tsx` & `server.ts`):**
         *   **Ícones Lucide na Categoria Acessórios & Embalamento**: os elementos da categoria de Acessórios deixaram de apresentar o quadrado/swatch de lã de cor e passaram a exibir ícones visuais dedicados (`Tag` para Etiquetas em Couro M★BRAVO, `Package` para Caixas Premium, `Scissors` para Fechos de Correr, `Disc` para Botões de Madeira, e `Layers` para Tecido de Forro).
         *   **Purga de Matérias-Primas Obsoletas**: o carregamento e arranque do servidor (`loadInventory()` em `server.ts`) assim como o filtro do painel frontal em `AdminDashboardModal.tsx` purgam automaticamente quaisquer referências antigas a fios de algodão (`rm_fio_algodao`, `algodão cru`, `cacau escuro`), mantendo a categoria de Acessórios & Embalamento estritamente limitada aos 5 itens reais e oficiais.
+    21. **Imagem Real do Botão de Madeira M★BRAVO & Thumbnails de Inventário Ampliados (`AdminDashboardModal.tsx`):**
+        *   **Fotografia Real do Botão de Madeira (`rm_botao_madeira`)**: em vez do ícone genérico, o componente `YarnSwatch` agora renderiza diretamente a imagem oficial em alta resolução (`https://i.ibb.co/gL2FL6LW/Botao-M-BRAVO-3.png`) com `object-contain`, mantendo a foto em destaque sobre um fundo suave `#FAF7F2`.
+        *   **Aumento de Thumbnails na Tabela de Inventário**: o tamanho de todas as amostras/thumbnails de matérias-primas no separador de Inventário foi ampliado para **48×48 px** (`w-12 h-12` em Tailwind), mantendo o padding da tabela (`py-3.5`) perfeitamente ajustado sem esticar as linhas.
 
 ---
 
