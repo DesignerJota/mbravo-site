@@ -1088,10 +1088,23 @@ function loadInventory() {
     return list;
   }
 
+  let modified = false;
+
+  // 3.5 SANITIZATION: Purge any obsolete legacy cotton yarn items (e.g. rm_fio_algodao, algodão cru, cacau escuro)
+  const lenBefore = list.length;
+  list = list.filter((item: any) => {
+    const id = (item.id || '').toLowerCase();
+    const name = (item.name || '').toLowerCase();
+    return !id.includes('fio_algodao') && !name.includes('algodão cru') && !name.includes('cacau escuro');
+  });
+  if (list.length !== lenBefore) {
+    modified = true;
+    console.log(`[INVENTORY SANITIZATION] Removed ${lenBefore - list.length} legacy raw materials from persistent store.`);
+  }
+
   // 4. SMART UPSERT: Check if any raw material declared in DEFAULT_INVENTORY is missing from list
   const existingIds = new Set(list.map((item: any) => item.id).filter(Boolean));
   const existingNames = new Set(list.map((item: any) => (item.name || '').toLowerCase().trim()).filter(Boolean));
-  let modified = false;
 
   for (const defaultItem of DEFAULT_INVENTORY) {
     const normName = (defaultItem.name || '').toLowerCase().trim();
