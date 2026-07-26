@@ -29,20 +29,23 @@ A aplicação está desenhada num modelo **Full-Stack integrado**:
 
 ---
 
-## 2. Persistência de Dados (JSON Database)
+## 2. Persistência de Dados (JSON Database & Volume Exclusivo)
 A aplicação adota um armazenamento baseado em ficheiros locais persistentes, otimizados para volumes persistentes na cloud:
-*   **Diretório de Volumes e Soberania do Estado (REGRA DE OURO / Pilar 10):** O Volume Persistente na Railway montado em `/app/data/` é a fonte soberana e inviolável de dados em produção. O estado gravado no Volume é imune a deploys do GitHub e NUNCA é sobrescrito ou modificado durante o arranque do servidor.
-*   **Protocolo de Arranque Estritamente Read-Only (`server.ts`):**
-    *   No boot do servidor (`server.ts`), as funções de carregamento de dados (`loadOrders`, `loadCustomers`, `loadInventory`, `loadCatalog`, `loadLogs`, `loadTestimonials`) limitam-se a ler em memória os ficheiros `.json` existentes em `/app/data/`.
-    *   **Zero Write On Boot:** Foram totalmente removidas lógicas de fusão (*Deep Merge*), cópias automáticas ou execuções de `writeFileSync` no arranque do servidor.
-    *   **Fallback In-Memory:** Caso um ficheiro do Volume ainda não exista na primeira execução, o servidor lê o ficheiro estático de fallback do workspace workspace diretamente para a memória, sem gravar nem modificar o disco durante o arranque.
+*   **Diretório de Volumes e Soberania do Estado (REGRA DE OURO / Pilar 10):** O Volume Persistente na Railway montado em `/app/data/` é a fonte soberana e única de dados em produção. Todos os ficheiros de base de dados viva (`inventory.json`, `orders.json`, `catalog.json`, `customers.json`, `audit_logs.json`, `testimonials.json`) residem exclusivamente dentro de `/app/data/`, tendo sido totalmente eliminados quaisquer ficheiros JSON duplicados ou soltos na raiz do projeto.
+*   **Lógica de Fusão Inteligente no Arranque (Smart Upsert de Matérias-Primas):**
+    *   No boot do servidor (`server.ts`), a função `loadInventory()` lê a base de dados `/app/data/inventory.json`.
+    *   **Injeção Automática de Novas Referências (Smart Upsert):** Se forem declaradas novas matérias-primas no código (`DEFAULT_INVENTORY`) que ainda não existam em `/app/data/inventory.json`, o servidor adicona-as automaticamente ao ficheiro persistente.
+    *   **Preservação Soberana do Stock Existente:** Se um item já existir no `/app/data/inventory.json`, o servidor preserva a 100% a sua quantidade real e atualizada em produção pelo Admin (nunca repondo a zeros nem sobrescrevendo o stock da Carolina).
+*   **Protocolo de Leitura Read-Only para Encomendas, CRM e Catálogo:**
+    *   As funções `loadOrders`, `loadCustomers`, `loadCatalog`, `loadLogs` e `loadTestimonials` leem em memória os ficheiros de `/app/data/` sem sobrescrever dados no boot.
     *   **Mutação Exclusiva por API:** A escrita física em disco (`writeFileSync`) ocorre exclusivamente por via de requisições explícitas de mutação sentidas pelas rotas de API (`POST`, `PUT`, `DELETE`) no Painel Admin ou durante o Checkout.
-*   **Ficheiros de Banco de Dados Persistidos:**
-    *   `orders.json`: Armazena todas as encomendas registadas e o seu estado de pagamento.
-    *   `customers.json`: Armazena fichas consolidadas do CRM e dados específicos de clientes.
-    *   `inventory.json`: Armazena o inventário de matérias-primas e fios físicos em armazém.
-    *   `catalog.json`: Armazena alterações do catálogo de artigos do e-commerce.
-    *   `audit_logs.json`: Armazena os registos imutáveis de auditoria administrativa.
+*   **Ficheiros de Banco de Dados Persistidos em `/app/data/`:**
+    *   `/app/data/inventory.json`: Armazena o inventário de matérias-primas e fios físicos em armazém (DROPS Safran, DROPS Paris #18241, acessórios e embalagens).
+    *   `/app/data/orders.json`: Armazena todas as encomendas registadas e o seu estado de pagamento.
+    *   `/app/data/customers.json`: Armazena fichas consolidadas do CRM e dados específicos de clientes.
+    *   `/app/data/catalog.json`: Armazena alterações do catálogo de artigos do e-commerce.
+    *   `/app/data/audit_logs.json`: Armazena os registos imutáveis de auditoria administrativa.
+    *   `/app/data/testimonials.json`: Armazena testemunhos locais de fallback de alta disponibilidade.
 
 ---
 
