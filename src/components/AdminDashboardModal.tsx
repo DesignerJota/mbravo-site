@@ -122,6 +122,7 @@ export default function AdminDashboardModal({ onClose, shopCategories = [] }: Ad
   const [inventoryError, setInventoryError] = useState<string | null>(null);
   const [isSavingInventory, setIsSavingInventory] = useState(false);
   const [editingMaterial, setEditingMaterial] = useState<any | null>(null);
+  const [inventorySubTab, setInventorySubTab] = useState<'safran' | 'paris' | 'accessories' | 'all'>('safran');
 
   // CRM states
   const [selectedCustomerEmail, setSelectedCustomerEmail] = useState<string | null>(null);
@@ -2716,13 +2717,46 @@ export default function AdminDashboardModal({ onClose, shopCategories = [] }: Ad
           })()}
 
           {/* INTERNAL PHYSICAL INVENTORY VIEW (FASE 2) */}
-          {activeTab === 'inventory' && (
-            <div className="space-y-6">
-              <div className="bg-white border border-forest/5 p-5 rounded-[16px] shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                <div>
-                  <h4 className="font-serif text-sm font-medium text-forest">Gestão de Stock</h4>
-                </div>
-                <div className="flex gap-2">
+          {activeTab === 'inventory' && (() => {
+            const safranItems = inventory.filter(i => (i.id || '').toLowerCase().includes('safran') || (i.name || '').toLowerCase().includes('safran'));
+            const parisItems = inventory.filter(i => (i.id || '').toLowerCase().includes('paris') || (i.name || '').toLowerCase().includes('paris'));
+            const accessoryItems = inventory.filter(i => 
+              !(i.id || '').toLowerCase().includes('safran') && 
+              !(i.name || '').toLowerCase().includes('safran') && 
+              !(i.id || '').toLowerCase().includes('paris') && 
+              !(i.name || '').toLowerCase().includes('paris')
+            );
+
+            const safranQty = safranItems.reduce((acc, i) => acc + (Number(i.quantity) || 0), 0);
+            const parisQty = parisItems.reduce((acc, i) => acc + (Number(i.quantity) || 0), 0);
+            const accessoryQty = accessoryItems.reduce((acc, i) => acc + (Number(i.quantity) || 0), 0);
+
+            const displayedItems = 
+              inventorySubTab === 'safran' ? safranItems :
+              inventorySubTab === 'paris' ? parisItems :
+              inventorySubTab === 'accessories' ? accessoryItems :
+              inventory;
+
+            return (
+              <div className="space-y-6 text-left">
+                <div className="bg-white border border-forest/5 p-5 rounded-[16px] shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                  <div>
+                    <h4 className="font-serif text-sm font-medium text-forest">Gestão de Stock de Matérias-Primas</h4>
+                    <p className="text-[11px] text-forest/50 font-sans mt-0.5">
+                      Lote Real Recebido — Encomenda #18241 (Armazém das Manualidades)
+                    </p>
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    <button
+                      type="button"
+                      onClick={() => fetchInventory()}
+                      disabled={loadingInventory}
+                      className="px-3 py-2 bg-cream/60 hover:bg-cream text-forest rounded-xl text-xs font-semibold flex items-center gap-1.5 cursor-pointer transition-colors"
+                      title="Recarregar dados reais de stock do servidor"
+                    >
+                      <RefreshCw className={`w-3.5 h-3.5 ${loadingInventory ? 'animate-spin text-[#C5A059]' : ''}`} />
+                      Recarregar
+                    </button>
                   <button
                     type="button"
                     onClick={() => {
@@ -2768,6 +2802,77 @@ export default function AdminDashboardModal({ onClose, shopCategories = [] }: Ad
                 </div>
               </div>
 
+              {/* INVENTORY SUB-TABS (DROPS Safran, DROPS Paris, Acessórios & Embalamento, Ver Tudo) */}
+              <div className="flex flex-wrap gap-2 bg-cream/20 p-2 rounded-[16px] border border-forest/5">
+                <button
+                  type="button"
+                  onClick={() => setInventorySubTab('safran')}
+                  className={`px-4 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center gap-2 cursor-pointer ${
+                    inventorySubTab === 'safran'
+                      ? 'bg-[#243119] text-cream shadow-md'
+                      : 'bg-white text-forest/70 hover:bg-cream/60 hover:text-forest'
+                  }`}
+                >
+                  <span>DROPS Safran</span>
+                  <span className={`px-2 py-0.5 rounded-full text-[10px] font-mono font-semibold ${
+                    inventorySubTab === 'safran' ? 'bg-[#C5A059] text-white' : 'bg-forest/10 text-forest'
+                  }`}>
+                    {safranItems.length} cores · {safranQty} nov.
+                  </span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setInventorySubTab('paris')}
+                  className={`px-4 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center gap-2 cursor-pointer ${
+                    inventorySubTab === 'paris'
+                      ? 'bg-[#243119] text-cream shadow-md'
+                      : 'bg-white text-forest/70 hover:bg-cream/60 hover:text-forest'
+                  }`}
+                >
+                  <span>DROPS Paris</span>
+                  <span className={`px-2 py-0.5 rounded-full text-[10px] font-mono font-semibold ${
+                    inventorySubTab === 'paris' ? 'bg-[#C5A059] text-white' : 'bg-forest/10 text-forest'
+                  }`}>
+                    {parisItems.length} cores · {parisQty} nov.
+                  </span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setInventorySubTab('accessories')}
+                  className={`px-4 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center gap-2 cursor-pointer ${
+                    inventorySubTab === 'accessories'
+                      ? 'bg-[#243119] text-cream shadow-md'
+                      : 'bg-white text-forest/70 hover:bg-cream/60 hover:text-forest'
+                  }`}
+                >
+                  <span>Acessórios & Embalamento</span>
+                  <span className={`px-2 py-0.5 rounded-full text-[10px] font-mono font-semibold ${
+                    inventorySubTab === 'accessories' ? 'bg-[#C5A059] text-white' : 'bg-forest/10 text-forest'
+                  }`}>
+                    {accessoryItems.length} itens · {accessoryQty} un.
+                  </span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setInventorySubTab('all')}
+                  className={`px-4 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center gap-2 cursor-pointer ${
+                    inventorySubTab === 'all'
+                      ? 'bg-[#243119] text-cream shadow-md'
+                      : 'bg-white text-forest/70 hover:bg-cream/60 hover:text-forest'
+                  }`}
+                >
+                  <span>Ver Tudo</span>
+                  <span className={`px-2 py-0.5 rounded-full text-[10px] font-mono font-semibold ${
+                    inventorySubTab === 'all' ? 'bg-[#C5A059] text-white' : 'bg-forest/10 text-forest'
+                  }`}>
+                    {inventory.length} matérias-primas
+                  </span>
+                </button>
+              </div>
+
               {inventoryError && (
                 <div className="bg-red-50 text-red-800 border border-red-100 rounded-xl p-4 text-xs">
                   {inventoryError}
@@ -2795,16 +2900,26 @@ export default function AdminDashboardModal({ onClose, shopCategories = [] }: Ad
                             </tr>
                           </thead>
                           <tbody className="divide-y divide-forest/5">
-                            {inventory.map((item) => {
-                              const isLow = item.quantity < item.minSafety;
-                              return (
-                                <tr key={item.id} className={`transition-colors ${isLow ? 'bg-amber-50/20 hover:bg-amber-50/45' : 'hover:bg-cream/10'}`}>
-                                  <td className="px-6 py-4">
-                                    <div className="font-semibold text-forest flex items-center gap-2">
-                                      {isLow && <AlertTriangle className="w-4 h-4 text-amber-500 shrink-0" />}
-                                      {item.name}
-                                    </div>
-                                  </td>
+                            {displayedItems.length === 0 ? (
+                              <tr>
+                                <td colSpan={4} className="px-6 py-8 text-center text-forest/40 italic text-xs">
+                                  Nenhuma matéria-prima encontrada neste separador.
+                                </td>
+                              </tr>
+                            ) : (
+                              displayedItems.map((item) => {
+                                const isLow = item.quantity < item.minSafety;
+                                return (
+                                  <tr key={item.id} className={`transition-colors ${isLow ? 'bg-amber-50/20 hover:bg-amber-50/45' : 'hover:bg-cream/10'}`}>
+                                    <td className="px-6 py-4">
+                                      <div className="font-semibold text-forest flex items-center gap-2">
+                                        {isLow && <AlertTriangle className="w-4 h-4 text-amber-500 shrink-0" />}
+                                        <span>{item.name}</span>
+                                      </div>
+                                      <div className="text-[10px] text-forest/40 font-mono mt-0.5">
+                                        ID: {item.id}
+                                      </div>
+                                    </td>
                                   <td className="px-6 py-4 text-center font-mono">
                                     <span className={`px-2 py-0.5 rounded-full font-bold text-[10px] ${
                                       isLow ? 'bg-amber-100 text-amber-800' : 'bg-green-100 text-green-800'
@@ -2853,8 +2968,9 @@ export default function AdminDashboardModal({ onClose, shopCategories = [] }: Ad
                                   </td>
                                 </tr>
                               );
-                            })}
-                          </tbody>
+                            })
+                          )}
+                        </tbody>
                         </table>
                       </div>
                     </div>
@@ -3010,7 +3126,8 @@ export default function AdminDashboardModal({ onClose, shopCategories = [] }: Ad
                 </div>
               )}
             </div>
-          )}
+          );
+        })()}
         </div>
       )}
     </div>
