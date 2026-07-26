@@ -1,0 +1,177 @@
+[
+  {
+    "id": "rm_safran_18_natural",
+    "name": "DROPS Safran 18 (Natural)",
+    "quantity": 10,
+    "unit": "novelos",
+    "minSafety": 3
+  },
+  {
+    "id": "rm_safran_17_branco",
+    "name": "DROPS Safran 17 (Branco)",
+    "quantity": 8,
+    "unit": "novelos",
+    "minSafety": 2
+  },
+  {
+    "id": "rm_safran_68_cafe",
+    "name": "DROPS Safran 68 (Café)",
+    "quantity": 5,
+    "unit": "novelos",
+    "minSafety": 2
+  },
+  {
+    "id": "rm_safran_01_rosa_deserto",
+    "name": "DROPS Safran 01 (Rosa do Deserto)",
+    "quantity": 3,
+    "unit": "novelos",
+    "minSafety": 1
+  },
+  {
+    "id": "rm_safran_78_verde_floresta",
+    "name": "DROPS Safran 78 (Verde Floresta)",
+    "quantity": 3,
+    "unit": "novelos",
+    "minSafety": 1
+  },
+  {
+    "id": "rm_safran_60_verde_musgo",
+    "name": "DROPS Safran 60 (Verde Musgo)",
+    "quantity": 3,
+    "unit": "novelos",
+    "minSafety": 1
+  },
+  {
+    "id": "rm_safran_73_azul_cobalto",
+    "name": "DROPS Safran 73 (Azul Cobalto)",
+    "quantity": 3,
+    "unit": "novelos",
+    "minSafety": 1
+  },
+  {
+    "id": "rm_safran_50_menta",
+    "name": "DROPS Safran 50 (Menta)",
+    "quantity": 3,
+    "unit": "novelos",
+    "minSafety": 1
+  },
+  {
+    "id": "rm_safran_19_vermelho",
+    "name": "DROPS Safran 19 (Vermelho)",
+    "quantity": 1,
+    "unit": "novelos",
+    "minSafety": 1
+  },
+  {
+    "id": "rm_paris_16_branco",
+    "name": "DROPS Paris 16 (Branco)",
+    "quantity": 10,
+    "unit": "novelos",
+    "minSafety": 3
+  },
+  {
+    "id": "rm_paris_43_verde",
+    "name": "DROPS Paris 43 (Verde)",
+    "quantity": 5,
+    "unit": "novelos",
+    "minSafety": 2
+  },
+  {
+    "id": "rm_paris_25_verde_musgo",
+    "name": "DROPS Paris 25 (Verde Musgo)",
+    "quantity": 5,
+    "unit": "novelos",
+    "minSafety": 2
+  },
+  {
+    "id": "rm_paris_48_petroleo",
+    "name": "DROPS Paris 48 (Petróleo)",
+    "quantity": 5,
+    "unit": "novelos",
+    "minSafety": 2
+  },
+  {
+    "id": "rm_paris_76_azul_ternura",
+    "name": "DROPS Paris 76 (Azul Ternura)",
+    "quantity": 5,
+    "unit": "novelos",
+    "minSafety": 2
+  },
+  {
+    "id": "rm_paris_57_rosa_clarissimo",
+    "name": "DROPS Paris 57 (Rosa Claríssimo)",
+    "quantity": 5,
+    "unit": "novelos",
+    "minSafety": 2
+  },
+  {
+    "id": "rm_paris_35_baunilha",
+    "name": "DROPS Paris 35 (Baunilha)",
+    "quantity": 5,
+    "unit": "novelos",
+    "minSafety": 2
+  },
+  {
+    "id": "rm_paris_19_amarelo_claro",
+    "name": "DROPS Paris 19 (Amarelo Claro)",
+    "quantity": 5,
+    "unit": "novelos",
+    "minSafety": 2
+  },
+  {
+    "id": "rm_paris_44_castanho",
+    "name": "DROPS Paris 44 (Castanho)",
+    "quantity": 5,
+    "unit": "novelos",
+    "minSafety": 2
+  },
+  {
+    "id": "rm_paris_12_vermelho",
+    "name": "DROPS Paris 12 (Vermelho)",
+    "quantity": 5,
+    "unit": "novelos",
+    "minSafety": 2
+  },
+  {
+    "id": "rm_paris_15_preto",
+    "name": "DROPS Paris 15 (Preto)",
+    "quantity": 3,
+    "unit": "novelos",
+    "minSafety": 1
+  },
+  {
+    "id": "rm_fecho_correr",
+    "name": "Fecho de Correr (Zipper)",
+    "quantity": 45,
+    "unit": "unidades",
+    "minSafety": 10
+  },
+  {
+    "id": "rm_botao_madeira",
+    "name": "Botão de Madeira M★BRAVO",
+    "quantity": 60,
+    "unit": "unidades",
+    "minSafety": 15
+  },
+  {
+    "id": "rm_forro_tecido",
+    "name": "Tecido para Forro (Algodão)",
+    "quantity": 20,
+    "unit": "metros",
+    "minSafety": 5
+  },
+  {
+    "id": "rm_caixa_embalamento",
+    "name": "Caixa de Embalamento Premium",
+    "quantity": 50,
+    "unit": "unidades",
+    "minSafety": 12
+  },
+  {
+    "id": "rm_etiqueta_couro",
+    "name": "Etiqueta em Couro M★BRAVO",
+    "quantity": 100,
+    "unit": "unidades",
+    "minSafety": 20
+  }
+]
