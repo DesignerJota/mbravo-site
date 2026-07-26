@@ -6,7 +6,8 @@ import {
   ExternalLink, Eye, RefreshCw, Sliders, Calendar, DollarSign, 
   Package, ChevronRight, AlertTriangle, ShieldCheck, Plus,
   Download, ClipboardList, Trash, Trash2, Ban, Edit, Save, Check, EyeOff, Layers, Settings,
-  BarChart3, Percent, TrendingUp, ArrowUpRight, Instagram
+  BarChart3, Percent, TrendingUp, ArrowUpRight, Instagram,
+  Tag, Scissors, Disc, Box
 } from 'lucide-react';
 const API_BASE_URL = import.meta.env.VITE_API_URL || '';
 
@@ -124,7 +125,84 @@ function getYarnSwatchColor(id?: string, name?: string) {
   return { bg: '#C5A059' };
 }
 
+function isAccessoryItem(id?: string, name?: string): boolean {
+  const norm = `${id || ''} ${name || ''}`.toLowerCase();
+  if (norm.includes('safran') || norm.includes('paris')) return false;
+  return (
+    id === 'rm_fecho_correr' || id === 'rm_botao_madeira' ||
+    id === 'rm_forro_tecido' || id === 'rm_caixa_embalamento' || id === 'rm_etiqueta_couro' ||
+    norm.includes('fecho') || norm.includes('zipper') ||
+    norm.includes('botão') || norm.includes('botao') ||
+    norm.includes('forro') || norm.includes('tecido') ||
+    norm.includes('caixa') || norm.includes('embalagem') || norm.includes('embalamento') ||
+    norm.includes('etiqueta') || norm.includes('couro')
+  );
+}
+
+function getAccessoryIconConfig(id?: string, name?: string) {
+  const norm = `${id || ''} ${name || ''}`.toLowerCase();
+  if (norm.includes('etiqueta') || norm.includes('couro') || id === 'rm_etiqueta_couro') {
+    return {
+      icon: Tag,
+      bg: 'bg-[#946342]/15',
+      border: 'border-[#946342]/35',
+      text: 'text-[#946342]'
+    };
+  }
+  if (norm.includes('caixa') || norm.includes('embalag') || id === 'rm_caixa_embalamento') {
+    return {
+      icon: Package,
+      bg: 'bg-[#D4C5B0]/30',
+      border: 'border-[#BDB09B]/50',
+      text: 'text-[#7A6E5D]'
+    };
+  }
+  if (norm.includes('fecho') || norm.includes('zipper') || id === 'rm_fecho_correr') {
+    return {
+      icon: Scissors,
+      bg: 'bg-[#C5A059]/20',
+      border: 'border-[#C5A059]/40',
+      text: 'text-[#243119]'
+    };
+  }
+  if (norm.includes('botão') || norm.includes('botao') || norm.includes('madeira') || id === 'rm_botao_madeira') {
+    return {
+      icon: Disc,
+      bg: 'bg-[#B38053]/20',
+      border: 'border-[#B38053]/40',
+      text: 'text-[#8B5A2B]'
+    };
+  }
+  if (norm.includes('forro') || norm.includes('tecido') || id === 'rm_forro_tecido') {
+    return {
+      icon: Layers,
+      bg: 'bg-[#EAE4D9]',
+      border: 'border-[#D0C8B8]',
+      text: 'text-[#635848]'
+    };
+  }
+  return {
+    icon: Box,
+    bg: 'bg-forest/10',
+    border: 'border-forest/20',
+    text: 'text-forest/70'
+  };
+}
+
 function YarnSwatch({ id, name, size = 'w-7 h-7' }: { id?: string; name?: string; size?: string }) {
+  if (isAccessoryItem(id, name)) {
+    const config = getAccessoryIconConfig(id, name);
+    const IconComp = config.icon;
+    return (
+      <span
+        className={`${size} rounded-lg shrink-0 inline-flex items-center justify-center align-middle shadow-2xs border ${config.bg} ${config.border} ${config.text}`}
+        title={name || id}
+      >
+        <IconComp className="w-[55%] h-[55%]" />
+      </span>
+    );
+  }
+
   const swatch = getYarnSwatchColor(id, name);
   return (
     <span
@@ -3093,9 +3171,16 @@ export default function AdminDashboardModal({ onClose, shopCategories = [] }: Ad
 
           {/* INTERNAL PHYSICAL INVENTORY VIEW (FASE 2) */}
           {activeTab === 'inventory' && (() => {
-            const safranItems = inventory.filter(i => (i.id || '').toLowerCase().includes('safran') || (i.name || '').toLowerCase().includes('safran'));
-            const parisItems = inventory.filter(i => (i.id || '').toLowerCase().includes('paris') || (i.name || '').toLowerCase().includes('paris'));
-            const accessoryItems = inventory.filter(i => 
+            // Exclude obsolete legacy cotton yarns (e.g. rm_fio_algodao, algodão cru, cacau escuro)
+            const cleanInventory = inventory.filter(i => {
+              const id = (i.id || '').toLowerCase();
+              const name = (i.name || '').toLowerCase();
+              return !id.includes('fio_algodao') && !name.includes('algodão cru') && !name.includes('cacau escuro');
+            });
+
+            const safranItems = cleanInventory.filter(i => (i.id || '').toLowerCase().includes('safran') || (i.name || '').toLowerCase().includes('safran'));
+            const parisItems = cleanInventory.filter(i => (i.id || '').toLowerCase().includes('paris') || (i.name || '').toLowerCase().includes('paris'));
+            const accessoryItems = cleanInventory.filter(i => 
               !(i.id || '').toLowerCase().includes('safran') && 
               !(i.name || '').toLowerCase().includes('safran') && 
               !(i.id || '').toLowerCase().includes('paris') && 
@@ -3110,7 +3195,7 @@ export default function AdminDashboardModal({ onClose, shopCategories = [] }: Ad
               inventorySubTab === 'safran' ? safranItems :
               inventorySubTab === 'paris' ? parisItems :
               inventorySubTab === 'accessories' ? accessoryItems :
-              inventory;
+              cleanInventory;
 
             return (
               <div className="space-y-6 text-left">
