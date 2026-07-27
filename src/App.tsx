@@ -2459,6 +2459,26 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({ product: rawProduct,
         forro: '',
         detalhe: ''
     });
+
+    useEffect(() => {
+        if (colorType === 'bicolor') {
+            const p = availableColorOptions[0] || '';
+            const d = availableColorOptions[1] || p;
+            setSelections(prev => ({
+                ...prev,
+                corPrincipal: p,
+                corDetalhe: d,
+                cor: `${formatColorName(p)} & ${formatColorName(d)}`
+            }));
+        } else if (colorType === 'single') {
+            const firstColor = availableColorOptions[0] || '';
+            setSelections(prev => ({
+                ...prev,
+                corPrincipal: firstColor,
+                cor: firstColor
+            }));
+        }
+    }, [product.id, availableColorOptions.join(',')]);
     const totalPrice = typeof rawPrice === 'number' 
         ? `${rawPrice * (hasQuantity ? (parseInt(selections.quantidade) || 1) : 1)}`
         : 'Sob Consulta';
@@ -3991,7 +4011,7 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({ product: rawProduct,
                                                     <button 
                                                         key={rawCol}
                                                         type="button"
-                                                        onClick={() => setSelections(prev => ({ ...prev, cor: rawCol }))}
+                                                        onClick={() => setSelections(prev => ({ ...prev, cor: rawCol, corPrincipal: rawCol }))}
                                                         className={`w-8 h-8 rounded-full border transition-all p-0.5 cursor-pointer relative ${
                                                             isActive 
                                                                 ? 'ring-2 ring-[#C5A059] scale-110 shadow-md shadow-[#C5A059]/20 border-white' 
@@ -5737,6 +5757,26 @@ const ProductDetailPage = ({ pathname }: { pathname: string }) => {
         detalhe: ''
     });
 
+    useEffect(() => {
+        if (colorType === 'bicolor') {
+            const p = availableColorOptions[0] || '';
+            const d = availableColorOptions[1] || p;
+            setSelections(prev => ({
+                ...prev,
+                corPrincipal: p,
+                corDetalhe: d,
+                cor: `${formatColorName(p)} & ${formatColorName(d)}`
+            }));
+        } else if (colorType === 'single') {
+            const firstColor = availableColorOptions[0] || '';
+            setSelections(prev => ({
+                ...prev,
+                corPrincipal: firstColor,
+                cor: firstColor
+            }));
+        }
+    }, [productTranslated.id, availableColorOptions.join(',')]);
+
     const [isCheckingOut, setIsCheckingOut] = useState(false);
     const [paymentMethod, setPaymentMethod] = useState<'mbway' | 'multibanco' | 'card' | 'wallet'>('mbway');
     const [checkoutForm, setCheckoutForm] = useState({
@@ -6310,7 +6350,7 @@ const ProductDetailPage = ({ pathname }: { pathname: string }) => {
                                                     <button
                                                         key={rawCol}
                                                         type="button"
-                                                        onClick={() => setSelections(prev => ({ ...prev, cor: rawCol }))}
+                                                        onClick={() => setSelections(prev => ({ ...prev, cor: rawCol, corPrincipal: rawCol }))}
                                                         className={`relative w-8 h-8 rounded-full border transition-all cursor-pointer ${
                                                             isActive 
                                                                 ? 'ring-2 ring-forest scale-105 border-white' 
