@@ -1082,61 +1082,61 @@ export default function AdminDashboardModal({ onClose, shopCategories = [] }: Ad
 
               {/* TAB SWITCHER & ACTION BAR */}
               <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-forest/10 pb-2 gap-2.5 sm:gap-4 w-full max-w-full overflow-hidden">
-                <div className="flex items-center gap-1 sm:gap-1.5 bg-cream/35 p-1 rounded-xl overflow-x-auto max-w-full no-scrollbar shrink-0">
+                <div className="flex items-center gap-1 sm:gap-1.5 bg-cream/35 p-1 rounded-xl overflow-x-auto whitespace-nowrap w-full max-w-full no-scrollbar touch-pan-x shrink-0">
                   <button
                     type="button"
                     onClick={() => setActiveTab('analytics')}
-                    className={`px-2.5 sm:px-3.5 py-1.5 sm:py-2 rounded-lg font-semibold text-[11px] sm:text-xs tracking-wider transition-all uppercase flex items-center gap-1.5 sm:gap-2 cursor-pointer shrink-0 whitespace-nowrap ${
+                    className={`px-2.5 sm:px-3.5 py-1.5 sm:py-2 rounded-lg font-semibold text-[10px] sm:text-xs tracking-wider transition-all uppercase flex items-center gap-1.5 sm:gap-2 cursor-pointer shrink-0 whitespace-nowrap ${
                       activeTab === 'analytics'
                         ? 'bg-[#243119] text-cream shadow-sm font-bold'
                         : 'text-forest/60 hover:text-forest hover:bg-cream/50'
                     }`}
                   >
-                    <BarChart3 className="w-3.5 h-3.5" /> Painel de Vendas
+                    <BarChart3 className="w-3.5 h-3.5 shrink-0" /> Painel de Vendas
                   </button>
                   <button
                     type="button"
                     onClick={() => setActiveTab('orders')}
-                    className={`px-2.5 sm:px-3.5 py-1.5 sm:py-2 rounded-lg font-semibold text-[11px] sm:text-xs tracking-wider transition-all uppercase flex items-center gap-1.5 sm:gap-2 cursor-pointer shrink-0 whitespace-nowrap ${
+                    className={`px-2.5 sm:px-3.5 py-1.5 sm:py-2 rounded-lg font-semibold text-[10px] sm:text-xs tracking-wider transition-all uppercase flex items-center gap-1.5 sm:gap-2 cursor-pointer shrink-0 whitespace-nowrap ${
                       activeTab === 'orders'
                         ? 'bg-[#243119] text-cream shadow-sm font-bold'
                         : 'text-forest/60 hover:text-forest hover:bg-cream/50'
                     }`}
                   >
-                    <Package className="w-3.5 h-3.5" /> Encomendas
+                    <Package className="w-3.5 h-3.5 shrink-0" /> Encomendas
                   </button>
                   <button
                     type="button"
                     onClick={() => setActiveTab('catalog')}
-                    className={`px-2.5 sm:px-3.5 py-1.5 sm:py-2 rounded-lg font-semibold text-[11px] sm:text-xs tracking-wider transition-all uppercase flex items-center gap-1.5 sm:gap-2 cursor-pointer shrink-0 whitespace-nowrap ${
+                    className={`px-2.5 sm:px-3.5 py-1.5 sm:py-2 rounded-lg font-semibold text-[10px] sm:text-xs tracking-wider transition-all uppercase flex items-center gap-1.5 sm:gap-2 cursor-pointer shrink-0 whitespace-nowrap ${
                       activeTab === 'catalog'
                         ? 'bg-[#243119] text-cream shadow-sm font-bold'
                         : 'text-forest/60 hover:text-forest hover:bg-cream/50'
                     }`}
                   >
-                    <Sliders className="w-3.5 h-3.5" /> CMS Catálogo
+                    <Sliders className="w-3.5 h-3.5 shrink-0" /> CMS Catálogo
                   </button>
                   <button
                     type="button"
                     onClick={() => setActiveTab('inventory')}
-                    className={`px-2.5 sm:px-3.5 py-1.5 sm:py-2 rounded-lg font-semibold text-[11px] sm:text-xs tracking-wider transition-all uppercase flex items-center gap-1.5 sm:gap-2 cursor-pointer shrink-0 whitespace-nowrap ${
+                    className={`px-2.5 sm:px-3.5 py-1.5 sm:py-2 rounded-lg font-semibold text-[10px] sm:text-xs tracking-wider transition-all uppercase flex items-center gap-1.5 sm:gap-2 cursor-pointer shrink-0 whitespace-nowrap ${
                       activeTab === 'inventory'
                         ? 'bg-[#243119] text-cream shadow-sm font-bold'
                         : 'text-forest/60 hover:text-forest hover:bg-cream/50'
                     }`}
                   >
-                    <Layers className="w-3.5 h-3.5" /> Inventário
+                    <Layers className="w-3.5 h-3.5 shrink-0" /> Inventário
                   </button>
                   <button
                     type="button"
                     onClick={() => setActiveTab('logs')}
-                    className={`px-2.5 sm:px-3.5 py-1.5 sm:py-2 rounded-lg font-semibold text-[11px] sm:text-xs tracking-wider transition-all uppercase flex items-center gap-1.5 sm:gap-2 cursor-pointer shrink-0 whitespace-nowrap ${
+                    className={`px-2.5 sm:px-3.5 py-1.5 sm:py-2 rounded-lg font-semibold text-[10px] sm:text-xs tracking-wider transition-all uppercase flex items-center gap-1.5 sm:gap-2 cursor-pointer shrink-0 whitespace-nowrap ${
                       activeTab === 'logs'
                         ? 'bg-[#243119] text-cream shadow-sm font-bold'
                         : 'text-forest/60 hover:text-forest hover:bg-cream/50'
                     }`}
                   >
-                    <ClipboardList className="w-3.5 h-3.5" /> Auditoria
+                    <ClipboardList className="w-3.5 h-3.5 shrink-0" /> Auditoria
                   </button>
                 </div>
 
