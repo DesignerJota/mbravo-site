@@ -227,15 +227,15 @@ function YarnSwatch({ id, name, size = 'w-7 h-7' }: { id?: string; name?: string
   const swatch = getYarnSwatchColor(id, name);
   return (
     <span
-      className={`${size} ${radiusClass} shrink-0 inline-block align-middle shadow-sm relative overflow-hidden border`}
+      className={`${size} ${radiusClass} shrink-0 inline-block align-middle shadow-2xs relative overflow-hidden border`}
       style={{
         backgroundColor: swatch.bg,
-        borderColor: swatch.border || 'rgba(0,0,0,0.15)',
-        backgroundImage: 'linear-gradient(135deg, rgba(255,255,255,0.35) 0%, rgba(0,0,0,0.15) 100%)'
+        borderColor: swatch.border || 'rgba(0,0,0,0.12)',
+        backgroundImage: 'linear-gradient(135deg, rgba(255,255,255,0.15) 0%, rgba(0,0,0,0.04) 100%)'
       }}
       title={name || id}
     >
-      <span className="absolute inset-0 opacity-25 bg-[radial-gradient(#000_1px,transparent_1px)] [background-size:3px_3px] pointer-events-none" />
+      <span className="absolute inset-0 opacity-5 bg-[radial-gradient(#000_1px,transparent_1px)] [background-size:3px_3px] pointer-events-none" />
     </span>
   );
 }
@@ -2262,10 +2262,32 @@ export default function AdminDashboardModal({ onClose, shopCategories = [] }: Ad
                           }
                         }
 
+                        // Sanitize bicolorConsumptions if present
+                        let sanitizedBicolor: { primary: number; secondary: number } | undefined = undefined;
+                        if (prodForm.colorType === 'bicolor' || prodForm.bicolorConsumptions) {
+                          const rawBicolor = prodForm.bicolorConsumptions || {};
+                          const pVal = parseFloat(String(rawBicolor.primary ?? '0.8').replace(',', '.').trim()) || 0.8;
+                          const sVal = parseFloat(String(rawBicolor.secondary ?? '0.4').replace(',', '.').trim()) || 0.4;
+                          sanitizedBicolor = { primary: pVal, secondary: sVal };
+                        }
+
+                        // Sanitize singleConsumption if present
+                        let sanitizedSingle: number | undefined = undefined;
+                        if (prodForm.singleConsumption !== undefined && prodForm.singleConsumption !== null && prodForm.singleConsumption !== '') {
+                          const strVal = String(prodForm.singleConsumption).replace(',', '.').trim();
+                          const numVal = parseFloat(strVal);
+                          if (!isNaN(numVal) && numVal > 0) {
+                            sanitizedSingle = numVal;
+                          }
+                        }
+
                         const finalProd = {
                           ...prodForm,
+                          colorType: prodForm.colorType || 'single',
                           availableColors: parsedColors,
-                          colorConsumptions: sanitizedConsumptions
+                          colorConsumptions: sanitizedConsumptions,
+                          bicolorConsumptions: sanitizedBicolor,
+                          singleConsumption: sanitizedSingle !== undefined ? sanitizedSingle : prodForm.singleConsumption
                         };
 
                         const updatedCatalog = catalog.map(c => {
@@ -2406,7 +2428,7 @@ export default function AdminDashboardModal({ onClose, shopCategories = [] }: Ad
 
                       <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-1">
-                          <label className="font-bold text-forest/70 block">Peças em Stock (Estoque)</label>
+                          <label className="font-bold text-forest/70 block">Unidades em Stock</label>
                           <input
                             type="number"
                             min="0"
@@ -2420,7 +2442,7 @@ export default function AdminDashboardModal({ onClose, shopCategories = [] }: Ad
                           />
                         </div>
                         <div className="space-y-1">
-                          <label className="font-bold text-forest/70 block">Tempo de Confeção (dias)</label>
+                          <label className="font-bold text-forest/70 block">Prazo de Produção (dias)</label>
                           <input
                             type="number"
                             min="1"
@@ -2435,7 +2457,7 @@ export default function AdminDashboardModal({ onClose, shopCategories = [] }: Ad
                         </div>
                       </div>
 
-                      {/* SELETOR INTELIGENTE DE CORES DE MATÉRIAS-PRIMAS */}
+                      {/* SELETOR DE CONFIGURAÇÃO DE COR */}
                       {(() => {
                         const safranYarns = inventory.filter(i => 
                           (i.id || '').toLowerCase().startsWith('rm_safran_') || 
@@ -2486,14 +2508,197 @@ export default function AdminDashboardModal({ onClose, shopCategories = [] }: Ad
 
                         return (
                           <div className="space-y-3 bg-cream/20 p-4 rounded-2xl border border-forest/10 text-left">
+                            {/* SELETOR DE CONFIGURAÇÃO DE COR */}
+                            <div className="space-y-1.5 pb-2.5 border-b border-forest/10">
+                              <label className="font-serif text-xs font-bold text-forest block">
+                                Tipo de Configuração de Cor da Peça
+                              </label>
+                              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                                <button
+                                  type="button"
+                                  onClick={() => setEditingProduct({
+                                    ...editingProduct,
+                                    product: { ...editingProduct.product, colorType: 'single' }
+                                  })}
+                                  className={`p-2 rounded-xl text-left border transition-all cursor-pointer ${
+                                    (!editingProduct.product.colorType || editingProduct.product.colorType === 'single')
+                                      ? 'bg-[#243119] text-cream border-[#243119] shadow-sm'
+                                      : 'bg-white text-forest/70 border-forest/15 hover:border-[#C5A059]'
+                                  }`}
+                                >
+                                  <div className="text-[11px] font-bold flex items-center gap-1.5">
+                                    <span className="w-2.5 h-2.5 rounded-full bg-[#C5A059] inline-block shrink-0"></span>
+                                    Cor Única
+                                  </div>
+                                </button>
+
+                                <button
+                                  type="button"
+                                  onClick={() => setEditingProduct({
+                                    ...editingProduct,
+                                    product: {
+                                      ...editingProduct.product,
+                                      colorType: 'bicolor',
+                                      bicolorConsumptions: editingProduct.product.bicolorConsumptions || { primary: '0.8', secondary: '0.4' }
+                                    }
+                                  })}
+                                  className={`p-2 rounded-xl text-left border transition-all cursor-pointer ${
+                                    editingProduct.product.colorType === 'bicolor'
+                                      ? 'bg-[#243119] text-cream border-[#243119] shadow-sm'
+                                      : 'bg-white text-forest/70 border-forest/15 hover:border-[#C5A059]'
+                                  }`}
+                                >
+                                  <div className="text-[11px] font-bold flex items-center gap-1.5">
+                                    <span className="flex items-center -space-x-1 shrink-0">
+                                      <span className="w-2.5 h-2.5 rounded-full bg-[#C5A059]"></span>
+                                      <span className="w-2.5 h-2.5 rounded-full bg-[#243119] border border-white/40"></span>
+                                    </span>
+                                    Peça Bicolor
+                                  </div>
+                                </button>
+
+                                <button
+                                  type="button"
+                                  onClick={() => setEditingProduct({
+                                    ...editingProduct,
+                                    product: { ...editingProduct.product, colorType: 'fixed' }
+                                  })}
+                                  className={`p-2 rounded-xl text-left border transition-all cursor-pointer ${
+                                    editingProduct.product.colorType === 'fixed'
+                                      ? 'bg-[#243119] text-cream border-[#243119] shadow-sm'
+                                      : 'bg-white text-forest/70 border-forest/15 hover:border-[#C5A059]'
+                                  }`}
+                                >
+                                  <div className="text-[11px] font-bold flex items-center gap-1.5">
+                                    <Layers className="w-3 h-3 text-[#C5A059] shrink-0" />
+                                    Cor Padrão
+                                  </div>
+                                </button>
+                              </div>
+                            </div>
+
+                            {/* CAMPO DE CONSUMO PARA COR ÚNICA */}
+                            {(!editingProduct.product.colorType || editingProduct.product.colorType === 'single') && (
+                              <div className="p-3 bg-amber-50/50 border border-amber-200/70 rounded-xl space-y-1.5">
+                                <div className="flex items-center justify-between">
+                                  <span className="font-serif text-[11px] font-bold text-amber-900 flex items-center gap-1">
+                                    <Sliders className="w-3.5 h-3.5 text-[#C5A059]" />
+                                    Consumo por Peça (nov)
+                                  </span>
+                                  <span className="text-[9px] bg-amber-100 text-amber-800 px-2 py-0.5 rounded font-mono font-bold">
+                                    1 Cor por Peça
+                                  </span>
+                                </div>
+                                <div className="flex items-center gap-1.5">
+                                  <input
+                                    type="text"
+                                    inputMode="decimal"
+                                    placeholder="1.0"
+                                    value={
+                                      editingProduct.product.singleConsumption !== undefined
+                                        ? editingProduct.product.singleConsumption
+                                        : (Object.values(editingProduct.product.colorConsumptions || {})[0] ?? '1.0')
+                                    }
+                                    onChange={(e) => {
+                                      const rawVal = e.target.value;
+                                      const updatedConsumptions: Record<string, string> = {};
+                                      (editingProduct.product.availableColors || []).forEach((cName: string) => {
+                                        updatedConsumptions[cName] = rawVal;
+                                      });
+                                      setEditingProduct({
+                                        ...editingProduct,
+                                        product: {
+                                          ...editingProduct.product,
+                                          singleConsumption: rawVal,
+                                          colorConsumptions: updatedConsumptions
+                                        }
+                                      });
+                                    }}
+                                    className="w-full bg-white border border-forest/20 focus:border-[#C5A059] focus:outline-none rounded-lg px-2.5 py-1 text-xs text-forest font-mono font-bold text-right"
+                                  />
+                                  <span className="text-[10px] text-forest/70 font-mono font-bold">nov</span>
+                                </div>
+                              </div>
+                            )}
+
+                            {/* CAMPOS DE CONSUMO PARA BICOLOR */}
+                            {editingProduct.product.colorType === 'bicolor' && (
+                              <div className="p-3 bg-amber-50/50 border border-amber-200/70 rounded-xl space-y-2">
+                                <div className="flex items-center justify-between">
+                                  <span className="font-serif text-[11px] font-bold text-amber-900 flex items-center gap-1">
+                                    <Sliders className="w-3.5 h-3.5 text-[#C5A059]" />
+                                    Consumos (Bicolor)
+                                  </span>
+                                  <span className="text-[9px] bg-amber-100 text-amber-800 px-2 py-0.5 rounded font-mono font-bold">
+                                    2 Cores por Peça
+                                  </span>
+                                </div>
+                                <div className="grid grid-cols-2 gap-2.5">
+                                  <div>
+                                    <label className="text-[10px] font-bold text-forest/80 block mb-1">
+                                      Cor Principal (nov)
+                                    </label>
+                                    <div className="flex items-center gap-1">
+                                      <input
+                                        type="text"
+                                        inputMode="decimal"
+                                        placeholder="0.8"
+                                        value={editingProduct.product.bicolorConsumptions?.primary !== undefined ? editingProduct.product.bicolorConsumptions.primary : '0.8'}
+                                        onChange={(e) => {
+                                          const rawVal = e.target.value;
+                                          setEditingProduct({
+                                            ...editingProduct,
+                                            product: {
+                                              ...editingProduct.product,
+                                              bicolorConsumptions: {
+                                                ...(editingProduct.product.bicolorConsumptions || { primary: '0.8', secondary: '0.4' }),
+                                                primary: rawVal
+                                              }
+                                            }
+                                          });
+                                        }}
+                                        className="w-full bg-white border border-forest/20 focus:border-[#C5A059] focus:outline-none rounded-lg px-2 py-1 text-xs text-forest font-mono font-bold text-right"
+                                      />
+                                      <span className="text-[9px] text-forest/60 font-mono">nov</span>
+                                    </div>
+                                  </div>
+                                  <div>
+                                    <label className="text-[10px] font-bold text-forest/80 block mb-1">
+                                      Cor do Detalhe (nov)
+                                    </label>
+                                    <div className="flex items-center gap-1">
+                                      <input
+                                        type="text"
+                                        inputMode="decimal"
+                                        placeholder="0.4"
+                                        value={editingProduct.product.bicolorConsumptions?.secondary !== undefined ? editingProduct.product.bicolorConsumptions.secondary : '0.4'}
+                                        onChange={(e) => {
+                                          const rawVal = e.target.value;
+                                          setEditingProduct({
+                                            ...editingProduct,
+                                            product: {
+                                              ...editingProduct.product,
+                                              bicolorConsumptions: {
+                                                ...(editingProduct.product.bicolorConsumptions || { primary: '0.8', secondary: '0.4' }),
+                                                secondary: rawVal
+                                              }
+                                            }
+                                          });
+                                        }}
+                                        className="w-full bg-white border border-forest/20 focus:border-[#C5A059] focus:outline-none rounded-lg px-2 py-1 text-xs text-forest font-mono font-bold text-right"
+                                      />
+                                      <span className="text-[9px] text-forest/60 font-mono">nov</span>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            )}
+
                             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                               <div>
                                 <label className="font-serif text-xs font-bold text-forest block">
-                                  Seletor Inteligente de Cores de Matérias-Primas
+                                  Matérias-Primas e Paleta
                                 </label>
-                                <p className="text-[10px] text-forest/60">
-                                  Sincronizado com o stock real do Atelier (DROPS Safran & DROPS Paris)
-                                </p>
                               </div>
                               <div className="flex gap-1.5 shrink-0">
                                 <button
@@ -2603,9 +2808,8 @@ export default function AdminDashboardModal({ onClose, shopCategories = [] }: Ad
 
                             {/* Manual Text Fallback */}
                             <div className="pt-2 border-t border-forest/10 space-y-1">
-                              <div className="flex justify-between items-center text-[10px] text-forest/60 font-semibold">
+                              <div className="text-[10px] text-forest/60 font-semibold">
                                 <span>Cores Ativas ({currentColors.length}):</span>
-                                <span>Edição em texto (separada por vírgula)</span>
                               </div>
                               <input
                                 type="text"
@@ -2618,25 +2822,17 @@ export default function AdminDashboardModal({ onClose, shopCategories = [] }: Ad
                                   }
                                 })}
                                 className="w-full bg-white border border-forest/15 focus:border-[#C5A059] focus:outline-none rounded-xl px-3 py-1.5 text-xs text-forest"
-                                placeholder="Ex: 18 - Natural, 16 - Branco"
+                                placeholder="Ex: 10 - Natural, 16 - Branco"
                               />
                             </div>
 
-                            {/* Consumo de Matéria-Prima por Cor Selecionada */}
-                            {currentColors.length > 0 && (
+                            {/* Consumo por Cor (Apenas para Cor Padrão / Edição Fixa) */}
+                            {editingProduct.product.colorType === 'fixed' && currentColors.length > 0 && (
                               <div className="pt-3 border-t border-forest/10 space-y-2">
-                                <div className="flex justify-between items-center">
-                                  <div>
-                                    <label className="font-serif text-[11px] font-bold text-forest block">
-                                      Consumo de Matéria-Prima por Cor Selecionada (por Peça)
-                                    </label>
-                                    <p className="text-[9px] text-forest/60">
-                                      Quantidade de fio gasta por cada peça fabricada nesta cor (ex: 0.5 novelos ou 25g)
-                                    </p>
-                                  </div>
-                                  <span className="text-[9px] bg-forest/5 text-forest/60 px-2 py-0.5 rounded-md font-mono shrink-0">
-                                    Padrão: 1.0 nov/peça
-                                  </span>
+                                <div>
+                                  <label className="font-serif text-[11px] font-bold text-forest block">
+                                    Consumo por Cor (nov)
+                                  </label>
                                 </div>
 
                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-40 overflow-y-auto pr-1">
@@ -2698,7 +2894,7 @@ export default function AdminDashboardModal({ onClose, shopCategories = [] }: Ad
                           className="w-4 h-4 text-[#243119] focus:ring-forest border-forest/10 rounded"
                         />
                         <label htmlFor="hidden_check" className="font-bold text-forest/70 cursor-pointer">
-                          Ocultar este produto no catálogo público temporariamente
+                          Ocultar produto na loja
                         </label>
                       </div>
 
@@ -2714,7 +2910,7 @@ export default function AdminDashboardModal({ onClose, shopCategories = [] }: Ad
                           type="submit"
                           className="flex-1 py-2.5 bg-[#243119] hover:bg-[#1a2412] text-cream rounded-xl font-bold uppercase transition-all cursor-pointer text-center shadow-md"
                         >
-                          Confirmar Peça
+                          Guardar Alterações
                         </button>
                       </div>
                     </form>
