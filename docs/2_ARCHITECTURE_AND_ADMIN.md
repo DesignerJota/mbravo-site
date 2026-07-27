@@ -83,7 +83,7 @@ A aplicação adota um armazenamento baseado em ficheiros locais persistentes, o
 ### C. Catálogo de Artigos / CMS (`catalog`)
 *   **Edição em Tempo Real:** Permite alterar títulos, preços, descrições, imagens de catálogo e o tempo estimado de produção em dias úteis para cada um dos produtos listados no site.
 *   **Configuração Inteligente de Cores (`colorType`)**:
-    *   **Cor Padrão (`fixed`)**: Modos para peças com paleta estática artesanal (ex: *Daisy Coasters*). O painel de seleção de cores é 100% omitido no Frontend público (sem swatches, sem labels e sem áreas em branco) e a indicação de cor é omitida dos resumos de carrinho e e-mails.
+    *   **Cor Padrão (`fixed`)**: Modos para peças com paleta estática artesanal (ex: *Daisy Coasters*). O painel de seleção de cores é 100% omitido no Frontend público (sem swatches, sem labels e sem áreas em branco) e a indicação de cor é omitida dos resumos de encomenda e e-mails.
     *   **Cor Única (`single`)**: Apresenta 1 linha de seletores de cor com amostragem visual baseada no inventário real do Atelier.
     *   **Peça Bicolor (`bicolor`)**: Apresenta 2 linhas independentes de seletores (Cor Principal & Cor do Detalhe) com consumos de matérias-primas diferenciados (`bicolorConsumptions`).
 *   **Criação de Artigos:** Permite introduzir novas peças em Crochet diretamente na interface do utilizador, que passam a constar imediatamente no catálogo público do e-commerce.
