@@ -633,9 +633,60 @@ export const colorTranslations: Record<string, string> = {
   'Branco Creme ': 'Cream White'
 };
 
+export function formatColorName(colorStr: string): string {
+  if (!colorStr) return '';
+  let cleaned = colorStr.trim();
+
+  // Remove supplier/brand prefixes
+  cleaned = cleaned.replace(/^(DROPS\s+(Safran|Paris|Loves\s+You\s*\d*)?|Safran|Paris)\s*[-–—]?\s*/i, '');
+
+  // Remove leading numbers or code patterns (e.g., "16 - ", "01 - ", "16 ")
+  cleaned = cleaned.replace(/^(\d+)\s*[-–—]?\s*/, '');
+
+  // Remove trailing numeric codes
+  cleaned = cleaned.replace(/\s*[-–—]\s*\d+\s*$/, '');
+
+  // Trim hyphens and spaces
+  cleaned = cleaned.replace(/^[-–—\s]+|[-–—\s]+$/g, '').trim();
+
+  return cleaned || colorStr.trim();
+}
+
+export function getColorSwatchBg(rawColorName: string): string {
+  if (!rawColorName) return '#D8C3A5';
+  const name = formatColorName(rawColorName).toLowerCase();
+  
+  if (name.includes('&')) {
+    const parts = name.split('&').map(s => s.trim());
+    const bg1 = getColorSwatchBg(parts[0]);
+    const bg2 = getColorSwatchBg(parts[1]);
+    return `linear-gradient(45deg, ${bg1} 50%, ${bg2} 50%)`;
+  }
+
+  if (name.includes('natural') || name.includes('cru') || name.includes('branco')) return '#FAF8F5';
+  if (name.includes('damasco') || name.includes('laranja') || name.includes('terracota')) return '#E07A5F';
+  if (name.includes('rosa')) return '#FADADD';
+  if (name.includes('verde musgo') || name.includes('musgo')) return '#243119';
+  if (name.includes('hortelã') || name.includes('menta')) return '#789D8A';
+  if (name.includes('petróleo') || name.includes('noite') || name.includes('marinho')) return '#1C2D37';
+  if (name.includes('azul glaciar') || name.includes('azul água') || name.includes('azul')) return '#A2C2D1';
+  if (name.includes('amarelo') || name.includes('limão') || name.includes('baunilha')) return '#F4D03F';
+  if (name.includes('creme') || name.includes('bege')) return '#E1D5C9';
+  if (name.includes('castanho') || name.includes('cacau') || name.includes('café')) return '#5D4037';
+  if (name.includes('vermelho')) return '#C0392B';
+
+  return '#D8C3A5';
+}
+
 export function translateColor(name: string, lang: 'pt' | 'en'): string {
-  if (lang === 'pt') return name;
-  return colorTranslations[name.trim()] || name;
+  if (!name) return '';
+  const formatted = formatColorName(name);
+  if (lang === 'pt') return formatted;
+  if (formatted.includes('&')) {
+    const parts = formatted.split('&').map(s => translateColor(s.trim(), 'en'));
+    return parts.join(' & ');
+  }
+  return colorTranslations[formatted.trim()] || formatted;
 }
 
 export function translateSize(size: string, lang: 'pt' | 'en'): string {
