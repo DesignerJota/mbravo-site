@@ -388,12 +388,12 @@ export const translations = {
     // Buttons
     "btn.order_now": "Order Piece",
     "btn.back_collection": "Back to Collection",
-    "btn.explore": "Contemplate the Matter",
+    "btn.explore": "Contemplate the Piece",
     "btn.close": "Close",
     "btn.discover_philosophy": "Feel the Essence",
     
     // Story Section
-    "story.tag": "RAW MEMORY",
+    "story.tag": "PURE MEMORY",
     "story.title_1": "It all started with",
     "story.title_2": "a memory.",
     "story.subtitle_1": "Before there was a brand, there was a story.",
@@ -402,7 +402,7 @@ export const translations = {
     "story.p2": "Each piece is handcrafted with calmness and purity, respecting the time that truly important things deserve.",
     "story.mantra_1": "Because some stories were not meant to be kept away.",
     "story.mantra_2": "They were meant to be felt.",
-    "story.cta": "Contemplate the Matter",
+    "story.cta": "Contemplate the Piece",
     
     // Made with Time Section
     "manifesto.tag": "THE CHOICE",
@@ -446,12 +446,12 @@ export const translations = {
     
     // Collection Section
     "collection.tag": "PRODUCTS",
-    "collection.subtitle": "What started as a gesture becomes matter.",
+    "collection.subtitle": "What started as a gesture takes beautiful shape.",
     "collection.category": "Category:",
     
     // Contact Section
-    "contact.title_1": "Enter our",
-    "contact.title_2": "Universe.",
+    "contact.title_1": "Step into our ",
+    "contact.title_2": "World.",
     "contact.subtitle": "Do you wish for a customized piece or simply want to know more about our process? We are just a stitch away.",
     "contact.chat_whatsapp": "Chat via WhatsApp",
     
@@ -574,8 +574,8 @@ export const translations = {
     "testimonials.tag": "TESTIMONIALS",
     "testimonials.title": "Shared by Those Who Choose Us",
     "testimonials.subtitle": "What those who wear our stories have to say.",
-    "testimonials.write_button": "Write comment",
-    "testimonials.modal_title": "Leave Your Testimonial",
+    "testimonials.write_button": "Share your thoughts",
+    "testimonials.modal_title": "Share Your Experience",
     "testimonials.label_name": "Your Name",
     "testimonials.label_text": "Your Comment",
     "testimonials.label_product": "Purchased Piece (e.g. Mala Daisy)",
