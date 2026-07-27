@@ -918,27 +918,27 @@ export default function AdminDashboardModal({ onClose, shopCategories = [] }: Ad
   });
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-0 md:p-4 bg-forest/80 backdrop-blur-sm select-text">
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-0 md:p-4 bg-forest/80 backdrop-blur-sm select-text w-full max-w-full overflow-hidden">
       <motion.div 
         initial={{ scale: 0.95, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         exit={{ scale: 0.95, opacity: 0 }}
         transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-        className="relative w-full max-w-6xl h-full md:h-[85vh] bg-[#FCFBF9] text-forest rounded-none md:rounded-[24px] shadow-2xl border border-[#C5A059]/10 flex flex-col overflow-hidden"
+        className="relative w-full max-w-full md:max-w-6xl h-full md:h-[85vh] bg-[#FCFBF9] text-forest rounded-none md:rounded-[24px] shadow-2xl border-0 md:border border-[#C5A059]/10 flex flex-col overflow-hidden"
       >
         {/* HEADER RAIL */}
-        <div className="flex items-center justify-between px-4 sm:px-8 py-4 sm:py-5 border-b border-forest/5 bg-white/50">
-          <div className="flex items-center gap-3">
-            <div className="w-2.5 h-2.5 rounded-full bg-[#C5A059] animate-pulse" />
-            <h3 className="font-serif text-sm sm:text-lg tracking-wider font-medium text-forest uppercase flex items-center gap-2">
-              M★BRAVO <span className="text-[#C5A059] font-sans text-[10px] sm:text-xs font-semibold tracking-widest bg-[#FCF8F2] border border-[#C5A059]/20 px-2 sm:px-2.5 py-0.5 rounded-full">ATELIER ADMIN</span>
+        <div className="flex items-center justify-between px-3.5 sm:px-8 py-3.5 sm:py-5 border-b border-forest/5 bg-white/50 shrink-0">
+          <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+            <div className="w-2.5 h-2.5 rounded-full bg-[#C5A059] animate-pulse shrink-0" />
+            <h3 className="font-serif text-xs sm:text-lg tracking-wider font-medium text-forest uppercase flex items-center gap-1.5 sm:gap-2 truncate">
+              M★BRAVO <span className="text-[#C5A059] font-sans text-[9px] sm:text-xs font-semibold tracking-widest bg-[#FCF8F2] border border-[#C5A059]/20 px-2 sm:px-2.5 py-0.5 rounded-full shrink-0">ADMIN</span>
             </h3>
           </div>
-          <div className="flex items-center gap-3 sm:gap-4">
+          <div className="flex items-center gap-2 sm:gap-4 shrink-0">
             {isAuthenticated && (
               <button 
                 onClick={handleLogout}
-                className="text-[10px] sm:text-xs uppercase tracking-widest text-red-700 hover:text-red-900 bg-red-50 hover:bg-red-100/55 px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-full transition-all font-semibold"
+                className="text-[9px] sm:text-xs uppercase tracking-widest text-red-700 hover:text-red-900 bg-red-50 hover:bg-red-100/55 px-2 sm:px-3 py-1 sm:py-1.5 rounded-full transition-all font-semibold"
               >
                 Sair
               </button>
@@ -954,7 +954,7 @@ export default function AdminDashboardModal({ onClose, shopCategories = [] }: Ad
         </div>
 
         {/* CONTAINER CONTENT */}
-        <div data-lenis-prevent className="flex-1 overflow-y-auto">
+        <div data-lenis-prevent className="flex-1 overflow-y-auto overflow-x-hidden w-full max-w-full min-h-0">
           {!isAuthenticated ? (
             /* LOGIN PANEL */
             <div className="h-full flex items-center justify-center p-6">
@@ -1013,80 +1013,80 @@ export default function AdminDashboardModal({ onClose, shopCategories = [] }: Ad
             </div>
           ) : (
             /* ADMIN DASHBOARD */
-            <div className="p-8 space-y-8 font-sans relative">
+            <div className="p-3 sm:p-6 lg:p-8 space-y-4 sm:space-y-8 font-sans relative w-full max-w-full overflow-x-hidden">
               
               {/* TOAST NOTIFICATION BANNER */}
               {saveNotification && (
-                <div className="fixed top-6 right-6 z-[250] bg-[#243119] text-cream px-5 py-3.5 rounded-2xl shadow-2xl border border-[#C5A059]/40 flex items-center gap-3 animate-slide-down">
+                <div className="fixed top-4 right-4 sm:top-6 sm:right-6 z-[250] bg-[#243119] text-cream px-4 py-3 rounded-2xl shadow-2xl border border-[#C5A059]/40 flex items-center gap-3 animate-slide-down max-w-[90vw]">
                   <CheckCircle className="w-5 h-5 text-[#C5A059] shrink-0" />
-                  <div>
-                    <p className="font-serif font-bold text-xs text-cream">{saveNotification}</p>
-                    <p className="text-[10px] text-cream/70">Alterações sincronizadas no servidor M★BRAVO (Railway)</p>
+                  <div className="min-w-0 flex-1">
+                    <p className="font-serif font-bold text-xs text-cream truncate">{saveNotification}</p>
+                    <p className="text-[9px] sm:text-[10px] text-cream/70 truncate">Sincronizado na Railway</p>
                   </div>
-                  <button onClick={() => setSaveNotification(null)} className="ml-2 text-cream/50 hover:text-cream cursor-pointer p-1">
+                  <button onClick={() => setSaveNotification(null)} className="ml-1 text-cream/50 hover:text-cream cursor-pointer p-1 shrink-0">
                     <X className="w-4 h-4" />
                   </button>
                 </div>
               )}
               
               {/* STATS HIGHLIGHT PANEL */}
-              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
-                <div className="bg-white border border-forest/5 p-4 rounded-[16px] shadow-sm space-y-1">
-                  <div className="text-[10px] font-bold uppercase tracking-wider text-forest/35">Total Encomendas</div>
-                  <div className="text-xl font-serif font-medium text-forest flex items-center gap-1.5">
-                    <Package className="w-4 h-4 text-[#C5A059] shrink-0" />
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2 sm:gap-4 w-full max-w-full">
+                <div className="bg-white border border-forest/5 p-2.5 sm:p-4 rounded-[12px] sm:rounded-[16px] shadow-sm space-y-1 min-w-0 w-full">
+                  <div className="text-[8.5px] sm:text-[10px] font-bold uppercase tracking-wider text-forest/35 truncate">Total Encomendas</div>
+                  <div className="text-base sm:text-xl font-serif font-medium text-forest flex items-center gap-1 sm:gap-1.5 truncate">
+                    <Package className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#C5A059] shrink-0" />
                     <span>{totalOrders}</span>
                   </div>
                 </div>
 
-                <div className="bg-white border border-forest/5 p-4 rounded-[16px] shadow-sm space-y-1">
-                  <div className="text-[10px] font-bold uppercase tracking-wider text-forest/35">Total Faturado</div>
-                  <div className="text-xl font-serif font-medium text-forest flex items-center gap-1">
-                    <span className="text-[#BACAA5] font-sans text-base">€</span>
+                <div className="bg-white border border-forest/5 p-2.5 sm:p-4 rounded-[12px] sm:rounded-[16px] shadow-sm space-y-1 min-w-0 w-full">
+                  <div className="text-[8.5px] sm:text-[10px] font-bold uppercase tracking-wider text-forest/35 truncate">Total Faturado</div>
+                  <div className="text-base sm:text-xl font-serif font-medium text-forest flex items-center gap-1 truncate">
+                    <span className="text-[#BACAA5] font-sans text-xs sm:text-base">€</span>
                     <span>{totalRevenue.toFixed(2)}</span>
                   </div>
                 </div>
 
-                <div className="bg-white border border-forest/5 p-4 rounded-[16px] shadow-sm space-y-1">
-                  <div className="text-[10px] font-bold uppercase tracking-wider text-forest/35">Aguardar Liquidação</div>
-                  <div className="text-xl font-serif font-medium text-amber-600 flex items-center gap-1.5">
-                    <Clock className="w-4 h-4 shrink-0" />
+                <div className="bg-white border border-forest/5 p-2.5 sm:p-4 rounded-[12px] sm:rounded-[16px] shadow-sm space-y-1 min-w-0 w-full">
+                  <div className="text-[8.5px] sm:text-[10px] font-bold uppercase tracking-wider text-forest/35 truncate">Liquidação</div>
+                  <div className="text-base sm:text-xl font-serif font-medium text-amber-600 flex items-center gap-1 sm:gap-1.5 truncate">
+                    <Clock className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
                     <span>{pendingOrders}</span>
                   </div>
                 </div>
 
-                <div className="bg-white border border-forest/5 p-4 rounded-[16px] shadow-sm space-y-1">
-                  <div className="text-[10px] font-bold uppercase tracking-wider text-forest/35">No Atelier</div>
-                  <div className="text-xl font-serif font-medium text-green-700 flex items-center gap-1.5">
-                    <CheckCircle className="w-4 h-4 shrink-0" />
+                <div className="bg-white border border-forest/5 p-2.5 sm:p-4 rounded-[12px] sm:rounded-[16px] shadow-sm space-y-1 min-w-0 w-full">
+                  <div className="text-[8.5px] sm:text-[10px] font-bold uppercase tracking-wider text-forest/35 truncate">No Atelier</div>
+                  <div className="text-base sm:text-xl font-serif font-medium text-green-700 flex items-center gap-1 sm:gap-1.5 truncate">
+                    <CheckCircle className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
                     <span>{paidOrders}</span>
                   </div>
                 </div>
 
-                <div className="bg-white border border-forest/5 p-4 rounded-[16px] shadow-sm space-y-1">
-                  <div className="text-[10px] font-bold uppercase tracking-wider text-[#A68244]">A Caminho</div>
-                  <div className="text-xl font-serif font-medium text-amber-700 flex items-center gap-1.5">
-                    <Truck className="w-4 h-4 shrink-0" />
+                <div className="bg-white border border-forest/5 p-2.5 sm:p-4 rounded-[12px] sm:rounded-[16px] shadow-sm space-y-1 min-w-0 w-full">
+                  <div className="text-[8.5px] sm:text-[10px] font-bold uppercase tracking-wider text-[#A68244] truncate">A Caminho</div>
+                  <div className="text-base sm:text-xl font-serif font-medium text-amber-700 flex items-center gap-1 sm:gap-1.5 truncate">
+                    <Truck className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
                     <span>{shippedOrders}</span>
                   </div>
                 </div>
 
-                <div className="bg-[#243119] text-cream p-4 rounded-[16px] shadow-sm space-y-1">
-                  <div className="text-[10px] font-bold uppercase tracking-wider text-cream/40">Entregues</div>
-                  <div className="text-xl font-serif font-medium text-[#C5A059] flex items-center gap-1.5">
-                    <Check className="w-4 h-4 shrink-0" />
+                <div className="bg-[#243119] text-cream p-2.5 sm:p-4 rounded-[12px] sm:rounded-[16px] shadow-sm space-y-1 min-w-0 w-full">
+                  <div className="text-[8.5px] sm:text-[10px] font-bold uppercase tracking-wider text-cream/40 truncate">Entregues</div>
+                  <div className="text-base sm:text-xl font-serif font-medium text-[#C5A059] flex items-center gap-1 sm:gap-1.5 truncate">
+                    <Check className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
                     <span>{deliveredOrders}</span>
                   </div>
                 </div>
               </div>
 
               {/* TAB SWITCHER & ACTION BAR */}
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-forest/10 pb-2 gap-4">
-                <div className="flex flex-wrap items-center gap-1.5 bg-cream/35 p-1 rounded-xl">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-forest/10 pb-2 gap-2.5 sm:gap-4 w-full max-w-full overflow-hidden">
+                <div className="flex items-center gap-1 sm:gap-1.5 bg-cream/35 p-1 rounded-xl overflow-x-auto max-w-full no-scrollbar shrink-0">
                   <button
                     type="button"
                     onClick={() => setActiveTab('analytics')}
-                    className={`px-3.5 py-2 rounded-lg font-semibold text-xs tracking-wider transition-all uppercase flex items-center gap-2 cursor-pointer ${
+                    className={`px-2.5 sm:px-3.5 py-1.5 sm:py-2 rounded-lg font-semibold text-[11px] sm:text-xs tracking-wider transition-all uppercase flex items-center gap-1.5 sm:gap-2 cursor-pointer shrink-0 whitespace-nowrap ${
                       activeTab === 'analytics'
                         ? 'bg-[#243119] text-cream shadow-sm font-bold'
                         : 'text-forest/60 hover:text-forest hover:bg-cream/50'
@@ -1097,7 +1097,7 @@ export default function AdminDashboardModal({ onClose, shopCategories = [] }: Ad
                   <button
                     type="button"
                     onClick={() => setActiveTab('orders')}
-                    className={`px-3.5 py-2 rounded-lg font-semibold text-xs tracking-wider transition-all uppercase flex items-center gap-2 cursor-pointer ${
+                    className={`px-2.5 sm:px-3.5 py-1.5 sm:py-2 rounded-lg font-semibold text-[11px] sm:text-xs tracking-wider transition-all uppercase flex items-center gap-1.5 sm:gap-2 cursor-pointer shrink-0 whitespace-nowrap ${
                       activeTab === 'orders'
                         ? 'bg-[#243119] text-cream shadow-sm font-bold'
                         : 'text-forest/60 hover:text-forest hover:bg-cream/50'
@@ -1108,7 +1108,7 @@ export default function AdminDashboardModal({ onClose, shopCategories = [] }: Ad
                   <button
                     type="button"
                     onClick={() => setActiveTab('catalog')}
-                    className={`px-3.5 py-2 rounded-lg font-semibold text-xs tracking-wider transition-all uppercase flex items-center gap-2 cursor-pointer ${
+                    className={`px-2.5 sm:px-3.5 py-1.5 sm:py-2 rounded-lg font-semibold text-[11px] sm:text-xs tracking-wider transition-all uppercase flex items-center gap-1.5 sm:gap-2 cursor-pointer shrink-0 whitespace-nowrap ${
                       activeTab === 'catalog'
                         ? 'bg-[#243119] text-cream shadow-sm font-bold'
                         : 'text-forest/60 hover:text-forest hover:bg-cream/50'
@@ -1119,7 +1119,7 @@ export default function AdminDashboardModal({ onClose, shopCategories = [] }: Ad
                   <button
                     type="button"
                     onClick={() => setActiveTab('inventory')}
-                    className={`px-3.5 py-2 rounded-lg font-semibold text-xs tracking-wider transition-all uppercase flex items-center gap-2 cursor-pointer ${
+                    className={`px-2.5 sm:px-3.5 py-1.5 sm:py-2 rounded-lg font-semibold text-[11px] sm:text-xs tracking-wider transition-all uppercase flex items-center gap-1.5 sm:gap-2 cursor-pointer shrink-0 whitespace-nowrap ${
                       activeTab === 'inventory'
                         ? 'bg-[#243119] text-cream shadow-sm font-bold'
                         : 'text-forest/60 hover:text-forest hover:bg-cream/50'
@@ -1130,7 +1130,7 @@ export default function AdminDashboardModal({ onClose, shopCategories = [] }: Ad
                   <button
                     type="button"
                     onClick={() => setActiveTab('logs')}
-                    className={`px-3.5 py-2 rounded-lg font-semibold text-xs tracking-wider transition-all uppercase flex items-center gap-2 cursor-pointer ${
+                    className={`px-2.5 sm:px-3.5 py-1.5 sm:py-2 rounded-lg font-semibold text-[11px] sm:text-xs tracking-wider transition-all uppercase flex items-center gap-1.5 sm:gap-2 cursor-pointer shrink-0 whitespace-nowrap ${
                       activeTab === 'logs'
                         ? 'bg-[#243119] text-cream shadow-sm font-bold'
                         : 'text-forest/60 hover:text-forest hover:bg-cream/50'
@@ -1140,12 +1140,12 @@ export default function AdminDashboardModal({ onClose, shopCategories = [] }: Ad
                   </button>
                 </div>
 
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-2 sm:gap-3 w-full sm:w-auto">
                   {activeTab === 'orders' && (
                     <button
                       type="button"
                       onClick={exportToCSV}
-                      className="px-4 py-2.5 rounded-xl text-xs tracking-wider font-bold transition-all bg-[#C5A059] hover:bg-[#a68244] text-white flex items-center gap-2 shadow-sm uppercase cursor-pointer"
+                      className="w-full sm:w-auto justify-center px-3.5 sm:px-4 py-2 sm:py-2.5 rounded-xl text-[11px] sm:text-xs tracking-wider font-bold transition-all bg-[#C5A059] hover:bg-[#a68244] text-white flex items-center gap-2 shadow-sm uppercase cursor-pointer"
                     >
                       <Download className="w-4 h-4" /> Exportar Contabilidade (CSV)
                     </button>
@@ -1154,7 +1154,7 @@ export default function AdminDashboardModal({ onClose, shopCategories = [] }: Ad
                     <button
                       type="button"
                       onClick={() => fetchCatalog()}
-                      className="px-4 py-2.5 rounded-xl text-xs tracking-wider font-bold transition-all bg-[#BACAA5] hover:bg-[#a3b38e] text-[#243119] flex items-center gap-2 shadow-sm uppercase cursor-pointer"
+                      className="w-full sm:w-auto justify-center px-3.5 sm:px-4 py-2 sm:py-2.5 rounded-xl text-[11px] sm:text-xs tracking-wider font-bold transition-all bg-[#BACAA5] hover:bg-[#a3b38e] text-[#243119] flex items-center gap-2 shadow-sm uppercase cursor-pointer"
                     >
                       <RefreshCw className={`w-3.5 h-3.5 ${loadingCatalog ? 'animate-spin' : ''}`} /> Sincronizar Catálogo
                     </button>
@@ -1163,7 +1163,7 @@ export default function AdminDashboardModal({ onClose, shopCategories = [] }: Ad
                     <button
                       type="button"
                       onClick={() => fetchInventory()}
-                      className="px-4 py-2.5 rounded-xl text-xs tracking-wider font-bold transition-all bg-[#BACAA5] hover:bg-[#a3b38e] text-[#243119] flex items-center gap-2 shadow-sm uppercase cursor-pointer"
+                      className="w-full sm:w-auto justify-center px-3.5 sm:px-4 py-2 sm:py-2.5 rounded-xl text-[11px] sm:text-xs tracking-wider font-bold transition-all bg-[#BACAA5] hover:bg-[#a3b38e] text-[#243119] flex items-center gap-2 shadow-sm uppercase cursor-pointer"
                     >
                       <RefreshCw className={`w-3.5 h-3.5 ${loadingInventory ? 'animate-spin' : ''}`} /> Sincronizar Stock
                     </button>
@@ -1172,7 +1172,7 @@ export default function AdminDashboardModal({ onClose, shopCategories = [] }: Ad
                     <button
                       type="button"
                       onClick={() => fetchLogs()}
-                      className="px-4 py-2.5 rounded-xl text-xs tracking-wider font-bold transition-all bg-[#BACAA5] hover:bg-[#a3b38e] text-[#243119] flex items-center gap-2 shadow-sm uppercase cursor-pointer"
+                      className="w-full sm:w-auto justify-center px-3.5 sm:px-4 py-2 sm:py-2.5 rounded-xl text-[11px] sm:text-xs tracking-wider font-bold transition-all bg-[#BACAA5] hover:bg-[#a3b38e] text-[#243119] flex items-center gap-2 shadow-sm uppercase cursor-pointer"
                     >
                       <RefreshCw className={`w-3.5 h-3.5 ${loadingLogs ? 'animate-spin' : ''}`} /> Sincronizar Logs
                     </button>
@@ -1197,47 +1197,47 @@ export default function AdminDashboardModal({ onClose, shopCategories = [] }: Ad
                 </div>
 
                 {/* Filter Tabs */}
-                <div className="flex flex-wrap items-center gap-1.5 text-xs">
+                <div className="flex items-center gap-1.5 text-xs overflow-x-auto max-w-full no-scrollbar shrink-0 py-0.5">
                   <button 
                     onClick={() => setStatusFilter('all')}
-                    className={`px-3 py-1.5 rounded-lg font-medium transition-all ${statusFilter === 'all' ? 'bg-[#243119] text-cream' : 'bg-cream/40 text-forest/60 hover:bg-cream/70'}`}
+                    className={`px-3 py-1.5 rounded-lg font-medium transition-all shrink-0 whitespace-nowrap ${statusFilter === 'all' ? 'bg-[#243119] text-cream' : 'bg-cream/40 text-forest/60 hover:bg-cream/70'}`}
                   >
                     Todas <span className={`ml-1 text-[10px] font-mono ${statusFilter === 'all' ? 'text-cream/70' : 'text-forest/40'}`}>{totalOrders}</span>
                   </button>
                   <button 
                     onClick={() => setStatusFilter('pending_payment')}
-                    className={`px-3 py-1.5 rounded-lg font-medium transition-all flex items-center gap-1.5 ${statusFilter === 'pending_payment' ? 'bg-amber-600 text-white' : 'bg-amber-50 text-amber-800 border border-amber-200/20 hover:bg-amber-100/50'}`}
+                    className={`px-3 py-1.5 rounded-lg font-medium transition-all flex items-center gap-1.5 shrink-0 whitespace-nowrap ${statusFilter === 'pending_payment' ? 'bg-amber-600 text-white' : 'bg-amber-50 text-amber-800 border border-amber-200/20 hover:bg-amber-100/50'}`}
                   >
                     Aguardar Liquidação <span className={`ml-1 text-[10px] font-mono ${statusFilter === 'pending_payment' ? 'text-white/70' : 'text-amber-800/40'}`}>{pendingOrders}</span>
                   </button>
                   <button 
                     onClick={() => setStatusFilter('paid')}
-                    className={`px-3 py-1.5 rounded-lg font-medium transition-all flex items-center gap-1.5 ${statusFilter === 'paid' ? 'bg-green-700 text-white' : 'bg-green-50 text-green-800 border border-green-200/20 hover:bg-green-100/50'}`}
+                    className={`px-3 py-1.5 rounded-lg font-medium transition-all flex items-center gap-1.5 shrink-0 whitespace-nowrap ${statusFilter === 'paid' ? 'bg-green-700 text-white' : 'bg-green-50 text-green-800 border border-green-200/20 hover:bg-green-100/50'}`}
                   >
                     No Atelier <span className={`ml-1 text-[10px] font-mono ${statusFilter === 'paid' ? 'text-white/70' : 'text-green-800/40'}`}>{paidOrders}</span>
                   </button>
                   <button 
                     onClick={() => setStatusFilter('shipped')}
-                    className={`px-3 py-1.5 rounded-lg font-medium transition-all flex items-center gap-1.5 ${statusFilter === 'shipped' ? 'bg-[#C5A059] text-[#243119]' : 'bg-amber-50/50 text-[#A68244] border border-[#C5A059]/10 hover:bg-amber-100/30'}`}
+                    className={`px-3 py-1.5 rounded-lg font-medium transition-all flex items-center gap-1.5 shrink-0 whitespace-nowrap ${statusFilter === 'shipped' ? 'bg-[#C5A059] text-[#243119]' : 'bg-amber-50/50 text-[#A68244] border border-[#C5A059]/10 hover:bg-amber-100/30'}`}
                   >
                     A Caminho <span className={`ml-1 text-[10px] font-mono ${statusFilter === 'shipped' ? 'text-[#243119]/70' : 'text-[#A68244]/50'}`}>{shippedOrders}</span>
                   </button>
                   <button 
                     onClick={() => setStatusFilter('delivered')}
-                    className={`px-3 py-1.5 rounded-lg font-medium transition-all flex items-center gap-1.5 ${statusFilter === 'delivered' ? 'bg-[#243119] text-cream' : 'bg-green-50 text-green-800 border border-green-200/20 hover:bg-green-100/50'}`}
+                    className={`px-3 py-1.5 rounded-lg font-medium transition-all flex items-center gap-1.5 shrink-0 whitespace-nowrap ${statusFilter === 'delivered' ? 'bg-[#243119] text-cream' : 'bg-green-50 text-green-800 border border-green-200/20 hover:bg-green-100/50'}`}
                   >
                     Entregues <span className={`ml-1 text-[10px] font-mono ${statusFilter === 'delivered' ? 'text-cream/70' : 'text-green-800/40'}`}>{deliveredOrders}</span>
                   </button>
                   <button 
                     onClick={() => setStatusFilter('failed')}
-                    className={`px-3 py-1.5 rounded-lg font-medium transition-all flex items-center gap-1.5 ${statusFilter === 'failed' ? 'bg-red-700 text-white' : 'bg-red-50 text-red-800 border border-red-200/20 hover:bg-red-100/50'}`}
+                    className={`px-3 py-1.5 rounded-lg font-medium transition-all flex items-center gap-1.5 shrink-0 whitespace-nowrap ${statusFilter === 'failed' ? 'bg-red-700 text-white' : 'bg-red-50 text-red-800 border border-red-200/20 hover:bg-red-100/50'}`}
                   >
                     Canceladas <span className={`ml-1 text-[10px] font-mono ${statusFilter === 'failed' ? 'text-white/70' : 'text-red-800/40'}`}>{orders.filter(o => o.status === 'failed').length}</span>
                   </button>
                   <button 
                     onClick={() => fetchOrders()}
                     title="Atualizar dados"
-                    className="p-2 hover:bg-forest/5 rounded-lg transition-all text-forest/60 ml-2"
+                    className="p-2 hover:bg-forest/5 rounded-lg transition-all text-forest/60 ml-1 shrink-0"
                   >
                     <RefreshCw className={`w-4 h-4 ${loadingOrders ? 'animate-spin' : ''}`} />
                   </button>
@@ -1245,7 +1245,7 @@ export default function AdminDashboardModal({ onClose, shopCategories = [] }: Ad
                   <button
                     type="button"
                     onClick={() => setShowManualForm(!showManualForm)}
-                    className="px-3 py-1.5 rounded-lg font-medium transition-all bg-[#BACAA5] text-[#243119] hover:bg-[#a3b38e] flex items-center gap-1.5 font-sans text-xs cursor-pointer"
+                    className="px-3 py-1.5 rounded-lg font-medium transition-all bg-[#BACAA5] text-[#243119] hover:bg-[#a3b38e] flex items-center gap-1.5 font-sans text-xs cursor-pointer shrink-0 whitespace-nowrap"
                   >
                     <Plus className="w-3.5 h-3.5" /> Registar Venda
                   </button>
@@ -2035,25 +2035,27 @@ export default function AdminDashboardModal({ onClose, shopCategories = [] }: Ad
               ) : (
                 <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
                   {/* Category selector column */}
-                  <div className="lg:col-span-1 bg-white border border-forest/5 p-4 rounded-[16px] shadow-sm space-y-2 h-fit">
-                    <span className="text-[10px] font-bold uppercase tracking-wider text-forest/35 block mb-2">Coleções Ativas</span>
-                    {catalog.map((cat) => (
-                      <button
-                        key={cat.id}
-                        type="button"
-                        onClick={() => setSelectedCategoryId(cat.id)}
-                        className={`w-full text-left px-3.5 py-3 rounded-xl transition-all flex items-center justify-between text-xs font-medium cursor-pointer ${
-                          selectedCategoryId === cat.id
-                            ? 'bg-cream/70 border border-forest/15 text-[#243119] font-bold shadow-sm'
-                            : 'text-forest/60 hover:bg-cream/20 hover:text-forest'
-                        }`}
-                      >
-                        <span className="truncate">{cat.name}</span>
-                        <span className="bg-forest/5 px-2 py-0.5 rounded-full text-[10px] font-bold text-forest/50">
-                          {cat.products ? cat.products.length : 0}
-                        </span>
-                      </button>
-                    ))}
+                  <div className="lg:col-span-1 bg-white border border-forest/5 p-3 sm:p-4 rounded-[16px] shadow-sm space-y-2 h-fit">
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-forest/35 block mb-1 lg:mb-2">Coleções Ativas</span>
+                    <div className="flex lg:flex-col overflow-x-auto lg:overflow-visible gap-2 no-scrollbar pb-1 lg:pb-0">
+                      {catalog.map((cat) => (
+                        <button
+                          key={cat.id}
+                          type="button"
+                          onClick={() => setSelectedCategoryId(cat.id)}
+                          className={`shrink-0 lg:w-full text-left px-3.5 py-2.5 sm:py-3 rounded-xl transition-all flex items-center justify-between gap-3 text-xs font-medium cursor-pointer ${
+                            selectedCategoryId === cat.id
+                              ? 'bg-cream/70 border border-forest/15 text-[#243119] font-bold shadow-sm'
+                              : 'text-forest/60 hover:bg-cream/20 hover:text-forest'
+                          }`}
+                        >
+                          <span className="truncate">{cat.name}</span>
+                          <span className="bg-forest/5 px-2 py-0.5 rounded-full text-[10px] font-bold text-forest/50 shrink-0">
+                            {cat.products ? cat.products.length : 0}
+                          </span>
+                        </button>
+                      ))}
+                    </div>
                   </div>
 
                   {/* Products Grid column */}
@@ -2218,16 +2220,16 @@ export default function AdminDashboardModal({ onClose, shopCategories = [] }: Ad
 
               {/* PRODUCT CREATION/EDITING FLOATING OVERLAY FORM */}
               {editingProduct && (
-                <div className="fixed inset-0 bg-[#243119]/40 backdrop-blur-sm flex items-center justify-center z-[110] p-4">
-                  <div data-lenis-prevent className="bg-white border border-forest/10 rounded-[24px] max-w-lg w-full p-6 shadow-2xl text-left space-y-4 max-h-[90vh] overflow-y-auto">
-                    <div className="flex items-center justify-between border-b border-forest/5 pb-3">
-                      <h5 className="font-serif text-base font-bold text-forest">
+                <div className="fixed inset-0 bg-[#243119]/40 backdrop-blur-sm flex items-center justify-center z-[110] p-0 sm:p-4">
+                  <div data-lenis-prevent className="bg-white border-0 sm:border border-forest/10 rounded-none sm:rounded-[24px] max-w-lg w-full h-full sm:h-auto max-h-screen sm:max-h-[90vh] p-4 sm:p-6 shadow-2xl text-left space-y-4 overflow-y-auto flex flex-col justify-between">
+                    <div className="flex items-center justify-between border-b border-forest/5 pb-3 sticky top-0 bg-white z-20 shrink-0 pt-1">
+                      <h5 className="font-serif text-sm sm:text-base font-bold text-forest pr-2 truncate">
                         {editingProduct.isNew ? 'Adicionar Nova Peça Única' : `Editar Peça: ${editingProduct.product.name}`}
                       </h5>
                       <button
                         type="button"
                         onClick={() => setEditingProduct(null)}
-                        className="text-forest/40 hover:text-forest cursor-pointer"
+                        className="p-1 text-forest/40 hover:text-forest hover:bg-forest/5 rounded-full cursor-pointer transition-colors shrink-0"
                         aria-label="Fechar"
                       >
                         <X className="w-5 h-5" />
@@ -2741,7 +2743,7 @@ export default function AdminDashboardModal({ onClose, shopCategories = [] }: Ad
                                     DROPS Safran ({safranYarns.length} Cores)
                                   </span>
                                 </div>
-                                <div className="flex flex-wrap gap-1.5">
+                                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-1.5">
                                   {safranYarns.map(y => {
                                     const shortName = getShortColorName(y);
                                     const selected = isColorSelected(shortName) || isColorSelected(y.name);
@@ -2750,18 +2752,22 @@ export default function AdminDashboardModal({ onClose, shopCategories = [] }: Ad
                                         key={y.id}
                                         type="button"
                                         onClick={() => toggleColor(shortName)}
-                                        className={`px-2 py-1 rounded-xl text-[11px] font-medium border transition-all flex items-center gap-1.5 cursor-pointer ${
+                                        className={`w-full px-2.5 py-1.5 sm:py-2 rounded-xl text-[11px] sm:text-xs font-medium border transition-all flex items-center justify-between gap-1.5 cursor-pointer min-h-[38px] ${
                                           selected
                                             ? 'bg-[#243119] text-cream border-[#243119] shadow-sm font-semibold'
                                             : 'bg-white text-forest/70 border-forest/15 hover:border-[#C5A059] hover:bg-cream/40'
                                         }`}
                                       >
-                                        <YarnSwatch id={y.id} name={y.name} size="w-5 h-5" />
-                                        <span>{selected ? '✓' : '+'}</span>
-                                        <span>{shortName}</span>
-                                        <span className={`text-[9px] px-1 rounded font-mono ${selected ? 'bg-cream/20 text-cream' : 'bg-forest/5 text-forest/50'}`}>
-                                          {y.quantity} nov
-                                        </span>
+                                        <div className="flex items-center gap-1.5 min-w-0 pr-1">
+                                          <YarnSwatch id={y.id} name={y.name} size="w-4 h-4 sm:w-5 sm:h-5 shrink-0" />
+                                          <span className="truncate">{shortName}</span>
+                                        </div>
+                                        <div className="flex items-center gap-1 shrink-0">
+                                          <span className={`text-[9px] px-1 py-0.5 rounded font-mono ${selected ? 'bg-cream/20 text-cream' : 'bg-forest/5 text-forest/50'}`}>
+                                            {y.quantity} nov
+                                          </span>
+                                          <span className="text-[10px] font-bold">{selected ? '✓' : '+'}</span>
+                                        </div>
                                       </button>
                                     );
                                   })}
@@ -2778,7 +2784,7 @@ export default function AdminDashboardModal({ onClose, shopCategories = [] }: Ad
                                     DROPS Paris ({parisYarns.length} Cores)
                                   </span>
                                 </div>
-                                <div className="flex flex-wrap gap-1.5">
+                                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-1.5">
                                   {parisYarns.map(y => {
                                     const shortName = getShortColorName(y);
                                     const selected = isColorSelected(shortName) || isColorSelected(y.name);
@@ -2787,18 +2793,22 @@ export default function AdminDashboardModal({ onClose, shopCategories = [] }: Ad
                                         key={y.id}
                                         type="button"
                                         onClick={() => toggleColor(shortName)}
-                                        className={`px-2 py-1 rounded-xl text-[11px] font-medium border transition-all flex items-center gap-1.5 cursor-pointer ${
+                                        className={`w-full px-2.5 py-1.5 sm:py-2 rounded-xl text-[11px] sm:text-xs font-medium border transition-all flex items-center justify-between gap-1.5 cursor-pointer min-h-[38px] ${
                                           selected
                                             ? 'bg-[#243119] text-cream border-[#243119] shadow-sm font-semibold'
                                             : 'bg-white text-forest/70 border-forest/15 hover:border-[#C5A059] hover:bg-cream/40'
                                         }`}
                                       >
-                                        <YarnSwatch id={y.id} name={y.name} size="w-5 h-5" />
-                                        <span>{selected ? '✓' : '+'}</span>
-                                        <span>{shortName}</span>
-                                        <span className={`text-[9px] px-1 rounded font-mono ${selected ? 'bg-cream/20 text-cream' : 'bg-forest/5 text-forest/50'}`}>
-                                          {y.quantity} nov
-                                        </span>
+                                        <div className="flex items-center gap-1.5 min-w-0 pr-1">
+                                          <YarnSwatch id={y.id} name={y.name} size="w-4 h-4 sm:w-5 sm:h-5 shrink-0" />
+                                          <span className="truncate">{shortName}</span>
+                                        </div>
+                                        <div className="flex items-center gap-1 shrink-0">
+                                          <span className={`text-[9px] px-1 py-0.5 rounded font-mono ${selected ? 'bg-cream/20 text-cream' : 'bg-forest/5 text-forest/50'}`}>
+                                            {y.quantity} nov
+                                          </span>
+                                          <span className="text-[10px] font-bold">{selected ? '✓' : '+'}</span>
+                                        </div>
                                       </button>
                                     );
                                   })}
@@ -2898,17 +2908,17 @@ export default function AdminDashboardModal({ onClose, shopCategories = [] }: Ad
                         </label>
                       </div>
 
-                      <div className="flex gap-3 pt-3 border-t border-forest/5">
+                      <div className="flex flex-col sm:flex-row gap-2.5 pt-3 border-t border-forest/10 sticky bottom-0 bg-white z-20 pb-1 mt-auto">
                         <button
                           type="button"
                           onClick={() => setEditingProduct(null)}
-                          className="flex-1 py-2.5 bg-cream hover:bg-cream/70 text-forest rounded-xl font-bold uppercase transition-all cursor-pointer text-center"
+                          className="w-full sm:flex-1 py-3 sm:py-2.5 bg-cream hover:bg-cream/70 text-forest rounded-xl font-bold uppercase transition-all cursor-pointer text-center text-xs tracking-wider"
                         >
                           Cancelar
                         </button>
                         <button
                           type="submit"
-                          className="flex-1 py-2.5 bg-[#243119] hover:bg-[#1a2412] text-cream rounded-xl font-bold uppercase transition-all cursor-pointer text-center shadow-md"
+                          className="w-full sm:flex-1 py-3 sm:py-2.5 bg-[#243119] hover:bg-[#1a2412] text-cream rounded-xl font-bold uppercase transition-all cursor-pointer text-center shadow-md text-xs tracking-wider"
                         >
                           Guardar Alterações
                         </button>
@@ -3480,11 +3490,11 @@ export default function AdminDashboardModal({ onClose, shopCategories = [] }: Ad
               </div>
 
               {/* INVENTORY SUB-TABS (DROPS Safran, DROPS Paris, Acessórios & Embalamento, Ver Tudo) */}
-              <div className="flex flex-wrap gap-2 bg-cream/20 p-2 rounded-[16px] border border-forest/5">
+              <div className="flex items-center gap-2 bg-cream/20 p-2 rounded-[16px] border border-forest/5 overflow-x-auto max-w-full no-scrollbar shrink-0">
                 <button
                   type="button"
                   onClick={() => setInventorySubTab('safran')}
-                  className={`px-4 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center gap-2 cursor-pointer ${
+                  className={`px-3.5 sm:px-4 py-2 sm:py-2.5 rounded-xl text-xs font-bold transition-all flex items-center gap-2 cursor-pointer shrink-0 whitespace-nowrap ${
                     inventorySubTab === 'safran'
                       ? 'bg-[#243119] text-cream shadow-md'
                       : 'bg-white text-forest/70 hover:bg-cream/60 hover:text-forest'
@@ -3501,7 +3511,7 @@ export default function AdminDashboardModal({ onClose, shopCategories = [] }: Ad
                 <button
                   type="button"
                   onClick={() => setInventorySubTab('paris')}
-                  className={`px-4 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center gap-2 cursor-pointer ${
+                  className={`px-3.5 sm:px-4 py-2 sm:py-2.5 rounded-xl text-xs font-bold transition-all flex items-center gap-2 cursor-pointer shrink-0 whitespace-nowrap ${
                     inventorySubTab === 'paris'
                       ? 'bg-[#243119] text-cream shadow-md'
                       : 'bg-white text-forest/70 hover:bg-cream/60 hover:text-forest'
@@ -3518,7 +3528,7 @@ export default function AdminDashboardModal({ onClose, shopCategories = [] }: Ad
                 <button
                   type="button"
                   onClick={() => setInventorySubTab('accessories')}
-                  className={`px-4 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center gap-2 cursor-pointer ${
+                  className={`px-3.5 sm:px-4 py-2 sm:py-2.5 rounded-xl text-xs font-bold transition-all flex items-center gap-2 cursor-pointer shrink-0 whitespace-nowrap ${
                     inventorySubTab === 'accessories'
                       ? 'bg-[#243119] text-cream shadow-md'
                       : 'bg-white text-forest/70 hover:bg-cream/60 hover:text-forest'
@@ -3535,7 +3545,7 @@ export default function AdminDashboardModal({ onClose, shopCategories = [] }: Ad
                 <button
                   type="button"
                   onClick={() => setInventorySubTab('all')}
-                  className={`px-4 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center gap-2 cursor-pointer ${
+                  className={`px-3.5 sm:px-4 py-2 sm:py-2.5 rounded-xl text-xs font-bold transition-all flex items-center gap-2 cursor-pointer shrink-0 whitespace-nowrap ${
                     inventorySubTab === 'all'
                       ? 'bg-[#243119] text-cream shadow-md'
                       : 'bg-white text-forest/70 hover:bg-cream/60 hover:text-forest'
@@ -3710,16 +3720,17 @@ export default function AdminDashboardModal({ onClose, shopCategories = [] }: Ad
 
               {/* MATERIAL CREATION/EDITING FLOATING OVERLAY FORM */}
               {editingMaterial && (
-                <div className="fixed inset-0 bg-[#243119]/40 backdrop-blur-sm flex items-center justify-center z-[110] p-4">
-                  <div data-lenis-prevent className="bg-white border border-forest/10 rounded-[24px] max-w-sm w-full p-6 shadow-2xl text-left space-y-4">
-                    <div className="flex items-center justify-between border-b border-forest/5 pb-3">
-                      <h5 className="font-serif text-base font-bold text-forest">
+                <div className="fixed inset-0 bg-[#243119]/40 backdrop-blur-sm flex items-center justify-center z-[110] p-0 sm:p-4">
+                  <div data-lenis-prevent className="bg-white border-0 sm:border border-forest/10 rounded-none sm:rounded-[24px] max-w-sm w-full h-full sm:h-auto max-h-screen sm:max-h-[90vh] p-4 sm:p-6 shadow-2xl text-left space-y-4 overflow-y-auto flex flex-col justify-between">
+                    <div className="flex items-center justify-between border-b border-forest/5 pb-3 sticky top-0 bg-white z-20 shrink-0">
+                      <h5 className="font-serif text-sm sm:text-base font-bold text-forest truncate pr-2">
                         {editingMaterial.isNew ? 'Nova Matéria-Prima' : `Editar: ${editingMaterial.material.name}`}
                       </h5>
                       <button
                         type="button"
                         onClick={() => setEditingMaterial(null)}
-                        className="text-forest/40 hover:text-forest cursor-pointer"
+                        className="p-1 text-forest/40 hover:text-forest hover:bg-forest/5 rounded-full cursor-pointer transition-colors shrink-0"
+                        aria-label="Fechar"
                       >
                         <X className="w-5 h-5" />
                       </button>
@@ -3811,19 +3822,19 @@ export default function AdminDashboardModal({ onClose, shopCategories = [] }: Ad
                         />
                       </div>
 
-                      <div className="flex gap-3 pt-3 border-t border-forest/5">
+                      <div className="flex flex-col sm:flex-row gap-2.5 pt-3 border-t border-forest/10 sticky bottom-0 bg-white z-20 pb-1 mt-auto">
                         <button
                           type="button"
                           onClick={() => setEditingMaterial(null)}
-                          className="flex-1 py-2.5 bg-cream hover:bg-cream/70 text-forest rounded-xl font-bold uppercase transition-all cursor-pointer text-center"
+                          className="w-full sm:flex-1 py-3 sm:py-2.5 bg-cream hover:bg-cream/70 text-forest rounded-xl font-bold uppercase transition-all cursor-pointer text-center text-xs tracking-wider"
                         >
                           Cancelar
                         </button>
                         <button
                           type="submit"
-                          className="flex-1 py-2.5 bg-[#243119] hover:bg-[#1a2412] text-cream rounded-xl font-bold uppercase transition-all cursor-pointer text-center shadow-md"
+                          className="w-full sm:flex-1 py-3 sm:py-2.5 bg-[#243119] hover:bg-[#1a2412] text-cream rounded-xl font-bold uppercase transition-all cursor-pointer text-center shadow-md text-xs tracking-wider"
                         >
-                          Confirmar
+                          Guardar Alterações
                         </button>
                       </div>
                     </form>
@@ -4114,11 +4125,11 @@ export default function AdminDashboardModal({ onClose, shopCategories = [] }: Ad
 
             {/* Drawer Footer Actions */}
             {customerProfile && !loadingCustomerProfile && (
-              <div className="px-6 py-4 border-t border-forest/5 bg-[#FCFBF9] flex gap-3">
+              <div className="p-4 sm:p-6 border-t border-forest/10 bg-[#FCFBF9] flex flex-col sm:flex-row gap-2.5 sticky bottom-0 z-20 shrink-0">
                 <button
                   type="button"
                   onClick={() => setSelectedCustomerEmail(null)}
-                  className="flex-1 py-2.5 bg-white border border-forest/10 hover:bg-forest/5 text-forest/70 hover:text-forest rounded-xl font-bold uppercase tracking-wider text-xs transition-colors cursor-pointer"
+                  className="w-full sm:flex-1 py-3 sm:py-2.5 bg-white border border-forest/10 hover:bg-forest/5 text-forest/70 hover:text-forest rounded-xl font-bold uppercase tracking-wider text-xs transition-colors cursor-pointer"
                 >
                   Fechar
                 </button>
@@ -4126,7 +4137,7 @@ export default function AdminDashboardModal({ onClose, shopCategories = [] }: Ad
                   type="button"
                   disabled={isSavingCustomerProfile}
                   onClick={handleSaveCustomerProfile}
-                  className="flex-1 py-2.5 bg-[#243119] hover:bg-[#1a2412] text-cream rounded-xl font-bold uppercase tracking-wider text-xs transition-colors cursor-pointer flex items-center justify-center gap-2 shadow-md disabled:opacity-50"
+                  className="w-full sm:flex-1 py-3 sm:py-2.5 bg-[#243119] hover:bg-[#1a2412] text-cream rounded-xl font-bold uppercase tracking-wider text-xs transition-colors cursor-pointer flex items-center justify-center gap-2 shadow-md disabled:opacity-50"
                 >
                   {isSavingCustomerProfile ? (
                     <>
