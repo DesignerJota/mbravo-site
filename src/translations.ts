@@ -654,8 +654,17 @@ export function formatColorName(colorStr: string): string {
 
 export function getColorSwatchBg(rawColorName: string): string {
   if (!rawColorName) return '#D8C3A5';
-  const name = formatColorName(rawColorName).toLowerCase();
-  
+
+  const rawClean = rawColorName.trim();
+  // 1. Check for direct hex code string or embedded hex code
+  const hexMatch = rawClean.match(/#(?:[0-9a-fA-F]{3}){1,2}\b/);
+  if (hexMatch) return hexMatch[0];
+
+  const formatted = formatColorName(rawColorName);
+  const name = formatted.toLowerCase().trim();
+  const rawLower = rawClean.toLowerCase();
+
+  // 2. Handle bicolor gradient combinations
   if (name.includes('&')) {
     const parts = name.split('&').map(s => s.trim());
     const bg1 = getColorSwatchBg(parts[0]);
@@ -663,17 +672,111 @@ export function getColorSwatchBg(rawColorName: string): string {
     return `linear-gradient(45deg, ${bg1} 50%, ${bg2} 50%)`;
   }
 
-  if (name.includes('natural') || name.includes('cru') || name.includes('branco')) return '#FAF8F5';
-  if (name.includes('damasco') || name.includes('laranja') || name.includes('terracota')) return '#E07A5F';
-  if (name.includes('rosa')) return '#FADADD';
-  if (name.includes('verde musgo') || name.includes('musgo')) return '#243119';
-  if (name.includes('hortelã') || name.includes('menta')) return '#789D8A';
-  if (name.includes('petróleo') || name.includes('noite') || name.includes('marinho')) return '#1C2D37';
-  if (name.includes('azul glaciar') || name.includes('azul água') || name.includes('azul')) return '#A2C2D1';
-  if (name.includes('amarelo') || name.includes('limão') || name.includes('baunilha')) return '#F4D03F';
-  if (name.includes('creme') || name.includes('bege')) return '#E1D5C9';
-  if (name.includes('castanho') || name.includes('cacau') || name.includes('café')) return '#5D4037';
-  if (name.includes('vermelho')) return '#C0392B';
+  // 3. High-precision M★BRAVO Luxury Palette & DROPS Safran/Paris Yarn Mapping
+  // Pure White (#FFFFFF)
+  if (name === 'branco' || name.endsWith('branco') || name.includes('white') || rawLower.includes('safran 11') || rawLower.includes('paris 16') || rawLower.includes('17 - branco')) {
+    return '#FFFFFF';
+  }
+  // Natural / Cru / Raw Cotton (#F5EFEB)
+  if (name.includes('natural') || name.includes('cru') || rawLower.includes('safran 18') || rawLower.includes('paris 17')) {
+    return '#F5EFEB';
+  }
+  // Creme / Cream / Baunilha (#F3E8D3)
+  if (name.includes('creme') || name.includes('cream') || name.includes('baunilha') || rawLower.includes('safran 08') || rawLower.includes('paris 35')) {
+    return '#F3E8D3';
+  }
+  // Bege / Beige (#E4D5C1)
+  if (name.includes('bege') || name.includes('beige') || rawLower.includes('safran 12')) {
+    return '#E4D5C1';
+  }
+  // Rosa do Deserto (#D99B9B)
+  if (name.includes('rosa do deserto') || name.includes('deserto') || rawLower.includes('safran 01')) {
+    return '#D99B9B';
+  }
+  // Rosa Pálido / Rosa Claríssimo (#F4DCD6)
+  if (name.includes('rosa pálido') || name.includes('rosa palido') || name.includes('rosa claríssimo') || name.includes('rosa clarissimo') || rawLower.includes('safran 17') || rawLower.includes('paris 57')) {
+    return '#F4DCD6';
+  }
+  // General Pink (#E8A2A8)
+  if (name.includes('rosa') || name.includes('pink')) {
+    return '#E8A2A8';
+  }
+  // Verde Musgo / Moss Green (#243119)
+  if (name.includes('musgo') || rawLower.includes('safran 60') || rawLower.includes('paris 25')) {
+    return '#243119'; // Signature M★BRAVO Forest/Musgo Green
+  }
+  // Verde Floresta (#1E3320)
+  if (name.includes('floresta') || rawLower.includes('safran 78')) {
+    return '#1E3320';
+  }
+  // Verde Militar (#3F4A2C)
+  if (name.includes('militar') || name.includes('military')) {
+    return '#3F4A2C';
+  }
+  // Oliva (#556B2F)
+  if (name.includes('oliva') || name.includes('olive')) {
+    return '#556B2F';
+  }
+  // Menta / Mint / Hortelã (#A8C3B2)
+  if (name.includes('menta') || name.includes('mint') || name.includes('hortelã') || name.includes('hortela') || rawLower.includes('safran 50')) {
+    return '#A8C3B2';
+  }
+  // General Green (#3B5836)
+  if (name.includes('verde') || name.includes('green') || rawLower.includes('paris 43')) {
+    return '#3B5836';
+  }
+  // Azul Cobalto (#1E3A8A)
+  if (name.includes('cobalto') || rawLower.includes('safran 73')) {
+    return '#1E3A8A';
+  }
+  // Azul Glaciar (#A8C5D1)
+  if (name.includes('glaciar') || rawLower.includes('safran 05')) {
+    return '#A8C5D1';
+  }
+  // Azul Pó / Ternura (#B0C4DE)
+  if (name.includes('pó') || name.includes('po') || name.includes('ternura') || rawLower.includes('safran 76') || rawLower.includes('paris 76')) {
+    return '#B0C4DE';
+  }
+  // Petróleo (#1C3144)
+  if (name.includes('petróleo') || name.includes('petroleo') || rawLower.includes('paris 48')) {
+    return '#1C3144';
+  }
+  // Azul Marinho / Noite (#0F172A)
+  if (name.includes('marinho') || name.includes('noite') || name.includes('navy')) {
+    return '#0F172A';
+  }
+  // General Blue (#4A7C9D)
+  if (name.includes('azul') || name.includes('blue')) {
+    return '#4A7C9D';
+  }
+  // Amarelo (#F3C64F)
+  if (name.includes('amarelo') || name.includes('yellow') || rawLower.includes('safran 10') || rawLower.includes('paris 19')) {
+    return '#F3C64F';
+  }
+  // Damasco / Laranja / Terracota (#C85A32)
+  if (name.includes('damasco') || name.includes('laranja') || name.includes('terracota') || name.includes('apricot')) {
+    return '#C85A32';
+  }
+  // Café / Cacau / Castanho (#4A2E1A)
+  if (name.includes('café') || name.includes('cafe') || name.includes('cacau') || name.includes('castanho') || rawLower.includes('safran 68') || rawLower.includes('paris 44')) {
+    return '#4A2E1A';
+  }
+  // Vermelho (#991B1B)
+  if (name.includes('vermelho') || name.includes('red') || rawLower.includes('safran 19') || rawLower.includes('paris 12')) {
+    return '#991B1B';
+  }
+  // Preto (#18181B)
+  if (name.includes('preto') || name.includes('black') || rawLower.includes('paris 15')) {
+    return '#18181B';
+  }
+  // Cinza (#71717A)
+  if (name.includes('cinza') || name.includes('grey') || name.includes('gray')) {
+    return '#71717A';
+  }
+  // Ouro (#C5A059)
+  if (name.includes('ouro') || name.includes('gold') || name.includes('dourado')) {
+    return '#C5A059';
+  }
 
   return '#D8C3A5';
 }
