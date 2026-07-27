@@ -157,7 +157,7 @@ export const translations = {
     "nav.close": "Fechar",
     
     // Buttons
-    "btn.add_to_cart": "Adicionar ao Carrinho",
+    "btn.order_now": "Encomendar Peça",
     "btn.back_collection": "Voltar à Coleção",
     "btn.explore": "Contemplar a Matéria",
     "btn.close": "Fechar",
@@ -386,7 +386,7 @@ export const translations = {
     "nav.close": "Close",
     
     // Buttons
-    "btn.add_to_cart": "Add to Cart",
+    "btn.order_now": "Order Piece",
     "btn.back_collection": "Back to Collection",
     "btn.explore": "Contemplate the Matter",
     "btn.close": "Close",
