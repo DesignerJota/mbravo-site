@@ -203,6 +203,11 @@ Para que o repositório no GitHub fique 100% sincronizado com a versão final de
 *   [x] **Blindagem CORS e Preflight OPTIONS:** Middleware verificado em `server.ts` garantindo suporte a `https://mbravobycarolina.com`, cabeçalho `X-Admin-Password` e resposta 200 OK no preflight.
 *   [x] **Soberania do Volume Persistente e Arranque Read-Only:** Volume Persistente `/app/data/` configurado na Railway como fonte soberana com boot 100% Read-Only em `server.ts` para preservação integral e imutável de dados durante deploys.
 
+*   [x] **Sincronização Absoluta e Mapeamento Fiel de Amostras Visuais de Cor (Swatches):**
+    *   **Consumo Dinâmico do Estado do Produto:** O componente de amostragem consome diretamente o array `availableColors` atribuído ao produto na base de dados/Admin sem injeção de listas genéricas.
+    *   **Mapeamento de Alta Precisão (#HEX):** A função `getColorSwatchBg` em `translations.ts` foi expandida para mapear com 100% de precisão todos os tons de fios M★BRAVO e DROPS Safran/Paris para os seus códigos Hexadecimais reais (ex: `#243119` Musgo, `#1E3A8A` Azul Cobalto, `#F5EFEB` Natural, `#FFFFFF` Branco, `#F4DCD6` Rosa Pálido, etc.), eliminando totalmente a amostragem por cores genéricas.
+    *   **Sincronização 100% da Rótulo/Pílula Selecionada:** Adicionada sincronização reativa com `useEffect` em `App.tsx` que atualiza simultaneamente `cor` e `corPrincipal` na seleção de cada pílula e ao alterar de produto, garantindo paridade absoluta entre a label superior (ex: *"COR: VERDE MUSGO"*) e a amostra visual marcada.
+
 ### B. Roteiro Técnico de Otimização Mobile & iOS WebKit (Meta: PageSpeed >90 - FASE 1 CONCLUÍDA):
 *   [x] **Aceleração Hardware-Backing para iOS WebKit:** Aplicado `-webkit-backface-visibility: hidden; transform: translateZ(0);` nos cartões de produtos e categorias para impedir a reciclagem agressiva de texturas da GPU pelo WebKit durante o scroll rápido em iPhones/iPads.
 *   [x] **Implementação de Estrutura `<picture>` no Hero:** Estrutura responsiva com atributos `fetchpriority="high"`, `loading="eager"` e `decoding="async"` para renderização acelerada.
