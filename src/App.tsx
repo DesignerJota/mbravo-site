@@ -2396,14 +2396,14 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({ product: rawProduct,
     const hasQuantity = isHomeSet;
     const rawPrice = getApprovedPrice(product.name);
     const isAfricanFlowerPouch = product.name.toLowerCase().includes('african flower pouch');
-    const isMiniPouches = product.name.toLowerCase().includes('mini pouches');
+    const isMiniPouches = product.name.toLowerCase().includes('mini pouches') || product.name.toLowerCase().includes('mini pouch');
     const isClassicCoasters = product.name.toLowerCase().includes('classic coasters');
     const isDualColor = isAfricanFlowerPouch || 
                         product.name.toLowerCase().includes('marea bikini set') ||
                         product.name.toLowerCase().includes('coral bikini top') ||
                         product.name.toLowerCase().includes('signature granny poncho') ||
                         product.name.toLowerCase().includes('cardigan') ||
-                        isClassicCoasters;
+                        isMiniPouches;
 
     const rawColorType = (product as any).colorType || (product as any).corType;
     const colorType: 'single' | 'bicolor' | 'fixed' = 
@@ -2421,13 +2421,7 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({ product: rawProduct,
             ? (product as any).availableColors.split(',').map((s: string) => s.trim()).filter(Boolean)
             : []);
 
-    const defaultColorsList = isMiniPouches ? [
-        'DROPS Safran - 16 Natural',
-        'DROPS Safran - 17 Rosa Pálido',
-        'DROPS Safran - 01 Verde Musgo',
-        'DROPS Safran - 10 Amarelo',
-        'DROPS Safran - 05 Azul Glaciar'
-    ] : [
+    const defaultColorsList = [
         'DROPS Safran - 16 Natural',
         'DROPS Safran - 17 Rosa Pálido',
         'DROPS Safran - 01 Verde Musgo',
@@ -2453,7 +2447,7 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({ product: rawProduct,
         cor: initialColor,
         corPrincipal: defaultPrim,
         corDetalhe: defaultDet,
-        corFio: isMiniPouches ? 'Branco Creme' : '',
+        corFio: defaultDet,
         quantidade: product.name.toLowerCase().includes('coasters') ? '4und.' : '2und.',
         fecho: '',
         forro: '',
@@ -2768,9 +2762,7 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({ product: rawProduct,
 
     const colorMsgPart = colorType === 'fixed' || !selectedColor 
         ? '' 
-        : (isMiniPouches 
-            ? `Cor do Saquinho: ${translateColor(selectedColor, lang)}\nCor do Fio: ${translateColor(selections.corFio, lang)}\n` 
-            : `Cor: ${translateColor(selectedColor, lang)}\n`);
+        : `Cor: ${translateColor(selectedColor, lang)}\n`;
 
     const messageText = lang === 'pt'
         ? `Olá Carolina! Quero encomendar uma peça M★BRAVO.\n\nProduto: ${product.name}\n${selectedSize ? `Tamanho: ${selectedSize}\n` : ''}${colorMsgPart}Quantidade: ${quantity}\n\nValor Total: ${totalPrice}€\n\nFico a aguardar os detalhes para combinarmos o envio e o pagamento. Obrigada!`
@@ -2785,7 +2777,7 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({ product: rawProduct,
                 cor: initialColor, 
                 corPrincipal: defaultPrim,
                 corDetalhe: defaultDet,
-                corFio: isMiniPouches ? 'Branco Creme' : '',
+                corFio: defaultDet,
                 quantidade: product.name.toLowerCase().includes('coasters') ? '4und.' : '2und.', 
                 fecho: '', 
                 forro: '', 
@@ -2819,45 +2811,6 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({ product: rawProduct,
     const quantities = isCoaster
         ? ['1und.', '2und.', '4und.', '6und.', '8und.']
         : ['2und.', '4und.', '6und.', '8und.'];
-
-    const colors = isDualColor ? [
-        { name: 'Azul Água & Branco', bg: 'linear-gradient(45deg, #A6BCAE 50%, #FFFFFF 50%)' },
-        { name: 'Amarelo & Branco', bg: 'linear-gradient(45deg, #F4D03F 50%, #FFFFFF 50%)' },
-        { name: 'Rosa & Branco', bg: 'linear-gradient(45deg, #FADADD 50%, #FFFFFF 50%)' },
-        { name: 'Verde & Branco', bg: 'linear-gradient(45deg, #243119 50%, #FFFFFF 50%)' },
-        { name: 'Vermelho & Branco', bg: 'linear-gradient(45deg, #C0392B 50%, #FFFFFF 50%)' }
-    ] : isMiniPouches ? [
-        { name: 'Verde Musgo', hex: '#2E3B26' },
-        { name: 'Azul Noite', hex: '#1C2D37' },
-        { name: 'Amarelo Baunilha', hex: '#F2E3A9' },
-        { name: 'Terracota', hex: '#A85B40' },
-        { name: 'Branco Creme', hex: '#F5F2ED' },
-        { name: 'Rosa Quartzo Subtil', hex: '#EADAD6' }
-    ] : [
-        { name: 'Verde Musgo', hex: '#243119' },
-        { name: 'Hortelã-Pimenta', hex: '#789D8A' },
-        { name: 'Petróleo', hex: '#005F6B' },
-        { name: 'Azul Glaciar', hex: '#A2C2D1' },
-        { name: 'Sorvete Limão', hex: '#F4D03F' },
-        { name: 'Creme', hex: '#FDFBF7' },
-        { name: 'Bege Claro', hex: '#E1D5C9' },
-        { name: 'Rosa Ternura', hex: '#FADADD' },
-        { name: 'Castanho', hex: '#5D4037' },
-        { name: 'Branco', hex: '#FFFFFF' }
-    ];
-
-    const yarnColors = isMiniPouches ? [
-        { name: 'Verde Musgo', hex: '#2E3B26' },
-        { name: 'Azul Noite', hex: '#1C2D37' },
-        { name: 'Amarelo Baunilha', hex: '#F2E3A9' },
-        { name: 'Terracota', hex: '#A85B40' },
-        { name: 'Branco Creme', hex: '#F5F2ED' },
-        { name: 'Rosa Quartzo Subtil', hex: '#EADAD6' }
-    ] : [
-        { name: 'Algodão Cru', hex: '#EFECE6' },
-        { name: 'Cacau Escuro', hex: '#4A3728' },
-        { name: 'Oliva Suave', hex: '#556B2F' }
-    ];
 
     const handleToggle = () => {
         onFocus(isFocused ? null : product.id);
@@ -3170,7 +3123,7 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({ product: rawProduct,
                                     <div className="flex justify-between border-b border-forest/5 pb-1.5">
                                         <span className="text-forest/40 uppercase tracking-wider text-[9px]">{lang === 'pt' ? 'Configuração' : 'Configuration'}</span>
                                         <span className="font-semibold text-forest text-right">
-                                            {(colorType !== 'fixed' && selectedColor) ? `${translateColor(selectedColor, lang)} ` : ''}{isMiniPouches && `| ${lang === 'pt' ? 'Fio: ' : 'Yarn: '}${translateColor(selections.corFio, lang)} `}{hasSize && `| ${translateSize(selections.tamanho, lang)}`} {hasQuantity && `| ${translateQuantity(selections.quantidade, lang)}`}
+                                            {(colorType !== 'fixed' && selectedColor) ? `${translateColor(selectedColor, lang)} ` : ''}{hasSize && `| ${translateSize(selections.tamanho, lang)}`} {hasQuantity && `| ${translateQuantity(selections.quantidade, lang)}`}
                                         </span>
                                     </div>
                                     <div className="flex justify-between border-b border-forest/5 pb-1.5">
@@ -3359,7 +3312,7 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({ product: rawProduct,
                                             <div>
                                                 <span className="font-serif font-light text-sm text-forest block">{product.name}</span>
                                                 <span className="text-[10px] text-forest/50 uppercase tracking-wider">
-                                                    {(colorType !== 'fixed' && selectedColor) ? `${translateColor(selectedColor, lang)} ` : ''}{isMiniPouches && `| ${lang === 'pt' ? 'Fio: ' : 'Yarn: '}${translateColor(selections.corFio, lang)} `}{hasSize && `| ${translateSize(selections.tamanho, lang)}`}
+                                                    {(colorType !== 'fixed' && selectedColor) ? `${translateColor(selectedColor, lang)} ` : ''}{hasSize && `| ${translateSize(selections.tamanho, lang)}`}
                                                 </span>
                                             </div>
                                         </div>
@@ -3998,7 +3951,7 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({ product: rawProduct,
                                             <h5 className="text-[9px] uppercase tracking-[0.25em] font-bold text-forest/45 flex items-center gap-1.5">
                                                 <span className="text-[#C5A059] text-xs">●</span> {t('product.color')}
                                             </h5>
-                                            <span className="text-[9px] font-extrabold text-[#A68244] bg-[#FDF9F3] px-3 py-0.5 rounded-full border border-[#C5A059]/10">
+                                            <span className="text-[9px] font-extrabold text-[#A68244] bg-[#FDF9F3] px-3 py-0.5 rounded-full border border-[#C5A059]/10 tracking-wider">
                                                 {translateColor(selections.cor, lang)}
                                             </span>
                                         </div>
@@ -4012,15 +3965,15 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({ product: rawProduct,
                                                         key={rawCol}
                                                         type="button"
                                                         onClick={() => setSelections(prev => ({ ...prev, cor: rawCol, corPrincipal: rawCol }))}
-                                                        className={`w-8 h-8 rounded-full border transition-all p-0.5 cursor-pointer relative ${
+                                                        className={`w-8 h-8 rounded-full border transition-all p-0.5 cursor-pointer relative shadow-sm ${
                                                             isActive 
-                                                                ? 'ring-2 ring-[#C5A059] scale-110 shadow-md shadow-[#C5A059]/20 border-white' 
+                                                                ? 'ring-2 ring-offset-2 ring-[#C5A059] scale-110 shadow-md shadow-[#C5A059]/20 border-white' 
                                                                 : 'border-forest/15 hover:scale-105 hover:border-[#C5A059]'
                                                         }`}
                                                         title={formattedName}
                                                     >
                                                         <div 
-                                                            className="w-full h-full rounded-full border border-forest/10" 
+                                                            className="w-full h-full rounded-full border border-black/10 shadow-inner" 
                                                             style={{ background: swatchBg }}
                                                         />
                                                     </button>
@@ -4038,7 +3991,7 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({ product: rawProduct,
                                                 <h5 className="text-[9px] uppercase tracking-[0.25em] font-bold text-forest/45 flex items-center gap-1.5">
                                                     <span className="text-[#C5A059] text-xs">●</span> {lang === 'pt' ? 'Cor Principal' : 'Main Color'}
                                                 </h5>
-                                                <span className="text-[9px] font-extrabold text-[#A68244] bg-[#FDF9F3] px-3 py-0.5 rounded-full border border-[#C5A059]/10">
+                                                <span className="text-[9px] font-extrabold text-[#A68244] bg-[#FDF9F3] px-3 py-0.5 rounded-full border border-[#C5A059]/10 tracking-wider">
                                                     {translateColor(selections.corPrincipal || availableColorOptions[0], lang)}
                                                 </span>
                                             </div>
@@ -4062,15 +4015,15 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({ product: rawProduct,
                                                                     cor: combined
                                                                 }));
                                                             }}
-                                                            className={`w-8 h-8 rounded-full border transition-all p-0.5 cursor-pointer relative ${
+                                                            className={`w-8 h-8 rounded-full border transition-all p-0.5 cursor-pointer relative shadow-sm ${
                                                                 isActive 
-                                                                    ? 'ring-2 ring-[#C5A059] scale-110 shadow-md shadow-[#C5A059]/20 border-white' 
+                                                                    ? 'ring-2 ring-offset-2 ring-[#C5A059] scale-110 shadow-md shadow-[#C5A059]/20 border-white' 
                                                                     : 'border-forest/15 hover:scale-105 hover:border-[#C5A059]'
                                                             }`}
                                                             title={formattedName}
                                                         >
                                                             <div 
-                                                                className="w-full h-full rounded-full border border-forest/10" 
+                                                                className="w-full h-full rounded-full border border-black/10 shadow-inner" 
                                                                 style={{ background: swatchBg }}
                                                             />
                                                         </button>
@@ -4079,13 +4032,13 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({ product: rawProduct,
                                             </div>
                                         </div>
 
-                                        {/* Row 2: Detail Color */}
+                                        {/* Row 2: Detail / Cord Color */}
                                         <div className="space-y-2">
                                             <div className="flex justify-between items-center">
                                                 <h5 className="text-[9px] uppercase tracking-[0.25em] font-bold text-forest/45 flex items-center gap-1.5">
-                                                    <span className="text-[#C5A059] text-xs">●</span> {lang === 'pt' ? 'Cor do Detalhe' : 'Detail Color'}
+                                                    <span className="text-[#C5A059] text-xs">●</span> {((product as any).secondColorLabel || (product as any).detailLabel || (product as any).corDetalheLabel || ((product.name.toLowerCase().includes('pouch') || product.name.toLowerCase().includes('bolsa')) ? (lang === 'pt' ? 'Cor do Cordão' : 'Drawstring Color') : (lang === 'pt' ? 'Cor do Detalhe' : 'Detail Color')))}
                                                 </h5>
-                                                <span className="text-[9px] font-extrabold text-[#A68244] bg-[#FDF9F3] px-3 py-0.5 rounded-full border border-[#C5A059]/10">
+                                                <span className="text-[9px] font-extrabold text-[#A68244] bg-[#FDF9F3] px-3 py-0.5 rounded-full border border-[#C5A059]/10 tracking-wider">
                                                     {translateColor(selections.corDetalhe || availableColorOptions[1] || availableColorOptions[0], lang)}
                                                 </span>
                                             </div>
@@ -4106,57 +4059,25 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({ product: rawProduct,
                                                                 setSelections(prev => ({
                                                                     ...prev,
                                                                     corDetalhe: newDet,
+                                                                    corFio: newDet,
                                                                     cor: combined
                                                                 }));
                                                             }}
-                                                            className={`w-8 h-8 rounded-full border transition-all p-0.5 cursor-pointer relative ${
+                                                            className={`w-8 h-8 rounded-full border transition-all p-0.5 cursor-pointer relative shadow-sm ${
                                                                 isActive 
-                                                                    ? 'ring-2 ring-[#C5A059] scale-110 shadow-md shadow-[#C5A059]/20 border-white' 
+                                                                    ? 'ring-2 ring-offset-2 ring-[#C5A059] scale-110 shadow-md shadow-[#C5A059]/20 border-white' 
                                                                     : 'border-forest/15 hover:scale-105 hover:border-[#C5A059]'
                                                             }`}
                                                             title={formattedName}
                                                         >
                                                             <div 
-                                                                className="w-full h-full rounded-full border border-forest/10" 
+                                                                className="w-full h-full rounded-full border border-black/10 shadow-inner" 
                                                                 style={{ background: swatchBg }}
                                                             />
                                                         </button>
                                                     );
                                                 })}
                                             </div>
-                                        </div>
-                                    </div>
-                                )}
-
-                                {/* Cor do Fio (Mini Pouches Only) */}
-                                {isMiniPouches && (
-                                    <div className="space-y-2">
-                                        <div className="flex justify-between items-center">
-                                            <h5 className="text-[9px] uppercase tracking-[0.25em] font-bold text-forest/45 flex items-center gap-1.5">
-                                                <span className="text-[#C5A059] text-xs">●</span> {t('product.yarn_color')}
-                                            </h5>
-                                            <span className="text-[9px] font-extrabold text-[#A68244] bg-[#FDF9F3] px-3 py-0.5 rounded-full border border-[#C5A059]/10">
-                                                {translateColor(selections.corFio, lang)}
-                                            </span>
-                                        </div>
-                                        <div className="flex flex-wrap gap-2">
-                                            {yarnColors.map(opt => (
-                                                <button 
-                                                    key={opt.name}
-                                                    onClick={() => setSelections(prev => ({ ...prev, corFio: opt.name }))}
-                                                    className={`w-8 h-8 rounded-full border-2 transition-all p-0.5 cursor-pointer ${
-                                                        selections.corFio === opt.name 
-                                                            ? 'border-forest scale-110 shadow-md shadow-forest/10'
-                                                            : 'border-transparent hover:scale-110'
-                                                    }`}
-                                                    title={translateColor(opt.name, lang)}
-                                                >
-                                                    <div 
-                                                        className="w-full h-full rounded-full border border-forest/5" 
-                                                        style={{ backgroundColor: opt.hex }} 
-                                                    />
-                                                </button>
-                                            ))}
                                         </div>
                                     </div>
                                 )}
@@ -4313,12 +4234,6 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({ product: rawProduct,
                                                 <span className="text-forest font-semibold">{translateColor(selections.cor, lang)}</span>
                                             </div>
                                         )}
-                                        {isMiniPouches && (
-                                            <div className="flex justify-between items-center border-b border-forest/5 pb-1">
-                                                <span className="text-forest/40 text-[9px] tracking-[0.2em]">{t('product.yarn_color')}</span>
-                                                <span className="text-forest font-semibold">{translateColor(selections.corFio, lang) || (lang === 'pt' ? 'Branco Creme' : 'Cream White')}</span>
-                                            </div>
-                                        )}
                                         {hasSize && (
                                             <div className="flex justify-between items-center border-b border-forest/5 pb-1">
                                                 <span className="text-forest/40 text-[9px] tracking-[0.2em]">{t('product.size')}</span>
@@ -4358,12 +4273,6 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({ product: rawProduct,
                                             <div className="flex justify-between items-center border-b border-white/5 pb-1">
                                                 <span className="text-white/40 text-[9px] tracking-[0.2em]">{t('product.color')}</span>
                                                 <span className="text-[#FCFBF9] font-semibold">{translateColor(selections.cor, lang)}</span>
-                                            </div>
-                                        )}
-                                        {isMiniPouches && (
-                                            <div className="flex justify-between items-center border-b border-white/5 pb-1">
-                                                <span className="text-white/40 text-[9px] tracking-[0.2em]">{t('product.yarn_color')}</span>
-                                                <span className="text-[#FCFBF9] font-semibold">{translateColor(selections.corFio, lang) || (lang === 'pt' ? 'Branco Creme' : 'Cream White')}</span>
                                             </div>
                                         )}
                                         {hasSize && (
@@ -5692,14 +5601,14 @@ const ProductDetailPage = ({ pathname }: { pathname: string }) => {
     const hasQuantity = isHomeSet;
     const rawPrice = getApprovedPrice(productTranslated.name);
     const isAfricanFlowerPouch = productTranslated.name.toLowerCase().includes('african flower pouch');
-    const isMiniPouches = productTranslated.name.toLowerCase().includes('mini pouches');
+    const isMiniPouches = productTranslated.name.toLowerCase().includes('mini pouches') || productTranslated.name.toLowerCase().includes('mini pouch');
     const isClassicCoasters = productTranslated.name.toLowerCase().includes('classic coasters');
     const isDualColor = isAfricanFlowerPouch || 
                         productTranslated.name.toLowerCase().includes('marea bikini set') ||
                         productTranslated.name.toLowerCase().includes('coral bikini top') ||
                         productTranslated.name.toLowerCase().includes('signature granny poncho') ||
                         productTranslated.name.toLowerCase().includes('cardigan') ||
-                        isClassicCoasters;
+                        isMiniPouches;
 
     const rawColorType = (productTranslated as any).colorType || (productTranslated as any).corType;
     const colorType: 'single' | 'bicolor' | 'fixed' = 
@@ -5717,13 +5626,7 @@ const ProductDetailPage = ({ pathname }: { pathname: string }) => {
             ? (productTranslated as any).availableColors.split(',').map((s: string) => s.trim()).filter(Boolean)
             : []);
 
-    const defaultColorsList = isMiniPouches ? [
-        'DROPS Safran - 16 Natural',
-        'DROPS Safran - 17 Rosa Pálido',
-        'DROPS Safran - 01 Verde Musgo',
-        'DROPS Safran - 10 Amarelo',
-        'DROPS Safran - 05 Azul Glaciar'
-    ] : [
+    const defaultColorsList = [
         'DROPS Safran - 16 Natural',
         'DROPS Safran - 17 Rosa Pálido',
         'DROPS Safran - 01 Verde Musgo',
@@ -5750,7 +5653,7 @@ const ProductDetailPage = ({ pathname }: { pathname: string }) => {
         cor: initialColor,
         corPrincipal: defaultPrim,
         corDetalhe: defaultDet,
-        corFio: isMiniPouches ? 'Branco Creme' : '',
+        corFio: defaultDet,
         quantidade: productTranslated.name.toLowerCase().includes('coasters') ? '4und.' : '2und.',
         fecho: '',
         forro: '',
@@ -5810,7 +5713,7 @@ const ProductDetailPage = ({ pathname }: { pathname: string }) => {
         setSelections({
             tamanho: (hasSize && productTranslated.sizes && productTranslated.sizes.length > 0) ? productTranslated.sizes[0] : '',
             cor: initialColor,
-            corFio: isMiniPouches ? 'Branco Creme' : '',
+            corFio: defaultDet,
             quantidade: productTranslated.name.toLowerCase().includes('coasters') ? '4und.' : '2und.',
             fecho: '',
             forro: '',
@@ -6112,44 +6015,6 @@ const ProductDetailPage = ({ pathname }: { pathname: string }) => {
         ? ['1und.', '2und.', '4und.', '6und.', '8und.']
         : ['2und.', '4und.', '6und.', '8und.'];
 
-    const colors = isDualColor ? [
-        { name: 'Azul Água & Branco', bg: 'linear-gradient(45deg, #A6BCAE 50%, #FFFFFF 50%)' },
-        { name: 'Amarelo & Branco', bg: 'linear-gradient(45deg, #F4D03F 50%, #FFFFFF 50%)' },
-        { name: 'Rosa & Branco', bg: 'linear-gradient(45deg, #FADADD 50%, #FFFFFF 50%)' },
-        { name: 'Verde & Branco', bg: 'linear-gradient(45deg, #243119 50%, #FFFFFF 50%)' },
-        { name: 'Vermelho & Branco', bg: 'linear-gradient(45deg, #C0392B 50%, #FFFFFF 50%)' }
-    ] : isMiniPouches ? [
-        { name: 'Verde Musgo', hex: '#2E3B26' },
-        { name: 'Azul Noite', hex: '#1C2D37' },
-        { name: 'Amarelo Baunilha', hex: '#F2E3A9' },
-        { name: 'Terracota', hex: '#A85B40' },
-        { name: 'Branco Creme', hex: '#F5F2ED' },
-        { name: 'Rosa Quartzo Subtil', hex: '#EADAD6' }
-    ] : [
-        { name: 'Verde Musgo', hex: '#243119' },
-        { name: 'Hortelã-Pimenta', hex: '#789D8A' },
-        { name: 'Petróleo', hex: '#005F6B' },
-        { name: 'Azul Glaciar', hex: '#A2C2D1' },
-        { name: 'Sorvete Limão', hex: '#F4D03F' },
-        { name: 'Creme', hex: '#FDFBF7' },
-        { name: 'Bege Claro', hex: '#E1D5C9' },
-        { name: 'Rosa Ternura', hex: '#FADADD' },
-        { name: 'Castanho', hex: '#5D4037' },
-        { name: 'Branco', hex: '#FFFFFF' }
-    ];
-
-    const yarnColors = isMiniPouches ? [
-        { name: 'Verde Musgo', hex: '#2E3B26' },
-        { name: 'Azul Noite', hex: '#1C2D37' },
-        { name: 'Amarelo Baunilha', hex: '#F2E3A9' },
-        { name: 'Terracota', hex: '#A85B40' },
-        { name: 'Branco Creme', hex: '#F5F2ED' },
-        { name: 'Rosa Quartzo Subtil', hex: '#EADAD6' }
-    ] : [
-        { name: 'Algodão Cru', hex: '#EFECE6' },
-        { name: 'Cacau Escuro', hex: '#4A3728' },
-        { name: 'Oliva Suave', hex: '#556B2F' }
-    ];
 
     const isSafran = isVestuario || productTranslated.id.startsWith('v') || productTranslated.id.startsWith('p');
     
@@ -6171,9 +6036,7 @@ const ProductDetailPage = ({ pathname }: { pathname: string }) => {
 
     const colorMsgPart = colorType === 'fixed' || !selectedColor 
         ? '' 
-        : (isMiniPouches 
-            ? `Cor do Saquinho: ${translateColor(selectedColor, lang)}\nCor do Fio: ${translateColor(selections.corFio, lang)}\n` 
-            : `Cor: ${translateColor(selectedColor, lang)}\n`);
+        : `Cor: ${translateColor(selectedColor, lang)}\n`;
 
     const messageText = lang === 'pt'
         ? `Olá Carolina! Quero encomendar uma peça M★BRAVO.\n\nProduto: ${productTranslated.name}\n${selectedSize ? `Tamanho: ${selectedSize}\n` : ''}${colorMsgPart}Quantidade: ${quantity}\n\nValor Total: ${currentPrice}\n\nFico a aguardar os detalhes para combinarmos o envio e o pagamento. Obrigada!`
@@ -6339,7 +6202,7 @@ const ProductDetailPage = ({ pathname }: { pathname: string }) => {
                                     <div className="space-y-2">
                                         <div className="flex justify-between items-center text-[10px] uppercase tracking-wider text-forest/55">
                                             <span>{lang === 'pt' ? 'Cor' : 'Color'}</span>
-                                            <span className="font-bold text-forest">{translateColor(selections.cor, lang)}</span>
+                                            <span className="font-bold text-[#A68244] bg-[#FDF9F3] px-3 py-0.5 rounded-full border border-[#C5A059]/10">{translateColor(selections.cor, lang)}</span>
                                         </div>
                                         <div className="flex flex-wrap gap-2.5">
                                             {availableColorOptions.map((rawCol) => {
@@ -6351,15 +6214,15 @@ const ProductDetailPage = ({ pathname }: { pathname: string }) => {
                                                         key={rawCol}
                                                         type="button"
                                                         onClick={() => setSelections(prev => ({ ...prev, cor: rawCol, corPrincipal: rawCol }))}
-                                                        className={`relative w-8 h-8 rounded-full border transition-all cursor-pointer ${
+                                                        className={`relative w-8 h-8 rounded-full border transition-all cursor-pointer p-0.5 shadow-sm ${
                                                             isActive 
-                                                                ? 'ring-2 ring-forest scale-105 border-white' 
-                                                                : 'border-forest/15 hover:scale-105'
+                                                                ? 'ring-2 ring-offset-2 ring-[#C5A059] scale-110 shadow-md shadow-[#C5A059]/20 border-white' 
+                                                                : 'border-forest/15 hover:scale-105 hover:border-[#C5A059]'
                                                         }`}
                                                         title={formattedName}
                                                     >
                                                         <div 
-                                                            className="w-full h-full rounded-full border border-forest/10" 
+                                                            className="w-full h-full rounded-full border border-black/10 shadow-inner" 
                                                             style={{ background: swatchBg }}
                                                         />
                                                     </button>
@@ -6375,7 +6238,7 @@ const ProductDetailPage = ({ pathname }: { pathname: string }) => {
                                         <div className="space-y-2">
                                             <div className="flex justify-between items-center text-[10px] uppercase tracking-wider text-forest/55">
                                                 <span>{lang === 'pt' ? 'Cor Principal' : 'Main Color'}</span>
-                                                <span className="font-bold text-forest">
+                                                <span className="font-bold text-[#A68244] bg-[#FDF9F3] px-3 py-0.5 rounded-full border border-[#C5A059]/10">
                                                     {translateColor(selections.corPrincipal || availableColorOptions[0], lang)}
                                                 </span>
                                             </div>
@@ -6399,15 +6262,15 @@ const ProductDetailPage = ({ pathname }: { pathname: string }) => {
                                                                     cor: combined
                                                                 }));
                                                             }}
-                                                            className={`relative w-8 h-8 rounded-full border transition-all cursor-pointer ${
+                                                            className={`relative w-8 h-8 rounded-full border transition-all cursor-pointer p-0.5 shadow-sm ${
                                                                 isActive 
-                                                                    ? 'ring-2 ring-forest scale-105 border-white' 
-                                                                    : 'border-forest/15 hover:scale-105'
+                                                                    ? 'ring-2 ring-offset-2 ring-[#C5A059] scale-110 shadow-md shadow-[#C5A059]/20 border-white' 
+                                                                    : 'border-forest/15 hover:scale-105 hover:border-[#C5A059]'
                                                             }`}
                                                             title={formattedName}
                                                         >
                                                             <div 
-                                                                className="w-full h-full rounded-full border border-forest/10" 
+                                                                className="w-full h-full rounded-full border border-black/10 shadow-inner" 
                                                                 style={{ background: swatchBg }}
                                                             />
                                                         </button>
@@ -6416,11 +6279,11 @@ const ProductDetailPage = ({ pathname }: { pathname: string }) => {
                                             </div>
                                         </div>
 
-                                        {/* Row 2: Detail Color */}
+                                        {/* Row 2: Detail / Cord Color */}
                                         <div className="space-y-2">
                                             <div className="flex justify-between items-center text-[10px] uppercase tracking-wider text-forest/55">
-                                                <span>{lang === 'pt' ? 'Cor do Detalhe' : 'Detail Color'}</span>
-                                                <span className="font-bold text-forest">
+                                                <span>{(productTranslated as any).secondColorLabel || (productTranslated as any).detailLabel || (productTranslated as any).corDetalheLabel || ((productTranslated.name.toLowerCase().includes('pouch') || productTranslated.name.toLowerCase().includes('bolsa')) ? (lang === 'pt' ? 'Cor do Cordão' : 'Drawstring Color') : (lang === 'pt' ? 'Cor do Detalhe' : 'Detail Color'))}</span>
+                                                <span className="font-bold text-[#A68244] bg-[#FDF9F3] px-3 py-0.5 rounded-full border border-[#C5A059]/10">
                                                     {translateColor(selections.corDetalhe || availableColorOptions[1] || availableColorOptions[0], lang)}
                                                 </span>
                                             </div>
@@ -6441,49 +6304,25 @@ const ProductDetailPage = ({ pathname }: { pathname: string }) => {
                                                                 setSelections(prev => ({
                                                                     ...prev,
                                                                     corDetalhe: newDet,
+                                                                    corFio: newDet,
                                                                     cor: combined
                                                                 }));
                                                             }}
-                                                            className={`relative w-8 h-8 rounded-full border transition-all cursor-pointer ${
+                                                            className={`relative w-8 h-8 rounded-full border transition-all cursor-pointer p-0.5 shadow-sm ${
                                                                 isActive 
-                                                                    ? 'ring-2 ring-forest scale-105 border-white' 
-                                                                    : 'border-forest/15 hover:scale-105'
+                                                                    ? 'ring-2 ring-offset-2 ring-[#C5A059] scale-110 shadow-md shadow-[#C5A059]/20 border-white' 
+                                                                    : 'border-forest/15 hover:scale-105 hover:border-[#C5A059]'
                                                             }`}
                                                             title={formattedName}
                                                         >
                                                             <div 
-                                                                className="w-full h-full rounded-full border border-forest/10" 
+                                                                className="w-full h-full rounded-full border border-black/10 shadow-inner" 
                                                                 style={{ background: swatchBg }}
                                                             />
                                                         </button>
                                                     );
                                                 })}
                                             </div>
-                                        </div>
-                                    </div>
-                                )}
-
-                                {/* Yarn Color Swatch (for mini pouches only) */}
-                                {isMiniPouches && (
-                                    <div className="space-y-2">
-                                        <div className="flex justify-between items-center text-[10px] uppercase tracking-wider text-forest/55">
-                                            <span>{lang === 'pt' ? 'Cor do Fio' : 'Yarn Color'}</span>
-                                            <span className="font-bold text-forest">{translateColor(selections.corFio, lang)}</span>
-                                        </div>
-                                        <div className="flex flex-wrap gap-2.5">
-                                            {yarnColors.map((c) => (
-                                                <button
-                                                    key={c.name}
-                                                    onClick={() => setSelections(prev => ({ ...prev, corFio: c.name }))}
-                                                    className={`relative w-8 h-8 rounded-full border transition-all ${
-                                                        selections.corFio === c.name 
-                                                            ? 'ring-2 ring-forest scale-105 border-white' 
-                                                            : 'border-forest/15 hover:scale-105'
-                                                    }`}
-                                                    title={translateColor(c.name, lang)}
-                                                    style={{ background: (c as any).bg || (c as any).hex }}
-                                                />
-                                            ))}
                                         </div>
                                     </div>
                                 )}
@@ -6549,7 +6388,7 @@ const ProductDetailPage = ({ pathname }: { pathname: string }) => {
                                             <div className="flex justify-between border-b border-forest/5 pb-1">
                                                 <span className="text-forest/40 uppercase tracking-wider text-[9px]">{lang === 'pt' ? 'Configuração' : 'Configuration'}</span>
                                                 <span className="font-semibold text-forest text-right">
-                                                    {(colorType !== 'fixed' && selectedColor) ? `${translateColor(selectedColor, lang)} ` : ''}{isMiniPouches && `| ${lang === 'pt' ? 'Fio: ' : 'Yarn: '}${translateColor(selections.corFio, lang)} `}{hasSize && `| ${translateSize(selections.tamanho, lang)}`} {hasQuantity && `| ${translateQuantity(selections.quantidade, lang)}`}
+                                                    {(colorType !== 'fixed' && selectedColor) ? `${translateColor(selectedColor, lang)} ` : ''}{hasSize && `| ${translateSize(selections.tamanho, lang)}`} {hasQuantity && `| ${translateQuantity(selections.quantidade, lang)}`}
                                                 </span>
                                             </div>
                                             <div className="flex justify-between border-b border-forest/5 pb-1">
