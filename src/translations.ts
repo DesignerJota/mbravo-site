@@ -610,6 +610,8 @@ export const colorTranslations: Record<string, string> = {
   'Verde Musgo': 'Moss Green',
   'Azul Noite': 'Midnight Blue',
   'Amarelo Baunilha': 'Vanilla Yellow',
+  'Amarelo Claro': 'Light Yellow',
+  'Baunilha': 'Vanilla',
   'Terracota': 'Terracotta',
   'Branco Creme': 'Cream White',
   'Rosa Quartzo Subtil': 'Subtle Quartz Pink',
@@ -681,8 +683,16 @@ export function getColorSwatchBg(rawColorName: string): string {
   if (name.includes('natural') || name.includes('cru') || rawLower.includes('safran 18') || rawLower.includes('paris 17')) {
     return '#F5EFEB';
   }
-  // Creme / Cream / Baunilha (#F3E8D3)
-  if (name.includes('creme') || name.includes('cream') || name.includes('baunilha') || rawLower.includes('safran 08') || rawLower.includes('paris 35')) {
+  // Amarelo Claro / Light Yellow / Paris 19 (#F3E2B8) - Soft pastel yellow
+  if (name.includes('amarelo claro') || name.includes('light yellow') || rawLower.includes('paris 19') || name.includes('sorvete limão') || name.includes('limão')) {
+    return '#F3E2B8';
+  }
+  // Baunilha / Vanilla / Paris 35 / Amarelo Baunilha (#F8C53A) - Warm golden vanilla yellow
+  if (name.includes('baunilha') || name.includes('vanilla') || rawLower.includes('paris 35')) {
+    return '#F8C53A';
+  }
+  // Creme / Cream / Safran 08 (#F3E8D3)
+  if (name.includes('creme') || name.includes('cream') || rawLower.includes('safran 08')) {
     return '#F3E8D3';
   }
   // Bege / Beige (#E4D5C1)
