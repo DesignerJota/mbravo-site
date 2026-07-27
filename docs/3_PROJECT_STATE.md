@@ -132,6 +132,22 @@ Respondendo às últimas solicitações de otimização de fluxo e consistência
     21. **Imagem Real do Botão de Madeira M★BRAVO & Thumbnails de Inventário Ampliados (`AdminDashboardModal.tsx`):**
         *   **Fotografia Real do Botão de Madeira (`rm_botao_madeira`)**: em vez do ícone genérico, o componente `YarnSwatch` agora renderiza diretamente a imagem oficial em alta resolução (`https://i.ibb.co/gL2FL6LW/Botao-M-BRAVO-3.png`) com `object-contain`, mantendo a foto em destaque sobre um fundo suave `#FAF7F2`.
         *   **Aumento de Thumbnails na Tabela de Inventário**: o tamanho de todas as amostras/thumbnails de matérias-primas no separador de Inventário foi ampliado para **48×48 px** (`w-12 h-12` em Tailwind), mantendo o padding da tabela (`py-3.5`) perfeitamente ajustado sem esticar as linhas.
+    22. **Seletor de Configuração de Cor da Peça (Cor Única, Bicolor e Edição Fixa) (`AdminDashboardModal.tsx`):**
+        *   **Suporte a Peças Bicolores (`bicolorConsumptions`)**: adicionados campos dedicados para definir autonomamente o consumo da **Cor Principal** (ex: 0.8 nov) e da **Cor de Detalhe** (ex: 0.4 nov) para peças bicolores como a *African Flower Pouch*.
+        *   **Modo Edição Fixa / Cor Padrão (`fixed`)**: permite registar consumos de matérias-primas e cálculo exato de margem para peças com paleta estática (ex: *Daisy Coasters*), sem forçar o cliente a escolher cores na loja.
+        *   **Preservação de Dados Existentes (`single`)**: 100% retrocompatível; todas as peças já guardadas assumem o modo de Cor Única sem alterar consumos existentes.
+    23. **Regra de Exibição Dinâmica de Consumos & Pílulas de Cor de Luxo (`AdminDashboardModal.tsx`):**
+        *   **Exibição Exclusiva de Campos por Tipo de Peça**: Quando selecionado "Peça Bicolor", são exibidos apenas os campos de Consumo Cor Principal e Cor Secundária, ocultando a secção inferior de cores individuais para eliminar duplicações. Quando selecionado "Cor Única" ou "Edição Fixa", a secção inferior de consumos individuais é apresentada normalmente.
+        *   **Suavização de Textura de Amostra de Cor**: Reduzida a opacidade da quadrícula/textura sobreposta para 5% e atenuado o gradiente em `YarnSwatch`, revelando a cor base pura e fiel aos tons reais dos fios (estética de alta moda de luxo).
+    24. **Refactoring UI/UX e Micro-copy de Atelier (`AdminDashboardModal.tsx`):**
+        *   **Auditoria PT-PT**: Atualizados os rótulos globais de formulário para máxima precisão técnica ("Unidades em Stock", "Prazo de Produção (dias)", "Ocultar produto na loja" e botão "Guardar Alterações").
+        *   **Simplificação Visual de Pílulas de Cor**: Removidos os subtextos cinzentos explicativos abaixo dos seletores e o bloco amarelado de "Edição Fixa", reduzindo a altura do formulário e eliminando ruído visual.
+        *   **Micro-copy de Luxo**: Rótulo da paleta atualizado para "Matérias-Primas e Paleta" (sem frases redundantes de sincronização) e campos de consumo bicolor compactados para "Consumos (Bicolor)", "Cor Principal (nov)" e "Cor do Detalhe (nov)".
+        *   **Limpeza Minimalista Final**: Removida a etiqueta de instrução por cima do input de cores ativas (mantido placeholder limpo `Ex: 10 - Natural, 16 - Branco`); simplificado o bloco inferior para "Consumo por Cor (nov)", eliminando frases e badges redundantes de "Padrão: 1.0 nov/peça".
+    25. **Padronização Ergonomica do Posicionamento dos Campos de Consumo (`AdminDashboardModal.tsx`):**
+        *   **Atualização de Nomenclatura**: Alterada a designação da 3ª opção de configuração de cor para **"Cor Padrão"** (alinhada com a linguagem de atelier).
+        *   **Definição Imediata de Consumo no Topo (Cor Única & Bicolor)**: Em modo *Cor Única*, surge imediatamente abaixo do seletor o campo limpo `Consumo por Peça (nov)`, permitindo definir o consumo diretamente no topo sem precisar de scroll. Em modo *Peça Bicolor*, mantém os campos de `Cor Principal (nov)` e `Cor do Detalhe (nov)` no topo.
+        *   **Exibição Exclusiva do Bloco Inferior**: A grelha inferior `Consumo por Cor (nov)` é apresentada exclusivamente quando a peça está configurada em modo *Cor Padrão*, ocultando-se totalmente nos modos *Cor Única* e *Peça Bicolor* para eliminar redundâncias e garantir um formulário 100% limpo.
 
 ---
 
