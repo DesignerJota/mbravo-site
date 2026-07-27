@@ -216,7 +216,7 @@ Para que o repositório no GitHub fique 100% sincronizado com a versão final de
         *   Produtos `single`: renderizam estritamente **1 seletor de cor** ("COR").
         *   Produtos `bicolor`: renderizam estritamente **2 seletores de cor** ("COR PRINCIPAL" e "COR DO DETALHE" / "COR DO CORDÃO").
         *   Produtos `fixed`: omitem seletores de cor e renderizam diretamente as especificações da peça.
-    *   **Rótulo Dinâmico Adaptativo Lido do Produto:** As labels superiores dos seletores (ex: *"COR DO CORDÃO"*, *"COR DO DETALHE"*, *"COR DO FIO"*) são lidas dinamicamente do objeto do produto retornado pelo Railway (`secondColorLabel`, `detailLabel`, `corDetalheLabel`), com fallback gracioso para nomes de categorias sem remendos no código.
+    *   **Rótulo Dinâmico Adaptativo Lido do Produto:** As labels superiores dos seletores (ex: *"COR DO CORDÃO"*, *"COR DO DETALHE"*, *"COR DO FIO"*) são lidas dinamicamente do objeto do produto retornado pelo Railway (`secondColorLabel`, `detailLabel`, `corDetalheLabel`). O fallback genérico de *"COR DO CORDÃO"* fica estritamente restrito a peças do tipo Mini Pouches (ou com atributo de cordão), garantindo que a **African Flower Pouch** e restantes bolsas com fecho renderizam de forma fidedigna e elegante *"COR DO DETALHE"*.
     *   **Amostragem de Luxo M★BRAVO:** Pílulas visuais aprimoradas com anel duplo em tom dourado nobre (`#C5A059`), borda interna sutil para destaque de fios claros (#FFFFFF/Natural) e badges superiores elegantes.
 
 ### B. Roteiro Técnico de Otimização Mobile & iOS WebKit (Meta: PageSpeed >90 - FASE 1 CONCLUÍDA):
