@@ -53,7 +53,13 @@ A aplicação adota um armazenamento baseado em ficheiros locais persistentes, o
 *   **Acesso Discreto e Rota Segura:** O Painel de Administração pode ser acedido diretamente pela rota URL `/admin` ou mediante um clique discreto sobre a nota de copyright no rodapé da página (`© 2026 M★BRAVO`). O botão visível público foi removido para manter a estética minimalista e exclusiva da marca em ambiente de produção final. O acesso é protegido por palavra-passe encriptada por sessões (Padrão: `CarolinaM26`).
 *   **Purga Total e Absoluta de Dados Mock/Seed:** As abas 'analytics', 'orders' e 'crm' carregam 100% de dados reais e dinâmicos persistidos no volume `/app/data/orders.json`. Quaisquer dados de demonstração, arrays estáticos ou sementes fictícias foram purgados do servidor (`server.ts`) e da interface (`AdminDashboardModal.tsx`), assegurando fiabilidade operacional absoluta.
 
-### A. Insights e Contabilidade (`analytics`)
+### B. Padronização de Design System & Regras Globais UI/UX Responsivas
+*   **Regra 1 — Overlays e Modais Mobile Full-Screen**: Todos os modais da plataforma (Admin principal, Edição de Produto, Edição de Matéria-Prima e Ficha de Cliente CRM) abrem obrigatoriamente em ecrã completo (`w-full h-full max-h-screen rounded-none`) em dispositivos móveis (`<640px`), incorporando Sticky Header (botão Fechar) e Sticky Footer (botões Cancelar/Guardar) para ergonomics de toque com uma só mão.
+*   **Regra 2 — Zero Scroll Horizontal & Grelhas Adaptativas**: O container pai força `w-full max-w-full overflow-x-hidden`. As estatísticas e KPIs adaptam-se para `grid-cols-2` sem larguras fixas em pixels, e os cartões de produtos/encomendas ajustam-se progressivamente (`grid-cols-1` em mobile, `grid-cols-2` em tablet, `grid-cols-3`/`grid-cols-4` em desktop), garantindo que nenhum elemento ultrapassa a largura do ecrã.
+*   **Regra 3 — Navegação Deslizante Desimpedida**: A barra principal de navegação de abas e os menus de filtro usam `flex overflow-x-auto whitespace-nowrap no-scrollbar` com scroll inercial suave.
+*   **Regra 4 — Ergonomia Tátil e Tipografia de Alta Moda**: Botões e áreas de toque alargadas (`whitespace-nowrap`, `p-2.5`) preparadas para polegares em smartphones.
+
+### C. Insights e Contabilidade (`analytics`)
 *   **Purga Total e Absoluta de Dados Mock/Seed:** As abas 'analytics', 'orders' e 'crm' carregam 100% de dados reais e dinâmicos persistidos no volume `/app/data/orders.json`. Quaisquer dados de demonstração, arrays estáticos ou sementes fictícias foram purgados do servidor (`server.ts`) e da interface (`AdminDashboardModal.tsx`), assegurando fiabilidade operacional absoluta.
 *   **Métricas de Desempenho:** Apresenta o Volume de Faturação Total, Número de Transações, Ticket Médio por Cliente e um indicador específico de faturas aguardando pagamento por Referência Multibanco.
 *   **Gráficos de Vendas:** Desenho dinâmico de gráficos de vendas em tempo real baseados no histórico real de encomendas.
@@ -77,6 +83,13 @@ A aplicação adota um armazenamento baseado em ficheiros locais persistentes, o
 ### C. Catálogo de Artigos / CMS (`catalog`)
 *   **Edição em Tempo Real:** Permite alterar títulos, preços, descrições, imagens de catálogo e o tempo estimado de produção em dias úteis para cada um dos produtos listados no site.
 *   **Criação de Artigos:** Permite introduzir novas peças em Crochet diretamente na interface do utilizador, que passam a constar imediatamente no catálogo público do e-commerce.
+*   **Ergonomia Mobile Full-Screen:** Em ecrãs móveis (`<640px`), o formulário modal de edição de produtos e matérias-primas expande para 100% de largura e altura (`w-full h-full max-h-screen rounded-none`), com grelha de pílulas de cores responsivas (`grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3`) e botões de ação fixos ao fundo (`sticky bottom-0 flex-col sm:flex-row gap-2.5`), garantindo utilização extremamente confortável no iPhone, iPad ou PC do Atelier.
+
+### D. Regras Globais de UI/UX Responsiva (Design System M★BRAVO)
+1. **Modais & Overlays em Mobile (`<640px`)**: Todos os modais do sistema abrem obrigatoriamente em Full-Screen (`w-full h-full max-h-screen rounded-none`), com Sticky Header (botão Fechar) e Sticky Footer (botão Cancelar / Guardar). Em Desktop/Tablet mantêm-se flutuantes centrados.
+2. **Grelhas & Proporções Adaptativas**: `grid-cols-1` para listagens e cartões em mobile, `grid-cols-2` em tablet e `grid-cols-3`/`grid-cols-4` em desktop. Zero pixels fixos a forçar scroll horizontal na página.
+3. **Navegação & Abas em Mobile**: Todos os menus de abas e filtros de contexto (menu principal Admin, barra de filtros de encomendas, seletor de coleções CMS e sub-abas de inventário) convertem-se automaticamente em barras horizontais deslizantes (`flex overflow-x-auto no-scrollbar shrink-0`).
+4. **Tipografia & Ações Touch**: Escala adaptativa com botões de ação ("Editar", "Eliminar", "Ocultar", "Reativar") com margens de toque alargadas e `whitespace-nowrap` sem quebra de linhas.
 
 ### D. Inventário de Matérias-Primas (`inventory`)
 *   **Gestão de Fios:** Monitorização do stock físico de rolos de fio (ex: *Fio de Algodão Cru*, *Fio Algodão Terracota*, *Linha Fina Ouro*).
