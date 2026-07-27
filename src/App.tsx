@@ -4036,7 +4036,7 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({ product: rawProduct,
                                         <div className="space-y-2">
                                             <div className="flex justify-between items-center">
                                                 <h5 className="text-[9px] uppercase tracking-[0.25em] font-bold text-forest/45 flex items-center gap-1.5">
-                                                    <span className="text-[#C5A059] text-xs">●</span> {((product as any).secondColorLabel || (product as any).detailLabel || (product as any).corDetalheLabel || ((product.name.toLowerCase().includes('pouch') || product.name.toLowerCase().includes('bolsa')) ? (lang === 'pt' ? 'Cor do Cordão' : 'Drawstring Color') : (lang === 'pt' ? 'Cor do Detalhe' : 'Detail Color')))}
+                                                    <span className="text-[#C5A059] text-xs">●</span> {(product as any).secondColorLabel || (product as any).detailLabel || (product as any).corDetalheLabel || ((product.name.toLowerCase().includes('mini pouch') || product.name.toLowerCase().includes('mini pouches') || (product as any).hasCordao) ? (lang === 'pt' ? 'Cor do Cordão' : 'Drawstring Color') : (lang === 'pt' ? 'Cor do Detalhe' : 'Detail Color'))}
                                                 </h5>
                                                 <span className="text-[9px] font-extrabold text-[#A68244] bg-[#FDF9F3] px-3 py-0.5 rounded-full border border-[#C5A059]/10 tracking-wider">
                                                     {translateColor(selections.corDetalhe || availableColorOptions[1] || availableColorOptions[0], lang)}
@@ -6282,7 +6282,7 @@ const ProductDetailPage = ({ pathname }: { pathname: string }) => {
                                         {/* Row 2: Detail / Cord Color */}
                                         <div className="space-y-2">
                                             <div className="flex justify-between items-center text-[10px] uppercase tracking-wider text-forest/55">
-                                                <span>{(productTranslated as any).secondColorLabel || (productTranslated as any).detailLabel || (productTranslated as any).corDetalheLabel || ((productTranslated.name.toLowerCase().includes('pouch') || productTranslated.name.toLowerCase().includes('bolsa')) ? (lang === 'pt' ? 'Cor do Cordão' : 'Drawstring Color') : (lang === 'pt' ? 'Cor do Detalhe' : 'Detail Color'))}</span>
+                                                <span>{(productTranslated as any).secondColorLabel || (productTranslated as any).detailLabel || (productTranslated as any).corDetalheLabel || ((productTranslated.name.toLowerCase().includes('mini pouch') || productTranslated.name.toLowerCase().includes('mini pouches') || (productTranslated as any).hasCordao) ? (lang === 'pt' ? 'Cor do Cordão' : 'Drawstring Color') : (lang === 'pt' ? 'Cor do Detalhe' : 'Detail Color'))}</span>
                                                 <span className="font-bold text-[#A68244] bg-[#FDF9F3] px-3 py-0.5 rounded-full border border-[#C5A059]/10">
                                                     {translateColor(selections.corDetalhe || availableColorOptions[1] || availableColorOptions[0], lang)}
                                                 </span>
