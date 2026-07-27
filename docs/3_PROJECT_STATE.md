@@ -207,6 +207,14 @@ Para que o repositório no GitHub fique 100% sincronizado com a versão final de
     *   **Consumo Dinâmico do Estado do Produto:** O componente de amostragem consome diretamente o array `availableColors` atribuído ao produto na base de dados/Admin sem injeção de listas genéricas.
     *   **Mapeamento de Alta Precisão (#HEX):** A função `getColorSwatchBg` em `translations.ts` foi expandida para mapear com 100% de precisão todos os tons de fios M★BRAVO e DROPS Safran/Paris para os seus códigos Hexadecimais reais (ex: `#243119` Musgo, `#1E3A8A` Azul Cobalto, `#F5EFEB` Natural, `#FFFFFF` Branco, `#F4DCD6` Rosa Pálido, etc.), eliminando totalmente a amostragem por cores genéricas.
     *   **Sincronização 100% da Rótulo/Pílula Selecionada:** Adicionada sincronização reativa com `useEffect` em `App.tsx` que atualiza simultaneamente `cor` e `corPrincipal` na seleção de cada pílula e ao alterar de produto, garantindo paridade absoluta entre a label superior (ex: *"COR: VERDE MUSGO"*) e a amostra visual marcada.
+*   [x] **Exclusividade Estrita por Tipo de Produto, Arquitetura 100% Dinâmica & Rótulos Adaptativos:**
+    *   **Purga Total de Condicionais Específicas de Produto:** Eliminadas todas as verificações manuais hardcoded (ex: `isMiniPouches`) de toda a codebase do `App.tsx` e dos modais.
+    *   **Lógica Condicional Exclusiva & Dinâmica:**
+        *   Produtos `single`: renderizam estritamente **1 seletor de cor** ("COR").
+        *   Produtos `bicolor`: renderizam estritamente **2 seletores de cor** ("COR PRINCIPAL" e "COR DO DETALHE" / "COR DO CORDÃO").
+        *   Produtos `fixed`: omitem seletores de cor e renderizam diretamente as especificações da peça.
+    *   **Rótulo Dinâmico Adaptativo Lido do Produto:** As labels superiores dos seletores (ex: *"COR DO CORDÃO"*, *"COR DO DETALHE"*, *"COR DO FIO"*) são lidas dinamicamente do objeto do produto retornado pelo Railway (`secondColorLabel`, `detailLabel`, `corDetalheLabel`), com fallback gracioso para nomes de categorias sem remendos no código.
+    *   **Amostragem de Luxo M★BRAVO:** Pílulas visuais aprimoradas com anel duplo em tom dourado nobre (`#C5A059`), borda interna sutil para destaque de fios claros (#FFFFFF/Natural) e badges superiores elegantes.
 
 ### B. Roteiro Técnico de Otimização Mobile & iOS WebKit (Meta: PageSpeed >90 - FASE 1 CONCLUÍDA):
 *   [x] **Aceleração Hardware-Backing para iOS WebKit:** Aplicado `-webkit-backface-visibility: hidden; transform: translateZ(0);` nos cartões de produtos e categorias para impedir a reciclagem agressiva de texturas da GPU pelo WebKit durante o scroll rápido em iPhones/iPads.
