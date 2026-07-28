@@ -624,8 +624,12 @@ export function sendMultibancoEmails(order: OrderData, multibancoRef: { entidade
   };
 }
 
-async function sendViaSendGrid(apiKey: string, toEmail: string, subject: string, htmlContent: string) {
+async function sendViaSendGrid(apiKey: string, toEmail: string, subject: string, htmlContent: string, bccEmails?: string[]) {
   const url = 'https://api.sendgrid.com/v3/mail/send';
+  const personalization: any = { to: [{ email: toEmail }] };
+  if (bccEmails && bccEmails.length > 0) {
+    personalization.bcc = bccEmails.map(email => ({ email }));
+  }
   const response = await fetch(url, {
     method: 'POST',
     headers: {
@@ -633,7 +637,7 @@ async function sendViaSendGrid(apiKey: string, toEmail: string, subject: string,
       'Authorization': `Bearer ${apiKey}`
     },
     body: JSON.stringify({
-      personalizations: [{ to: [{ email: toEmail }] }],
+      personalizations: [personalization],
       from: { email: process.env.FROM_EMAIL || 'encomendas@mbravobycarolina.com', name: 'M BRAVO' },
       subject: subject,
       content: [{ type: 'text/html', value: htmlContent }]
@@ -646,20 +650,24 @@ async function sendViaSendGrid(apiKey: string, toEmail: string, subject: string,
   }
 }
 
-async function sendViaResend(apiKey: string, toEmail: string, subject: string, htmlContent: string) {
+async function sendViaResend(apiKey: string, toEmail: string, subject: string, htmlContent: string, bccEmails?: string[]) {
   const url = 'https://api.resend.com/emails';
+  const bodyData: any = {
+    from: `M BRAVO <${process.env.FROM_EMAIL || 'encomendas@mbravobycarolina.com'}>`,
+    to: [toEmail],
+    subject: subject,
+    html: htmlContent
+  };
+  if (bccEmails && bccEmails.length > 0) {
+    bodyData.bcc = bccEmails;
+  }
   const response = await fetch(url, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
       'Authorization': `Bearer ${apiKey}`
     },
-    body: JSON.stringify({
-      from: `M BRAVO <${process.env.FROM_EMAIL || 'encomendas@mbravobycarolina.com'}>`,
-      to: [toEmail],
-      subject: subject,
-      html: htmlContent
-    })
+    body: JSON.stringify(bodyData)
   });
 
   if (!response.ok) {
@@ -900,20 +908,39 @@ export function sendShippedEmails(order: OrderData, trackingCode: string): { shi
 
   console.log(`[M.BRAVO EMAIL SYSTEM] Shipped Notification Email generated for ${order.orderId}`);
 
-  const hasSendGridKey = process.env.SENDGRID_API_KEY && 
-                        process.env.SENDGRID_API_KEY !== "" && 
-                        process.env.SENDGRID_API_KEY.startsWith("SG.") &&
-                        !process.env.SENDGRID_API_KEY.includes("INSERT_") &&
-                        !process.env.SENDGRID_API_KEY.includes("YOUR_") &&
-                        !process.env.SENDGRID_API_KEY.includes("mock") &&
-                        !process.env.SENDGRID_API_KEY.includes("test");
+  // Atelier BCC list: automatically sends hidden copy to Atelier
+  const atelierBcc = [
+    process.env.NOTIFICATION_EMAIL || 'handmade.mbravo@gmail.com',
+    'encomendas@mbravobycarolina.com'
+  ].filter((v, i, a) => v && a.indexOf(v) === i);
 
-  if (hasSendGridKey) {
-    sendViaSendGrid(process.env.SENDGRID_API_KEY!, order.customer.email, `M BRAVO | A sua Encomenda foi Enviada! - ${order.orderId}`, customerHtml)
-      .then(() => console.log(`[M.BRAVO EMAIL SYSTEM] Shipped Notification email sent successfully via SendGrid.`))
+  const resendKey = process.env.RESEND_API_KEY && 
+                    process.env.RESEND_API_KEY !== "" && 
+                    !process.env.RESEND_API_KEY.includes("INSERT_") &&
+                    !process.env.RESEND_API_KEY.includes("YOUR_");
+
+  const sendGridKey = process.env.SENDGRID_API_KEY && 
+                      process.env.SENDGRID_API_KEY !== "" && 
+                      process.env.SENDGRID_API_KEY.startsWith("SG.") &&
+                      !process.env.SENDGRID_API_KEY.includes("INSERT_") &&
+                      !process.env.SENDGRID_API_KEY.includes("YOUR_") &&
+                      !process.env.SENDGRID_API_KEY.includes("mock") &&
+                      !process.env.SENDGRID_API_KEY.includes("test");
+
+  if (resendKey) {
+    sendViaResend(process.env.RESEND_API_KEY!, order.customer.email, `M BRAVO | A sua Encomenda foi Enviada! - ${order.orderId}`, customerHtml, atelierBcc)
+      .then(() => console.log(`[M.BRAVO EMAIL SYSTEM] Shipped Notification email sent successfully via Resend with BCC to Atelier (${atelierBcc.join(', ')}).`))
+      .catch(err => {
+        console.warn(`[M.BRAVO EMAIL SYSTEM WARNING] Could not send Shipped Notification email via Resend: ${err.message}`);
+      });
+  } else if (sendGridKey) {
+    sendViaSendGrid(process.env.SENDGRID_API_KEY!, order.customer.email, `M BRAVO | A sua Encomenda foi Enviada! - ${order.orderId}`, customerHtml, atelierBcc)
+      .then(() => console.log(`[M.BRAVO EMAIL SYSTEM] Shipped Notification email sent successfully via SendGrid with BCC to Atelier (${atelierBcc.join(', ')}).`))
       .catch(err => {
         console.warn(`[M.BRAVO EMAIL SYSTEM WARNING] Could not send Shipped Notification email via SendGrid: ${err.message}`);
       });
+  } else {
+    console.log(`[M.BRAVO EMAIL SYSTEM] Live email gateway unconfigured. Local preview saved at /emails/${custFileName}`);
   }
 
   return {
