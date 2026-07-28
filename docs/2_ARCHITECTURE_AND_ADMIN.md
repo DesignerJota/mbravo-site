@@ -74,6 +74,9 @@ A aplicação adota um armazenamento baseado em ficheiros locais persistentes, o
 *   **Gestão e Apagar/Cancelar Encomendas Manuais:**
     *   **Cancelamento:** Ação rápida para cancelar qualquer encomenda (`Cancelar`), alterando o estado para `failed` (Cancelada).
     *   **Eliminação Definitiva (`/api/admin/orders/delete`):** Ação direta para apagar/eliminar registos de encomendas criadas manualmente ou por engano (`Eliminar`), removendo o registo da base de dados e recalculando instantaneamente os totais de faturação e métricas da contabilidade.
+*   **Registo de Venda Manual / Direta (`/api/admin/orders/manual`):** Interface dedicada para registar vendas diretas no Atelier ou recuperação de pedidos.
+    *   **Mapeamento Dinâmico de Inventário (Single Source of Truth):** O seletor de "COR & VARIAÇÃO" lê dinamicamente as 10 cores ativas de DROPS Safran e as 12 cores ativas de DROPS Paris diretamente de `inventory.json`.
+    *   **Abate Atómico:** Ao registar a encomenda, o motor backend `abateInventoryForOrder` abate automaticamente a quantidade exata de novelos e a receita de acessórios BOM do `inventory.json`.
 *   **Indicador de Sincronização Limpo:** Badge discreto de estado na interface (`● Sincronizado em tempo real`), livre de referências a nomes de ficheiros ou termos técnicos do servidor.
 *   **Automação do Fluxo de Expedição CTT (`sendShippedEmails`):** Ao introduzir o código de rastreamento dos CTT e marcar a encomenda como "enviada" (`shipped`), o sistema executa automaticamente de forma imediata:
     1. Atualização do estado no `orders.json` e sincronização reativa no perfil CRM do cliente.
@@ -145,9 +148,9 @@ A lógica de envio de e-mails comunica as atualizações de forma profissional c
 *   **Origem:** `encomendas@mbravobycarolina.com`
 *   **Destino Interno (Atelier):** `encomendas@mbravobycarolina.com` / `handmade.mbravo@gmail.com` (recebe cópia de alertas de stock baixo e novas encomendas para produção imediata).
 *   **Modelos de Email (HTML/CSS Embutido):**
-    *   `generateCustomerEmailHtml`: Envia um recibo de pagamento luxuoso em tons de creme e verde floresta, com os detalhes da peça comprada, especificações dinâmicas de cor e tamanho, formatação de telemóvel legível humana (`+351 917 827 458`) e uma mensagem personalizada que valoriza o processo de produção artesanal.
+    *   `generateCustomerEmailHtml`: Envia um recibo de pagamento luxuoso em tons de creme e verde floresta, apresentando os detalhes da peça em linhas organizadas e separadas (`Peça Selecionada`, `Tom / Cor`, `Tamanho`, `Quantidade`), formatação de telemóvel legível (`+351 917 827 458`) e a mensagem autêntica do atelier: *"Confirmamos com gosto a receção do seu pedido. A sua peça M★BRAVO foi integrada no nosso calendário de produção e começará em breve a ser moldada à mão no atelier com o ritmo e rigor que o trabalho artesanal exige."*.
     *   `sendMultibancoEmails`: Instruções detalhadas com Entidade, Referência e Montante.
-    *   `sendShippedEmails`: Confirmação de expedição com o respetivo código de registo CTT da transportadora para rastreamento.
+    *   `sendShippedEmails`: Confirmação de expedição CTT apresentando os detalhes da peça em linhas dedicadas e a narrativa do atelier: *"A sua peça M★BRAVO está pronta. Foi criada à mão no nosso atelier, inspecionada ao detalhe e cuidadosamente embalada. Encontra-se neste momento a caminho da sua morada através dos CTT."*, com link direto de rastreamento CTT.
 
 ---
 
