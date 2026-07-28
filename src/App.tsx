@@ -263,7 +263,7 @@ export function getShippingEstimate(product: any, lang: 'pt' | 'en') {
       inStock: true,
       title: lang === 'pt' ? 'Artigo em Stock' : 'Item in Stock',
       desc: lang === 'pt' 
-        ? 'Esta peça já se encontra confecionada por nós. O envio será processado no prazo imediato de 24h a 48h úteis.' 
+        ? 'Esta peça já se encontra produzida no nosso atelier. O envio será processado no prazo imediato de 24h a 48h úteis.' 
         : 'This piece is already crafted by us. Shipping will be processed immediately within 24h to 48h business hours.',
       badge: lang === 'pt' ? 'Envio em 24h/48h' : 'Shipping 24h/48h'
     };
@@ -285,8 +285,8 @@ export function getShippingEstimate(product: any, lang: 'pt' | 'en') {
       inStock: false,
       title: lang === 'pt' ? 'Peça por Encomenda (Produção Artesanal)' : 'Made to Order (Artisanal Production)',
       desc: lang === 'pt'
-        ? `Por ser um artigo artesanal e não haver stock imediato, esta peça será tecida especialmente para si. O tempo estimado de produção é de ${craftingDays} dias, com expedição prevista para ${formattedDate}.`
-        : `Since this is a handmade item with no immediate stock, this piece will be woven especially for you. Estimated crafting time is ${craftingDays} days, with shipping expected on ${formattedDate}.`,
+        ? `Por ser um artigo artesanal e não haver stock imediato, esta peça será criada artesanalmente especialmente para si. O tempo estimado de produção é de ${craftingDays} dias, com expedição prevista para ${formattedDate}.`
+        : `Since this is a handmade item with no immediate stock, this piece will be crafted especially for you. Estimated crafting time is ${craftingDays} days, with shipping expected on ${formattedDate}.`,
       badge: lang === 'pt' ? `Produção: ${craftingDays} dias` : `Crafting: ${craftingDays} days`
     };
   }
@@ -341,7 +341,7 @@ export let SHOP_CATEGORIES = [
           'https://i.ibb.co/WvPWRnhs/Coraline-coasters-4.png',
           'https://i.ibb.co/tpyY6NRY/Coraline-coasters-5.png'
         ],
-        description: "Bases em crochet inspiradas no design Coraline, tecidas à mão com todo o carinho para trazer um toque aconchegante, elegante e especial ao teu espaço.",
+        description: "Bases em crochet inspiradas no design Coraline, feitas à mão com todo o carinho para trazer um toque aconchegante, elegante e especial ao teu espaço.",
         material: "- Material: 100% algodão",
         care: "- Lavagem delicada\n- Secar na horizontal"
       },
