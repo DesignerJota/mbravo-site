@@ -56,7 +56,7 @@ const LegalModal = ({ type, onClose }: LegalModalProps) => {
                             Política de Devoluções
                         </h3>
                         <p className="text-forest/75 text-sm font-sans font-light leading-relaxed mb-4">
-                            Por se tratarem de artigos de design autoral, confecionados artesanalmente sob encomenda, a M★BRAVO apenas aceita devoluções ou trocas em caso de defeito de fabrico comprovado.
+                            Por se tratarem de artigos de design autoral, criados artesanalmente sob encomenda, a M★BRAVO apenas aceita devoluções ou trocas em caso de defeito de fabrico comprovado.
                         </p>
                         <p className="text-forest/75 text-sm font-sans font-light leading-relaxed mb-4">
                             Se detetar algum defeito na sua peça, deverá contactar-nos no prazo máximo de 14 dias após a receção, através do e-mail <a href={`mailto:${CONTACT_EMAIL}`} className="underline hover:text-forest transition-colors font-medium font-mono">{CONTACT_EMAIL}</a>, enviando fotografias detalhadas do problema.
@@ -117,7 +117,7 @@ const LegalModal = ({ type, onClose }: LegalModalProps) => {
                             Autenticidade e Especificidades Artesanais
                         </h3>
                         <p className="text-forest/75 text-sm font-sans font-light leading-relaxed mb-4">
-                            Todas as nossas peças são confecionadas 100% à mão através de técnicas tradicionais de crochet de luxo. Devido à natureza artesanal de cada criação, podem ocorrer pequenas variações impercetíveis na textura do fio ou nas dimensões exatas, o que confere a cada peça a sua identidade única e autêntica.
+                            Todas as nossas peças são feitas 100% à mão no nosso atelier através de técnicas tradicionais de crochet de luxo. Devido à natureza artesanal de cada criação, podem ocorrer pequenas variações impercetíveis na textura do fio ou nas dimensões exatas, o que confere a cada peça a sua identidade única e autêntica.
                         </p>
                     </div>
 
