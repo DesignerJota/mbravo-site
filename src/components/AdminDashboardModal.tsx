@@ -336,6 +336,56 @@ export default function AdminDashboardModal({ onClose, shopCategories = [] }: Ad
     customNotes: ''
   });
 
+  // Email Preview Modal State
+  const [emailPreviewModal, setEmailPreviewModal] = useState<{
+    isOpen: boolean;
+    title: string;
+    html: string;
+    loading: boolean;
+  } | null>(null);
+
+  const handleOpenEmailPreview = async (orderId: string, type: 'shipped' | 'customer' | 'admin' | 'multibanco') => {
+    setEmailPreviewModal({
+      isOpen: true,
+      title: 'A carregar e-mail...',
+      html: '',
+      loading: true
+    });
+
+    try {
+      const activePass = password || localStorage.getItem('mbravo_admin_password') || '';
+      const res = await fetch(`${API_BASE_URL}/api/admin/orders/${orderId}/email-preview?type=${type}`, {
+        headers: {
+          'x-admin-password': activePass,
+          'Authorization': activePass
+        }
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        setEmailPreviewModal({
+          isOpen: true,
+          title: data.title,
+          html: data.html,
+          loading: false
+        });
+      } else {
+        setEmailPreviewModal({
+          isOpen: true,
+          title: 'Erro ao obter e-mail',
+          html: `<div style="padding:40px; font-family:sans-serif; text-align:center; color:#900; background:#fff;">${data.error || 'Erro ao obter pré-visualização do e-mail.'}</div>`,
+          loading: false
+        });
+      }
+    } catch (err) {
+      setEmailPreviewModal({
+        isOpen: true,
+        title: 'Erro de Ligação',
+        html: `<div style="padding:40px; font-family:sans-serif; text-align:center; color:#900; background:#fff;">Não foi possível ligar ao servidor para obter o e-mail.</div>`,
+        loading: false
+      });
+    }
+  };
+
   const fetchCustomerProfile = async (email: string) => {
     setLoadingCustomerProfile(true);
     setCustomerProfileError(null);
@@ -1916,14 +1966,29 @@ export default function AdminDashboardModal({ onClose, shopCategories = [] }: Ad
                                       className="w-full bg-[#FCFBF9] border border-forest/10 focus:border-[#C5A059] focus:outline-none rounded-lg px-3 py-2 text-xs font-mono uppercase"
                                     />
                                   </div>
-                                  <button
-                                    onClick={() => handleDispatchTracking(order.orderId)}
-                                    disabled={isUpdating || !trInput}
-                                    className="w-full py-2 bg-[#243119] hover:bg-[#1a2412] text-cream rounded-lg text-[10px] font-bold uppercase tracking-wider shadow-sm transition-all cursor-pointer flex items-center justify-center gap-1.5 disabled:opacity-40"
-                                  >
-                                    <Truck className="w-3.5 h-3.5" />
-                                    Expedir & Enviar E-mail
-                                  </button>
+                                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
+                                    <button
+                                      onClick={() => handleDispatchTracking(order.orderId)}
+                                      disabled={isUpdating || !trInput}
+                                      className="w-full py-2 bg-[#243119] hover:bg-[#1a2412] text-cream rounded-lg text-[10px] font-bold uppercase tracking-wider shadow-sm transition-all cursor-pointer flex items-center justify-center gap-1.5 disabled:opacity-40"
+                                    >
+                                      <Truck className="w-3.5 h-3.5" />
+                                      Expedir (CTT)
+                                    </button>
+                                    <button
+                                      onClick={() => {
+                                        if (window.confirm(`Deseja marcar a encomenda ${order.orderId} como 'Entregue em Mão / Concluída' sem gerar código CTT ou disparar e-mail de envio?`)) {
+                                          handleUpdateStatus(order.orderId, 'delivered');
+                                        }
+                                      }}
+                                      disabled={isUpdating}
+                                      className="w-full py-2 bg-emerald-800 hover:bg-emerald-900 text-white rounded-lg text-[10px] font-bold uppercase tracking-wider shadow-sm transition-all cursor-pointer flex items-center justify-center gap-1.5 disabled:opacity-40"
+                                      title="Para levantamentos no atelier ou entregas presenciais"
+                                    >
+                                      <CheckCircle className="w-3.5 h-3.5" />
+                                      Entrega em Mão
+                                    </button>
+                                  </div>
                                 </div>
                               )}
 
@@ -1962,11 +2027,15 @@ export default function AdminDashboardModal({ onClose, shopCategories = [] }: Ad
                                 <div className="bg-green-50 border border-green-200 rounded-xl p-3 text-xs space-y-2">
                                   <div className="flex items-center gap-1 text-green-800 font-medium font-sans">
                                     <CheckCircle className="w-4 h-4 text-green-600 shrink-0" />
-                                    <span>Encomenda Entregue com Sucesso</span>
+                                    <span>Encomenda Entregue / Concluída</span>
                                   </div>
-                                  {order.trackingCode && (
+                                  {order.trackingCode ? (
                                     <div className="text-[11px] text-forest/70">
                                       Código de rastreio usado: <span className="font-mono font-bold">{order.trackingCode}</span>
+                                    </div>
+                                  ) : (
+                                    <div className="text-[11px] text-forest/70 font-medium">
+                                      Modalidade: <span className="font-bold">Entrega em Mão / Concluída</span>
                                     </div>
                                   )}
                                   <p className="text-[10px] text-forest/50">Esta encomenda está concluída e arquivada.</p>
@@ -2003,49 +2072,46 @@ export default function AdminDashboardModal({ onClose, shopCategories = [] }: Ad
                             <div className="pt-3 border-t border-forest/5 space-y-1.5">
                               <span className="text-[9px] font-bold text-forest/35 uppercase tracking-wider block">Comprovativos de E-mail</span>
                               <div className="grid grid-cols-2 gap-1.5 text-[9px]">
-                                {order.emailLinks?.customerEmailUrl && (
-                                  <a 
-                                    href={order.emailLinks.customerEmailUrl} 
-                                    target="_blank" 
-                                    rel="noreferrer"
-                                    className="p-1.5 bg-[#FCF8F2] border border-[#C5A059]/10 text-[#243119] rounded-lg hover:bg-[#F3EFE9] flex items-center justify-center gap-1 hover:underline font-medium"
-                                  >
-                                    <Eye className="w-3 h-3 text-[#C5A059]" />
-                                    Ver Recibo
-                                  </a>
-                                )}
-                                {order.emailLinks?.adminEmailUrl && (
-                                  <a 
-                                    href={order.emailLinks.adminEmailUrl} 
-                                    target="_blank" 
-                                    rel="noreferrer"
-                                    className="p-1.5 bg-[#FCF8F2] border border-[#C5A059]/10 text-[#243119] rounded-lg hover:bg-[#F3EFE9] flex items-center justify-center gap-1 hover:underline font-medium"
-                                  >
-                                    <Eye className="w-3 h-3 text-[#C5A059]" />
-                                    Notif. Atelier
-                                  </a>
-                                )}
-                                {order.shippedEmailUrl && (
-                                  <a 
-                                    href={order.shippedEmailUrl} 
-                                    target="_blank" 
-                                    rel="noreferrer"
-                                    className="p-1.5 bg-[#E6ECDF] border border-[#BACAA5]/30 text-[#243119] rounded-lg hover:bg-[#DCE4D4] flex items-center justify-center gap-1 hover:underline font-medium col-span-2"
-                                  >
-                                    <Eye className="w-3 h-3 text-green-700" />
-                                    Ver E-mail CTT Enviado
-                                  </a>
-                                )}
-                                {order.multibancoRef && !order.emailLinks?.customerEmailUrl && (
-                                  <a 
-                                    href={`/emails/multibanco-instruction-${order.orderId}.html`} 
-                                    target="_blank" 
-                                    rel="noreferrer"
-                                    className="p-1.5 bg-amber-50 border border-amber-200/20 text-amber-800 rounded-lg hover:bg-amber-100/50 flex items-center justify-center gap-1 hover:underline font-medium col-span-2"
+                                {/* Ver Recibo / Confirmação Cliente */}
+                                <button
+                                  type="button"
+                                  onClick={() => handleOpenEmailPreview(order.orderId, 'customer')}
+                                  className="p-1.5 bg-[#FCF8F2] border border-[#C5A059]/10 text-[#243119] rounded-lg hover:bg-[#F3EFE9] flex items-center justify-center gap-1 font-medium cursor-pointer transition-colors"
+                                >
+                                  <Eye className="w-3 h-3 text-[#C5A059]" />
+                                  Ver Recibo
+                                </button>
+
+                                {/* Notificação do Atelier */}
+                                <button
+                                  type="button"
+                                  onClick={() => handleOpenEmailPreview(order.orderId, 'admin')}
+                                  className="p-1.5 bg-[#FCF8F2] border border-[#C5A059]/10 text-[#243119] rounded-lg hover:bg-[#F3EFE9] flex items-center justify-center gap-1 font-medium cursor-pointer transition-colors"
+                                >
+                                  <Eye className="w-3 h-3 text-[#C5A059]" />
+                                  Notif. Atelier
+                                </button>
+
+                                {/* Ver E-mail CTT Enviado */}
+                                <button
+                                  type="button"
+                                  onClick={() => handleOpenEmailPreview(order.orderId, 'shipped')}
+                                  className="p-1.5 bg-[#E6ECDF] border border-[#BACAA5]/30 text-[#243119] rounded-lg hover:bg-[#DCE4D4] flex items-center justify-center gap-1 font-medium col-span-2 cursor-pointer transition-colors shadow-xs"
+                                >
+                                  <Eye className="w-3 h-3 text-green-700" />
+                                  Ver E-mail CTT Enviado
+                                </button>
+
+                                {/* Instruções Multibanco */}
+                                {order.multibancoRef && (
+                                  <button
+                                    type="button"
+                                    onClick={() => handleOpenEmailPreview(order.orderId, 'multibanco')}
+                                    className="p-1.5 bg-amber-50 border border-amber-200/20 text-amber-800 rounded-lg hover:bg-amber-100/50 flex items-center justify-center gap-1 font-medium col-span-2 cursor-pointer transition-colors"
                                   >
                                     <Eye className="w-3 h-3 text-amber-600" />
                                     Ver Instruções Multibanco
-                                  </a>
+                                  </button>
                                 )}
                               </div>
                             </div>
@@ -4370,6 +4436,83 @@ export default function AdminDashboardModal({ onClose, shopCategories = [] }: Ad
             )}
           </motion.div>
         </>
+      )}
+    </AnimatePresence>
+
+    {/* EMAIL PREVIEW MODAL OVERLAY */}
+    <AnimatePresence>
+      {emailPreviewModal?.isOpen && (
+        <div className="fixed inset-0 z-[200] flex items-center justify-center p-3 sm:p-6 bg-black/60 backdrop-blur-sm animate-fade-in">
+          <motion.div 
+            initial={{ opacity: 0, scale: 0.95, y: 10 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.95, y: 10 }}
+            className="bg-[#FAF8F5] border border-[#C5A059]/30 rounded-2xl shadow-2xl w-full max-w-4xl max-h-[92vh] flex flex-col overflow-hidden"
+          >
+            {/* Header */}
+            <div className="p-4 sm:p-5 bg-[#243119] text-cream flex items-center justify-between shrink-0">
+              <div className="flex items-center gap-2">
+                <Mail className="w-5 h-5 text-[#C5A059]" />
+                <h3 className="font-serif text-base sm:text-lg font-bold tracking-wide">
+                  {emailPreviewModal.title}
+                </h3>
+              </div>
+              <button
+                type="button"
+                onClick={() => setEmailPreviewModal(null)}
+                className="p-1.5 hover:bg-white/10 rounded-full transition-colors text-cream/70 hover:text-cream cursor-pointer"
+                title="Fechar"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Action Bar */}
+            <div className="px-4 py-2.5 bg-[#FCF8F2] border-b border-[#C5A059]/15 flex items-center justify-between shrink-0 text-xs">
+              <span className="text-forest/60 font-medium hidden sm:inline">Pré-visualização Fidedigna do Template HTML</span>
+              <span className="text-forest/60 font-medium sm:hidden">Template HTML</span>
+              <div className="flex items-center gap-2">
+                {!emailPreviewModal.loading && emailPreviewModal.html && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const blob = new Blob([emailPreviewModal.html], { type: 'text/html;charset=utf-8;' });
+                      const url = URL.createObjectURL(blob);
+                      window.open(url, '_blank');
+                    }}
+                    className="px-3 py-1.5 bg-white border border-[#C5A059]/30 hover:bg-[#F3EFE9] text-[#243119] rounded-lg font-bold uppercase tracking-wider text-[10px] flex items-center gap-1 transition-colors cursor-pointer"
+                  >
+                    <ExternalLink className="w-3 h-3 text-[#C5A059]" />
+                    Abrir em Nova Aba
+                  </button>
+                )}
+                <button
+                  type="button"
+                  onClick={() => setEmailPreviewModal(null)}
+                  className="px-3 py-1.5 bg-[#243119] text-cream hover:bg-[#1a2412] rounded-lg font-bold uppercase tracking-wider text-[10px] transition-colors cursor-pointer"
+                >
+                  Fechar
+                </button>
+              </div>
+            </div>
+
+            {/* Modal Body / Iframe */}
+            <div className="p-3 sm:p-5 flex-1 bg-[#F5F2ED] overflow-y-auto min-h-[380px] flex items-center justify-center">
+              {emailPreviewModal.loading ? (
+                <div className="flex flex-col items-center justify-center p-12 space-y-3">
+                  <RefreshCw className="w-8 h-8 text-[#C5A059] animate-spin" />
+                  <p className="text-xs font-bold uppercase tracking-widest text-[#243119]">A gerar modelo do e-mail...</p>
+                </div>
+              ) : (
+                <iframe
+                  srcDoc={emailPreviewModal.html}
+                  title="Pré-visualização de E-mail"
+                  className="w-full h-[65vh] border border-[#C5A059]/20 rounded-xl shadow-inner bg-white"
+                />
+              )}
+            </div>
+          </motion.div>
+        </div>
       )}
     </AnimatePresence>
     </div>
