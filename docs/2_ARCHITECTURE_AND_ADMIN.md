@@ -67,6 +67,10 @@ A aplicação adota um armazenamento baseado em ficheiros locais persistentes, o
 
 ### B. Gestão de Encomendas & CRM (`orders`)
 *   **Estado da Encomenda:** Gestão do fluxo da transação (`pendente de pagamento`, `paga`, `enviada`, `entregue`, `cancelada`).
+*   **Registo de Venda / Encomenda Manual Inteligente (`/api/admin/orders/create`):**
+    *   **Dropdown Dinâmico de Produtos:** A criação de vendas manuais no Admin integra um seletor dinâmico que carrega automaticamente todas as peças ativas do catálogo e preenche o preço de tabela do artigo.
+    *   **Seleção Adaptativa de Cores/Variações:** Identifica se o produto é de cor única (`single`) ou bicolor (`bicolor`) e renderiza dropdowns com as cores reais configuradas no catálogo do atelier (ex: "Cor da Base" e "Cor do Detalhe").
+    *   **Abatimento Dinâmico de Matérias-Primas:** Ao criar uma encomenda manual no estado "paga", o servidor invoca a função `getMaterialsNeededForProduct` em `server.ts` que abate imediatamente as bobinas de fio e acessórios do inventário (`/app/data/inventory.json`) segundo as proporções do produto (100% monocolor ou 70%/30% bicolor) e gera os devidos registos no histórico do cliente (CRM).
 *   **Gestão e Apagar/Cancelar Encomendas Manuais:**
     *   **Cancelamento:** Ação rápida para cancelar qualquer encomenda (`Cancelar`), alterando o estado para `failed` (Cancelada).
     *   **Eliminação Definitiva (`/api/admin/orders/delete`):** Ação direta para apagar/eliminar registos de encomendas criadas manualmente ou por engano (`Eliminar`), removendo o registo da base de dados e recalculando instantaneamente os totais de faturação e métricas da contabilidade.
