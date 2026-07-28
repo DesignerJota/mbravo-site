@@ -150,13 +150,13 @@ export function generateCustomerEmailHtml(order: OrderData): string {
               RECIBO DE PAGAMENTO &bull; COMPROVATIVO
             </div>
             <div style="font-size: 13px; color: #243119; font-style: italic; line-height: 1.5;">
-              Este documento serve como comprovativo de pagamento elegível da sua encomenda. O pagamento foi validado com sucesso e a peça entrou em confecção.
+              Este documento serve como comprovativo de pagamento elegível da sua encomenda. O pagamento foi validado com sucesso e a peça deu entrada na nossa lista de produção artesanal.
             </div>
           </div>
 
           <!-- STORY TEXT -->
           <div style="font-size: 14px; line-height: 1.8; color: rgba(36, 49, 25, 0.85); text-align: justify; margin-bottom: 30px; font-weight: 300;">
-            Cada peça M★BRAVO é tecida à mão, respeitando o ritmo orgânico do trabalho artesanal e a nobreza das matérias-primas nacionais. O seu pedido acaba de dar entrada no nosso atelier e começará a ganhar forma pelas mãos da nossa equipa.
+            Cada peça M★BRAVO é feita à mão no nosso atelier, criada artesanalmente e respeitando o ritmo orgânico das matérias-primas e a nobreza do trabalho manual. O seu pedido acaba de dar entrada na nossa oficina e começará a ganhar forma pelas mãos da nossa equipa.
           </div>
 
           <!-- DIVIDER -->
@@ -228,7 +228,7 @@ export function generateCustomerEmailHtml(order: OrderData): string {
 
           <!-- PRODUCTION NOTE -->
           <div style="background-color: #FDFBF7; border-left: 3px solid #C5A059; padding: 15px; font-size: 12px; line-height: 1.6; font-style: italic; color: rgba(36, 49, 25, 0.8); margin-bottom: 35px;">
-            <strong>Nota de Confecção:</strong> Por se tratar de um processo meticuloso e 100% manual, estimamos que a sua peça seja expedida num prazo de 7 a 14 dias úteis. Receberá uma nova notificação com o código de acompanhamento assim que for enviada.
+            <strong>Nota de Produção Artesanal:</strong> Por se tratar de um processo meticuloso e 100% manual, estimamos que a sua peça seja expedida num prazo de 7 a 14 dias úteis. Receberá uma nova notificação com o código de acompanhamento assim que for enviada.
           </div>
 
           <!-- DIVIDER -->
@@ -268,7 +268,7 @@ export function generateAdminEmailHtml(order: OrderData): string {
 
   const instructionStep2 = corText
     ? `2. Reservar o novelo de fio de cor <strong>${corText}</strong> no stock.<br>`
-    : `2. Separar os materiais de confecção correspondentes.<br>`;
+    : `2. Separar as matérias-primas de produção correspondentes.<br>`;
 
   return `<!DOCTYPE html>
 <html>
@@ -570,7 +570,7 @@ export function generateMultibancoEmailHtml(order: OrderData, multibancoRef: { e
 
           <!-- NOTE TEXT -->
           <div style="font-size: 12px; font-style: italic; color: rgba(36, 49, 25, 0.6); text-align: center; line-height: 1.6; margin-bottom: 30px; font-weight: 300;">
-            Nota: O prazo limite para pagamento desta referência é de 3 dias. Assim que efetuar o pagamento, receberá um e-mail de confirmação automático e iniciaremos a confecção da sua peça.
+            Nota: O prazo limite para pagamento desta referência é de 3 dias. Assim que efetuar o pagamento, receberá um e-mail de confirmação automático e iniciaremos a produção manual da sua peça.
           </div>
 
           <!-- DIVIDER -->
@@ -775,7 +775,7 @@ export function generateShippedEmailHtml(order: OrderData, trackingCode: string)
 
           <!-- SHIPPED STORY TEXT -->
           <div style="font-size: 14px; line-height: 1.8; color: rgba(36, 49, 25, 0.85); text-align: justify; margin-bottom: 30px; font-weight: 300;">
-            A sua peça foi tecida à mão no nosso atelier com todo o afeto, cuidado e dedicação. O processo de confecção manual está agora concluído e a sua encomenda foi carinhosamente embalada e entregue aos CTT para envio.
+            A sua peça foi feita à mão no nosso atelier com todo o afeto, cuidado e dedicação. O processo de elaboração artesanal está agora concluído e a sua encomenda foi carinhosamente embalada e entregue aos CTT para envio.
           </div>
 
           <!-- TRACKING BOX TABLE -->
@@ -801,7 +801,7 @@ export function generateShippedEmailHtml(order: OrderData, trackingCode: string)
                   <!-- Row: Button -->
                   <tr>
                     <td colspan="2" align="center" style="padding-top: 20px; text-align: center;">
-                      <a href="${trackingUrl}" target="_blank" style="display: inline-block; background-color: #243119; color: #F5F2ED; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: 0.15em; text-decoration: none; padding: 14px 28px; border-radius: 50px; transition: all 0.2s ease;">
+                      <a href="${trackingUrl}" target="_blank" style="display: inline-block; background-color: #243119; color: #FAF8F5; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 11px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.12em; text-decoration: none; padding: 10px 22px; border-radius: 4px; transition: all 0.2s ease;">
                         Rastrear nos CTT
                       </a>
                     </td>
@@ -863,16 +863,16 @@ export function generateShippedEmailHtml(order: OrderData, trackingCode: string)
           </div>
 
           <!-- GOOGLE REVIEWS REQUEST -->
-          <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #FAF8F5; border: 1px solid rgba(197, 160, 89, 0.25); border-radius: 12px; font-family: 'Georgia', 'Garamond', serif; margin-top: 30px; margin-bottom: 30px; text-align: center;">
+          <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #FAF8F5; border: 1px solid rgba(197, 160, 89, 0.25); border-radius: 8px; font-family: 'Georgia', 'Garamond', serif; margin-top: 30px; margin-bottom: 30px; text-align: center;">
             <tr>
-              <td style="padding: 25px; text-align: center;">
-                <div style="color: #C5A059; font-size: 16px; margin-bottom: 8px; letter-spacing: 0.1em;">★ ★ ★ ★ ★</div>
-                <div style="font-size: 16px; font-style: italic; font-weight: bold; color: #243119; margin-bottom: 10px;">Partilhe a sua experiência M★BRAVO!</div>
+              <td style="padding: 24px; text-align: center;">
+                <div style="color: #C5A059; font-size: 15px; margin-bottom: 8px; letter-spacing: 0.15em;">★ ★ ★ ★ ★</div>
+                <div style="font-size: 15px; font-style: italic; font-weight: bold; color: #243119; margin-bottom: 8px;">Partilhe a sua experiência</div>
                 <div style="font-size: 13px; line-height: 1.6; color: rgba(36, 49, 25, 0.8); margin-bottom: 18px; font-weight: 300;">
-                  Como uma marca artesanal e independente, cada opinião é imensamente valiosa para nós. Se adorou o seu atendimento e a sua nova peça tecida à mão, significaria o mundo para nós se nos pudesse deixar uma breve crítica de 5 estrelas no Google.
+                  A sua opinião é fundamental para o nosso atelier. Conte-nos como foi a sua experiência com a M★BRAVO.
                 </div>
-                <a href="https://g.page/r/Cdo7JGP_Xpc3EBM/review" target="_blank" style="display: inline-block; background-color: #243119; color: #F5F2ED; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: 0.15em; text-decoration: none; padding: 12px 24px; border-radius: 50px; transition: all 0.2s ease;">
-                  Deixar Crítica no Google
+                <a href="https://g.page/r/Cdo7JGP_Xpc3EBM/review" target="_blank" style="display: inline-block; background-color: #243119; color: #FAF8F5; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 11px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.12em; text-decoration: none; padding: 10px 22px; border-radius: 4px; transition: all 0.2s ease;">
+                  Avaliar no Google
                 </a>
               </td>
             </tr>
