@@ -57,6 +57,16 @@ Respondendo às últimas solicitações de otimização de fluxo e consistência
 2.  **Contador de Itens Simplificado:**
     *   A expressão original *"X peças únicas"* que exibia o número de artigos da categoria foi considerada em desalinho com o tom premium e profissional pretendido.
     *   **Nova Expressão:** **"X Produtos"** (PT) e *"X Products"* (EN), mantendo o número dinâmico reativo aos filtros.
+3.  **Ajuste da Label do 2.º Seletor de Cor na African Flower Pouch:**
+    *   Ajustado de "COR DO CORDÃO" para "COR DO DETALHE" (ou rótulo configurado no catálogo), reservando "COR DO CORDÃO" unicamente a peças com fio/cordão (como Mini Pouches).
+4.  **Seleção Dinâmica de Produtos/Cores no Registo Manual de Encomendas & Abatimento de Stock Bicolor:**
+    *   Substituição de texto livre por dropdowns dinâmicos ligados ao catálogo e desmembramento automático do par de cores bicolores para abatimento proporcional no inventário de matérias-primas.
+5.  **Cópia Oculta (BCC) dos E-mails de Expedição para o Atelier:**
+    *   Configurado em `src/lib/emailService.ts` o envio automático em BCC para `handmade.mbravo@gmail.com` e `encomendas@mbravobycarolina.com`.
+6.  **Modal Interna de Pré-Visualização de E-mails HTML ("Ver E-mail CTT Enviado"):**
+    *   Criado o endpoint `GET /api/admin/orders/:orderId/email-preview` no `server.ts` e integrada modal no `AdminDashboardModal.tsx` com renderização fidedigna em `<iframe>` e opção "Abrir em Nova Aba".
+7.  **Modalidade "Entrega em Mão / Concluído":**
+    *   Adicionado o botão "Entrega em Mão" no painel administrativo para encomendas "No Atelier", permitindo transitar para "Entregue" sem exigir código CTT.
 
 ---
 
