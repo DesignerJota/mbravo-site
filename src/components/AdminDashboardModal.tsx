@@ -266,9 +266,13 @@ export default function AdminDashboardModal({ onClose, shopCategories = [] }: Ad
   // Manual Order states
   const [showManualForm, setShowManualForm] = useState(false);
   const [manualForm, setManualForm] = useState({
+    selectedProductId: '',
     productName: '',
     price: '',
+    corType: 'single' as 'single' | 'bicolor' | 'fixed',
     cor: '',
+    corPrincipal: '',
+    corDetalhe: '',
     tamanho: '',
     quantidade: '1',
     customerNome: '',
@@ -400,6 +404,144 @@ export default function AdminDashboardModal({ onClose, shopCategories = [] }: Ad
     }
   };
 
+  const DEFAULT_PALETTE = [
+    'Branco', 'Natural', 'Baunilha', 'Amarelo Claro', 'Verde Musgo',
+    'Verde Floresta', 'Azul Cobalto', 'Azul Pó', 'Rosa do Deserto',
+    'Rosa Claríssimo', 'Vermelho', 'Preto', 'Castanho', 'Café', 'Petróleo', 'Menta'
+  ];
+
+  const allCatalogProducts = React.useMemo(() => {
+    const list: any[] = [];
+    const source = (catalog && catalog.length > 0) ? catalog : shopCategories;
+    if (Array.isArray(source)) {
+      source.forEach((cat: any) => {
+        if (Array.isArray(cat.products)) {
+          cat.products.forEach((prod: any) => {
+            list.push(prod);
+          });
+        }
+      });
+    }
+    return list;
+  }, [catalog, shopCategories]);
+
+  const selectedProductObj = React.useMemo(() => {
+    if (!manualForm.selectedProductId || manualForm.selectedProductId === 'custom') return null;
+    return allCatalogProducts.find(
+      p => String(p.id) === manualForm.selectedProductId || p.name === manualForm.productName
+    );
+  }, [allCatalogProducts, manualForm.selectedProductId, manualForm.productName]);
+
+  const activeAvailableColors = React.useMemo(() => {
+    if (!selectedProductObj) return DEFAULT_PALETTE;
+    let list: string[] = [];
+    if (Array.isArray(selectedProductObj.availableColors)) {
+      list = selectedProductObj.availableColors;
+    } else if (typeof selectedProductObj.availableColors === 'string' && selectedProductObj.availableColors.trim()) {
+      list = selectedProductObj.availableColors.split(',').map((s: string) => s.trim()).filter(Boolean);
+    }
+    return list.length > 0 ? list : DEFAULT_PALETTE;
+  }, [selectedProductObj]);
+
+  const handleSelectProduct = (productIdOrName: string) => {
+    if (!productIdOrName) {
+      setManualForm(prev => ({
+        ...prev,
+        selectedProductId: '',
+        productName: '',
+        price: '',
+        corType: 'single',
+        cor: '',
+        corPrincipal: '',
+        corDetalhe: ''
+      }));
+      return;
+    }
+
+    if (productIdOrName === 'custom') {
+      setManualForm(prev => ({
+        ...prev,
+        selectedProductId: 'custom',
+        productName: '',
+        price: '',
+        corType: 'single',
+        cor: '',
+        corPrincipal: '',
+        corDetalhe: ''
+      }));
+      return;
+    }
+
+    const prod = allCatalogProducts.find(p => String(p.id) === productIdOrName || p.name === productIdOrName);
+    if (!prod) return;
+
+    let rawPrice = '';
+    if (typeof prod.price === 'number') {
+      rawPrice = prod.price.toFixed(2);
+    } else if (typeof prod.price === 'string') {
+      const clean = prod.price.replace(/[^0-9.,]/g, '').replace(',', '.');
+      const parsed = parseFloat(clean);
+      rawPrice = !isNaN(parsed) ? parsed.toFixed(2) : prod.price;
+    }
+
+    const nameLower = prod.name.toLowerCase();
+    const isAfricanFlowerPouch = nameLower.includes('african flower pouch');
+    const isMiniPouches = nameLower.includes('mini pouches') || nameLower.includes('mini pouch');
+    const isClassicCoasters = nameLower.includes('classic coasters');
+    const isCoaster = nameLower.includes('coasters') || nameLower.includes('placemats');
+
+    const isDualColor = isAfricanFlowerPouch || 
+                        nameLower.includes('marea bikini set') ||
+                        nameLower.includes('signature granny poncho') ||
+                        nameLower.includes('cardigan') ||
+                        isMiniPouches ||
+                        isClassicCoasters;
+
+    const rawColorType = (prod as any).colorType || (prod as any).corType;
+    const computedColorType: 'single' | 'bicolor' | 'fixed' = 
+      rawColorType === 'bicolor' ? 'bicolor'
+      : (rawColorType === 'single' ? 'single'
+      : (rawColorType === 'fixed' ? 'fixed'
+      : (isDualColor ? 'bicolor' : (isCoaster && !isClassicCoasters ? 'fixed' : 'single'))));
+
+    let rawColorsList: string[] = [];
+    if (Array.isArray(prod.availableColors)) {
+      rawColorsList = prod.availableColors;
+    } else if (typeof prod.availableColors === 'string' && prod.availableColors.trim()) {
+      rawColorsList = prod.availableColors.split(',').map((s: string) => s.trim()).filter(Boolean);
+    }
+    if (rawColorsList.length === 0) {
+      rawColorsList = DEFAULT_PALETTE;
+    }
+
+    let defaultPrim = rawColorsList[0] || 'Natural';
+    let defaultDet = rawColorsList[1] || rawColorsList[0] || 'Branco';
+    let initialCor = '';
+
+    if (computedColorType === 'bicolor') {
+      initialCor = `${defaultPrim} & ${defaultDet}`;
+    } else if (computedColorType === 'single') {
+      initialCor = defaultPrim;
+      defaultPrim = '';
+      defaultDet = '';
+    } else {
+      initialCor = 'Padrão';
+      defaultPrim = '';
+      defaultDet = '';
+    }
+
+    setManualForm(prev => ({
+      ...prev,
+      selectedProductId: String(prod.id || prod.name),
+      productName: prod.name,
+      price: rawPrice,
+      corType: computedColorType,
+      cor: initialCor,
+      corPrincipal: defaultPrim,
+      corDetalhe: defaultDet
+    }));
+  };
+
   const handleCreateManualOrder = async (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -420,6 +562,14 @@ export default function AdminDashboardModal({ onClose, shopCategories = [] }: Ad
     const priceVal = parseFloat(String(manualForm.price).replace(/[^0-9.,]/g, '').replace(',', '.')) || 0;
     const qtdVal = manualForm.quantidade.replace(/\D/g, '') || '1';
 
+    let finalCor = manualForm.cor.trim();
+    if (manualForm.corType === 'bicolor' && manualForm.corPrincipal) {
+      finalCor = manualForm.corDetalhe 
+        ? `${manualForm.corPrincipal} & ${manualForm.corDetalhe}` 
+        : manualForm.corPrincipal;
+    }
+    if (!finalCor) finalCor = 'Padrão';
+
     setIsCreatingManual(true);
     try {
       const res = await fetch(`${API_BASE_URL}/api/admin/orders/create`, {
@@ -432,7 +582,9 @@ export default function AdminDashboardModal({ onClose, shopCategories = [] }: Ad
           productName: cleanProdName,
           price: priceVal,
           selections: {
-            cor: manualForm.cor.trim() || 'Padrão',
+            cor: finalCor,
+            corPrincipal: manualForm.corType === 'bicolor' ? manualForm.corPrincipal : undefined,
+            corDetalhe: manualForm.corType === 'bicolor' ? manualForm.corDetalhe : undefined,
             tamanho: manualForm.tamanho.trim(),
             quantidade: qtdVal
           },
@@ -454,11 +606,15 @@ export default function AdminDashboardModal({ onClose, shopCategories = [] }: Ad
 
       const data = await res.json();
       if (res.ok && data.success) {
-        alert("Encomenda manual registada com sucesso na base de dados!");
+        alert("Encomenda manual registada com sucesso! O inventário de matérias-primas foi atualizado automaticamente.");
         setManualForm({
+          selectedProductId: '',
           productName: '',
           price: '',
+          corType: 'single',
           cor: '',
+          corPrincipal: '',
+          corDetalhe: '',
           tamanho: '',
           quantidade: '1',
           customerNome: '',
@@ -1270,52 +1426,116 @@ export default function AdminDashboardModal({ onClose, shopCategories = [] }: Ad
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    {/* Product Name */}
+                    {/* Dynamic Product Selection Dropdown */}
                     <div className="space-y-1">
-                      <label className="font-bold uppercase tracking-wider text-[10px] text-forest/50">Nome do Produto *</label>
-                      <input 
-                        type="text" 
-                        placeholder="Ex: Daisy Coasters (Set de 4)" 
-                        value={manualForm.productName}
-                        onChange={(e) => setManualForm(prev => ({ ...prev, productName: e.target.value }))}
-                        className="w-full bg-white border border-forest/15 rounded-xl px-3 py-2.5 focus:outline-none focus:border-[#C5A059]"
+                      <label className="font-bold uppercase tracking-wider text-[10px] text-forest/50">Selecione o Produto do Catálogo *</label>
+                      <select 
+                        value={manualForm.selectedProductId}
+                        onChange={(e) => handleSelectProduct(e.target.value)}
+                        className="w-full bg-white border border-forest/15 rounded-xl px-3 py-2.5 focus:outline-none focus:border-[#C5A059] font-medium"
                         required
-                      />
+                      >
+                        <option value="">-- Escolher Peça do Catálogo --</option>
+                        {allCatalogProducts.map((prod: any) => (
+                          <option key={prod.id || prod.name} value={prod.id || prod.name}>
+                            {prod.name} ({typeof prod.price === 'number' ? `${prod.price.toFixed(2)}€` : prod.price})
+                          </option>
+                        ))}
+                        <option value="custom">-- Outro / Personalizado (Inserir Manualmente) --</option>
+                      </select>
+                      
+                      {manualForm.selectedProductId === 'custom' && (
+                        <input 
+                          type="text" 
+                          placeholder="Nome da peça personalizada" 
+                          value={manualForm.productName}
+                          onChange={(e) => setManualForm(prev => ({ ...prev, productName: e.target.value }))}
+                          className="w-full bg-white border border-forest/15 rounded-xl px-3 py-2 mt-1 focus:outline-none focus:border-[#C5A059]"
+                          required
+                        />
+                      )}
                     </div>
 
                     {/* Price */}
                     <div className="space-y-1">
-                      <label className="font-bold uppercase tracking-wider text-[10px] text-forest/50">Preço (€) *</label>
+                      <label className="font-bold uppercase tracking-wider text-[10px] text-forest/50">Preço Total (€) *</label>
                       <input 
                         type="text" 
                         placeholder="Ex: 24.00" 
                         value={manualForm.price}
                         onChange={(e) => setManualForm(prev => ({ ...prev, price: e.target.value.replace(/[^0-9.,]/g, '') }))}
-                        className="w-full bg-white border border-forest/15 rounded-xl px-3 py-2.5 focus:outline-none focus:border-[#C5A059]"
+                        className="w-full bg-white border border-forest/15 rounded-xl px-3 py-2.5 focus:outline-none focus:border-[#C5A059] font-medium"
                         required
                       />
                     </div>
 
-                    {/* Selections Quantity, Color, Size */}
-                    <div className="grid grid-cols-3 gap-2">
-                      <div className="space-y-1">
-                        <label className="font-bold uppercase tracking-wider text-[10px] text-forest/50">Cor</label>
-                        <input 
-                          type="text" 
-                          placeholder="Cru" 
+                    {/* Dynamic Color Selections & Qtd */}
+                    <div className="space-y-1">
+                      <label className="font-bold uppercase tracking-wider text-[10px] text-forest/50">Cor & Variação *</label>
+                      
+                      {manualForm.corType === 'bicolor' ? (
+                        <div className="grid grid-cols-2 gap-2">
+                          <div>
+                            <span className="text-[9px] uppercase tracking-wider text-forest/40 block mb-0.5 font-bold">
+                              {selectedProductObj && selectedProductObj.name.toLowerCase().includes('african flower pouch') ? 'Cor da Base' : 'Cor Principal'}
+                            </span>
+                            <select
+                              value={manualForm.corPrincipal}
+                              onChange={(e) => setManualForm(prev => ({ ...prev, corPrincipal: e.target.value }))}
+                              className="w-full bg-white border border-forest/15 rounded-xl px-2.5 py-2 focus:outline-none focus:border-[#C5A059] text-xs font-medium"
+                            >
+                              {activeAvailableColors.map(c => (
+                                <option key={`p_${c}`} value={c}>{c}</option>
+                              ))}
+                            </select>
+                          </div>
+                          <div>
+                            <span className="text-[9px] uppercase tracking-wider text-forest/40 block mb-0.5 font-bold">
+                              {selectedProductObj && selectedProductObj.name.toLowerCase().includes('african flower pouch') ? 'Cor do Detalhe' : 'Cor do Cordão/Detalhe'}
+                            </span>
+                            <select
+                              value={manualForm.corDetalhe}
+                              onChange={(e) => setManualForm(prev => ({ ...prev, corDetalhe: e.target.value }))}
+                              className="w-full bg-white border border-forest/15 rounded-xl px-2.5 py-2 focus:outline-none focus:border-[#C5A059] text-xs font-medium"
+                            >
+                              {activeAvailableColors.map(c => (
+                                <option key={`d_${c}`} value={c}>{c}</option>
+                              ))}
+                            </select>
+                          </div>
+                        </div>
+                      ) : manualForm.corType === 'single' ? (
+                        <select
                           value={manualForm.cor}
                           onChange={(e) => setManualForm(prev => ({ ...prev, cor: e.target.value }))}
-                          className="w-full bg-white border border-forest/15 rounded-xl px-3 py-2.5 focus:outline-none"
+                          className="w-full bg-white border border-forest/15 rounded-xl px-3 py-2.5 focus:outline-none focus:border-[#C5A059] text-xs font-medium"
+                        >
+                          {activeAvailableColors.map(c => (
+                            <option key={`s_${c}`} value={c}>{c}</option>
+                          ))}
+                        </select>
+                      ) : (
+                        <input
+                          type="text"
+                          value={manualForm.cor || 'Padrão'}
+                          onChange={(e) => setManualForm(prev => ({ ...prev, cor: e.target.value }))}
+                          className="w-full bg-white border border-forest/15 rounded-xl px-3 py-2.5 focus:outline-none text-xs"
                         />
-                      </div>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    {/* Size & Quantity */}
+                    <div className="grid grid-cols-2 gap-2 md:col-span-1">
                       <div className="space-y-1">
-                        <label className="font-bold uppercase tracking-wider text-[10px] text-forest/50">Tam.</label>
+                        <label className="font-bold uppercase tracking-wider text-[10px] text-forest/50">Tamanho</label>
                         <input 
                           type="text" 
                           placeholder="Único" 
                           value={manualForm.tamanho}
                           onChange={(e) => setManualForm(prev => ({ ...prev, tamanho: e.target.value }))}
-                          className="w-full bg-white border border-forest/15 rounded-xl px-3 py-2.5 focus:outline-none"
+                          className="w-full bg-white border border-forest/15 rounded-xl px-3 py-2.5 focus:outline-none text-xs"
                         />
                       </div>
                       <div className="space-y-1">
@@ -1325,13 +1545,11 @@ export default function AdminDashboardModal({ onClose, shopCategories = [] }: Ad
                           placeholder="1" 
                           value={manualForm.quantidade}
                           onChange={(e) => setManualForm(prev => ({ ...prev, quantidade: e.target.value.replace(/\D/g, '') }))}
-                          className="w-full bg-white border border-forest/15 rounded-xl px-3 py-2.5 focus:outline-none"
+                          className="w-full bg-white border border-forest/15 rounded-xl px-3 py-2.5 focus:outline-none font-bold text-center text-xs"
                         />
                       </div>
                     </div>
-                  </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     {/* Customer Name */}
                     <div className="space-y-1">
                       <label className="font-bold uppercase tracking-wider text-[10px] text-forest/50">Nome do Cliente *</label>
@@ -1356,7 +1574,9 @@ export default function AdminDashboardModal({ onClose, shopCategories = [] }: Ad
                         className="w-full bg-white border border-forest/15 rounded-xl px-3 py-2.5 focus:outline-none focus:border-[#C5A059]"
                       />
                     </div>
+                  </div>
 
+                  <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                     {/* Customer Phone */}
                     <div className="space-y-1">
                       <label className="font-bold uppercase tracking-wider text-[10px] text-forest/50">Telefone do Cliente</label>
@@ -1368,9 +1588,6 @@ export default function AdminDashboardModal({ onClose, shopCategories = [] }: Ad
                         className="w-full bg-white border border-forest/15 rounded-xl px-3 py-2.5 focus:outline-none focus:border-[#C5A059]"
                       />
                     </div>
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                     {/* Address */}
                     <div className="space-y-1 md:col-span-2">
                       <label className="font-bold uppercase tracking-wider text-[10px] text-forest/50">Morada de Envio</label>
