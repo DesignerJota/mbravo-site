@@ -1215,6 +1215,23 @@ function getMaterialsNeededForProduct(productName: string, selections: any = {})
   function getYarnIdForColor(colorName: string) {
     const norm = (colorName || '').toLowerCase().trim();
     if (!norm) return 'rm_safran_18_natural';
+    if (norm.startsWith('rm_')) return norm;
+
+    // Direct lookup in loadInventory() by exact id or name matching
+    try {
+      const invData = loadInventory();
+      if (Array.isArray(invData)) {
+        const exactItem = invData.find((i: any) => {
+          if (!i || !i.id || !i.name) return false;
+          const iId = i.id.toLowerCase();
+          const iName = i.name.toLowerCase();
+          return iId === norm || iName === norm || norm.includes(iId) || norm.includes(iName);
+        });
+        if (exactItem) return exactItem.id;
+      }
+    } catch (e) {
+      // ignore
+    }
     
     // DROPS Paris Specific Checks
     if (norm.includes('baunilha') || norm.includes('vanilla') || norm.includes('35')) return 'rm_paris_35_baunilha';
