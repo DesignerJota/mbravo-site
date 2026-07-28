@@ -104,7 +104,12 @@ export function formatOrderSpecifications(selections: OrderData['selections']): 
  * Generates the elegant cream & forest green customer purchase confirmation HTML email template.
  */
 export function generateCustomerEmailHtml(order: OrderData): string {
-  const specsText = formatOrderSpecifications(order.selections);
+  const showSize = hasValidSize(order.selections?.tamanho, order.selections?.hasSize);
+  const corText = order.selections?.cor && order.selections.cor.trim() !== '' && !['n/a', 'na', 'nenhum', 'padrão', 'padrao', '-'].includes(order.selections.cor.trim().toLowerCase())
+    ? order.selections.cor.trim()
+    : null;
+  const rawQtd = order.selections?.quantidade && order.selections.quantidade.trim() !== '' ? order.selections.quantidade.trim() : '1';
+  const qtdFormatted = `${rawQtd} ${rawQtd === '1' ? 'unidade' : 'unidades'}`;
   const footerNotice = 'Esta é uma mensagem automática de confirmação de encomenda M★BRAVO.';
 
   return `<!DOCTYPE html>
@@ -147,16 +152,16 @@ export function generateCustomerEmailHtml(order: OrderData): string {
           <!-- RECEIPT BANNER -->
           <div style="background-color: #E2EAD9; border: 1px solid #BACAA5; border-radius: 8px; padding: 18px; margin-bottom: 30px; text-align: center; font-family: 'Georgia', 'Garamond', serif;">
             <div style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 10px; text-transform: uppercase; letter-spacing: 0.25em; color: #243119; font-weight: bold; margin-bottom: 6px;">
-              RECIBO DE PAGAMENTO &bull; COMPROVATIVO
+              PAGAMENTO CONFIRMADO &bull; RECIBO
             </div>
             <div style="font-size: 13px; color: #243119; font-style: italic; line-height: 1.5;">
-              Este documento serve como comprovativo de pagamento elegível da sua encomenda. O pagamento foi validado com sucesso e a peça deu entrada na nossa lista de produção artesanal.
+              O seu pagamento foi validado com sucesso e o recibo referente a esta encomenda encontra-se emitido abaixo.
             </div>
           </div>
 
           <!-- STORY TEXT -->
           <div style="font-size: 14px; line-height: 1.8; color: rgba(36, 49, 25, 0.85); text-align: justify; margin-bottom: 30px; font-weight: 300;">
-            Cada peça M★BRAVO é feita à mão no nosso atelier, criada artesanalmente e respeitando o ritmo orgânico das matérias-primas e a nobreza do trabalho manual. O seu pedido acaba de dar entrada na nossa oficina e começará a ganhar forma pelas mãos da nossa equipa.
+            Confirmamos com gosto a receção do seu pedido. A sua peça M★BRAVO foi integrada no nosso calendário de produção e começará em breve a ser moldada à mão no atelier com o ritmo e rigor que o trabalho artesanal exige.
           </div>
 
           <!-- DIVIDER -->
@@ -182,10 +187,24 @@ export function generateCustomerEmailHtml(order: OrderData): string {
                     <td style="color: rgba(36, 49, 25, 0.5); font-weight: 300; padding-top: 12px; padding-bottom: 12px; font-size: 13px; text-align: left; border-bottom: 1px dashed rgba(36, 49, 25, 0.08);">Peça Selecionada:</td>
                     <td align="right" style="font-weight: bold; padding-top: 12px; padding-bottom: 12px; font-size: 13px; color: #243119; text-align: right; border-bottom: 1px dashed rgba(36, 49, 25, 0.08);">${order.productName}</td>
                   </tr>
-                  <!-- Row: Especificações -->
+                  ${corText ? `
+                  <!-- Row: Tom / Cor -->
                   <tr>
-                    <td style="color: rgba(36, 49, 25, 0.5); font-weight: 300; padding-top: 12px; padding-bottom: 12px; font-size: 13px; text-align: left; border-bottom: 1px dashed rgba(36, 49, 25, 0.08);">Especificações:</td>
-                    <td align="right" style="font-weight: bold; padding-top: 12px; padding-bottom: 12px; font-size: 13px; color: #243119; text-align: right; border-bottom: 1px dashed rgba(36, 49, 25, 0.08);">${specsText}</td>
+                    <td style="color: rgba(36, 49, 25, 0.5); font-weight: 300; padding-top: 12px; padding-bottom: 12px; font-size: 13px; text-align: left; border-bottom: 1px dashed rgba(36, 49, 25, 0.08);">Tom / Cor:</td>
+                    <td align="right" style="font-weight: bold; padding-top: 12px; padding-bottom: 12px; font-size: 13px; color: #243119; text-align: right; border-bottom: 1px dashed rgba(36, 49, 25, 0.08);">${corText}</td>
+                  </tr>
+                  ` : ''}
+                  ${showSize ? `
+                  <!-- Row: Tamanho -->
+                  <tr>
+                    <td style="color: rgba(36, 49, 25, 0.5); font-weight: 300; padding-top: 12px; padding-bottom: 12px; font-size: 13px; text-align: left; border-bottom: 1px dashed rgba(36, 49, 25, 0.08);">Tamanho:</td>
+                    <td align="right" style="font-weight: bold; padding-top: 12px; padding-bottom: 12px; font-size: 13px; color: #243119; text-align: right; border-bottom: 1px dashed rgba(36, 49, 25, 0.08);">${order.selections.tamanho}</td>
+                  </tr>
+                  ` : ''}
+                  <!-- Row: Quantidade -->
+                  <tr>
+                    <td style="color: rgba(36, 49, 25, 0.5); font-weight: 300; padding-top: 12px; padding-bottom: 12px; font-size: 13px; text-align: left; border-bottom: 1px dashed rgba(36, 49, 25, 0.08);">Quantidade:</td>
+                    <td align="right" style="font-weight: bold; padding-top: 12px; padding-bottom: 12px; font-size: 13px; color: #243119; text-align: right; border-bottom: 1px dashed rgba(36, 49, 25, 0.08);">${qtdFormatted}</td>
                   </tr>
                   <!-- Row: Método de Pagamento -->
                   <tr>
@@ -733,7 +752,12 @@ export async function sendAtelierNotificationOnly(order: OrderData): Promise<{ a
  */
 export function generateShippedEmailHtml(order: OrderData, trackingCode: string): string {
   const trackingUrl = `https://www.ctt.pt/feapl_2/app/open/objectSearch/objectSearch.jspx?lang=def&objects=${trackingCode}`;
-  const specsText = formatOrderSpecifications(order.selections);
+  const showSize = hasValidSize(order.selections?.tamanho, order.selections?.hasSize);
+  const corText = order.selections?.cor && order.selections.cor.trim() !== '' && !['n/a', 'na', 'nenhum', 'padrão', 'padrao', '-'].includes(order.selections.cor.trim().toLowerCase())
+    ? order.selections.cor.trim()
+    : null;
+  const rawQtd = order.selections?.quantidade && order.selections.quantidade.trim() !== '' ? order.selections.quantidade.trim() : '1';
+  const qtdFormatted = `${rawQtd} ${rawQtd === '1' ? 'unidade' : 'unidades'}`;
   const footerNotice = 'Esta é uma mensagem automática de aviso de expedição M★BRAVO.';
 
   return `<!DOCTYPE html>
@@ -775,7 +799,7 @@ export function generateShippedEmailHtml(order: OrderData, trackingCode: string)
 
           <!-- SHIPPED STORY TEXT -->
           <div style="font-size: 14px; line-height: 1.8; color: rgba(36, 49, 25, 0.85); text-align: justify; margin-bottom: 30px; font-weight: 300;">
-            A sua peça foi feita à mão no nosso atelier com todo o afeto, cuidado e dedicação. O processo de elaboração artesanal está agora concluído e a sua encomenda foi carinhosamente embalada e entregue aos CTT para envio.
+            A sua peça M★BRAVO está pronta. Foi criada à mão no nosso atelier, inspecionada ao detalhe e cuidadosamente embalada. Encontra-se neste momento a caminho da sua morada através dos CTT.
           </div>
 
           <!-- TRACKING BOX TABLE -->
@@ -831,13 +855,27 @@ export function generateShippedEmailHtml(order: OrderData, trackingCode: string)
                   </tr>
                   <!-- Row: Peça -->
                   <tr>
-                    <td style="color: rgba(36, 49, 25, 0.5); font-weight: 300; padding-top: 12px; padding-bottom: 12px; font-size: 13px; text-align: left; border-bottom: 1px dashed rgba(36, 49, 25, 0.08);">Peça:</td>
+                    <td style="color: rgba(36, 49, 25, 0.5); font-weight: 300; padding-top: 12px; padding-bottom: 12px; font-size: 13px; text-align: left; border-bottom: 1px dashed rgba(36, 49, 25, 0.08);">Peça Selecionada:</td>
                     <td align="right" style="font-weight: bold; padding-top: 12px; padding-bottom: 12px; font-size: 13px; color: #243119; text-align: right; border-bottom: 1px dashed rgba(36, 49, 25, 0.08);">${order.productName}</td>
                   </tr>
-                  <!-- Row: Especificações -->
+                  ${corText ? `
+                  <!-- Row: Tom / Cor -->
                   <tr>
-                    <td style="color: rgba(36, 49, 25, 0.5); font-weight: 300; padding-top: 12px; padding-bottom: 12px; font-size: 13px; text-align: left; border-bottom: 1px dashed rgba(36, 49, 25, 0.08);">Especificações:</td>
-                    <td align="right" style="font-weight: bold; padding-top: 12px; padding-bottom: 12px; font-size: 13px; color: #243119; text-align: right; border-bottom: 1px dashed rgba(36, 49, 25, 0.08);">${specsText}</td>
+                    <td style="color: rgba(36, 49, 25, 0.5); font-weight: 300; padding-top: 12px; padding-bottom: 12px; font-size: 13px; text-align: left; border-bottom: 1px dashed rgba(36, 49, 25, 0.08);">Tom / Cor:</td>
+                    <td align="right" style="font-weight: bold; padding-top: 12px; padding-bottom: 12px; font-size: 13px; color: #243119; text-align: right; border-bottom: 1px dashed rgba(36, 49, 25, 0.08);">${corText}</td>
+                  </tr>
+                  ` : ''}
+                  ${showSize ? `
+                  <!-- Row: Tamanho -->
+                  <tr>
+                    <td style="color: rgba(36, 49, 25, 0.5); font-weight: 300; padding-top: 12px; padding-bottom: 12px; font-size: 13px; text-align: left; border-bottom: 1px dashed rgba(36, 49, 25, 0.08);">Tamanho:</td>
+                    <td align="right" style="font-weight: bold; padding-top: 12px; padding-bottom: 12px; font-size: 13px; color: #243119; text-align: right; border-bottom: 1px dashed rgba(36, 49, 25, 0.08);">${order.selections.tamanho}</td>
+                  </tr>
+                  ` : ''}
+                  <!-- Row: Quantidade -->
+                  <tr>
+                    <td style="color: rgba(36, 49, 25, 0.5); font-weight: 300; padding-top: 12px; padding-bottom: 12px; font-size: 13px; text-align: left;">Quantidade:</td>
+                    <td align="right" style="font-weight: bold; padding-top: 12px; padding-bottom: 12px; font-size: 13px; color: #243119; text-align: right;">${qtdFormatted}</td>
                   </tr>
                 </table>
               </td>
