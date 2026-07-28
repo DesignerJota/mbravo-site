@@ -204,7 +204,7 @@ export const translations = {
     "manifesto.p4_title": "O verdadeiro valor é aquilo que permanece.",
     "manifesto.p4_desc_1": "O valor de uma peça artesanal não vive apenas nos materiais.",
     "manifesto.p4_desc_2": "Vive no cuidado, na intenção e na emoção transportada em cada ponto.",
-    "manifesto.p4_desc_3": "Muito depois de o fio ser tecido, o sentimento permanece.",
+    "manifesto.p4_desc_3": "Muito depois de o fio ganhar forma, o sentimento permanece.",
     
     // Knot Section
     "feeling.tag": "Filosofia de Criação",
@@ -264,7 +264,7 @@ export const translations = {
     "product.close": "Fechar",
     "product.zoom": "Clique para ampliar a matéria",
     "product.custom_yarn_placeholder": "Fio de algodão certificado tecelagem manual",
-    "product.final_note": "Cada peça M★BRAVO é tecida manualmente com fios certificados, garantindo exclusividade em cada detalhe.",
+    "product.final_note": "Cada peça M★BRAVO é feita à mão no nosso atelier com fios certificados, garantindo exclusividade em cada detalhe.",
     "product.care.handwash": "LAVAGEM À MÃO",
     "product.care.dryflat": "SECAR HORIZONTAL",
     "product.care.notumble": "SEM SECADORA",
@@ -889,7 +889,7 @@ export const translatedProductsData = {
     },
     'h1f': {
       name: 'Coraline Coasters',
-      description: 'Bases em crochet inspiradas no design Coraline, tecidas à mão com todo o carinho para trazer um toque aconchegante, elegante e especial ao teu espaço.',
+      description: 'Bases em crochet inspiradas no design Coraline, feitas à mão com todo o carinho para trazer um toque aconchegante, elegante e especial ao teu espaço.',
       material: '- Material: 100% algodão',
       care: '- Lavagem delicada\n- Secar na horizontal'
     },
