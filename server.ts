@@ -2,7 +2,17 @@ import express from "express";
 import path from "path";
 import fs from "fs";
 import { createServer as createViteServer } from "vite";
-import { sendTransactionEmails, sendMultibancoEmails, sendShippedEmails, sendAtelierNotificationOnly, OrderData } from "./src/lib/emailService";
+import { 
+  sendTransactionEmails, 
+  sendMultibancoEmails, 
+  sendShippedEmails, 
+  sendAtelierNotificationOnly, 
+  generateShippedEmailHtml, 
+  generateAdminEmailHtml, 
+  generateCustomerEmailHtml, 
+  generateMultibancoEmailHtml, 
+  OrderData 
+} from "./src/lib/emailService";
 import Stripe from "stripe";
 import pg from "pg";
 
@@ -1560,6 +1570,47 @@ app.get("/api/admin/logs", verifyAdmin, (req, res) => {
   const currentLogs = loadLogs();
   activeLogs = currentLogs;
   res.json({ success: true, logs: activeLogs });
+});
+
+// Endpoint to generate and return HTML email previews directly for Admin Modal
+app.get("/api/admin/orders/:orderId/email-preview", verifyAdmin, (req, res) => {
+  const { orderId } = req.params;
+  const type = (req.query.type as string) || 'shipped'; // 'shipped' | 'customer' | 'admin' | 'multibanco'
+
+  // Reload current orders to guarantee freshness
+  const currentOrders = loadOrders();
+  const order = currentOrders.get(orderId) || activeOrders.get(orderId);
+
+  if (!order) {
+    return res.status(404).json({ error: "Encomenda não encontrada no sistema" });
+  }
+
+  try {
+    let html = '';
+    let title = '';
+
+    if (type === 'shipped') {
+      const code = order.trackingCode || "DA123456789PT";
+      html = generateShippedEmailHtml(order, code);
+      title = `E-mail de Expedição CTT - ${order.orderId}`;
+    } else if (type === 'admin') {
+      html = generateAdminEmailHtml(order);
+      title = `Notificação do Atelier - ${order.orderId}`;
+    } else if (type === 'multibanco') {
+      const ref = order.multibancoRef || { entidade: "12345", referencia: "123 456 789" };
+      html = generateMultibancoEmailHtml(order, ref);
+      title = `Instruções Multibanco - ${order.orderId}`;
+    } else {
+      // 'customer' or default receipt
+      html = generateCustomerEmailHtml(order);
+      title = `Recibo & Confirmação - ${order.orderId}`;
+    }
+
+    res.json({ success: true, orderId, type, title, html });
+  } catch (err: any) {
+    console.error("[EMAIL PREVIEW GENERATION ERROR]", err);
+    res.status(500).json({ error: "Erro ao gerar a pré-visualização do e-mail" });
+  }
 });
 
 // Endpoint to update an order
