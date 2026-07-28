@@ -284,7 +284,14 @@ export default function AdminDashboardModal({ onClose, shopCategories = [] }: Ad
     customerNif: '',
     paymentMethod: 'card',
     status: 'paid',
-    priority: 'NORMAL'
+    priority: 'NORMAL',
+    accessories: {
+      fecho: false,
+      forro: false,
+      etiqueta: true,
+      caixa: true,
+      botao: false
+    }
   });
   const [isCreatingManual, setIsCreatingManual] = useState(false);
 
@@ -580,6 +587,8 @@ export default function AdminDashboardModal({ onClose, shopCategories = [] }: Ad
       defaultDet = '';
     }
 
+    const isMiniShellPouch = nameLower.includes('mini shell pouch');
+
     setManualForm(prev => ({
       ...prev,
       selectedProductId: String(prod.id || prod.name),
@@ -588,7 +597,14 @@ export default function AdminDashboardModal({ onClose, shopCategories = [] }: Ad
       corType: computedColorType,
       cor: initialCor,
       corPrincipal: defaultPrim,
-      corDetalhe: defaultDet
+      corDetalhe: defaultDet,
+      accessories: {
+        fecho: isAfricanFlowerPouch || isMiniPouches,
+        forro: isAfricanFlowerPouch,
+        etiqueta: true,
+        caixa: true,
+        botao: isMiniShellPouch
+      }
     }));
   };
 
@@ -636,7 +652,8 @@ export default function AdminDashboardModal({ onClose, shopCategories = [] }: Ad
             corPrincipal: manualForm.corType === 'bicolor' ? manualForm.corPrincipal : undefined,
             corDetalhe: manualForm.corType === 'bicolor' ? manualForm.corDetalhe : undefined,
             tamanho: manualForm.tamanho.trim(),
-            quantidade: qtdVal
+            quantidade: qtdVal,
+            accessories: manualForm.accessories
           },
           customer: {
             nome: cleanCustomerNome,
@@ -676,7 +693,14 @@ export default function AdminDashboardModal({ onClose, shopCategories = [] }: Ad
           customerNif: '',
           paymentMethod: 'card',
           status: 'paid',
-          priority: 'NORMAL'
+          priority: 'NORMAL',
+          accessories: {
+            fecho: false,
+            forro: false,
+            etiqueta: true,
+            caixa: true,
+            botao: false
+          }
         });
         setShowManualForm(false);
         fetchOrders();
@@ -1213,7 +1237,7 @@ export default function AdminDashboardModal({ onClose, shopCategories = [] }: Ad
                 </form>
 
                 <div className="text-[9px] text-center text-forest/30 font-serif italic border-t border-forest/5 pt-4">
-                  M★BRAVO &bull; Confeccionado com Tempo e Afeto
+                  M★BRAVO &bull; Criado Artesanalmente com Tempo e Afeto
                 </div>
               </div>
             </div>
@@ -1534,9 +1558,23 @@ export default function AdminDashboardModal({ onClose, shopCategories = [] }: Ad
                               onChange={(e) => setManualForm(prev => ({ ...prev, corPrincipal: e.target.value }))}
                               className="w-full bg-white border border-forest/15 rounded-xl px-2.5 py-2 focus:outline-none focus:border-[#C5A059] text-xs font-medium"
                             >
-                              {activeAvailableColors.map(c => (
-                                <option key={`p_${c}`} value={c}>{c}</option>
-                              ))}
+                              <optgroup label="DROPS Safran (100% Algodão Egípcio · 50g/160m · Agulha 3mm)">
+                                {activeAvailableColors.filter(c => c.toLowerCase().includes('safran') || c.toLowerCase().includes('azul pó') || c.toLowerCase().includes('natural') || c.toLowerCase().includes('vermelho')).map(c => (
+                                  <option key={`p_saf_${c}`} value={c}>{c}</option>
+                                ))}
+                              </optgroup>
+                              <optgroup label="DROPS Paris (100% Algodão Reciclado · 50g/75m · Agulha 5mm)">
+                                {activeAvailableColors.filter(c => c.toLowerCase().includes('paris') || c.toLowerCase().includes('verde musgo') || c.toLowerCase().includes('verde')).map(c => (
+                                  <option key={`p_par_${c}`} value={c}>{c}</option>
+                                ))}
+                              </optgroup>
+                              {activeAvailableColors.filter(c => !c.toLowerCase().includes('safran') && !c.toLowerCase().includes('paris') && !c.toLowerCase().includes('verde musgo') && !c.toLowerCase().includes('azul pó')).length > 0 && (
+                                <optgroup label="Outras Cores / Variações">
+                                  {activeAvailableColors.filter(c => !c.toLowerCase().includes('safran') && !c.toLowerCase().includes('paris') && !c.toLowerCase().includes('verde musgo') && !c.toLowerCase().includes('azul pó')).map(c => (
+                                    <option key={`p_oth_${c}`} value={c}>{c}</option>
+                                  ))}
+                                </optgroup>
+                              )}
                             </select>
                           </div>
                           <div>
@@ -1548,9 +1586,23 @@ export default function AdminDashboardModal({ onClose, shopCategories = [] }: Ad
                               onChange={(e) => setManualForm(prev => ({ ...prev, corDetalhe: e.target.value }))}
                               className="w-full bg-white border border-forest/15 rounded-xl px-2.5 py-2 focus:outline-none focus:border-[#C5A059] text-xs font-medium"
                             >
-                              {activeAvailableColors.map(c => (
-                                <option key={`d_${c}`} value={c}>{c}</option>
-                              ))}
+                              <optgroup label="DROPS Safran (100% Algodão Egípcio · 50g/160m · Agulha 3mm)">
+                                {activeAvailableColors.filter(c => c.toLowerCase().includes('safran') || c.toLowerCase().includes('azul pó') || c.toLowerCase().includes('natural') || c.toLowerCase().includes('vermelho')).map(c => (
+                                  <option key={`d_saf_${c}`} value={c}>{c}</option>
+                                ))}
+                              </optgroup>
+                              <optgroup label="DROPS Paris (100% Algodão Reciclado · 50g/75m · Agulha 5mm)">
+                                {activeAvailableColors.filter(c => c.toLowerCase().includes('paris') || c.toLowerCase().includes('verde musgo') || c.toLowerCase().includes('verde')).map(c => (
+                                  <option key={`d_par_${c}`} value={c}>{c}</option>
+                                ))}
+                              </optgroup>
+                              {activeAvailableColors.filter(c => !c.toLowerCase().includes('safran') && !c.toLowerCase().includes('paris') && !c.toLowerCase().includes('verde musgo') && !c.toLowerCase().includes('azul pó')).length > 0 && (
+                                <optgroup label="Outras Cores / Variações">
+                                  {activeAvailableColors.filter(c => !c.toLowerCase().includes('safran') && !c.toLowerCase().includes('paris') && !c.toLowerCase().includes('verde musgo') && !c.toLowerCase().includes('azul pó')).map(c => (
+                                    <option key={`d_oth_${c}`} value={c}>{c}</option>
+                                  ))}
+                                </optgroup>
+                              )}
                             </select>
                           </div>
                         </div>
@@ -1560,9 +1612,23 @@ export default function AdminDashboardModal({ onClose, shopCategories = [] }: Ad
                           onChange={(e) => setManualForm(prev => ({ ...prev, cor: e.target.value }))}
                           className="w-full bg-white border border-forest/15 rounded-xl px-3 py-2.5 focus:outline-none focus:border-[#C5A059] text-xs font-medium"
                         >
-                          {activeAvailableColors.map(c => (
-                            <option key={`s_${c}`} value={c}>{c}</option>
-                          ))}
+                          <optgroup label="DROPS Safran (100% Algodão Egípcio · 50g/160m · Agulha 3mm)">
+                            {activeAvailableColors.filter(c => c.toLowerCase().includes('safran') || c.toLowerCase().includes('azul pó') || c.toLowerCase().includes('natural') || c.toLowerCase().includes('vermelho')).map(c => (
+                              <option key={`s_saf_${c}`} value={c}>{c}</option>
+                            ))}
+                          </optgroup>
+                          <optgroup label="DROPS Paris (100% Algodão Reciclado · 50g/75m · Agulha 5mm)">
+                            {activeAvailableColors.filter(c => c.toLowerCase().includes('paris') || c.toLowerCase().includes('verde musgo') || c.toLowerCase().includes('verde')).map(c => (
+                              <option key={`s_par_${c}`} value={c}>{c}</option>
+                            ))}
+                          </optgroup>
+                          {activeAvailableColors.filter(c => !c.toLowerCase().includes('safran') && !c.toLowerCase().includes('paris') && !c.toLowerCase().includes('verde musgo') && !c.toLowerCase().includes('azul pó')).length > 0 && (
+                            <optgroup label="Outras Cores / Variações">
+                              {activeAvailableColors.filter(c => !c.toLowerCase().includes('safran') && !c.toLowerCase().includes('paris') && !c.toLowerCase().includes('verde musgo') && !c.toLowerCase().includes('azul pó')).map(c => (
+                                <option key={`s_oth_${c}`} value={c}>{c}</option>
+                              ))}
+                            </optgroup>
+                          )}
                         </select>
                       ) : (
                         <input
@@ -1673,6 +1739,76 @@ export default function AdminDashboardModal({ onClose, shopCategories = [] }: Ad
                         onChange={(e) => setManualForm(prev => ({ ...prev, customerCidade: e.target.value }))}
                         className="w-full bg-white border border-forest/15 rounded-xl px-3 py-2.5 focus:outline-none focus:border-[#C5A059]"
                       />
+                    </div>
+                  </div>
+
+                  {/* Acessórios & Embalamento Consumidos Checklist */}
+                  <div className="bg-white/80 border border-[#C5A059]/25 rounded-2xl p-4 space-y-2 text-left shadow-xs">
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-forest/60 flex items-center gap-1.5 font-sans">
+                      <Layers className="w-3.5 h-3.5 text-[#C5A059]" />
+                      Acessórios & Embalamento Consumidos (Abatimento Automático no Inventário)
+                    </span>
+                    <div className="grid grid-cols-2 sm:grid-cols-5 gap-2 text-xs pt-1">
+                      <label className="flex items-center gap-2 cursor-pointer hover:text-forest select-none font-medium text-forest/80 bg-[#FCFBF9] p-2 rounded-xl border border-forest/5">
+                        <input
+                          type="checkbox"
+                          checked={manualForm.accessories?.etiqueta ?? true}
+                          onChange={(e) => setManualForm(prev => ({
+                            ...prev,
+                            accessories: { ...prev.accessories, etiqueta: e.target.checked }
+                          }))}
+                          className="rounded text-[#C5A059] focus:ring-[#C5A059] w-3.5 h-3.5"
+                        />
+                        <span>Etiqueta Couro</span>
+                      </label>
+                      <label className="flex items-center gap-2 cursor-pointer hover:text-forest select-none font-medium text-forest/80 bg-[#FCFBF9] p-2 rounded-xl border border-forest/5">
+                        <input
+                          type="checkbox"
+                          checked={manualForm.accessories?.caixa ?? true}
+                          onChange={(e) => setManualForm(prev => ({
+                            ...prev,
+                            accessories: { ...prev.accessories, caixa: e.target.checked }
+                          }))}
+                          className="rounded text-[#C5A059] focus:ring-[#C5A059] w-3.5 h-3.5"
+                        />
+                        <span>Caixa Premium</span>
+                      </label>
+                      <label className="flex items-center gap-2 cursor-pointer hover:text-forest select-none font-medium text-forest/80 bg-[#FCFBF9] p-2 rounded-xl border border-forest/5">
+                        <input
+                          type="checkbox"
+                          checked={manualForm.accessories?.fecho ?? false}
+                          onChange={(e) => setManualForm(prev => ({
+                            ...prev,
+                            accessories: { ...prev.accessories, fecho: e.target.checked }
+                          }))}
+                          className="rounded text-[#C5A059] focus:ring-[#C5A059] w-3.5 h-3.5"
+                        />
+                        <span>Fecho Correr</span>
+                      </label>
+                      <label className="flex items-center gap-2 cursor-pointer hover:text-forest select-none font-medium text-forest/80 bg-[#FCFBF9] p-2 rounded-xl border border-forest/5">
+                        <input
+                          type="checkbox"
+                          checked={manualForm.accessories?.forro ?? false}
+                          onChange={(e) => setManualForm(prev => ({
+                            ...prev,
+                            accessories: { ...prev.accessories, forro: e.target.checked }
+                          }))}
+                          className="rounded text-[#C5A059] focus:ring-[#C5A059] w-3.5 h-3.5"
+                        />
+                        <span>Forro Algodão</span>
+                      </label>
+                      <label className="flex items-center gap-2 cursor-pointer hover:text-forest select-none font-medium text-forest/80 bg-[#FCFBF9] p-2 rounded-xl border border-forest/5">
+                        <input
+                          type="checkbox"
+                          checked={manualForm.accessories?.botao ?? false}
+                          onChange={(e) => setManualForm(prev => ({
+                            ...prev,
+                            accessories: { ...prev.accessories, botao: e.target.checked }
+                          }))}
+                          className="rounded text-[#C5A059] focus:ring-[#C5A059] w-3.5 h-3.5"
+                        />
+                        <span>Botão Madeira</span>
+                      </label>
                     </div>
                   </div>
 
@@ -1846,7 +1982,7 @@ export default function AdminDashboardModal({ onClose, shopCategories = [] }: Ad
                                   onClick={() => handleUpdateStatus(order.orderId, 'failed')}
                                   disabled={isUpdating}
                                   title="Cancelar Encomenda"
-                                  className="px-2 py-1 text-amber-800 hover:text-amber-950 bg-amber-50 hover:bg-amber-100 rounded-md transition-all cursor-pointer border border-amber-200/50 flex items-center gap-1 text-[9px] font-bold uppercase tracking-wider"
+                                  className="px-2.5 py-1 text-amber-900 hover:text-amber-950 bg-amber-50 hover:bg-amber-100 rounded-[6px] transition-all cursor-pointer border border-amber-200/60 flex items-center gap-1 text-[10px] font-medium tracking-wide shadow-2xs"
                                 >
                                   <Ban className="w-3 h-3 text-amber-700 shrink-0" />
                                   <span>Cancelar</span>
@@ -1857,7 +1993,7 @@ export default function AdminDashboardModal({ onClose, shopCategories = [] }: Ad
                                 onClick={() => handleDeleteOrder(order.orderId)}
                                 disabled={isUpdating}
                                 title="Eliminar Encomenda do Sistema"
-                                className="px-2 py-1 text-red-700 hover:text-red-900 bg-red-50 hover:bg-red-100 rounded-md transition-all cursor-pointer border border-red-200/50 flex items-center gap-1 text-[9px] font-bold uppercase tracking-wider"
+                                className="px-2.5 py-1 text-red-700 hover:text-red-900 bg-red-50 hover:bg-red-100 rounded-[6px] transition-all cursor-pointer border border-red-200/60 flex items-center gap-1 text-[10px] font-medium tracking-wide shadow-2xs"
                               >
                                 <Trash2 className="w-3 h-3 text-red-600 shrink-0" />
                                 <span>Eliminar</span>
@@ -1895,7 +2031,7 @@ export default function AdminDashboardModal({ onClose, shopCategories = [] }: Ad
                                   <button
                                     type="button"
                                     onClick={() => handleOpenCustomerProfile(order.customer.email)}
-                                    className="text-[10px] font-semibold text-[#C5A059] hover:text-[#9e7d3e] flex items-center gap-1.5 transition-all cursor-pointer bg-[#FCF8F2] hover:bg-[#F7EFE3] px-2.5 py-1.5 rounded-lg border border-[#C5A059]/15 shadow-[0_1px_2px_rgba(197,160,89,0.05)] font-serif italic"
+                                    className="text-[10px] font-medium text-[#C5A059] hover:text-[#9e7d3e] flex items-center gap-1.5 transition-all cursor-pointer bg-[#FCF8F2] hover:bg-[#F7EFE3] px-2.5 py-1 rounded-[6px] border border-[#C5A059]/20 shadow-2xs font-serif italic"
                                   >
                                     <User className="w-3 h-3 text-[#C5A059]" /> Ver Ficha de Cliente
                                   </button>
@@ -1963,17 +2099,17 @@ export default function AdminDashboardModal({ onClose, shopCategories = [] }: Ad
                                       placeholder="Ex: DA123456789PT"
                                       value={trInput}
                                       onChange={(e) => setTrackingInputs(prev => ({ ...prev, [order.orderId]: e.target.value.toUpperCase() }))}
-                                      className="w-full bg-[#FCFBF9] border border-forest/10 focus:border-[#C5A059] focus:outline-none rounded-lg px-3 py-2 text-xs font-mono uppercase"
+                                      className="w-full bg-[#FCFBF9] border border-forest/10 focus:border-[#C5A059] focus:outline-none rounded-[6px] px-3 py-1.5 text-xs font-mono uppercase"
                                     />
                                   </div>
                                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
                                     <button
                                       onClick={() => handleDispatchTracking(order.orderId)}
                                       disabled={isUpdating || !trInput}
-                                      className="w-full py-2 bg-[#243119] hover:bg-[#1a2412] text-cream rounded-lg text-[10px] font-bold uppercase tracking-wider shadow-sm transition-all cursor-pointer flex items-center justify-center gap-1.5 disabled:opacity-40"
+                                      className="w-full px-2.5 py-1.5 bg-[#243119] hover:bg-[#1a2412] text-cream rounded-[6px] text-[10px] font-medium tracking-wide shadow-2xs transition-all cursor-pointer flex items-center justify-center gap-1.5 disabled:opacity-40"
                                     >
-                                      <Truck className="w-3.5 h-3.5" />
-                                      Expedir (CTT)
+                                      <Truck className="w-3.5 h-3.5 text-[#C5A059]" />
+                                      Expedir CTT
                                     </button>
                                     <button
                                       onClick={() => {
@@ -1982,7 +2118,7 @@ export default function AdminDashboardModal({ onClose, shopCategories = [] }: Ad
                                         }
                                       }}
                                       disabled={isUpdating}
-                                      className="w-full py-2 bg-emerald-800 hover:bg-emerald-900 text-white rounded-lg text-[10px] font-bold uppercase tracking-wider shadow-sm transition-all cursor-pointer flex items-center justify-center gap-1.5 disabled:opacity-40"
+                                      className="w-full px-2.5 py-1.5 bg-emerald-800 hover:bg-emerald-900 text-white rounded-[6px] text-[10px] font-medium tracking-wide shadow-2xs transition-all cursor-pointer flex items-center justify-center gap-1.5 disabled:opacity-40"
                                       title="Para levantamentos no atelier ou entregas presenciais"
                                     >
                                       <CheckCircle className="w-3.5 h-3.5" />
@@ -1993,20 +2129,20 @@ export default function AdminDashboardModal({ onClose, shopCategories = [] }: Ad
                               )}
 
                               {order.status === 'shipped' && (
-                                <div className="space-y-3">
-                                  <div className="bg-[#E6ECDF]/30 border border-[#BACAA5]/40 rounded-xl p-3 text-xs space-y-2">
+                                <div className="space-y-2.5">
+                                  <div className="bg-[#E6ECDF]/30 border border-[#BACAA5]/40 rounded-xl p-2.5 text-xs space-y-2">
                                     <div className="flex items-center gap-1 text-[#243119] font-medium font-sans">
                                       <ShieldCheck className="w-4 h-4 text-[#C5A059] shrink-0" />
                                       <span>Rastreio CTT Ativo</span>
                                     </div>
-                                    <div className="font-mono font-bold text-[#243119] text-center bg-white border border-forest/5 rounded px-2 py-1.5">
+                                    <div className="font-mono font-bold text-[#243119] text-center bg-white border border-forest/5 rounded px-2 py-1">
                                       {order.trackingCode}
                                     </div>
                                     <a 
                                       href={`https://www.ctt.pt/feapl_2/app/open/objectSearch/objectSearch.jspx?lang=def&objects=${order.trackingCode}`}
                                       target="_blank" 
                                       rel="noreferrer"
-                                      className="text-[10px] uppercase tracking-wider text-[#C5A059] hover:text-[#A68244] font-bold flex items-center justify-center gap-1 mt-1 hover:underline"
+                                      className="px-2 py-1 bg-white hover:bg-[#FCF8F2] border border-[#C5A059]/30 text-[#C5A059] hover:text-[#A68244] rounded-[6px] text-[10px] font-medium tracking-wide flex items-center justify-center gap-1 transition-all shadow-2xs"
                                     >
                                       Acompanhar nos CTT
                                       <ExternalLink className="w-3 h-3" />
@@ -2015,16 +2151,16 @@ export default function AdminDashboardModal({ onClose, shopCategories = [] }: Ad
                                   <button
                                     onClick={() => handleUpdateStatus(order.orderId, 'delivered')}
                                     disabled={isUpdating}
-                                    className="w-full py-2 bg-green-800 hover:bg-green-900 text-white rounded-lg text-[10px] font-bold uppercase tracking-wider shadow-sm transition-all cursor-pointer flex items-center justify-center gap-1.5 disabled:opacity-40"
+                                    className="w-full px-3 py-1.5 bg-emerald-800 hover:bg-emerald-900 text-white rounded-[6px] text-[10px] font-medium tracking-wide shadow-2xs transition-all cursor-pointer flex items-center justify-center gap-1.5 disabled:opacity-40"
                                   >
                                     <Check className="w-3.5 h-3.5" />
-                                    Confirmar Entrega (Entregue)
+                                    Confirmar Entrega
                                   </button>
                                 </div>
                               )}
 
                               {order.status === 'delivered' && (
-                                <div className="bg-green-50 border border-green-200 rounded-xl p-3 text-xs space-y-2">
+                                <div className="bg-green-50 border border-green-200/50 rounded-xl p-3 text-xs space-y-2">
                                   <div className="flex items-center gap-1 text-green-800 font-medium font-sans">
                                     <CheckCircle className="w-4 h-4 text-green-600 shrink-0" />
                                     <span>Encomenda Entregue / Concluída</span>
@@ -2052,14 +2188,14 @@ export default function AdminDashboardModal({ onClose, shopCategories = [] }: Ad
                                     <button
                                       onClick={() => handleSimulateWebhook(order.orderId, 'simulate_payment')}
                                       disabled={isUpdating}
-                                      className="py-1.5 bg-green-700 hover:bg-green-800 text-white rounded-lg text-[9px] uppercase font-bold tracking-wider transition-all cursor-pointer text-center"
+                                      className="px-2 py-1.5 bg-emerald-700 hover:bg-emerald-800 text-white rounded-[6px] text-[10px] font-medium tracking-wide transition-all cursor-pointer text-center flex items-center justify-center gap-1 shadow-2xs"
                                     >
                                       Simular Pago
                                     </button>
                                     <button
                                       onClick={() => handleSimulateWebhook(order.orderId, 'simulate_failure')}
                                       disabled={isUpdating}
-                                      className="py-1.5 bg-red-700 hover:bg-red-800 text-white rounded-lg text-[9px] uppercase font-bold tracking-wider transition-all cursor-pointer text-center"
+                                      className="px-2 py-1.5 bg-red-700 hover:bg-red-800 text-white rounded-[6px] text-[10px] font-medium tracking-wide transition-all cursor-pointer text-center flex items-center justify-center gap-1 shadow-2xs"
                                     >
                                       Simular Falha
                                     </button>
@@ -2071,12 +2207,12 @@ export default function AdminDashboardModal({ onClose, shopCategories = [] }: Ad
                             {/* Email Previews Hub */}
                             <div className="pt-3 border-t border-forest/5 space-y-1.5">
                               <span className="text-[9px] font-bold text-forest/35 uppercase tracking-wider block">Comprovativos de E-mail</span>
-                              <div className="grid grid-cols-2 gap-1.5 text-[9px]">
+                              <div className="grid grid-cols-2 gap-1.5 text-[10px]">
                                 {/* Ver Recibo / Confirmação Cliente */}
                                 <button
                                   type="button"
                                   onClick={() => handleOpenEmailPreview(order.orderId, 'customer')}
-                                  className="p-1.5 bg-[#FCF8F2] border border-[#C5A059]/10 text-[#243119] rounded-lg hover:bg-[#F3EFE9] flex items-center justify-center gap-1 font-medium cursor-pointer transition-colors"
+                                  className="px-2.5 py-1.5 bg-[#FCF8F2] border border-[#C5A059]/20 text-[#243119] rounded-[6px] hover:bg-[#F3EFE9] flex items-center justify-center gap-1.5 font-medium cursor-pointer transition-all shadow-2xs"
                                 >
                                   <Eye className="w-3 h-3 text-[#C5A059]" />
                                   Ver Recibo
@@ -2086,7 +2222,7 @@ export default function AdminDashboardModal({ onClose, shopCategories = [] }: Ad
                                 <button
                                   type="button"
                                   onClick={() => handleOpenEmailPreview(order.orderId, 'admin')}
-                                  className="p-1.5 bg-[#FCF8F2] border border-[#C5A059]/10 text-[#243119] rounded-lg hover:bg-[#F3EFE9] flex items-center justify-center gap-1 font-medium cursor-pointer transition-colors"
+                                  className="px-2.5 py-1.5 bg-[#FCF8F2] border border-[#C5A059]/20 text-[#243119] rounded-[6px] hover:bg-[#F3EFE9] flex items-center justify-center gap-1.5 font-medium cursor-pointer transition-all shadow-2xs"
                                 >
                                   <Eye className="w-3 h-3 text-[#C5A059]" />
                                   Notif. Atelier
@@ -2096,7 +2232,7 @@ export default function AdminDashboardModal({ onClose, shopCategories = [] }: Ad
                                 <button
                                   type="button"
                                   onClick={() => handleOpenEmailPreview(order.orderId, 'shipped')}
-                                  className="p-1.5 bg-[#E6ECDF] border border-[#BACAA5]/30 text-[#243119] rounded-lg hover:bg-[#DCE4D4] flex items-center justify-center gap-1 font-medium col-span-2 cursor-pointer transition-colors shadow-xs"
+                                  className="px-2.5 py-1.5 bg-[#E6ECDF] border border-[#BACAA5]/40 text-[#243119] rounded-[6px] hover:bg-[#DCE4D4] flex items-center justify-center gap-1.5 font-medium col-span-2 cursor-pointer transition-all shadow-2xs"
                                 >
                                   <Eye className="w-3 h-3 text-green-700" />
                                   Ver E-mail CTT Enviado
@@ -2107,7 +2243,7 @@ export default function AdminDashboardModal({ onClose, shopCategories = [] }: Ad
                                   <button
                                     type="button"
                                     onClick={() => handleOpenEmailPreview(order.orderId, 'multibanco')}
-                                    className="p-1.5 bg-amber-50 border border-amber-200/20 text-amber-800 rounded-lg hover:bg-amber-100/50 flex items-center justify-center gap-1 font-medium col-span-2 cursor-pointer transition-colors"
+                                    className="px-2.5 py-1.5 bg-amber-50 border border-amber-200/40 text-amber-900 rounded-[6px] hover:bg-amber-100/60 flex items-center justify-center gap-1.5 font-medium col-span-2 cursor-pointer transition-all shadow-2xs"
                                   >
                                     <Eye className="w-3 h-3 text-amber-600" />
                                     Ver Instruções Multibanco
@@ -2572,7 +2708,14 @@ export default function AdminDashboardModal({ onClose, shopCategories = [] }: Ad
                           availableColors: parsedColors,
                           colorConsumptions: sanitizedConsumptions,
                           bicolorConsumptions: sanitizedBicolor,
-                          singleConsumption: sanitizedSingle !== undefined ? sanitizedSingle : prodForm.singleConsumption
+                          singleConsumption: sanitizedSingle !== undefined ? sanitizedSingle : prodForm.singleConsumption,
+                          accessories: prodForm.accessories || {
+                            etiqueta: true,
+                            caixa: true,
+                            fecho: false,
+                            forro: false,
+                            botao: false
+                          }
                         };
 
                         const updatedCatalog = catalog.map(c => {
@@ -3174,6 +3317,94 @@ export default function AdminDashboardModal({ onClose, shopCategories = [] }: Ad
                           </div>
                         );
                       })()}
+
+                      {/* Receita BOM: Acessórios & Ferragens Associadas */}
+                      <div className="bg-[#FCFBF9] border border-[#C5A059]/25 rounded-xl p-3.5 space-y-2">
+                        <div className="flex items-center justify-between">
+                          <label className="font-bold text-forest/80 text-[11px] uppercase tracking-wider flex items-center gap-1.5">
+                            <Layers className="w-3.5 h-3.5 text-[#C5A059]" />
+                            Acessórios & Ferragens Associadas (Receita BOM)
+                          </label>
+                          <span className="text-[9px] text-forest/40 italic font-serif">Abate automático em Vendas</span>
+                        </div>
+                        <div className="grid grid-cols-2 sm:grid-cols-5 gap-2 text-xs pt-1">
+                          <label className="flex items-center gap-2 cursor-pointer hover:text-forest select-none font-medium text-forest/80 bg-white p-2 rounded-lg border border-forest/10 shadow-2xs">
+                            <input
+                              type="checkbox"
+                              checked={editingProduct.product.accessories?.etiqueta ?? true}
+                              onChange={(e) => setEditingProduct({
+                                ...editingProduct,
+                                product: {
+                                  ...editingProduct.product,
+                                  accessories: { ...(editingProduct.product.accessories || { etiqueta: true, caixa: true, fecho: false, forro: false, botao: false }), etiqueta: e.target.checked }
+                                }
+                              })}
+                              className="rounded text-[#C5A059] focus:ring-[#C5A059] w-3.5 h-3.5"
+                            />
+                            <span>Etiqueta Couro</span>
+                          </label>
+                          <label className="flex items-center gap-2 cursor-pointer hover:text-forest select-none font-medium text-forest/80 bg-white p-2 rounded-lg border border-forest/10 shadow-2xs">
+                            <input
+                              type="checkbox"
+                              checked={editingProduct.product.accessories?.caixa ?? true}
+                              onChange={(e) => setEditingProduct({
+                                ...editingProduct,
+                                product: {
+                                  ...editingProduct.product,
+                                  accessories: { ...(editingProduct.product.accessories || { etiqueta: true, caixa: true, fecho: false, forro: false, botao: false }), caixa: e.target.checked }
+                                }
+                              })}
+                              className="rounded text-[#C5A059] focus:ring-[#C5A059] w-3.5 h-3.5"
+                            />
+                            <span>Caixa Premium</span>
+                          </label>
+                          <label className="flex items-center gap-2 cursor-pointer hover:text-forest select-none font-medium text-forest/80 bg-white p-2 rounded-lg border border-forest/10 shadow-2xs">
+                            <input
+                              type="checkbox"
+                              checked={editingProduct.product.accessories?.fecho ?? false}
+                              onChange={(e) => setEditingProduct({
+                                ...editingProduct,
+                                product: {
+                                  ...editingProduct.product,
+                                  accessories: { ...(editingProduct.product.accessories || { etiqueta: true, caixa: true, fecho: false, forro: false, botao: false }), fecho: e.target.checked }
+                                }
+                              })}
+                              className="rounded text-[#C5A059] focus:ring-[#C5A059] w-3.5 h-3.5"
+                            />
+                            <span>Fecho Correr</span>
+                          </label>
+                          <label className="flex items-center gap-2 cursor-pointer hover:text-forest select-none font-medium text-forest/80 bg-white p-2 rounded-lg border border-forest/10 shadow-2xs">
+                            <input
+                              type="checkbox"
+                              checked={editingProduct.product.accessories?.forro ?? false}
+                              onChange={(e) => setEditingProduct({
+                                ...editingProduct,
+                                product: {
+                                  ...editingProduct.product,
+                                  accessories: { ...(editingProduct.product.accessories || { etiqueta: true, caixa: true, fecho: false, forro: false, botao: false }), forro: e.target.checked }
+                                }
+                              })}
+                              className="rounded text-[#C5A059] focus:ring-[#C5A059] w-3.5 h-3.5"
+                            />
+                            <span>Forro Algodão</span>
+                          </label>
+                          <label className="flex items-center gap-2 cursor-pointer hover:text-forest select-none font-medium text-forest/80 bg-white p-2 rounded-lg border border-forest/10 shadow-2xs">
+                            <input
+                              type="checkbox"
+                              checked={editingProduct.product.accessories?.botao ?? false}
+                              onChange={(e) => setEditingProduct({
+                                ...editingProduct,
+                                product: {
+                                  ...editingProduct.product,
+                                  accessories: { ...(editingProduct.product.accessories || { etiqueta: true, caixa: true, fecho: false, forro: false, botao: false }), botao: e.target.checked }
+                                }
+                              })}
+                              className="rounded text-[#C5A059] focus:ring-[#C5A059] w-3.5 h-3.5"
+                            />
+                            <span>Botão Madeira</span>
+                          </label>
+                        </div>
+                      </div>
 
                       <div className="flex items-center gap-2 pt-2">
                         <input
