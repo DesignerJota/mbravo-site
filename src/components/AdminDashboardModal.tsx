@@ -500,6 +500,56 @@ export default function AdminDashboardModal({ onClose, shopCategories = [] }: Ad
     return list.length > 0 ? list : DEFAULT_PALETTE;
   }, [selectedProductObj]);
 
+  const safranYarns = React.useMemo(() => {
+    const list = (inventory || []).filter((item: any) => 
+      item && item.id && (item.id.toLowerCase().includes('safran') || item.name.toLowerCase().includes('safran'))
+    );
+    if (list.length > 0) return list;
+    return [
+      { id: "rm_safran_18_natural", name: "DROPS Safran 18 (Natural)", quantity: 10, unit: "novelos" },
+      { id: "rm_safran_17_branco", name: "DROPS Safran 17 (Branco)", quantity: 8, unit: "novelos" },
+      { id: "rm_safran_68_cafe", name: "DROPS Safran 68 (Café)", quantity: 5, unit: "novelos" },
+      { id: "rm_safran_01_rosa_deserto", name: "DROPS Safran 01 (Rosa do Deserto)", quantity: 3, unit: "novelos" },
+      { id: "rm_safran_78_verde_floresta", name: "DROPS Safran 78 (Verde Floresta)", quantity: 3, unit: "novelos" },
+      { id: "rm_safran_60_verde_musgo", name: "DROPS Safran 60 (Verde Musgo)", quantity: 3, unit: "novelos" },
+      { id: "rm_safran_73_azul_cobalto", name: "DROPS Safran 73 (Azul Cobalto)", quantity: 3, unit: "novelos" },
+      { id: "rm_safran_50_menta", name: "DROPS Safran 50 (Menta)", quantity: 3, unit: "novelos" },
+      { id: "rm_safran_19_vermelho", name: "DROPS Safran 19 (Vermelho)", quantity: 1, unit: "novelos" },
+      { id: "rm_safran_76_azul_po", name: "DROPS Safran 76 (Azul Pó)", quantity: 5, unit: "novelos" }
+    ];
+  }, [inventory]);
+
+  const parisYarns = React.useMemo(() => {
+    const list = (inventory || []).filter((item: any) => 
+      item && item.id && (item.id.toLowerCase().includes('paris') || item.name.toLowerCase().includes('paris'))
+    );
+    if (list.length > 0) return list;
+    return [
+      { id: "rm_paris_16_branco", name: "DROPS Paris 16 (Branco)", quantity: 10, unit: "novelos" },
+      { id: "rm_paris_17_natural", name: "DROPS Paris 17 (Natural)", quantity: 5, unit: "novelos" },
+      { id: "rm_paris_43_verde", name: "DROPS Paris 43 (Verde)", quantity: 5, unit: "novelos" },
+      { id: "rm_paris_25_verde_musgo", name: "DROPS Paris 25 (Verde Musgo)", quantity: 5, unit: "novelos" },
+      { id: "rm_paris_48_petroleo", name: "DROPS Paris 48 (Petróleo)", quantity: 5, unit: "novelos" },
+      { id: "rm_paris_76_azul_ternura", name: "DROPS Paris 76 (Azul Ternura)", quantity: 5, unit: "novelos" },
+      { id: "rm_paris_57_rosa_clarissimo", name: "DROPS Paris 57 (Rosa Claríssimo)", quantity: 5, unit: "novelos" },
+      { id: "rm_paris_35_baunilha", name: "DROPS Paris 35 (Baunilha)", quantity: 5, unit: "novelos" },
+      { id: "rm_paris_19_amarelo_claro", name: "DROPS Paris 19 (Amarelo Claro)", quantity: 5, unit: "novelos" },
+      { id: "rm_paris_44_castanho", name: "DROPS Paris 44 (Castanho)", quantity: 5, unit: "novelos" },
+      { id: "rm_paris_12_vermelho", name: "DROPS Paris 12 (Vermelho)", quantity: 5, unit: "novelos" },
+      { id: "rm_paris_15_preto", name: "DROPS Paris 15 (Preto)", quantity: 3, unit: "novelos" }
+    ];
+  }, [inventory]);
+
+  const otherProductColors = React.useMemo(() => {
+    const safranNames = safranYarns.map((i: any) => (i.name || '').toLowerCase());
+    const parisNames = parisYarns.map((i: any) => (i.name || '').toLowerCase());
+    return activeAvailableColors.filter(c => {
+      const cLow = c.toLowerCase();
+      return !safranNames.some(sn => sn.includes(cLow) || cLow.includes(sn)) &&
+             !parisNames.some(pn => pn.includes(cLow) || cLow.includes(pn));
+    });
+  }, [activeAvailableColors, safranYarns, parisYarns]);
+
   const handleSelectProduct = (productIdOrName: string) => {
     if (!productIdOrName) {
       setManualForm(prev => ({
@@ -1559,18 +1609,22 @@ export default function AdminDashboardModal({ onClose, shopCategories = [] }: Ad
                               className="w-full bg-white border border-forest/15 rounded-xl px-2.5 py-2 focus:outline-none focus:border-[#C5A059] text-xs font-medium"
                             >
                               <optgroup label="DROPS Safran (100% Algodão Egípcio · 50g/160m · Agulha 3mm)">
-                                {activeAvailableColors.filter(c => c.toLowerCase().includes('safran') || c.toLowerCase().includes('azul pó') || c.toLowerCase().includes('natural') || c.toLowerCase().includes('vermelho')).map(c => (
-                                  <option key={`p_saf_${c}`} value={c}>{c}</option>
+                                {safranYarns.map((item: any) => (
+                                  <option key={`p_saf_${item.id}`} value={item.name}>
+                                    {item.name} ({item.quantity} {item.unit || 'novelos'})
+                                  </option>
                                 ))}
                               </optgroup>
                               <optgroup label="DROPS Paris (100% Algodão Reciclado · 50g/75m · Agulha 5mm)">
-                                {activeAvailableColors.filter(c => c.toLowerCase().includes('paris') || c.toLowerCase().includes('verde musgo') || c.toLowerCase().includes('verde')).map(c => (
-                                  <option key={`p_par_${c}`} value={c}>{c}</option>
+                                {parisYarns.map((item: any) => (
+                                  <option key={`p_par_${item.id}`} value={item.name}>
+                                    {item.name} ({item.quantity} {item.unit || 'novelos'})
+                                  </option>
                                 ))}
                               </optgroup>
-                              {activeAvailableColors.filter(c => !c.toLowerCase().includes('safran') && !c.toLowerCase().includes('paris') && !c.toLowerCase().includes('verde musgo') && !c.toLowerCase().includes('azul pó')).length > 0 && (
+                              {otherProductColors.length > 0 && (
                                 <optgroup label="Outras Cores / Variações">
-                                  {activeAvailableColors.filter(c => !c.toLowerCase().includes('safran') && !c.toLowerCase().includes('paris') && !c.toLowerCase().includes('verde musgo') && !c.toLowerCase().includes('azul pó')).map(c => (
+                                  {otherProductColors.map(c => (
                                     <option key={`p_oth_${c}`} value={c}>{c}</option>
                                   ))}
                                 </optgroup>
@@ -1587,18 +1641,22 @@ export default function AdminDashboardModal({ onClose, shopCategories = [] }: Ad
                               className="w-full bg-white border border-forest/15 rounded-xl px-2.5 py-2 focus:outline-none focus:border-[#C5A059] text-xs font-medium"
                             >
                               <optgroup label="DROPS Safran (100% Algodão Egípcio · 50g/160m · Agulha 3mm)">
-                                {activeAvailableColors.filter(c => c.toLowerCase().includes('safran') || c.toLowerCase().includes('azul pó') || c.toLowerCase().includes('natural') || c.toLowerCase().includes('vermelho')).map(c => (
-                                  <option key={`d_saf_${c}`} value={c}>{c}</option>
+                                {safranYarns.map((item: any) => (
+                                  <option key={`d_saf_${item.id}`} value={item.name}>
+                                    {item.name} ({item.quantity} {item.unit || 'novelos'})
+                                  </option>
                                 ))}
                               </optgroup>
                               <optgroup label="DROPS Paris (100% Algodão Reciclado · 50g/75m · Agulha 5mm)">
-                                {activeAvailableColors.filter(c => c.toLowerCase().includes('paris') || c.toLowerCase().includes('verde musgo') || c.toLowerCase().includes('verde')).map(c => (
-                                  <option key={`d_par_${c}`} value={c}>{c}</option>
+                                {parisYarns.map((item: any) => (
+                                  <option key={`d_par_${item.id}`} value={item.name}>
+                                    {item.name} ({item.quantity} {item.unit || 'novelos'})
+                                  </option>
                                 ))}
                               </optgroup>
-                              {activeAvailableColors.filter(c => !c.toLowerCase().includes('safran') && !c.toLowerCase().includes('paris') && !c.toLowerCase().includes('verde musgo') && !c.toLowerCase().includes('azul pó')).length > 0 && (
+                              {otherProductColors.length > 0 && (
                                 <optgroup label="Outras Cores / Variações">
-                                  {activeAvailableColors.filter(c => !c.toLowerCase().includes('safran') && !c.toLowerCase().includes('paris') && !c.toLowerCase().includes('verde musgo') && !c.toLowerCase().includes('azul pó')).map(c => (
+                                  {otherProductColors.map(c => (
                                     <option key={`d_oth_${c}`} value={c}>{c}</option>
                                   ))}
                                 </optgroup>
@@ -1613,18 +1671,22 @@ export default function AdminDashboardModal({ onClose, shopCategories = [] }: Ad
                           className="w-full bg-white border border-forest/15 rounded-xl px-3 py-2.5 focus:outline-none focus:border-[#C5A059] text-xs font-medium"
                         >
                           <optgroup label="DROPS Safran (100% Algodão Egípcio · 50g/160m · Agulha 3mm)">
-                            {activeAvailableColors.filter(c => c.toLowerCase().includes('safran') || c.toLowerCase().includes('azul pó') || c.toLowerCase().includes('natural') || c.toLowerCase().includes('vermelho')).map(c => (
-                              <option key={`s_saf_${c}`} value={c}>{c}</option>
+                            {safranYarns.map((item: any) => (
+                              <option key={`s_saf_${item.id}`} value={item.name}>
+                                {item.name} ({item.quantity} {item.unit || 'novelos'})
+                              </option>
                             ))}
                           </optgroup>
                           <optgroup label="DROPS Paris (100% Algodão Reciclado · 50g/75m · Agulha 5mm)">
-                            {activeAvailableColors.filter(c => c.toLowerCase().includes('paris') || c.toLowerCase().includes('verde musgo') || c.toLowerCase().includes('verde')).map(c => (
-                              <option key={`s_par_${c}`} value={c}>{c}</option>
+                            {parisYarns.map((item: any) => (
+                              <option key={`s_par_${item.id}`} value={item.name}>
+                                {item.name} ({item.quantity} {item.unit || 'novelos'})
+                              </option>
                             ))}
                           </optgroup>
-                          {activeAvailableColors.filter(c => !c.toLowerCase().includes('safran') && !c.toLowerCase().includes('paris') && !c.toLowerCase().includes('verde musgo') && !c.toLowerCase().includes('azul pó')).length > 0 && (
+                          {otherProductColors.length > 0 && (
                             <optgroup label="Outras Cores / Variações">
-                              {activeAvailableColors.filter(c => !c.toLowerCase().includes('safran') && !c.toLowerCase().includes('paris') && !c.toLowerCase().includes('verde musgo') && !c.toLowerCase().includes('azul pó')).map(c => (
+                              {otherProductColors.map(c => (
                                 <option key={`s_oth_${c}`} value={c}>{c}</option>
                               ))}
                             </optgroup>
