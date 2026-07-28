@@ -2,7 +2,11 @@
 <html lang="en" style="background-color: #1F2A18;">
   <head>
     <meta charset="UTF-8" />
-    <!-- Google Search & Browser Favicon Configuration (Same-domain, multiple of 48px square) -->
+    
+    <!-- URL Canonical Oficial para o Google consolidar as buscas -->
+    <link rel="canonical" href="https://mbravobycarolina.com/" />
+
+    <!-- Google Search & Browser Favicon Configuration -->
     <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=2" />
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png?v=2" />
     <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png?v=2" />
@@ -13,14 +17,13 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     
-    <!-- Load Google Fonts asynchronously to prevent render-blocking -->
+    <!-- Load Google Fonts asynchronously -->
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Inter:wght@300;400;500;600&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Great+Vibes&family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" media="print" onload="this.media='all'" />
     <noscript>
       <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Inter:wght@300;400;500;600&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Great+Vibes&family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" />
     </noscript>
 
-
-    <!-- Preload Critical Hero Background Images (Responsive WebP for Mobile & Desktop LCP) -->
+    <!-- Preload Critical Hero Background Images -->
     <link rel="preload" as="image" href="/hero-bg-1-mobile.webp" media="(max-width: 640px)" fetchpriority="high" type="image/webp" />
     <link rel="preload" as="image" href="/hero-bg-1-desktop.webp" media="(min-width: 641px)" fetchpriority="high" type="image/webp" />
     
@@ -29,7 +32,7 @@
     <!-- Pinterest Domain Verification Meta Tag -->
     <meta name="p:domain_verify" content="c32665e021fefd842c4d20a190181ba7"/>
 
-    <!-- Deferred Non-Critical Analytics / Pinterest Script Execution (Zero Main Thread Blocking) -->
+    <!-- Deferred Non-Critical Analytics / Pinterest Script Execution -->
     <script>
       window.addEventListener('load', function() {
         var loadDeferred = function() {
@@ -54,7 +57,7 @@
     <!-- OpenGraph Brand Metas -->
     <meta property="og:title" content="M☆BRAVO | Handmade With Love" />
     <meta property="og:type" content="website" />
-    <meta property="og:url" content="https://mbravobycarolina.com" />
+    <meta property="og:url" content="https://mbravobycarolina.com/" />
     <meta property="og:image" content="https://mbravobycarolina.com/android-chrome-512x512.png?v=2" />
     <meta property="og:description" content="Cada ponto guarda uma memória. Peças feitas com tempo, amor e memória." />
     <meta property="og:site_name" content="M☆BRAVO" />
@@ -65,12 +68,12 @@
     <meta name="twitter:description" content="Cada ponto guarda uma memória. Peças feitas com tempo, amor e memória." />
     <meta name="twitter:image" content="https://mbravobycarolina.com/android-chrome-512x512.png?v=2" />
     
-    <!-- JSON-LD Schema Markup -->
+    <!-- JSON-LD Schema Markup (Unificado com ☆) -->
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
       "@type": "OnlineStore",
-      "name": "M★BRAVO",
+      "name": "M☆BRAVO",
       "url": "https://mbravobycarolina.com",
       "logo": "https://mbravobycarolina.com/logo.png",
       "description": "Peças criadas à mão, ponto a ponto. Crochet autêntico com foco na qualidade e pureza da criação de acessórios, vestuário e artigos para a casa.",
