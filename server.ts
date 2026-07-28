@@ -1174,8 +1174,27 @@ function getProductCustomConsumption(productName: string, selectedColor: string)
 function getMaterialsNeededForProduct(productName: string, selections: any = {}) {
   const nameLower = (productName || '').toLowerCase();
   const quantity = parseInt(selections.quantidade || "1", 10) || 1;
-  const color = (selections.cor || selections.corFio || "").toLowerCase().trim();
   
+  // Determine colors
+  let primColor = (selections.corPrincipal || '').trim();
+  let detColor = (selections.corDetalhe || '').trim();
+  let fullColor = (selections.cor || selections.corFio || '').trim();
+
+  // If fullColor contains '&' or ' e ' or ' / ' or ' + ' and primColor/detColor are not set:
+  if (!primColor && !detColor && fullColor) {
+    const parts = fullColor.split(/&| e |\/|\+/i).map((s: string) => s.trim()).filter(Boolean);
+    if (parts.length >= 2) {
+      primColor = parts[0];
+      detColor = parts[1];
+    } else {
+      primColor = fullColor;
+    }
+  } else if (!primColor && fullColor) {
+    primColor = fullColor;
+  }
+
+  const isBicolor = Boolean(primColor && detColor && primColor.toLowerCase() !== detColor.toLowerCase());
+
   const materials: { id: string; quantityNeeded: number }[] = [];
   
   // Base packaging and leather brand tags are consumed with every item in an order
@@ -1184,77 +1203,108 @@ function getMaterialsNeededForProduct(productName: string, selections: any = {})
   
   // Helper to resolve yarn bobbin ID by color name
   function getYarnIdForColor(colorName: string) {
-    const norm = colorName.toLowerCase();
+    const norm = (colorName || '').toLowerCase().trim();
+    if (!norm) return 'rm_safran_18_natural';
     
-    // DROPS Safran
-    if (norm.includes('18') || norm.includes('natural') || norm.includes('cru')) return 'rm_safran_18_natural';
-    if (norm.includes('17') || norm.includes('safran branco')) return 'rm_safran_17_branco';
+    // DROPS Paris Specific Checks
+    if (norm.includes('baunilha') || norm.includes('vanilla') || norm.includes('35')) return 'rm_paris_35_baunilha';
+    if (norm.includes('amarelo claro') || norm.includes('light yellow') || (norm.includes('19') && norm.includes('amarelo'))) return 'rm_paris_19_amarelo_claro';
+    if (norm.includes('paris 17') || (norm.includes('natural') && norm.includes('paris'))) return 'rm_paris_17_natural';
+    if (norm.includes('paris 16') || (norm.includes('branco') && norm.includes('paris'))) return 'rm_paris_16_branco';
+    if (norm.includes('paris 43') || (norm.includes('verde') && !norm.includes('musgo') && !norm.includes('floresta') && !norm.includes('menta') && !norm.includes('safran'))) return 'rm_paris_43_verde';
+    if (norm.includes('paris 25') || (norm.includes('musgo') && !norm.includes('safran'))) return 'rm_paris_25_verde_musgo';
+    if (norm.includes('48') || norm.includes('petróleo') || norm.includes('petroleo')) return 'rm_paris_48_petroleo';
+    if (norm.includes('76') && norm.includes('ternura')) return 'rm_paris_76_azul_ternura';
+    if (norm.includes('57') || norm.includes('claríssimo') || norm.includes('clarissimo')) return 'rm_paris_57_rosa_clarissimo';
+    if (norm.includes('44') || norm.includes('castanho') || norm.includes('cacau')) return 'rm_paris_44_castanho';
+    if (norm.includes('paris 12') || (norm.includes('vermelho') && norm.includes('paris'))) return 'rm_paris_12_vermelho';
+    if (norm.includes('15') || norm.includes('preto')) return 'rm_paris_15_preto';
+
+    // DROPS Safran Specific Checks
     if (norm.includes('68') || norm.includes('café') || norm.includes('cafe')) return 'rm_safran_68_cafe';
     if (norm.includes('01') || norm.includes('deserto')) return 'rm_safran_01_rosa_deserto';
     if (norm.includes('78') || norm.includes('floresta')) return 'rm_safran_78_verde_floresta';
-    if (norm.includes('60') || norm.includes('safran verde musgo')) return 'rm_safran_60_verde_musgo';
+    if (norm.includes('60') || (norm.includes('musgo') && norm.includes('safran'))) return 'rm_safran_60_verde_musgo';
     if (norm.includes('73') || norm.includes('cobalto')) return 'rm_safran_73_azul_cobalto';
     if (norm.includes('50') || norm.includes('menta')) return 'rm_safran_50_menta';
-    if (norm.includes('19') || norm.includes('safran vermelho')) return 'rm_safran_19_vermelho';
+    if (norm.includes('safran 19') || (norm.includes('vermelho') && norm.includes('safran'))) return 'rm_safran_19_vermelho';
     if (norm.includes('safran 76') || norm.includes('azul pó') || norm.includes('azul po')) return 'rm_safran_76_azul_po';
+    if (norm.includes('safran 17') || (norm.includes('branco') && norm.includes('safran'))) return 'rm_safran_17_branco';
+    if (norm.includes('safran 18') || (norm.includes('natural') && norm.includes('safran'))) return 'rm_safran_18_natural';
 
-    // DROPS Paris
-    if (norm.includes('16') || norm.includes('paris branco') || norm.includes('branco')) return 'rm_paris_16_branco';
-    if (norm.includes('paris 17') || norm.includes('paris natural')) return 'rm_paris_17_natural';
-    if (norm.includes('43') || norm.includes('paris verde')) return 'rm_paris_43_verde';
-    if (norm.includes('25') || norm.includes('paris verde musgo') || norm.includes('musgo')) return 'rm_paris_25_verde_musgo';
-    if (norm.includes('48') || norm.includes('petróleo') || norm.includes('petroleo')) return 'rm_paris_48_petroleo';
-    if (norm.includes('76') || norm.includes('ternura')) return 'rm_paris_76_azul_ternura';
-    if (norm.includes('57') || norm.includes('rosa claríssimo') || norm.includes('rosa clarissimo')) return 'rm_paris_57_rosa_clarissimo';
-    if (norm.includes('35') || norm.includes('baunilha')) return 'rm_paris_35_baunilha';
-    if (norm.includes('amarelo claro') || norm.includes('amarelo')) return 'rm_paris_19_amarelo_claro';
-    if (norm.includes('44') || norm.includes('castanho') || norm.includes('cacau')) return 'rm_paris_44_castanho';
-    if (norm.includes('12') || norm.includes('paris vermelho')) return 'rm_paris_12_vermelho';
-    if (norm.includes('15') || norm.includes('preto')) return 'rm_paris_15_preto';
+    // General Fallbacks
+    if (norm.includes('musgo')) return 'rm_paris_25_verde_musgo';
+    if (norm.includes('vermelho')) return 'rm_paris_12_vermelho';
+    if (norm.includes('branco')) return 'rm_paris_16_branco';
+    if (norm.includes('natural') || norm.includes('cru')) return 'rm_safran_18_natural';
+    if (norm.includes('verde')) return 'rm_paris_43_verde';
 
-    // Default fallback
     return 'rm_safran_18_natural';
   }
 
-  const yarnId = getYarnIdForColor(color);
-
   // Check if product has explicit custom color consumption specified in catalog.json
-  const customConsumption = getProductCustomConsumption(productName, color);
+  const customConsumption = getProductCustomConsumption(productName, fullColor || primColor);
+
+  let totalYarnNeeded = 1.0;
+  let hasZipper = false;
+  let hasLining = false;
+  let hasButton = false;
 
   if (customConsumption !== null) {
-    materials.push({ id: yarnId, quantityNeeded: customConsumption * quantity });
+    totalYarnNeeded = customConsumption;
   } else if (nameLower.includes('african flower pouch')) {
-    materials.push({ id: yarnId, quantityNeeded: 0.15 * quantity });
-    materials.push({ id: 'rm_fecho_correr', quantityNeeded: 1 * quantity });
-    materials.push({ id: 'rm_forro_tecido', quantityNeeded: 0.2 * quantity });
-  } 
-  else if (nameLower.includes('mini pouches') || nameLower.includes('mini pouch')) {
-    materials.push({ id: yarnId, quantityNeeded: 0.08 * quantity });
-    materials.push({ id: 'rm_fecho_correr', quantityNeeded: 1 * quantity });
+    totalYarnNeeded = 0.15;
+    hasZipper = true;
+    hasLining = true;
+  } else if (nameLower.includes('mini pouches') || nameLower.includes('mini pouch')) {
+    totalYarnNeeded = 0.08;
+    hasZipper = true;
+  } else if (nameLower.includes('mini shell pouch')) {
+    totalYarnNeeded = 0.10;
+    hasButton = true;
+  } else if (nameLower.includes('airpods case')) {
+    totalYarnNeeded = 0.05;
+  } else if (nameLower.includes('daisy coasters') || nameLower.includes('coasters') || nameLower.includes('coaster')) {
+    totalYarnNeeded = 0.07;
+  } else if (nameLower.includes('bikini') || nameLower.includes('top')) {
+    totalYarnNeeded = 0.30;
+  } else if (nameLower.includes('cardigan') || nameLower.includes('poncho')) {
+    totalYarnNeeded = 1.20;
+  } else if (nameLower.includes('bandana') || nameLower.includes('headband')) {
+    totalYarnNeeded = 0.20;
   }
-  else if (nameLower.includes('mini shell pouch')) {
-    materials.push({ id: yarnId, quantityNeeded: 0.1 * quantity });
-    materials.push({ id: 'rm_botao_madeira', quantityNeeded: 1 * quantity });
-  }
-  else if (nameLower.includes('airpods case')) {
-    materials.push({ id: yarnId, quantityNeeded: 0.05 * quantity });
-  }
-  else if (nameLower.includes('daisy coasters') || nameLower.includes('coasters') || nameLower.includes('coaster')) {
+
+  // Add yarn materials
+  if (nameLower.includes('daisy coasters')) {
     materials.push({ id: 'rm_safran_17_branco', quantityNeeded: 0.05 * quantity });
     materials.push({ id: 'rm_safran_18_natural', quantityNeeded: 0.02 * quantity });
+  } else if (isBicolor) {
+    const mainYarnId = getYarnIdForColor(primColor);
+    const detailYarnId = getYarnIdForColor(detColor);
+
+    if (mainYarnId === detailYarnId) {
+      materials.push({ id: mainYarnId, quantityNeeded: parseFloat((totalYarnNeeded * quantity).toFixed(2)) });
+    } else {
+      // 70% main color, 30% detail color
+      const mainQty = parseFloat((totalYarnNeeded * 0.70 * quantity).toFixed(2));
+      const detQty = parseFloat((totalYarnNeeded * 0.30 * quantity).toFixed(2));
+      materials.push({ id: mainYarnId, quantityNeeded: Math.max(0.01, mainQty) });
+      materials.push({ id: detailYarnId, quantityNeeded: Math.max(0.01, detQty) });
+    }
+  } else {
+    const yarnId = getYarnIdForColor(primColor || fullColor);
+    materials.push({ id: yarnId, quantityNeeded: parseFloat((totalYarnNeeded * quantity).toFixed(2)) });
   }
-  else if (nameLower.includes('bikini') || nameLower.includes('top')) {
-    materials.push({ id: yarnId, quantityNeeded: 0.3 * quantity });
+
+  // Add accessories
+  if (hasZipper) {
+    materials.push({ id: 'rm_fecho_correr', quantityNeeded: 1 * quantity });
   }
-  else if (nameLower.includes('cardigan') || nameLower.includes('poncho')) {
-    materials.push({ id: yarnId, quantityNeeded: 1.2 * quantity });
+  if (hasLining) {
+    materials.push({ id: 'rm_forro_tecido', quantityNeeded: 0.2 * quantity });
   }
-  else if (nameLower.includes('bandana') || nameLower.includes('headband')) {
-    materials.push({ id: yarnId, quantityNeeded: 0.2 * quantity });
-  }
-  else {
-    // Default fallback: 1.0 novelo por peça por segurança se não houver regra específica
-    materials.push({ id: yarnId, quantityNeeded: 1.0 * quantity });
+  if (hasButton) {
+    materials.push({ id: 'rm_botao_madeira', quantityNeeded: 1 * quantity });
   }
   
   return materials;
@@ -1603,7 +1653,14 @@ app.post("/api/admin/orders/create", verifyAdmin, async (req, res) => {
   }
 
   const priceNum = sanitizeNumber(price, 0);
-  const selCor = sanitizeText(selections?.cor) || "Padrão";
+  const selCorPrincipal = sanitizeText(selections?.corPrincipal);
+  const selCorDetalhe = sanitizeText(selections?.corDetalhe);
+  let selCor = sanitizeText(selections?.cor);
+  if (!selCor && selCorPrincipal) {
+    selCor = selCorDetalhe ? `${selCorPrincipal} & ${selCorDetalhe}` : selCorPrincipal;
+  }
+  if (!selCor) selCor = "Padrão";
+
   const selTam = sanitizeText(selections?.tamanho);
   const selQtd = sanitizeText(selections?.quantidade).replace(/\D/g, "") || "1";
 
@@ -1619,6 +1676,8 @@ app.post("/api/admin/orders/create", verifyAdmin, async (req, res) => {
     price: priceNum,
     selections: {
       cor: selCor,
+      corPrincipal: selCorPrincipal || undefined,
+      corDetalhe: selCorDetalhe || undefined,
       tamanho: selTam,
       hasSize,
       quantidade: selQtd
