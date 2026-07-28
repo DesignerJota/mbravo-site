@@ -1306,15 +1306,52 @@ function getMaterialsNeededForProduct(productName: string, selections: any = {})
     materials.push({ id: yarnId, quantityNeeded: parseFloat((totalYarnNeeded * quantity).toFixed(2)) });
   }
 
-  // Add accessories
-  if (hasZipper) {
+  // Add accessories based on selections.accessories -> catalogAcc -> smart fallbacks
+  let catalogAcc: any = null;
+  try {
+    const catalogData = loadCatalog();
+    if (catalogData && Array.isArray(catalogData)) {
+      const normProdName = (productName || '').toLowerCase().trim();
+      for (const cat of catalogData) {
+        if (!cat.products || !Array.isArray(cat.products)) continue;
+        for (const prod of cat.products) {
+          const pName = (prod.name || prod.title || '').toLowerCase().trim();
+          if (pName && (pName === normProdName || normProdName.includes(pName) || pName.includes(normProdName))) {
+            if (prod.accessories && typeof prod.accessories === 'object') {
+              catalogAcc = prod.accessories;
+              break;
+            }
+          }
+        }
+        if (catalogAcc) break;
+      }
+    }
+  } catch (e) {
+    // lookup fallback
+  }
+
+  const customAcc = selections?.accessories || catalogAcc || {};
+
+  const wantZipper = customAcc.fecho !== undefined ? Boolean(customAcc.fecho) : hasZipper;
+  const wantLining = customAcc.forro !== undefined ? Boolean(customAcc.forro) : hasLining;
+  const wantButton = customAcc.botao !== undefined ? Boolean(customAcc.botao) : hasButton;
+  const wantEtiqueta = customAcc.etiqueta !== undefined ? Boolean(customAcc.etiqueta) : !nameLower.includes('digital');
+  const wantCaixa = customAcc.caixa !== undefined ? Boolean(customAcc.caixa) : !nameLower.includes('digital');
+
+  if (wantZipper) {
     materials.push({ id: 'rm_fecho_correr', quantityNeeded: 1 * quantity });
   }
-  if (hasLining) {
+  if (wantLining) {
     materials.push({ id: 'rm_forro_tecido', quantityNeeded: 0.2 * quantity });
   }
-  if (hasButton) {
+  if (wantButton) {
     materials.push({ id: 'rm_botao_madeira', quantityNeeded: 1 * quantity });
+  }
+  if (wantEtiqueta) {
+    materials.push({ id: 'rm_etiqueta_couro', quantityNeeded: 1 * quantity });
+  }
+  if (wantCaixa) {
+    materials.push({ id: 'rm_caixa_embalamento', quantityNeeded: 1 * quantity });
   }
   
   return materials;
