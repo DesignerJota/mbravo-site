@@ -1054,7 +1054,8 @@ const DEFAULT_INVENTORY = [
   { id: 'rm_botao_madeira', name: 'Botão de Madeira M★BRAVO', quantity: 60.0, unit: 'unidades', minSafety: 15.0 },
   { id: 'rm_forro_tecido', name: 'Tecido para Forro (Algodão)', quantity: 20.0, unit: 'metros', minSafety: 5.0 },
   { id: 'rm_caixa_embalamento', name: 'Caixa de Embalamento Premium', quantity: 50.0, unit: 'unidades', minSafety: 12.0 },
-  { id: 'rm_etiqueta_couro', name: 'Etiqueta em Couro M★BRAVO', quantity: 100.0, unit: 'unidades', minSafety: 20.0 }
+  { id: 'rm_etiqueta_couro', name: 'Etiqueta em Couro M★BRAVO', quantity: 100.0, unit: 'unidades', minSafety: 20.0 },
+  { id: 're_saco_envelope', name: 'Saco Envelope Personalizado M★BRAVO', quantity: 50.0, unit: 'unidades', minSafety: 10.0 }
 ];
 
 function loadInventory() {
@@ -1207,10 +1208,6 @@ function getMaterialsNeededForProduct(productName: string, selections: any = {})
 
   const materials: { id: string; quantityNeeded: number }[] = [];
   
-  // Base packaging and leather brand tags are consumed with every item in an order
-  materials.push({ id: 'rm_caixa_embalamento', quantityNeeded: 1 * quantity });
-  materials.push({ id: 'rm_etiqueta_couro', quantityNeeded: 1 * quantity });
-  
   // Helper to resolve yarn bobbin ID by color name
   function getYarnIdForColor(colorName: string) {
     const norm = (colorName || '').toLowerCase().trim();
@@ -1267,6 +1264,64 @@ function getMaterialsNeededForProduct(productName: string, selections: any = {})
     if (norm.includes('verde')) return 'rm_paris_43_verde';
 
     return 'rm_safran_18_natural';
+  }
+
+  // Helper to resolve zipper ID matching piece color
+  function getZipperIdForColor(colorName: string): string {
+    const norm = (colorName || '').toLowerCase().trim();
+    try {
+      const invData = loadInventory();
+      if (Array.isArray(invData)) {
+        const zippers = invData.filter((i: any) => 
+          i && i.id && i.name && (i.id.toLowerCase().includes('fecho') || i.name.toLowerCase().includes('fecho') || i.id.toLowerCase().includes('zipper'))
+        );
+        if (zippers.length > 0) {
+          if (norm) {
+            const normWords = norm.split(/[\s,()/]+/).filter(w => w.length > 2 && !['drops', 'safran', 'paris', '100%'].includes(w));
+            const colorMatch = zippers.find((z: any) => {
+              const zId = z.id.toLowerCase();
+              const zName = z.name.toLowerCase();
+              return normWords.some(w => zId.includes(w) || zName.includes(w));
+            });
+            if (colorMatch) return colorMatch.id;
+          }
+          const base = zippers.find((z: any) => z.id === 'rm_fecho_correr') || zippers[0];
+          return base.id;
+        }
+      }
+    } catch (e) {
+      // ignore
+    }
+    return 'rm_fecho_correr';
+  }
+
+  // Helper to resolve lining ID matching piece color
+  function getLiningIdForColor(colorName: string): string {
+    const norm = (colorName || '').toLowerCase().trim();
+    try {
+      const invData = loadInventory();
+      if (Array.isArray(invData)) {
+        const linings = invData.filter((i: any) => 
+          i && i.id && i.name && (i.id.toLowerCase().includes('forro') || i.name.toLowerCase().includes('forro'))
+        );
+        if (linings.length > 0) {
+          if (norm) {
+            const normWords = norm.split(/[\s,()/]+/).filter(w => w.length > 2 && !['drops', 'safran', 'paris', '100%'].includes(w));
+            const colorMatch = linings.find((l: any) => {
+              const lId = l.id.toLowerCase();
+              const lName = l.name.toLowerCase();
+              return normWords.some(w => lId.includes(w) || lName.includes(w));
+            });
+            if (colorMatch) return colorMatch.id;
+          }
+          const base = linings.find((l: any) => l.id === 'rm_forro_tecido') || linings[0];
+          return base.id;
+        }
+      }
+    } catch (e) {
+      // ignore
+    }
+    return 'rm_forro_tecido';
   }
 
   // Check if product has explicit custom color consumption specified in catalog.json
@@ -1354,21 +1409,39 @@ function getMaterialsNeededForProduct(productName: string, selections: any = {})
   const wantButton = customAcc.botao !== undefined ? Boolean(customAcc.botao) : hasButton;
   const wantEtiqueta = customAcc.etiqueta !== undefined ? Boolean(customAcc.etiqueta) : !nameLower.includes('digital');
   const wantCaixa = customAcc.caixa !== undefined ? Boolean(customAcc.caixa) : !nameLower.includes('digital');
+  const wantSaco = customAcc.sacoEnvelope !== undefined ? Boolean(customAcc.sacoEnvelope) : (customAcc.saco !== undefined ? Boolean(customAcc.saco) : (customAcc.envelope !== undefined ? Boolean(customAcc.envelope) : false));
+
+  const pieceColor = primColor || fullColor || '';
 
   if (wantZipper) {
-    materials.push({ id: 'rm_fecho_correr', quantityNeeded: 1 * quantity });
+    const zipperId = getZipperIdForColor(pieceColor);
+    const qtyPerPiece = customAcc.fechoQty && !isNaN(parseFloat(customAcc.fechoQty)) ? Math.max(1, parseFloat(customAcc.fechoQty)) : 1;
+    materials.push({ id: zipperId, quantityNeeded: qtyPerPiece * quantity });
   }
   if (wantLining) {
-    materials.push({ id: 'rm_forro_tecido', quantityNeeded: 0.2 * quantity });
+    const liningId = getLiningIdForColor(pieceColor);
+    const metersPerPiece = customAcc.forroMeters && !isNaN(parseFloat(customAcc.forroMeters)) 
+      ? Math.max(0.01, parseFloat(customAcc.forroMeters)) 
+      : (customAcc.forroConsumo && !isNaN(parseFloat(customAcc.forroConsumo)) ? Math.max(0.01, parseFloat(customAcc.forroConsumo)) : 0.25);
+    materials.push({ id: liningId, quantityNeeded: parseFloat((metersPerPiece * quantity).toFixed(3)) });
   }
   if (wantButton) {
-    materials.push({ id: 'rm_botao_madeira', quantityNeeded: 1 * quantity });
+    const qtyPerPiece = customAcc.botaoQty && !isNaN(parseFloat(customAcc.botaoQty)) ? Math.max(1, parseFloat(customAcc.botaoQty)) : 1;
+    materials.push({ id: 'rm_botao_madeira', quantityNeeded: qtyPerPiece * quantity });
   }
   if (wantEtiqueta) {
-    materials.push({ id: 'rm_etiqueta_couro', quantityNeeded: 1 * quantity });
+    const qtyPerPiece = customAcc.etiquetaQty && !isNaN(parseFloat(customAcc.etiquetaQty)) ? Math.max(1, parseFloat(customAcc.etiquetaQty)) : 1;
+    materials.push({ id: 'rm_etiqueta_couro', quantityNeeded: qtyPerPiece * quantity });
   }
   if (wantCaixa) {
-    materials.push({ id: 'rm_caixa_embalamento', quantityNeeded: 1 * quantity });
+    const qtyPerPiece = customAcc.caixaQty && !isNaN(parseFloat(customAcc.caixaQty)) ? Math.max(1, parseFloat(customAcc.caixaQty)) : 1;
+    materials.push({ id: 'rm_caixa_embalamento', quantityNeeded: qtyPerPiece * quantity });
+  }
+  if (wantSaco) {
+    const qtyPerPiece = customAcc.sacoEnvelopeQty && !isNaN(parseFloat(customAcc.sacoEnvelopeQty)) 
+      ? Math.max(1, parseFloat(customAcc.sacoEnvelopeQty)) 
+      : (customAcc.sacoQty && !isNaN(parseFloat(customAcc.sacoQty)) ? Math.max(1, parseFloat(customAcc.sacoQty)) : 1);
+    materials.push({ id: 're_saco_envelope', quantityNeeded: qtyPerPiece * quantity });
   }
   
   return materials;
