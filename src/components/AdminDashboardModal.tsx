@@ -287,10 +287,17 @@ export default function AdminDashboardModal({ onClose, shopCategories = [] }: Ad
     priority: 'NORMAL',
     accessories: {
       fecho: false,
+      fechoQty: 1,
       forro: false,
+      forroMeters: 0.25,
       etiqueta: true,
+      etiquetaQty: 1,
       caixa: true,
-      botao: false
+      caixaQty: 1,
+      sacoEnvelope: true,
+      sacoEnvelopeQty: 1,
+      botao: false,
+      botaoQty: 1
     }
   });
   const [isCreatingManual, setIsCreatingManual] = useState(false);
@@ -649,11 +656,18 @@ export default function AdminDashboardModal({ onClose, shopCategories = [] }: Ad
       corPrincipal: defaultPrim,
       corDetalhe: defaultDet,
       accessories: {
-        fecho: isAfricanFlowerPouch || isMiniPouches,
-        forro: isAfricanFlowerPouch,
-        etiqueta: true,
-        caixa: true,
-        botao: isMiniShellPouch
+        fecho: prod.accessories?.fecho ?? (isAfricanFlowerPouch || isMiniPouches),
+        fechoQty: prod.accessories?.fechoQty ?? 1,
+        forro: prod.accessories?.forro ?? isAfricanFlowerPouch,
+        forroMeters: prod.accessories?.forroMeters ?? prod.accessories?.forroConsumo ?? 0.25,
+        etiqueta: prod.accessories?.etiqueta ?? true,
+        etiquetaQty: prod.accessories?.etiquetaQty ?? 1,
+        caixa: prod.accessories?.caixa ?? true,
+        caixaQty: prod.accessories?.caixaQty ?? 1,
+        sacoEnvelope: prod.accessories?.sacoEnvelope ?? prod.accessories?.saco ?? true,
+        sacoEnvelopeQty: prod.accessories?.sacoEnvelopeQty ?? prod.accessories?.sacoQty ?? 1,
+        botao: prod.accessories?.botao ?? isMiniShellPouch,
+        botaoQty: prod.accessories?.botaoQty ?? 1
       }
     }));
   };
@@ -1804,73 +1818,222 @@ export default function AdminDashboardModal({ onClose, shopCategories = [] }: Ad
                     </div>
                   </div>
 
-                  {/* Acessórios & Embalamento Consumidos Checklist */}
-                  <div className="bg-white/80 border border-[#C5A059]/25 rounded-2xl p-4 space-y-2 text-left shadow-xs">
+                  {/* Acessórios & Embalamento Checklist */}
+                  <div className="bg-white/80 border border-[#C5A059]/25 rounded-2xl p-4 space-y-2.5 text-left shadow-xs">
                     <span className="text-[10px] font-bold uppercase tracking-wider text-forest/60 flex items-center gap-1.5 font-sans">
                       <Layers className="w-3.5 h-3.5 text-[#C5A059]" />
-                      Acessórios & Embalamento Consumidos (Abatimento Automático no Inventário)
+                      Acessórios & Embalamento
                     </span>
-                    <div className="grid grid-cols-2 sm:grid-cols-5 gap-2 text-xs pt-1">
-                      <label className="flex items-center gap-2 cursor-pointer hover:text-forest select-none font-medium text-forest/80 bg-[#FCFBF9] p-2 rounded-xl border border-forest/5">
-                        <input
-                          type="checkbox"
-                          checked={manualForm.accessories?.etiqueta ?? true}
-                          onChange={(e) => setManualForm(prev => ({
-                            ...prev,
-                            accessories: { ...prev.accessories, etiqueta: e.target.checked }
-                          }))}
-                          className="rounded text-[#C5A059] focus:ring-[#C5A059] w-3.5 h-3.5"
-                        />
-                        <span>Etiqueta Couro</span>
-                      </label>
-                      <label className="flex items-center gap-2 cursor-pointer hover:text-forest select-none font-medium text-forest/80 bg-[#FCFBF9] p-2 rounded-xl border border-forest/5">
-                        <input
-                          type="checkbox"
-                          checked={manualForm.accessories?.caixa ?? true}
-                          onChange={(e) => setManualForm(prev => ({
-                            ...prev,
-                            accessories: { ...prev.accessories, caixa: e.target.checked }
-                          }))}
-                          className="rounded text-[#C5A059] focus:ring-[#C5A059] w-3.5 h-3.5"
-                        />
-                        <span>Caixa Premium</span>
-                      </label>
-                      <label className="flex items-center gap-2 cursor-pointer hover:text-forest select-none font-medium text-forest/80 bg-[#FCFBF9] p-2 rounded-xl border border-forest/5">
-                        <input
-                          type="checkbox"
-                          checked={manualForm.accessories?.fecho ?? false}
-                          onChange={(e) => setManualForm(prev => ({
-                            ...prev,
-                            accessories: { ...prev.accessories, fecho: e.target.checked }
-                          }))}
-                          className="rounded text-[#C5A059] focus:ring-[#C5A059] w-3.5 h-3.5"
-                        />
-                        <span>Fecho Correr</span>
-                      </label>
-                      <label className="flex items-center gap-2 cursor-pointer hover:text-forest select-none font-medium text-forest/80 bg-[#FCFBF9] p-2 rounded-xl border border-forest/5">
-                        <input
-                          type="checkbox"
-                          checked={manualForm.accessories?.forro ?? false}
-                          onChange={(e) => setManualForm(prev => ({
-                            ...prev,
-                            accessories: { ...prev.accessories, forro: e.target.checked }
-                          }))}
-                          className="rounded text-[#C5A059] focus:ring-[#C5A059] w-3.5 h-3.5"
-                        />
-                        <span>Forro Algodão</span>
-                      </label>
-                      <label className="flex items-center gap-2 cursor-pointer hover:text-forest select-none font-medium text-forest/80 bg-[#FCFBF9] p-2 rounded-xl border border-forest/5">
-                        <input
-                          type="checkbox"
-                          checked={manualForm.accessories?.botao ?? false}
-                          onChange={(e) => setManualForm(prev => ({
-                            ...prev,
-                            accessories: { ...prev.accessories, botao: e.target.checked }
-                          }))}
-                          className="rounded text-[#C5A059] focus:ring-[#C5A059] w-3.5 h-3.5"
-                        />
-                        <span>Botão Madeira</span>
-                      </label>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 text-xs pt-1">
+                      {/* 1. Etiqueta Couro */}
+                      <div className={`p-2.5 rounded-xl border transition-all ${manualForm.accessories?.etiqueta ? 'bg-[#FCFBF9] border-[#C5A059]/50 shadow-2xs' : 'bg-white border-forest/10 opacity-70'}`}>
+                        <label className="flex items-center gap-2 cursor-pointer select-none font-medium text-forest">
+                          <input
+                            type="checkbox"
+                            checked={manualForm.accessories?.etiqueta ?? true}
+                            onChange={(e) => setManualForm(prev => ({
+                              ...prev,
+                              accessories: { ...prev.accessories, etiqueta: e.target.checked }
+                            }))}
+                            className="rounded text-[#C5A059] focus:ring-[#C5A059] w-4 h-4 shrink-0"
+                          />
+                          <span className="text-xs sm:text-sm font-semibold">Etiqueta Couro</span>
+                        </label>
+                        {(manualForm.accessories?.etiqueta ?? true) && (
+                          <div className="flex items-center justify-between gap-2 pt-2 mt-1.5 border-t border-forest/10 text-xs">
+                            <span className="text-[10px] font-bold uppercase tracking-wider text-forest/50">Qtd:</span>
+                            <div className="flex items-center gap-1">
+                              <input
+                                type="number"
+                                min="1"
+                                step="1"
+                                value={manualForm.accessories?.etiquetaQty ?? 1}
+                                onChange={(e) => setManualForm(prev => ({
+                                  ...prev,
+                                  accessories: { ...prev.accessories, etiquetaQty: Math.max(1, parseInt(e.target.value) || 1) }
+                                }))}
+                                className="w-16 bg-white border border-forest/20 rounded-lg px-2 py-0.5 text-center font-bold text-forest text-xs focus:outline-none focus:border-[#C5A059]"
+                              />
+                              <span className="text-[10px] text-forest/60">unid.</span>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* 2. Caixa Premium */}
+                      <div className={`p-2.5 rounded-xl border transition-all ${manualForm.accessories?.caixa ? 'bg-[#FCFBF9] border-[#C5A059]/50 shadow-2xs' : 'bg-white border-forest/10 opacity-70'}`}>
+                        <label className="flex items-center gap-2 cursor-pointer select-none font-medium text-forest">
+                          <input
+                            type="checkbox"
+                            checked={manualForm.accessories?.caixa ?? true}
+                            onChange={(e) => setManualForm(prev => ({
+                              ...prev,
+                              accessories: { ...prev.accessories, caixa: e.target.checked }
+                            }))}
+                            className="rounded text-[#C5A059] focus:ring-[#C5A059] w-4 h-4 shrink-0"
+                          />
+                          <span className="text-xs sm:text-sm font-semibold">Caixa Premium</span>
+                        </label>
+                        {(manualForm.accessories?.caixa ?? true) && (
+                          <div className="flex items-center justify-between gap-2 pt-2 mt-1.5 border-t border-forest/10 text-xs">
+                            <span className="text-[10px] font-bold uppercase tracking-wider text-forest/50">Qtd:</span>
+                            <div className="flex items-center gap-1">
+                              <input
+                                type="number"
+                                min="1"
+                                step="1"
+                                value={manualForm.accessories?.caixaQty ?? 1}
+                                onChange={(e) => setManualForm(prev => ({
+                                  ...prev,
+                                  accessories: { ...prev.accessories, caixaQty: Math.max(1, parseInt(e.target.value) || 1) }
+                                }))}
+                                className="w-16 bg-white border border-forest/20 rounded-lg px-2 py-0.5 text-center font-bold text-forest text-xs focus:outline-none focus:border-[#C5A059]"
+                              />
+                              <span className="text-[10px] text-forest/60">unid.</span>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* 3. Saco Envelope */}
+                      <div className={`p-2.5 rounded-xl border transition-all ${manualForm.accessories?.sacoEnvelope ? 'bg-[#FCFBF9] border-[#C5A059]/50 shadow-2xs' : 'bg-white border-forest/10 opacity-70'}`}>
+                        <label className="flex items-center gap-2 cursor-pointer select-none font-medium text-forest">
+                          <input
+                            type="checkbox"
+                            checked={manualForm.accessories?.sacoEnvelope ?? true}
+                            onChange={(e) => setManualForm(prev => ({
+                              ...prev,
+                              accessories: { ...prev.accessories, sacoEnvelope: e.target.checked }
+                            }))}
+                            className="rounded text-[#C5A059] focus:ring-[#C5A059] w-4 h-4 shrink-0"
+                          />
+                          <span className="text-xs sm:text-sm font-semibold">Saco Envelope</span>
+                        </label>
+                        {(manualForm.accessories?.sacoEnvelope ?? true) && (
+                          <div className="flex items-center justify-between gap-2 pt-2 mt-1.5 border-t border-forest/10 text-xs">
+                            <span className="text-[10px] font-bold uppercase tracking-wider text-forest/50">Qtd:</span>
+                            <div className="flex items-center gap-1">
+                              <input
+                                type="number"
+                                min="1"
+                                step="1"
+                                value={manualForm.accessories?.sacoEnvelopeQty ?? 1}
+                                onChange={(e) => setManualForm(prev => ({
+                                  ...prev,
+                                  accessories: { ...prev.accessories, sacoEnvelopeQty: Math.max(1, parseInt(e.target.value) || 1) }
+                                }))}
+                                className="w-16 bg-white border border-forest/20 rounded-lg px-2 py-0.5 text-center font-bold text-forest text-xs focus:outline-none focus:border-[#C5A059]"
+                              />
+                              <span className="text-[10px] text-forest/60">unid.</span>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* 4. Fecho Correr */}
+                      <div className={`p-2.5 rounded-xl border transition-all ${manualForm.accessories?.fecho ? 'bg-[#FCFBF9] border-[#C5A059]/50 shadow-2xs' : 'bg-white border-forest/10 opacity-70'}`}>
+                        <label className="flex items-center gap-2 cursor-pointer select-none font-medium text-forest">
+                          <input
+                            type="checkbox"
+                            checked={manualForm.accessories?.fecho ?? false}
+                            onChange={(e) => setManualForm(prev => ({
+                              ...prev,
+                              accessories: { ...prev.accessories, fecho: e.target.checked }
+                            }))}
+                            className="rounded text-[#C5A059] focus:ring-[#C5A059] w-4 h-4 shrink-0"
+                          />
+                          <span className="text-xs sm:text-sm font-semibold">Fecho Correr</span>
+                        </label>
+                        {Boolean(manualForm.accessories?.fecho) && (
+                          <div className="flex items-center justify-between gap-2 pt-2 mt-1.5 border-t border-forest/10 text-xs">
+                            <span className="text-[10px] font-bold uppercase tracking-wider text-forest/50">Qtd:</span>
+                            <div className="flex items-center gap-1">
+                              <input
+                                type="number"
+                                min="1"
+                                step="1"
+                                value={manualForm.accessories?.fechoQty ?? 1}
+                                onChange={(e) => setManualForm(prev => ({
+                                  ...prev,
+                                  accessories: { ...prev.accessories, fechoQty: Math.max(1, parseInt(e.target.value) || 1) }
+                                }))}
+                                className="w-16 bg-white border border-forest/20 rounded-lg px-2 py-0.5 text-center font-bold text-forest text-xs focus:outline-none focus:border-[#C5A059]"
+                              />
+                              <span className="text-[10px] text-forest/60">unid.</span>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* 5. Forro Algodão */}
+                      <div className={`p-2.5 rounded-xl border transition-all ${manualForm.accessories?.forro ? 'bg-[#FCFBF9] border-[#C5A059]/50 shadow-2xs' : 'bg-white border-forest/10 opacity-70'}`}>
+                        <label className="flex items-center gap-2 cursor-pointer select-none font-medium text-forest">
+                          <input
+                            type="checkbox"
+                            checked={manualForm.accessories?.forro ?? false}
+                            onChange={(e) => setManualForm(prev => ({
+                              ...prev,
+                              accessories: { ...prev.accessories, forro: e.target.checked }
+                            }))}
+                            className="rounded text-[#C5A059] focus:ring-[#C5A059] w-4 h-4 shrink-0"
+                          />
+                          <span className="text-xs sm:text-sm font-semibold">Forro Algodão</span>
+                        </label>
+                        {Boolean(manualForm.accessories?.forro) && (
+                          <div className="flex items-center justify-between gap-2 pt-2 mt-1.5 border-t border-forest/10 text-xs">
+                            <span className="text-[10px] font-bold uppercase tracking-wider text-forest/50">Consumo:</span>
+                            <div className="flex items-center gap-1">
+                              <input
+                                type="number"
+                                min="0.01"
+                                step="0.05"
+                                value={manualForm.accessories?.forroMeters ?? 0.25}
+                                onChange={(e) => setManualForm(prev => ({
+                                  ...prev,
+                                  accessories: { ...prev.accessories, forroMeters: Math.max(0.01, parseFloat(e.target.value) || 0.25) }
+                                }))}
+                                className="w-16 bg-white border border-forest/20 rounded-lg px-2 py-0.5 text-center font-bold text-forest text-xs focus:outline-none focus:border-[#C5A059]"
+                              />
+                              <span className="text-[10px] text-forest/60">metros</span>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* 6. Botão Madeira */}
+                      <div className={`p-2.5 rounded-xl border transition-all ${manualForm.accessories?.botao ? 'bg-[#FCFBF9] border-[#C5A059]/50 shadow-2xs' : 'bg-white border-forest/10 opacity-70'}`}>
+                        <label className="flex items-center gap-2 cursor-pointer select-none font-medium text-forest">
+                          <input
+                            type="checkbox"
+                            checked={manualForm.accessories?.botao ?? false}
+                            onChange={(e) => setManualForm(prev => ({
+                              ...prev,
+                              accessories: { ...prev.accessories, botao: e.target.checked }
+                            }))}
+                            className="rounded text-[#C5A059] focus:ring-[#C5A059] w-4 h-4 shrink-0"
+                          />
+                          <span className="text-xs sm:text-sm font-semibold">Botão Madeira</span>
+                        </label>
+                        {Boolean(manualForm.accessories?.botao) && (
+                          <div className="flex items-center justify-between gap-2 pt-2 mt-1.5 border-t border-forest/10 text-xs">
+                            <span className="text-[10px] font-bold uppercase tracking-wider text-forest/50">Qtd:</span>
+                            <div className="flex items-center gap-1">
+                              <input
+                                type="number"
+                                min="1"
+                                step="1"
+                                value={manualForm.accessories?.botaoQty ?? 1}
+                                onChange={(e) => setManualForm(prev => ({
+                                  ...prev,
+                                  accessories: { ...prev.accessories, botaoQty: Math.max(1, parseInt(e.target.value) || 1) }
+                                }))}
+                                className="w-16 bg-white border border-forest/20 rounded-lg px-2 py-0.5 text-center font-bold text-forest text-xs focus:outline-none focus:border-[#C5A059]"
+                              />
+                              <span className="text-[10px] text-forest/60">unid.</span>
+                            </div>
+                          </div>
+                        )}
+                      </div>
                     </div>
                   </div>
 
@@ -3380,91 +3543,260 @@ export default function AdminDashboardModal({ onClose, shopCategories = [] }: Ad
                         );
                       })()}
 
-                      {/* Receita BOM: Acessórios & Ferragens Associadas */}
-                      <div className="bg-[#FCFBF9] border border-[#C5A059]/25 rounded-xl p-3.5 space-y-2">
+                      {/* Acessórios & Embalamento */}
+                      <div className="bg-[#FCFBF9] border border-[#C5A059]/25 rounded-xl p-3.5 space-y-2.5">
                         <div className="flex items-center justify-between">
                           <label className="font-bold text-forest/80 text-[11px] uppercase tracking-wider flex items-center gap-1.5">
                             <Layers className="w-3.5 h-3.5 text-[#C5A059]" />
-                            Acessórios & Ferragens Associadas (Receita BOM)
+                            Acessórios & Embalamento
                           </label>
-                          <span className="text-[9px] text-forest/40 italic font-serif">Abate automático em Vendas</span>
                         </div>
-                        <div className="grid grid-cols-2 sm:grid-cols-5 gap-2 text-xs pt-1">
-                          <label className="flex items-center gap-2 cursor-pointer hover:text-forest select-none font-medium text-forest/80 bg-white p-2 rounded-lg border border-forest/10 shadow-2xs">
-                            <input
-                              type="checkbox"
-                              checked={editingProduct.product.accessories?.etiqueta ?? true}
-                              onChange={(e) => setEditingProduct({
-                                ...editingProduct,
-                                product: {
-                                  ...editingProduct.product,
-                                  accessories: { ...(editingProduct.product.accessories || { etiqueta: true, caixa: true, fecho: false, forro: false, botao: false }), etiqueta: e.target.checked }
-                                }
-                              })}
-                              className="rounded text-[#C5A059] focus:ring-[#C5A059] w-3.5 h-3.5"
-                            />
-                            <span>Etiqueta Couro</span>
-                          </label>
-                          <label className="flex items-center gap-2 cursor-pointer hover:text-forest select-none font-medium text-forest/80 bg-white p-2 rounded-lg border border-forest/10 shadow-2xs">
-                            <input
-                              type="checkbox"
-                              checked={editingProduct.product.accessories?.caixa ?? true}
-                              onChange={(e) => setEditingProduct({
-                                ...editingProduct,
-                                product: {
-                                  ...editingProduct.product,
-                                  accessories: { ...(editingProduct.product.accessories || { etiqueta: true, caixa: true, fecho: false, forro: false, botao: false }), caixa: e.target.checked }
-                                }
-                              })}
-                              className="rounded text-[#C5A059] focus:ring-[#C5A059] w-3.5 h-3.5"
-                            />
-                            <span>Caixa Premium</span>
-                          </label>
-                          <label className="flex items-center gap-2 cursor-pointer hover:text-forest select-none font-medium text-forest/80 bg-white p-2 rounded-lg border border-forest/10 shadow-2xs">
-                            <input
-                              type="checkbox"
-                              checked={editingProduct.product.accessories?.fecho ?? false}
-                              onChange={(e) => setEditingProduct({
-                                ...editingProduct,
-                                product: {
-                                  ...editingProduct.product,
-                                  accessories: { ...(editingProduct.product.accessories || { etiqueta: true, caixa: true, fecho: false, forro: false, botao: false }), fecho: e.target.checked }
-                                }
-                              })}
-                              className="rounded text-[#C5A059] focus:ring-[#C5A059] w-3.5 h-3.5"
-                            />
-                            <span>Fecho Correr</span>
-                          </label>
-                          <label className="flex items-center gap-2 cursor-pointer hover:text-forest select-none font-medium text-forest/80 bg-white p-2 rounded-lg border border-forest/10 shadow-2xs">
-                            <input
-                              type="checkbox"
-                              checked={editingProduct.product.accessories?.forro ?? false}
-                              onChange={(e) => setEditingProduct({
-                                ...editingProduct,
-                                product: {
-                                  ...editingProduct.product,
-                                  accessories: { ...(editingProduct.product.accessories || { etiqueta: true, caixa: true, fecho: false, forro: false, botao: false }), forro: e.target.checked }
-                                }
-                              })}
-                              className="rounded text-[#C5A059] focus:ring-[#C5A059] w-3.5 h-3.5"
-                            />
-                            <span>Forro Algodão</span>
-                          </label>
-                          <label className="flex items-center gap-2 cursor-pointer hover:text-forest select-none font-medium text-forest/80 bg-white p-2 rounded-lg border border-forest/10 shadow-2xs">
-                            <input
-                              type="checkbox"
-                              checked={editingProduct.product.accessories?.botao ?? false}
-                              onChange={(e) => setEditingProduct({
-                                ...editingProduct,
-                                product: {
-                                  ...editingProduct.product,
-                                  accessories: { ...(editingProduct.product.accessories || { etiqueta: true, caixa: true, fecho: false, forro: false, botao: false }), botao: e.target.checked }
-                                }
-                              })}
-                              className="rounded text-[#C5A059] focus:ring-[#C5A059] w-3.5 h-3.5"
-                            />
-                            <span>Botão Madeira</span>
-                          </label>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 text-xs pt-1">
+                          {/* 1. Etiqueta Couro */}
+                          <div className={`p-2.5 rounded-xl border transition-all ${editingProduct.product.accessories?.etiqueta ?? true ? 'bg-white border-[#C5A059]/50 shadow-2xs' : 'bg-white/60 border-forest/10 opacity-70'}`}>
+                            <label className="flex items-center gap-2 cursor-pointer select-none font-medium text-forest">
+                              <input
+                                type="checkbox"
+                                checked={editingProduct.product.accessories?.etiqueta ?? true}
+                                onChange={(e) => setEditingProduct({
+                                  ...editingProduct,
+                                  product: {
+                                    ...editingProduct.product,
+                                    accessories: { ...(editingProduct.product.accessories || {}), etiqueta: e.target.checked }
+                                  }
+                                })}
+                                className="rounded text-[#C5A059] focus:ring-[#C5A059] w-4 h-4 shrink-0"
+                              />
+                              <span className="text-xs sm:text-sm font-semibold">Etiqueta Couro</span>
+                            </label>
+                            {(editingProduct.product.accessories?.etiqueta ?? true) && (
+                              <div className="flex items-center justify-between gap-2 pt-2 mt-1.5 border-t border-forest/10 text-xs">
+                                <span className="text-[10px] font-bold uppercase tracking-wider text-forest/50">Qtd:</span>
+                                <div className="flex items-center gap-1">
+                                  <input
+                                    type="number"
+                                    min="1"
+                                    step="1"
+                                    value={editingProduct.product.accessories?.etiquetaQty ?? 1}
+                                    onChange={(e) => setEditingProduct({
+                                      ...editingProduct,
+                                      product: {
+                                        ...editingProduct.product,
+                                        accessories: { ...(editingProduct.product.accessories || {}), etiquetaQty: Math.max(1, parseInt(e.target.value) || 1) }
+                                      }
+                                    })}
+                                    className="w-16 bg-[#FCFBF9] border border-forest/20 rounded-lg px-2 py-0.5 text-center font-bold text-forest text-xs focus:outline-none focus:border-[#C5A059]"
+                                  />
+                                  <span className="text-[10px] text-forest/60">unid.</span>
+                                </div>
+                              </div>
+                            )}
+                          </div>
+
+                          {/* 2. Caixa Premium */}
+                          <div className={`p-2.5 rounded-xl border transition-all ${editingProduct.product.accessories?.caixa ?? true ? 'bg-white border-[#C5A059]/50 shadow-2xs' : 'bg-white/60 border-forest/10 opacity-70'}`}>
+                            <label className="flex items-center gap-2 cursor-pointer select-none font-medium text-forest">
+                              <input
+                                type="checkbox"
+                                checked={editingProduct.product.accessories?.caixa ?? true}
+                                onChange={(e) => setEditingProduct({
+                                  ...editingProduct,
+                                  product: {
+                                    ...editingProduct.product,
+                                    accessories: { ...(editingProduct.product.accessories || {}), caixa: e.target.checked }
+                                  }
+                                })}
+                                className="rounded text-[#C5A059] focus:ring-[#C5A059] w-4 h-4 shrink-0"
+                              />
+                              <span className="text-xs sm:text-sm font-semibold">Caixa Premium</span>
+                            </label>
+                            {(editingProduct.product.accessories?.caixa ?? true) && (
+                              <div className="flex items-center justify-between gap-2 pt-2 mt-1.5 border-t border-forest/10 text-xs">
+                                <span className="text-[10px] font-bold uppercase tracking-wider text-forest/50">Qtd:</span>
+                                <div className="flex items-center gap-1">
+                                  <input
+                                    type="number"
+                                    min="1"
+                                    step="1"
+                                    value={editingProduct.product.accessories?.caixaQty ?? 1}
+                                    onChange={(e) => setEditingProduct({
+                                      ...editingProduct,
+                                      product: {
+                                        ...editingProduct.product,
+                                        accessories: { ...(editingProduct.product.accessories || {}), caixaQty: Math.max(1, parseInt(e.target.value) || 1) }
+                                      }
+                                    })}
+                                    className="w-16 bg-[#FCFBF9] border border-forest/20 rounded-lg px-2 py-0.5 text-center font-bold text-forest text-xs focus:outline-none focus:border-[#C5A059]"
+                                  />
+                                  <span className="text-[10px] text-forest/60">unid.</span>
+                                </div>
+                              </div>
+                            )}
+                          </div>
+
+                          {/* 3. Saco Envelope */}
+                          <div className={`p-2.5 rounded-xl border transition-all ${(editingProduct.product.accessories?.sacoEnvelope ?? editingProduct.product.accessories?.saco ?? true) ? 'bg-white border-[#C5A059]/50 shadow-2xs' : 'bg-white/60 border-forest/10 opacity-70'}`}>
+                            <label className="flex items-center gap-2 cursor-pointer select-none font-medium text-forest">
+                              <input
+                                type="checkbox"
+                                checked={editingProduct.product.accessories?.sacoEnvelope ?? editingProduct.product.accessories?.saco ?? true}
+                                onChange={(e) => setEditingProduct({
+                                  ...editingProduct,
+                                  product: {
+                                    ...editingProduct.product,
+                                    accessories: { ...(editingProduct.product.accessories || {}), sacoEnvelope: e.target.checked, saco: e.target.checked }
+                                  }
+                                })}
+                                className="rounded text-[#C5A059] focus:ring-[#C5A059] w-4 h-4 shrink-0"
+                              />
+                              <span className="text-xs sm:text-sm font-semibold">Saco Envelope</span>
+                            </label>
+                            {(editingProduct.product.accessories?.sacoEnvelope ?? editingProduct.product.accessories?.saco ?? true) && (
+                              <div className="flex items-center justify-between gap-2 pt-2 mt-1.5 border-t border-forest/10 text-xs">
+                                <span className="text-[10px] font-bold uppercase tracking-wider text-forest/50">Qtd:</span>
+                                <div className="flex items-center gap-1">
+                                  <input
+                                    type="number"
+                                    min="1"
+                                    step="1"
+                                    value={editingProduct.product.accessories?.sacoEnvelopeQty ?? editingProduct.product.accessories?.sacoQty ?? 1}
+                                    onChange={(e) => setEditingProduct({
+                                      ...editingProduct,
+                                      product: {
+                                        ...editingProduct.product,
+                                        accessories: { ...(editingProduct.product.accessories || {}), sacoEnvelopeQty: Math.max(1, parseInt(e.target.value) || 1), sacoQty: Math.max(1, parseInt(e.target.value) || 1) }
+                                      }
+                                    })}
+                                    className="w-16 bg-[#FCFBF9] border border-forest/20 rounded-lg px-2 py-0.5 text-center font-bold text-forest text-xs focus:outline-none focus:border-[#C5A059]"
+                                  />
+                                  <span className="text-[10px] text-forest/60">unid.</span>
+                                </div>
+                              </div>
+                            )}
+                          </div>
+
+                          {/* 4. Fecho Correr */}
+                          <div className={`p-2.5 rounded-xl border transition-all ${editingProduct.product.accessories?.fecho ? 'bg-white border-[#C5A059]/50 shadow-2xs' : 'bg-white/60 border-forest/10 opacity-70'}`}>
+                            <label className="flex items-center gap-2 cursor-pointer select-none font-medium text-forest">
+                              <input
+                                type="checkbox"
+                                checked={editingProduct.product.accessories?.fecho ?? false}
+                                onChange={(e) => setEditingProduct({
+                                  ...editingProduct,
+                                  product: {
+                                    ...editingProduct.product,
+                                    accessories: { ...(editingProduct.product.accessories || {}), fecho: e.target.checked }
+                                  }
+                                })}
+                                className="rounded text-[#C5A059] focus:ring-[#C5A059] w-4 h-4 shrink-0"
+                              />
+                              <span className="text-xs sm:text-sm font-semibold">Fecho Correr</span>
+                            </label>
+                            {Boolean(editingProduct.product.accessories?.fecho) && (
+                              <div className="flex items-center justify-between gap-2 pt-2 mt-1.5 border-t border-forest/10 text-xs">
+                                <span className="text-[10px] font-bold uppercase tracking-wider text-forest/50">Qtd:</span>
+                                <div className="flex items-center gap-1">
+                                  <input
+                                    type="number"
+                                    min="1"
+                                    step="1"
+                                    value={editingProduct.product.accessories?.fechoQty ?? 1}
+                                    onChange={(e) => setEditingProduct({
+                                      ...editingProduct,
+                                      product: {
+                                        ...editingProduct.product,
+                                        accessories: { ...(editingProduct.product.accessories || {}), fechoQty: Math.max(1, parseInt(e.target.value) || 1) }
+                                      }
+                                    })}
+                                    className="w-16 bg-[#FCFBF9] border border-forest/20 rounded-lg px-2 py-0.5 text-center font-bold text-forest text-xs focus:outline-none focus:border-[#C5A059]"
+                                  />
+                                  <span className="text-[10px] text-forest/60">unid.</span>
+                                </div>
+                              </div>
+                            )}
+                          </div>
+
+                          {/* 5. Forro Algodão */}
+                          <div className={`p-2.5 rounded-xl border transition-all ${editingProduct.product.accessories?.forro ? 'bg-white border-[#C5A059]/50 shadow-2xs' : 'bg-white/60 border-forest/10 opacity-70'}`}>
+                            <label className="flex items-center gap-2 cursor-pointer select-none font-medium text-forest">
+                              <input
+                                type="checkbox"
+                                checked={editingProduct.product.accessories?.forro ?? false}
+                                onChange={(e) => setEditingProduct({
+                                  ...editingProduct,
+                                  product: {
+                                    ...editingProduct.product,
+                                    accessories: { ...(editingProduct.product.accessories || {}), forro: e.target.checked }
+                                  }
+                                })}
+                                className="rounded text-[#C5A059] focus:ring-[#C5A059] w-4 h-4 shrink-0"
+                              />
+                              <span className="text-xs sm:text-sm font-semibold">Forro Algodão</span>
+                            </label>
+                            {Boolean(editingProduct.product.accessories?.forro) && (
+                              <div className="flex items-center justify-between gap-2 pt-2 mt-1.5 border-t border-forest/10 text-xs">
+                                <span className="text-[10px] font-bold uppercase tracking-wider text-forest/50">Consumo:</span>
+                                <div className="flex items-center gap-1">
+                                  <input
+                                    type="number"
+                                    min="0.01"
+                                    step="0.05"
+                                    value={editingProduct.product.accessories?.forroMeters ?? editingProduct.product.accessories?.forroConsumo ?? 0.25}
+                                    onChange={(e) => setEditingProduct({
+                                      ...editingProduct,
+                                      product: {
+                                        ...editingProduct.product,
+                                        accessories: { ...(editingProduct.product.accessories || {}), forroMeters: Math.max(0.01, parseFloat(e.target.value) || 0.25) }
+                                      }
+                                    })}
+                                    className="w-16 bg-[#FCFBF9] border border-forest/20 rounded-lg px-2 py-0.5 text-center font-bold text-forest text-xs focus:outline-none focus:border-[#C5A059]"
+                                  />
+                                  <span className="text-[10px] text-forest/60">metros</span>
+                                </div>
+                              </div>
+                            )}
+                          </div>
+
+                          {/* 6. Botão Madeira */}
+                          <div className={`p-2.5 rounded-xl border transition-all ${editingProduct.product.accessories?.botao ? 'bg-white border-[#C5A059]/50 shadow-2xs' : 'bg-white/60 border-forest/10 opacity-70'}`}>
+                            <label className="flex items-center gap-2 cursor-pointer select-none font-medium text-forest">
+                              <input
+                                type="checkbox"
+                                checked={editingProduct.product.accessories?.botao ?? false}
+                                onChange={(e) => setEditingProduct({
+                                  ...editingProduct,
+                                  product: {
+                                    ...editingProduct.product,
+                                    accessories: { ...(editingProduct.product.accessories || {}), botao: e.target.checked }
+                                  }
+                                })}
+                                className="rounded text-[#C5A059] focus:ring-[#C5A059] w-4 h-4 shrink-0"
+                              />
+                              <span className="text-xs sm:text-sm font-semibold">Botão Madeira</span>
+                            </label>
+                            {Boolean(editingProduct.product.accessories?.botao) && (
+                              <div className="flex items-center justify-between gap-2 pt-2 mt-1.5 border-t border-forest/10 text-xs">
+                                <span className="text-[10px] font-bold uppercase tracking-wider text-forest/50">Qtd:</span>
+                                <div className="flex items-center gap-1">
+                                  <input
+                                    type="number"
+                                    min="1"
+                                    step="1"
+                                    value={editingProduct.product.accessories?.botaoQty ?? 1}
+                                    onChange={(e) => setEditingProduct({
+                                      ...editingProduct,
+                                      product: {
+                                        ...editingProduct.product,
+                                        accessories: { ...(editingProduct.product.accessories || {}), botaoQty: Math.max(1, parseInt(e.target.value) || 1) }
+                                      }
+                                    })}
+                                    className="w-16 bg-[#FCFBF9] border border-forest/20 rounded-lg px-2 py-0.5 text-center font-bold text-forest text-xs focus:outline-none focus:border-[#C5A059]"
+                                  />
+                                  <span className="text-[10px] text-forest/60">unid.</span>
+                                </div>
+                              </div>
+                            )}
+                          </div>
                         </div>
                       </div>
 
