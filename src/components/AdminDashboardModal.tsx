@@ -1826,8 +1826,8 @@ export default function AdminDashboardModal({ onClose, shopCategories = [] }: Ad
                     </span>
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 text-xs pt-1">
                       {/* 1. Etiqueta Couro */}
-                      <div className={`p-2.5 rounded-xl border transition-all ${manualForm.accessories?.etiqueta ? 'bg-[#FCFBF9] border-[#C5A059]/50 shadow-2xs' : 'bg-white border-forest/10 opacity-70'}`}>
-                        <label className="flex items-center gap-2 cursor-pointer select-none font-medium text-forest">
+                      <div className={`p-2.5 rounded-xl border flex flex-col justify-between h-full min-w-0 transition-all ${manualForm.accessories?.etiqueta ? 'bg-[#FCFBF9] border-[#C5A059]/50 shadow-2xs' : 'bg-white border-forest/10 opacity-70'}`}>
+                        <label className="flex items-center gap-2 cursor-pointer select-none font-medium text-forest min-w-0 w-full">
                           <input
                             type="checkbox"
                             checked={manualForm.accessories?.etiqueta ?? true}
@@ -1837,12 +1837,12 @@ export default function AdminDashboardModal({ onClose, shopCategories = [] }: Ad
                             }))}
                             className="rounded text-[#C5A059] focus:ring-[#C5A059] w-4 h-4 shrink-0"
                           />
-                          <span className="text-xs sm:text-sm font-semibold">Etiqueta Couro</span>
+                          <span className="text-xs sm:text-sm font-semibold truncate leading-tight min-w-0">Etiqueta Couro</span>
                         </label>
                         {(manualForm.accessories?.etiqueta ?? true) && (
-                          <div className="flex items-center justify-between gap-2 pt-2 mt-1.5 border-t border-forest/10 text-xs">
-                            <span className="text-[10px] font-bold uppercase tracking-wider text-forest/50">Qtd:</span>
-                            <div className="flex items-center gap-1">
+                          <div className="flex items-center justify-between gap-1.5 pt-2 mt-2 border-t border-forest/10 text-xs w-full min-w-0">
+                            <span className="text-[10px] font-bold uppercase tracking-wider text-forest/50 shrink-0">Qtd:</span>
+                            <div className="flex items-center gap-1 min-w-0 shrink-0">
                               <input
                                 type="number"
                                 min="1"
@@ -1852,17 +1852,17 @@ export default function AdminDashboardModal({ onClose, shopCategories = [] }: Ad
                                   ...prev,
                                   accessories: { ...prev.accessories, etiquetaQty: Math.max(1, parseInt(e.target.value) || 1) }
                                 }))}
-                                className="w-16 bg-white border border-forest/20 rounded-lg px-2 py-0.5 text-center font-bold text-forest text-xs focus:outline-none focus:border-[#C5A059]"
+                                className="w-14 sm:w-16 bg-white border border-forest/20 rounded-lg px-1.5 py-0.5 text-center font-bold text-forest text-xs focus:outline-none focus:border-[#C5A059] min-w-0"
                               />
-                              <span className="text-[10px] text-forest/60">unid.</span>
+                              <span className="text-[10px] text-forest/60 shrink-0">unid.</span>
                             </div>
                           </div>
                         )}
                       </div>
 
                       {/* 2. Caixa Premium */}
-                      <div className={`p-2.5 rounded-xl border transition-all ${manualForm.accessories?.caixa ? 'bg-[#FCFBF9] border-[#C5A059]/50 shadow-2xs' : 'bg-white border-forest/10 opacity-70'}`}>
-                        <label className="flex items-center gap-2 cursor-pointer select-none font-medium text-forest">
+                      <div className={`p-2.5 rounded-xl border flex flex-col justify-between h-full min-w-0 transition-all ${manualForm.accessories?.caixa ? 'bg-[#FCFBF9] border-[#C5A059]/50 shadow-2xs' : 'bg-white border-forest/10 opacity-70'}`}>
+                        <label className="flex items-center gap-2 cursor-pointer select-none font-medium text-forest min-w-0 w-full">
                           <input
                             type="checkbox"
                             checked={manualForm.accessories?.caixa ?? true}
@@ -1872,12 +1872,12 @@ export default function AdminDashboardModal({ onClose, shopCategories = [] }: Ad
                             }))}
                             className="rounded text-[#C5A059] focus:ring-[#C5A059] w-4 h-4 shrink-0"
                           />
-                          <span className="text-xs sm:text-sm font-semibold">Caixa Premium</span>
+                          <span className="text-xs sm:text-sm font-semibold truncate leading-tight min-w-0">Caixa Premium</span>
                         </label>
                         {(manualForm.accessories?.caixa ?? true) && (
-                          <div className="flex items-center justify-between gap-2 pt-2 mt-1.5 border-t border-forest/10 text-xs">
-                            <span className="text-[10px] font-bold uppercase tracking-wider text-forest/50">Qtd:</span>
-                            <div className="flex items-center gap-1">
+                          <div className="flex items-center justify-between gap-1.5 pt-2 mt-2 border-t border-forest/10 text-xs w-full min-w-0">
+                            <span className="text-[10px] font-bold uppercase tracking-wider text-forest/50 shrink-0">Qtd:</span>
+                            <div className="flex items-center gap-1 min-w-0 shrink-0">
                               <input
                                 type="number"
                                 min="1"
@@ -1887,17 +1887,17 @@ export default function AdminDashboardModal({ onClose, shopCategories = [] }: Ad
                                   ...prev,
                                   accessories: { ...prev.accessories, caixaQty: Math.max(1, parseInt(e.target.value) || 1) }
                                 }))}
-                                className="w-16 bg-white border border-forest/20 rounded-lg px-2 py-0.5 text-center font-bold text-forest text-xs focus:outline-none focus:border-[#C5A059]"
+                                className="w-14 sm:w-16 bg-white border border-forest/20 rounded-lg px-1.5 py-0.5 text-center font-bold text-forest text-xs focus:outline-none focus:border-[#C5A059] min-w-0"
                               />
-                              <span className="text-[10px] text-forest/60">unid.</span>
+                              <span className="text-[10px] text-forest/60 shrink-0">unid.</span>
                             </div>
                           </div>
                         )}
                       </div>
 
                       {/* 3. Saco Envelope */}
-                      <div className={`p-2.5 rounded-xl border transition-all ${manualForm.accessories?.sacoEnvelope ? 'bg-[#FCFBF9] border-[#C5A059]/50 shadow-2xs' : 'bg-white border-forest/10 opacity-70'}`}>
-                        <label className="flex items-center gap-2 cursor-pointer select-none font-medium text-forest">
+                      <div className={`p-2.5 rounded-xl border flex flex-col justify-between h-full min-w-0 transition-all ${manualForm.accessories?.sacoEnvelope ? 'bg-[#FCFBF9] border-[#C5A059]/50 shadow-2xs' : 'bg-white border-forest/10 opacity-70'}`}>
+                        <label className="flex items-center gap-2 cursor-pointer select-none font-medium text-forest min-w-0 w-full">
                           <input
                             type="checkbox"
                             checked={manualForm.accessories?.sacoEnvelope ?? true}
@@ -1907,12 +1907,12 @@ export default function AdminDashboardModal({ onClose, shopCategories = [] }: Ad
                             }))}
                             className="rounded text-[#C5A059] focus:ring-[#C5A059] w-4 h-4 shrink-0"
                           />
-                          <span className="text-xs sm:text-sm font-semibold">Saco Envelope</span>
+                          <span className="text-xs sm:text-sm font-semibold truncate leading-tight min-w-0">Saco Envelope</span>
                         </label>
                         {(manualForm.accessories?.sacoEnvelope ?? true) && (
-                          <div className="flex items-center justify-between gap-2 pt-2 mt-1.5 border-t border-forest/10 text-xs">
-                            <span className="text-[10px] font-bold uppercase tracking-wider text-forest/50">Qtd:</span>
-                            <div className="flex items-center gap-1">
+                          <div className="flex items-center justify-between gap-1.5 pt-2 mt-2 border-t border-forest/10 text-xs w-full min-w-0">
+                            <span className="text-[10px] font-bold uppercase tracking-wider text-forest/50 shrink-0">Qtd:</span>
+                            <div className="flex items-center gap-1 min-w-0 shrink-0">
                               <input
                                 type="number"
                                 min="1"
@@ -1922,17 +1922,17 @@ export default function AdminDashboardModal({ onClose, shopCategories = [] }: Ad
                                   ...prev,
                                   accessories: { ...prev.accessories, sacoEnvelopeQty: Math.max(1, parseInt(e.target.value) || 1) }
                                 }))}
-                                className="w-16 bg-white border border-forest/20 rounded-lg px-2 py-0.5 text-center font-bold text-forest text-xs focus:outline-none focus:border-[#C5A059]"
+                                className="w-14 sm:w-16 bg-white border border-forest/20 rounded-lg px-1.5 py-0.5 text-center font-bold text-forest text-xs focus:outline-none focus:border-[#C5A059] min-w-0"
                               />
-                              <span className="text-[10px] text-forest/60">unid.</span>
+                              <span className="text-[10px] text-forest/60 shrink-0">unid.</span>
                             </div>
                           </div>
                         )}
                       </div>
 
                       {/* 4. Fecho Correr */}
-                      <div className={`p-2.5 rounded-xl border transition-all ${manualForm.accessories?.fecho ? 'bg-[#FCFBF9] border-[#C5A059]/50 shadow-2xs' : 'bg-white border-forest/10 opacity-70'}`}>
-                        <label className="flex items-center gap-2 cursor-pointer select-none font-medium text-forest">
+                      <div className={`p-2.5 rounded-xl border flex flex-col justify-between h-full min-w-0 transition-all ${manualForm.accessories?.fecho ? 'bg-[#FCFBF9] border-[#C5A059]/50 shadow-2xs' : 'bg-white border-forest/10 opacity-70'}`}>
+                        <label className="flex items-center gap-2 cursor-pointer select-none font-medium text-forest min-w-0 w-full">
                           <input
                             type="checkbox"
                             checked={manualForm.accessories?.fecho ?? false}
@@ -1942,12 +1942,12 @@ export default function AdminDashboardModal({ onClose, shopCategories = [] }: Ad
                             }))}
                             className="rounded text-[#C5A059] focus:ring-[#C5A059] w-4 h-4 shrink-0"
                           />
-                          <span className="text-xs sm:text-sm font-semibold">Fecho Correr</span>
+                          <span className="text-xs sm:text-sm font-semibold truncate leading-tight min-w-0">Fecho Correr</span>
                         </label>
                         {Boolean(manualForm.accessories?.fecho) && (
-                          <div className="flex items-center justify-between gap-2 pt-2 mt-1.5 border-t border-forest/10 text-xs">
-                            <span className="text-[10px] font-bold uppercase tracking-wider text-forest/50">Qtd:</span>
-                            <div className="flex items-center gap-1">
+                          <div className="flex items-center justify-between gap-1.5 pt-2 mt-2 border-t border-forest/10 text-xs w-full min-w-0">
+                            <span className="text-[10px] font-bold uppercase tracking-wider text-forest/50 shrink-0">Qtd:</span>
+                            <div className="flex items-center gap-1 min-w-0 shrink-0">
                               <input
                                 type="number"
                                 min="1"
@@ -1957,17 +1957,17 @@ export default function AdminDashboardModal({ onClose, shopCategories = [] }: Ad
                                   ...prev,
                                   accessories: { ...prev.accessories, fechoQty: Math.max(1, parseInt(e.target.value) || 1) }
                                 }))}
-                                className="w-16 bg-white border border-forest/20 rounded-lg px-2 py-0.5 text-center font-bold text-forest text-xs focus:outline-none focus:border-[#C5A059]"
+                                className="w-14 sm:w-16 bg-white border border-forest/20 rounded-lg px-1.5 py-0.5 text-center font-bold text-forest text-xs focus:outline-none focus:border-[#C5A059] min-w-0"
                               />
-                              <span className="text-[10px] text-forest/60">unid.</span>
+                              <span className="text-[10px] text-forest/60 shrink-0">unid.</span>
                             </div>
                           </div>
                         )}
                       </div>
 
                       {/* 5. Forro Algodão */}
-                      <div className={`p-2.5 rounded-xl border transition-all ${manualForm.accessories?.forro ? 'bg-[#FCFBF9] border-[#C5A059]/50 shadow-2xs' : 'bg-white border-forest/10 opacity-70'}`}>
-                        <label className="flex items-center gap-2 cursor-pointer select-none font-medium text-forest">
+                      <div className={`p-2.5 rounded-xl border flex flex-col justify-between h-full min-w-0 transition-all ${manualForm.accessories?.forro ? 'bg-[#FCFBF9] border-[#C5A059]/50 shadow-2xs' : 'bg-white border-forest/10 opacity-70'}`}>
+                        <label className="flex items-center gap-2 cursor-pointer select-none font-medium text-forest min-w-0 w-full">
                           <input
                             type="checkbox"
                             checked={manualForm.accessories?.forro ?? false}
@@ -1977,12 +1977,12 @@ export default function AdminDashboardModal({ onClose, shopCategories = [] }: Ad
                             }))}
                             className="rounded text-[#C5A059] focus:ring-[#C5A059] w-4 h-4 shrink-0"
                           />
-                          <span className="text-xs sm:text-sm font-semibold">Forro Algodão</span>
+                          <span className="text-xs sm:text-sm font-semibold truncate leading-tight min-w-0">Forro Algodão</span>
                         </label>
                         {Boolean(manualForm.accessories?.forro) && (
-                          <div className="flex items-center justify-between gap-2 pt-2 mt-1.5 border-t border-forest/10 text-xs">
-                            <span className="text-[10px] font-bold uppercase tracking-wider text-forest/50">Consumo:</span>
-                            <div className="flex items-center gap-1">
+                          <div className="flex items-center justify-between gap-1.5 pt-2 mt-2 border-t border-forest/10 text-xs w-full min-w-0">
+                            <span className="text-[10px] font-bold uppercase tracking-wider text-forest/50 shrink-0">Consumo:</span>
+                            <div className="flex items-center gap-1 min-w-0 shrink-0">
                               <input
                                 type="number"
                                 min="0.01"
@@ -1992,17 +1992,17 @@ export default function AdminDashboardModal({ onClose, shopCategories = [] }: Ad
                                   ...prev,
                                   accessories: { ...prev.accessories, forroMeters: Math.max(0.01, parseFloat(e.target.value) || 0.25) }
                                 }))}
-                                className="w-16 bg-white border border-forest/20 rounded-lg px-2 py-0.5 text-center font-bold text-forest text-xs focus:outline-none focus:border-[#C5A059]"
+                                className="w-14 sm:w-16 bg-white border border-forest/20 rounded-lg px-1.5 py-0.5 text-center font-bold text-forest text-xs focus:outline-none focus:border-[#C5A059] min-w-0"
                               />
-                              <span className="text-[10px] text-forest/60">metros</span>
+                              <span className="text-[10px] text-forest/60 shrink-0">metros</span>
                             </div>
                           </div>
                         )}
                       </div>
 
                       {/* 6. Botão Madeira */}
-                      <div className={`p-2.5 rounded-xl border transition-all ${manualForm.accessories?.botao ? 'bg-[#FCFBF9] border-[#C5A059]/50 shadow-2xs' : 'bg-white border-forest/10 opacity-70'}`}>
-                        <label className="flex items-center gap-2 cursor-pointer select-none font-medium text-forest">
+                      <div className={`p-2.5 rounded-xl border flex flex-col justify-between h-full min-w-0 transition-all ${manualForm.accessories?.botao ? 'bg-[#FCFBF9] border-[#C5A059]/50 shadow-2xs' : 'bg-white border-forest/10 opacity-70'}`}>
+                        <label className="flex items-center gap-2 cursor-pointer select-none font-medium text-forest min-w-0 w-full">
                           <input
                             type="checkbox"
                             checked={manualForm.accessories?.botao ?? false}
@@ -2012,12 +2012,12 @@ export default function AdminDashboardModal({ onClose, shopCategories = [] }: Ad
                             }))}
                             className="rounded text-[#C5A059] focus:ring-[#C5A059] w-4 h-4 shrink-0"
                           />
-                          <span className="text-xs sm:text-sm font-semibold">Botão Madeira</span>
+                          <span className="text-xs sm:text-sm font-semibold truncate leading-tight min-w-0">Botão Madeira</span>
                         </label>
                         {Boolean(manualForm.accessories?.botao) && (
-                          <div className="flex items-center justify-between gap-2 pt-2 mt-1.5 border-t border-forest/10 text-xs">
-                            <span className="text-[10px] font-bold uppercase tracking-wider text-forest/50">Qtd:</span>
-                            <div className="flex items-center gap-1">
+                          <div className="flex items-center justify-between gap-1.5 pt-2 mt-2 border-t border-forest/10 text-xs w-full min-w-0">
+                            <span className="text-[10px] font-bold uppercase tracking-wider text-forest/50 shrink-0">Qtd:</span>
+                            <div className="flex items-center gap-1 min-w-0 shrink-0">
                               <input
                                 type="number"
                                 min="1"
@@ -2027,9 +2027,9 @@ export default function AdminDashboardModal({ onClose, shopCategories = [] }: Ad
                                   ...prev,
                                   accessories: { ...prev.accessories, botaoQty: Math.max(1, parseInt(e.target.value) || 1) }
                                 }))}
-                                className="w-16 bg-white border border-forest/20 rounded-lg px-2 py-0.5 text-center font-bold text-forest text-xs focus:outline-none focus:border-[#C5A059]"
+                                className="w-14 sm:w-16 bg-white border border-forest/20 rounded-lg px-1.5 py-0.5 text-center font-bold text-forest text-xs focus:outline-none focus:border-[#C5A059] min-w-0"
                               />
-                              <span className="text-[10px] text-forest/60">unid.</span>
+                              <span className="text-[10px] text-forest/60 shrink-0">unid.</span>
                             </div>
                           </div>
                         )}
@@ -3553,8 +3553,8 @@ export default function AdminDashboardModal({ onClose, shopCategories = [] }: Ad
                         </div>
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 text-xs pt-1">
                           {/* 1. Etiqueta Couro */}
-                          <div className={`p-2.5 rounded-xl border transition-all ${editingProduct.product.accessories?.etiqueta ?? true ? 'bg-white border-[#C5A059]/50 shadow-2xs' : 'bg-white/60 border-forest/10 opacity-70'}`}>
-                            <label className="flex items-center gap-2 cursor-pointer select-none font-medium text-forest">
+                          <div className={`p-2.5 rounded-xl border flex flex-col justify-between h-full min-w-0 transition-all ${editingProduct.product.accessories?.etiqueta ?? true ? 'bg-white border-[#C5A059]/50 shadow-2xs' : 'bg-white/60 border-forest/10 opacity-70'}`}>
+                            <label className="flex items-center gap-2 cursor-pointer select-none font-medium text-forest min-w-0 w-full">
                               <input
                                 type="checkbox"
                                 checked={editingProduct.product.accessories?.etiqueta ?? true}
@@ -3567,12 +3567,12 @@ export default function AdminDashboardModal({ onClose, shopCategories = [] }: Ad
                                 })}
                                 className="rounded text-[#C5A059] focus:ring-[#C5A059] w-4 h-4 shrink-0"
                               />
-                              <span className="text-xs sm:text-sm font-semibold">Etiqueta Couro</span>
+                              <span className="text-xs sm:text-sm font-semibold truncate leading-tight min-w-0">Etiqueta Couro</span>
                             </label>
                             {(editingProduct.product.accessories?.etiqueta ?? true) && (
-                              <div className="flex items-center justify-between gap-2 pt-2 mt-1.5 border-t border-forest/10 text-xs">
-                                <span className="text-[10px] font-bold uppercase tracking-wider text-forest/50">Qtd:</span>
-                                <div className="flex items-center gap-1">
+                              <div className="flex items-center justify-between gap-1.5 pt-2 mt-2 border-t border-forest/10 text-xs w-full min-w-0">
+                                <span className="text-[10px] font-bold uppercase tracking-wider text-forest/50 shrink-0">Qtd:</span>
+                                <div className="flex items-center gap-1 min-w-0 shrink-0">
                                   <input
                                     type="number"
                                     min="1"
@@ -3585,17 +3585,17 @@ export default function AdminDashboardModal({ onClose, shopCategories = [] }: Ad
                                         accessories: { ...(editingProduct.product.accessories || {}), etiquetaQty: Math.max(1, parseInt(e.target.value) || 1) }
                                       }
                                     })}
-                                    className="w-16 bg-[#FCFBF9] border border-forest/20 rounded-lg px-2 py-0.5 text-center font-bold text-forest text-xs focus:outline-none focus:border-[#C5A059]"
+                                    className="w-14 sm:w-16 bg-[#FCFBF9] border border-forest/20 rounded-lg px-1.5 py-0.5 text-center font-bold text-forest text-xs focus:outline-none focus:border-[#C5A059] min-w-0"
                                   />
-                                  <span className="text-[10px] text-forest/60">unid.</span>
+                                  <span className="text-[10px] text-forest/60 shrink-0">unid.</span>
                                 </div>
                               </div>
                             )}
                           </div>
 
                           {/* 2. Caixa Premium */}
-                          <div className={`p-2.5 rounded-xl border transition-all ${editingProduct.product.accessories?.caixa ?? true ? 'bg-white border-[#C5A059]/50 shadow-2xs' : 'bg-white/60 border-forest/10 opacity-70'}`}>
-                            <label className="flex items-center gap-2 cursor-pointer select-none font-medium text-forest">
+                          <div className={`p-2.5 rounded-xl border flex flex-col justify-between h-full min-w-0 transition-all ${editingProduct.product.accessories?.caixa ?? true ? 'bg-white border-[#C5A059]/50 shadow-2xs' : 'bg-white/60 border-forest/10 opacity-70'}`}>
+                            <label className="flex items-center gap-2 cursor-pointer select-none font-medium text-forest min-w-0 w-full">
                               <input
                                 type="checkbox"
                                 checked={editingProduct.product.accessories?.caixa ?? true}
@@ -3608,12 +3608,12 @@ export default function AdminDashboardModal({ onClose, shopCategories = [] }: Ad
                                 })}
                                 className="rounded text-[#C5A059] focus:ring-[#C5A059] w-4 h-4 shrink-0"
                               />
-                              <span className="text-xs sm:text-sm font-semibold">Caixa Premium</span>
+                              <span className="text-xs sm:text-sm font-semibold truncate leading-tight min-w-0">Caixa Premium</span>
                             </label>
                             {(editingProduct.product.accessories?.caixa ?? true) && (
-                              <div className="flex items-center justify-between gap-2 pt-2 mt-1.5 border-t border-forest/10 text-xs">
-                                <span className="text-[10px] font-bold uppercase tracking-wider text-forest/50">Qtd:</span>
-                                <div className="flex items-center gap-1">
+                              <div className="flex items-center justify-between gap-1.5 pt-2 mt-2 border-t border-forest/10 text-xs w-full min-w-0">
+                                <span className="text-[10px] font-bold uppercase tracking-wider text-forest/50 shrink-0">Qtd:</span>
+                                <div className="flex items-center gap-1 min-w-0 shrink-0">
                                   <input
                                     type="number"
                                     min="1"
@@ -3626,17 +3626,17 @@ export default function AdminDashboardModal({ onClose, shopCategories = [] }: Ad
                                         accessories: { ...(editingProduct.product.accessories || {}), caixaQty: Math.max(1, parseInt(e.target.value) || 1) }
                                       }
                                     })}
-                                    className="w-16 bg-[#FCFBF9] border border-forest/20 rounded-lg px-2 py-0.5 text-center font-bold text-forest text-xs focus:outline-none focus:border-[#C5A059]"
+                                    className="w-14 sm:w-16 bg-[#FCFBF9] border border-forest/20 rounded-lg px-1.5 py-0.5 text-center font-bold text-forest text-xs focus:outline-none focus:border-[#C5A059] min-w-0"
                                   />
-                                  <span className="text-[10px] text-forest/60">unid.</span>
+                                  <span className="text-[10px] text-forest/60 shrink-0">unid.</span>
                                 </div>
                               </div>
                             )}
                           </div>
 
                           {/* 3. Saco Envelope */}
-                          <div className={`p-2.5 rounded-xl border transition-all ${(editingProduct.product.accessories?.sacoEnvelope ?? editingProduct.product.accessories?.saco ?? true) ? 'bg-white border-[#C5A059]/50 shadow-2xs' : 'bg-white/60 border-forest/10 opacity-70'}`}>
-                            <label className="flex items-center gap-2 cursor-pointer select-none font-medium text-forest">
+                          <div className={`p-2.5 rounded-xl border flex flex-col justify-between h-full min-w-0 transition-all ${(editingProduct.product.accessories?.sacoEnvelope ?? editingProduct.product.accessories?.saco ?? true) ? 'bg-white border-[#C5A059]/50 shadow-2xs' : 'bg-white/60 border-forest/10 opacity-70'}`}>
+                            <label className="flex items-center gap-2 cursor-pointer select-none font-medium text-forest min-w-0 w-full">
                               <input
                                 type="checkbox"
                                 checked={editingProduct.product.accessories?.sacoEnvelope ?? editingProduct.product.accessories?.saco ?? true}
@@ -3649,12 +3649,12 @@ export default function AdminDashboardModal({ onClose, shopCategories = [] }: Ad
                                 })}
                                 className="rounded text-[#C5A059] focus:ring-[#C5A059] w-4 h-4 shrink-0"
                               />
-                              <span className="text-xs sm:text-sm font-semibold">Saco Envelope</span>
+                              <span className="text-xs sm:text-sm font-semibold truncate leading-tight min-w-0">Saco Envelope</span>
                             </label>
                             {(editingProduct.product.accessories?.sacoEnvelope ?? editingProduct.product.accessories?.saco ?? true) && (
-                              <div className="flex items-center justify-between gap-2 pt-2 mt-1.5 border-t border-forest/10 text-xs">
-                                <span className="text-[10px] font-bold uppercase tracking-wider text-forest/50">Qtd:</span>
-                                <div className="flex items-center gap-1">
+                              <div className="flex items-center justify-between gap-1.5 pt-2 mt-2 border-t border-forest/10 text-xs w-full min-w-0">
+                                <span className="text-[10px] font-bold uppercase tracking-wider text-forest/50 shrink-0">Qtd:</span>
+                                <div className="flex items-center gap-1 min-w-0 shrink-0">
                                   <input
                                     type="number"
                                     min="1"
@@ -3667,17 +3667,17 @@ export default function AdminDashboardModal({ onClose, shopCategories = [] }: Ad
                                         accessories: { ...(editingProduct.product.accessories || {}), sacoEnvelopeQty: Math.max(1, parseInt(e.target.value) || 1), sacoQty: Math.max(1, parseInt(e.target.value) || 1) }
                                       }
                                     })}
-                                    className="w-16 bg-[#FCFBF9] border border-forest/20 rounded-lg px-2 py-0.5 text-center font-bold text-forest text-xs focus:outline-none focus:border-[#C5A059]"
+                                    className="w-14 sm:w-16 bg-[#FCFBF9] border border-forest/20 rounded-lg px-1.5 py-0.5 text-center font-bold text-forest text-xs focus:outline-none focus:border-[#C5A059] min-w-0"
                                   />
-                                  <span className="text-[10px] text-forest/60">unid.</span>
+                                  <span className="text-[10px] text-forest/60 shrink-0">unid.</span>
                                 </div>
                               </div>
                             )}
                           </div>
 
                           {/* 4. Fecho Correr */}
-                          <div className={`p-2.5 rounded-xl border transition-all ${editingProduct.product.accessories?.fecho ? 'bg-white border-[#C5A059]/50 shadow-2xs' : 'bg-white/60 border-forest/10 opacity-70'}`}>
-                            <label className="flex items-center gap-2 cursor-pointer select-none font-medium text-forest">
+                          <div className={`p-2.5 rounded-xl border flex flex-col justify-between h-full min-w-0 transition-all ${editingProduct.product.accessories?.fecho ? 'bg-white border-[#C5A059]/50 shadow-2xs' : 'bg-white/60 border-forest/10 opacity-70'}`}>
+                            <label className="flex items-center gap-2 cursor-pointer select-none font-medium text-forest min-w-0 w-full">
                               <input
                                 type="checkbox"
                                 checked={editingProduct.product.accessories?.fecho ?? false}
@@ -3690,12 +3690,12 @@ export default function AdminDashboardModal({ onClose, shopCategories = [] }: Ad
                                 })}
                                 className="rounded text-[#C5A059] focus:ring-[#C5A059] w-4 h-4 shrink-0"
                               />
-                              <span className="text-xs sm:text-sm font-semibold">Fecho Correr</span>
+                              <span className="text-xs sm:text-sm font-semibold truncate leading-tight min-w-0">Fecho Correr</span>
                             </label>
                             {Boolean(editingProduct.product.accessories?.fecho) && (
-                              <div className="flex items-center justify-between gap-2 pt-2 mt-1.5 border-t border-forest/10 text-xs">
-                                <span className="text-[10px] font-bold uppercase tracking-wider text-forest/50">Qtd:</span>
-                                <div className="flex items-center gap-1">
+                              <div className="flex items-center justify-between gap-1.5 pt-2 mt-2 border-t border-forest/10 text-xs w-full min-w-0">
+                                <span className="text-[10px] font-bold uppercase tracking-wider text-forest/50 shrink-0">Qtd:</span>
+                                <div className="flex items-center gap-1 min-w-0 shrink-0">
                                   <input
                                     type="number"
                                     min="1"
@@ -3708,17 +3708,17 @@ export default function AdminDashboardModal({ onClose, shopCategories = [] }: Ad
                                         accessories: { ...(editingProduct.product.accessories || {}), fechoQty: Math.max(1, parseInt(e.target.value) || 1) }
                                       }
                                     })}
-                                    className="w-16 bg-[#FCFBF9] border border-forest/20 rounded-lg px-2 py-0.5 text-center font-bold text-forest text-xs focus:outline-none focus:border-[#C5A059]"
+                                    className="w-14 sm:w-16 bg-[#FCFBF9] border border-forest/20 rounded-lg px-1.5 py-0.5 text-center font-bold text-forest text-xs focus:outline-none focus:border-[#C5A059] min-w-0"
                                   />
-                                  <span className="text-[10px] text-forest/60">unid.</span>
+                                  <span className="text-[10px] text-forest/60 shrink-0">unid.</span>
                                 </div>
                               </div>
                             )}
                           </div>
 
                           {/* 5. Forro Algodão */}
-                          <div className={`p-2.5 rounded-xl border transition-all ${editingProduct.product.accessories?.forro ? 'bg-white border-[#C5A059]/50 shadow-2xs' : 'bg-white/60 border-forest/10 opacity-70'}`}>
-                            <label className="flex items-center gap-2 cursor-pointer select-none font-medium text-forest">
+                          <div className={`p-2.5 rounded-xl border flex flex-col justify-between h-full min-w-0 transition-all ${editingProduct.product.accessories?.forro ? 'bg-white border-[#C5A059]/50 shadow-2xs' : 'bg-white/60 border-forest/10 opacity-70'}`}>
+                            <label className="flex items-center gap-2 cursor-pointer select-none font-medium text-forest min-w-0 w-full">
                               <input
                                 type="checkbox"
                                 checked={editingProduct.product.accessories?.forro ?? false}
@@ -3731,12 +3731,12 @@ export default function AdminDashboardModal({ onClose, shopCategories = [] }: Ad
                                 })}
                                 className="rounded text-[#C5A059] focus:ring-[#C5A059] w-4 h-4 shrink-0"
                               />
-                              <span className="text-xs sm:text-sm font-semibold">Forro Algodão</span>
+                              <span className="text-xs sm:text-sm font-semibold truncate leading-tight min-w-0">Forro Algodão</span>
                             </label>
                             {Boolean(editingProduct.product.accessories?.forro) && (
-                              <div className="flex items-center justify-between gap-2 pt-2 mt-1.5 border-t border-forest/10 text-xs">
-                                <span className="text-[10px] font-bold uppercase tracking-wider text-forest/50">Consumo:</span>
-                                <div className="flex items-center gap-1">
+                              <div className="flex items-center justify-between gap-1.5 pt-2 mt-2 border-t border-forest/10 text-xs w-full min-w-0">
+                                <span className="text-[10px] font-bold uppercase tracking-wider text-forest/50 shrink-0">Consumo:</span>
+                                <div className="flex items-center gap-1 min-w-0 shrink-0">
                                   <input
                                     type="number"
                                     min="0.01"
@@ -3749,17 +3749,17 @@ export default function AdminDashboardModal({ onClose, shopCategories = [] }: Ad
                                         accessories: { ...(editingProduct.product.accessories || {}), forroMeters: Math.max(0.01, parseFloat(e.target.value) || 0.25) }
                                       }
                                     })}
-                                    className="w-16 bg-[#FCFBF9] border border-forest/20 rounded-lg px-2 py-0.5 text-center font-bold text-forest text-xs focus:outline-none focus:border-[#C5A059]"
+                                    className="w-14 sm:w-16 bg-[#FCFBF9] border border-forest/20 rounded-lg px-1.5 py-0.5 text-center font-bold text-forest text-xs focus:outline-none focus:border-[#C5A059] min-w-0"
                                   />
-                                  <span className="text-[10px] text-forest/60">metros</span>
+                                  <span className="text-[10px] text-forest/60 shrink-0">metros</span>
                                 </div>
                               </div>
                             )}
                           </div>
 
                           {/* 6. Botão Madeira */}
-                          <div className={`p-2.5 rounded-xl border transition-all ${editingProduct.product.accessories?.botao ? 'bg-white border-[#C5A059]/50 shadow-2xs' : 'bg-white/60 border-forest/10 opacity-70'}`}>
-                            <label className="flex items-center gap-2 cursor-pointer select-none font-medium text-forest">
+                          <div className={`p-2.5 rounded-xl border flex flex-col justify-between h-full min-w-0 transition-all ${editingProduct.product.accessories?.botao ? 'bg-white border-[#C5A059]/50 shadow-2xs' : 'bg-white/60 border-forest/10 opacity-70'}`}>
+                            <label className="flex items-center gap-2 cursor-pointer select-none font-medium text-forest min-w-0 w-full">
                               <input
                                 type="checkbox"
                                 checked={editingProduct.product.accessories?.botao ?? false}
@@ -3772,12 +3772,12 @@ export default function AdminDashboardModal({ onClose, shopCategories = [] }: Ad
                                 })}
                                 className="rounded text-[#C5A059] focus:ring-[#C5A059] w-4 h-4 shrink-0"
                               />
-                              <span className="text-xs sm:text-sm font-semibold">Botão Madeira</span>
+                              <span className="text-xs sm:text-sm font-semibold truncate leading-tight min-w-0">Botão Madeira</span>
                             </label>
                             {Boolean(editingProduct.product.accessories?.botao) && (
-                              <div className="flex items-center justify-between gap-2 pt-2 mt-1.5 border-t border-forest/10 text-xs">
-                                <span className="text-[10px] font-bold uppercase tracking-wider text-forest/50">Qtd:</span>
-                                <div className="flex items-center gap-1">
+                              <div className="flex items-center justify-between gap-1.5 pt-2 mt-2 border-t border-forest/10 text-xs w-full min-w-0">
+                                <span className="text-[10px] font-bold uppercase tracking-wider text-forest/50 shrink-0">Qtd:</span>
+                                <div className="flex items-center gap-1 min-w-0 shrink-0">
                                   <input
                                     type="number"
                                     min="1"
@@ -3790,9 +3790,9 @@ export default function AdminDashboardModal({ onClose, shopCategories = [] }: Ad
                                         accessories: { ...(editingProduct.product.accessories || {}), botaoQty: Math.max(1, parseInt(e.target.value) || 1) }
                                       }
                                     })}
-                                    className="w-16 bg-[#FCFBF9] border border-forest/20 rounded-lg px-2 py-0.5 text-center font-bold text-forest text-xs focus:outline-none focus:border-[#C5A059]"
+                                    className="w-14 sm:w-16 bg-[#FCFBF9] border border-forest/20 rounded-lg px-1.5 py-0.5 text-center font-bold text-forest text-xs focus:outline-none focus:border-[#C5A059] min-w-0"
                                   />
-                                  <span className="text-[10px] text-forest/60">unid.</span>
+                                  <span className="text-[10px] text-forest/60 shrink-0">unid.</span>
                                 </div>
                               </div>
                             )}
