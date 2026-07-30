@@ -1837,7 +1837,7 @@ export default function AdminDashboardModal({ onClose, shopCategories = [] }: Ad
                             }))}
                             className="rounded text-[#C5A059] focus:ring-[#C5A059] w-4 h-4 shrink-0"
                           />
-                          <span className="text-xs sm:text-sm font-semibold truncate leading-tight min-w-0">Etiqueta Couro</span>
+                          <span className="text-xs sm:text-sm font-semibold leading-tight min-w-0 break-words whitespace-normal">Etiqueta Couro</span>
                         </label>
                         {(manualForm.accessories?.etiqueta ?? true) && (
                           <div className="flex items-center justify-between gap-1.5 pt-2 mt-2 border-t border-forest/10 text-xs w-full min-w-0">
@@ -1872,7 +1872,7 @@ export default function AdminDashboardModal({ onClose, shopCategories = [] }: Ad
                             }))}
                             className="rounded text-[#C5A059] focus:ring-[#C5A059] w-4 h-4 shrink-0"
                           />
-                          <span className="text-xs sm:text-sm font-semibold truncate leading-tight min-w-0">Caixa Premium</span>
+                          <span className="text-xs sm:text-sm font-semibold leading-tight min-w-0 break-words whitespace-normal">Caixa Premium</span>
                         </label>
                         {(manualForm.accessories?.caixa ?? true) && (
                           <div className="flex items-center justify-between gap-1.5 pt-2 mt-2 border-t border-forest/10 text-xs w-full min-w-0">
@@ -1907,7 +1907,7 @@ export default function AdminDashboardModal({ onClose, shopCategories = [] }: Ad
                             }))}
                             className="rounded text-[#C5A059] focus:ring-[#C5A059] w-4 h-4 shrink-0"
                           />
-                          <span className="text-xs sm:text-sm font-semibold truncate leading-tight min-w-0">Saco Envelope</span>
+                          <span className="text-xs sm:text-sm font-semibold leading-tight min-w-0 break-words whitespace-normal">Saco Envelope</span>
                         </label>
                         {(manualForm.accessories?.sacoEnvelope ?? true) && (
                           <div className="flex items-center justify-between gap-1.5 pt-2 mt-2 border-t border-forest/10 text-xs w-full min-w-0">
@@ -1942,7 +1942,7 @@ export default function AdminDashboardModal({ onClose, shopCategories = [] }: Ad
                             }))}
                             className="rounded text-[#C5A059] focus:ring-[#C5A059] w-4 h-4 shrink-0"
                           />
-                          <span className="text-xs sm:text-sm font-semibold truncate leading-tight min-w-0">Fecho Correr</span>
+                          <span className="text-xs sm:text-sm font-semibold leading-tight min-w-0 break-words whitespace-normal">Fecho Correr</span>
                         </label>
                         {Boolean(manualForm.accessories?.fecho) && (
                           <div className="flex items-center justify-between gap-1.5 pt-2 mt-2 border-t border-forest/10 text-xs w-full min-w-0">
@@ -1977,7 +1977,7 @@ export default function AdminDashboardModal({ onClose, shopCategories = [] }: Ad
                             }))}
                             className="rounded text-[#C5A059] focus:ring-[#C5A059] w-4 h-4 shrink-0"
                           />
-                          <span className="text-xs sm:text-sm font-semibold truncate leading-tight min-w-0">Forro Algodão</span>
+                          <span className="text-xs sm:text-sm font-semibold leading-tight min-w-0 break-words whitespace-normal">Forro Algodão</span>
                         </label>
                         {Boolean(manualForm.accessories?.forro) && (
                           <div className="flex items-center justify-between gap-1.5 pt-2 mt-2 border-t border-forest/10 text-xs w-full min-w-0">
@@ -2012,7 +2012,7 @@ export default function AdminDashboardModal({ onClose, shopCategories = [] }: Ad
                             }))}
                             className="rounded text-[#C5A059] focus:ring-[#C5A059] w-4 h-4 shrink-0"
                           />
-                          <span className="text-xs sm:text-sm font-semibold truncate leading-tight min-w-0">Botão Madeira</span>
+                          <span className="text-xs sm:text-sm font-semibold leading-tight min-w-0 break-words whitespace-normal">Botão Madeira</span>
                         </label>
                         {Boolean(manualForm.accessories?.botao) && (
                           <div className="flex items-center justify-between gap-1.5 pt-2 mt-2 border-t border-forest/10 text-xs w-full min-w-0">
@@ -2865,7 +2865,7 @@ export default function AdminDashboardModal({ onClose, shopCategories = [] }: Ad
               {/* PRODUCT CREATION/EDITING FLOATING OVERLAY FORM */}
               {editingProduct && (
                 <div className="fixed inset-0 bg-[#243119]/40 backdrop-blur-sm flex items-center justify-center z-[110] p-0 sm:p-4">
-                  <div data-lenis-prevent className="bg-white border-0 sm:border border-forest/10 rounded-none sm:rounded-[24px] max-w-lg w-full h-full sm:h-auto max-h-screen sm:max-h-[90vh] p-4 sm:p-6 shadow-2xl text-left space-y-4 overflow-y-auto flex flex-col justify-between">
+                  <div data-lenis-prevent className="bg-white border-0 sm:border border-forest/10 rounded-none sm:rounded-[24px] max-w-2xl w-full h-full sm:h-auto max-h-screen sm:max-h-[90vh] p-4 sm:p-6 shadow-2xl text-left space-y-4 overflow-y-auto flex flex-col justify-between">
                     <div className="flex items-center justify-between border-b border-forest/5 pb-3 sticky top-0 bg-white z-20 shrink-0 pt-1">
                       <h5 className="font-serif text-sm sm:text-base font-bold text-forest pr-2 truncate">
                         {editingProduct.isNew ? 'Adicionar Nova Peça Única' : `Editar Peça: ${editingProduct.product.name}`}
@@ -3567,7 +3567,7 @@ export default function AdminDashboardModal({ onClose, shopCategories = [] }: Ad
                                 })}
                                 className="rounded text-[#C5A059] focus:ring-[#C5A059] w-4 h-4 shrink-0"
                               />
-                              <span className="text-xs sm:text-sm font-semibold truncate leading-tight min-w-0">Etiqueta Couro</span>
+                              <span className="text-xs sm:text-sm font-semibold leading-tight min-w-0 break-words whitespace-normal">Etiqueta Couro</span>
                             </label>
                             {(editingProduct.product.accessories?.etiqueta ?? true) && (
                               <div className="flex items-center justify-between gap-1.5 pt-2 mt-2 border-t border-forest/10 text-xs w-full min-w-0">
@@ -3608,7 +3608,7 @@ export default function AdminDashboardModal({ onClose, shopCategories = [] }: Ad
                                 })}
                                 className="rounded text-[#C5A059] focus:ring-[#C5A059] w-4 h-4 shrink-0"
                               />
-                              <span className="text-xs sm:text-sm font-semibold truncate leading-tight min-w-0">Caixa Premium</span>
+                              <span className="text-xs sm:text-sm font-semibold leading-tight min-w-0 break-words whitespace-normal">Caixa Premium</span>
                             </label>
                             {(editingProduct.product.accessories?.caixa ?? true) && (
                               <div className="flex items-center justify-between gap-1.5 pt-2 mt-2 border-t border-forest/10 text-xs w-full min-w-0">
@@ -3649,7 +3649,7 @@ export default function AdminDashboardModal({ onClose, shopCategories = [] }: Ad
                                 })}
                                 className="rounded text-[#C5A059] focus:ring-[#C5A059] w-4 h-4 shrink-0"
                               />
-                              <span className="text-xs sm:text-sm font-semibold truncate leading-tight min-w-0">Saco Envelope</span>
+                              <span className="text-xs sm:text-sm font-semibold leading-tight min-w-0 break-words whitespace-normal">Saco Envelope</span>
                             </label>
                             {(editingProduct.product.accessories?.sacoEnvelope ?? editingProduct.product.accessories?.saco ?? true) && (
                               <div className="flex items-center justify-between gap-1.5 pt-2 mt-2 border-t border-forest/10 text-xs w-full min-w-0">
@@ -3690,7 +3690,7 @@ export default function AdminDashboardModal({ onClose, shopCategories = [] }: Ad
                                 })}
                                 className="rounded text-[#C5A059] focus:ring-[#C5A059] w-4 h-4 shrink-0"
                               />
-                              <span className="text-xs sm:text-sm font-semibold truncate leading-tight min-w-0">Fecho Correr</span>
+                              <span className="text-xs sm:text-sm font-semibold leading-tight min-w-0 break-words whitespace-normal">Fecho Correr</span>
                             </label>
                             {Boolean(editingProduct.product.accessories?.fecho) && (
                               <div className="flex items-center justify-between gap-1.5 pt-2 mt-2 border-t border-forest/10 text-xs w-full min-w-0">
@@ -3731,7 +3731,7 @@ export default function AdminDashboardModal({ onClose, shopCategories = [] }: Ad
                                 })}
                                 className="rounded text-[#C5A059] focus:ring-[#C5A059] w-4 h-4 shrink-0"
                               />
-                              <span className="text-xs sm:text-sm font-semibold truncate leading-tight min-w-0">Forro Algodão</span>
+                              <span className="text-xs sm:text-sm font-semibold leading-tight min-w-0 break-words whitespace-normal">Forro Algodão</span>
                             </label>
                             {Boolean(editingProduct.product.accessories?.forro) && (
                               <div className="flex items-center justify-between gap-1.5 pt-2 mt-2 border-t border-forest/10 text-xs w-full min-w-0">
@@ -3772,7 +3772,7 @@ export default function AdminDashboardModal({ onClose, shopCategories = [] }: Ad
                                 })}
                                 className="rounded text-[#C5A059] focus:ring-[#C5A059] w-4 h-4 shrink-0"
                               />
-                              <span className="text-xs sm:text-sm font-semibold truncate leading-tight min-w-0">Botão Madeira</span>
+                              <span className="text-xs sm:text-sm font-semibold leading-tight min-w-0 break-words whitespace-normal">Botão Madeira</span>
                             </label>
                             {Boolean(editingProduct.product.accessories?.botao) && (
                               <div className="flex items-center justify-between gap-1.5 pt-2 mt-2 border-t border-forest/10 text-xs w-full min-w-0">
