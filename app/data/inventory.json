@@ -63,11 +63,25 @@
     "minSafety": 1
   },
   {
+    "id": "rm_safran_76_azul_po",
+    "name": "DROPS Safran 76 (Azul Pó)",
+    "quantity": 5,
+    "unit": "novelos",
+    "minSafety": 2
+  },
+  {
     "id": "rm_paris_16_branco",
     "name": "DROPS Paris 16 (Branco)",
     "quantity": 10,
     "unit": "novelos",
     "minSafety": 3
+  },
+  {
+    "id": "rm_paris_17_natural",
+    "name": "DROPS Paris 17 (Natural)",
+    "quantity": 5,
+    "unit": "novelos",
+    "minSafety": 2
   },
   {
     "id": "rm_paris_43_verde",
@@ -173,5 +187,12 @@
     "quantity": 100,
     "unit": "unidades",
     "minSafety": 20
+  },
+  {
+    "id": "re_saco_envelope",
+    "name": "Saco Envelope Personalizado M★BRAVO",
+    "quantity": 50,
+    "unit": "unidades",
+    "minSafety": 10
   }
 ]
