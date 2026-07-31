@@ -74,6 +74,30 @@
             y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
         })(window, document, "clarity", "script", "xuu4fvcodg");
     </script>
+
+    <!-- SPA Session Unification Helper (Clarity & GA4 Route Tracker) -->
+    <script>
+      window.trackSPAPageView = function(pagePath, pageTitle) {
+        var path = pagePath || (window.location.pathname + window.location.search);
+        var title = pageTitle || document.title;
+        if (typeof window.clarity === "function") {
+          window.clarity("pageview", path);
+        }
+        if (typeof window.gtag === "function") {
+          window.gtag("event", "page_view", {
+            page_path: path,
+            page_title: title
+          });
+        }
+        if (window.dataLayer && Array.isArray(window.dataLayer)) {
+          window.dataLayer.push({
+            event: "virtual_page_view",
+            page_path: path,
+            page_title: title
+          });
+        }
+      };
+    </script>
     
     <!-- Meta Title and Brand Indexing Settings -->
     <title>M☆BRAVO | Handmade With Love</title>
