@@ -52,4 +52,11 @@ Este documento regista a visão estratégica de futuro para a evolução tecnol�
 
 ---
 
+## 6. Telemetria, Rastreio & BI Preditivo no Painel Admin (Atelier Intelligence)
+*   [x] **Integração de Rastreio (GA4 `G-E3ZXEK6RGR`, GTM `GTM-TBNWW6L2`, Clarity `xuul4vcodg`):** Coleta de tráfego, funis de conversão, mapas de calor e gravações de sessão ativas no frontend.
+*   [x] **Proteção de Subdomínio & Bloqueio de Indexação da API (`api.mbravobycarolina.com`):** Implementação de `robots.txt` estrito e cabeçalhos `X-Robots-Tag: noindex, nofollow` no servidor Express.
+*   [ ] **Telemetria de Visitantes em Tempo Real (Server-Sent Events - SSE):** Implementação de stream unidirecional leve `/api/admin/telemetry/live` para exibição de utilizadores ativos no site, peças visualizadas no momento e carrinhos em preparação no Painel Admin, com consumo ultrabaixo de recursos e zero sobrecarga de conexões persistentemente mantidas.
+
+---
+
 *M★BRAVO Atelier — Onde o tempo do artesanato de luxo se cruza com a engenharia do futuro.*
