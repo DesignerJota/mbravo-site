@@ -67,6 +67,18 @@ app.use((req, res, next) => {
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// Dynamic robots.txt route protecting api.mbravobycarolina.com from search engine indexing
+app.get("/robots.txt", (req, res) => {
+  const host = req.headers.host || "";
+  if (host.toLowerCase().startsWith("api.")) {
+    res.setHeader("X-Robots-Tag", "noindex, nofollow");
+    res.type("text/plain");
+    return res.send("User-agent: *\nDisallow: /\n");
+  }
+  res.type("text/plain");
+  return res.send("User-agent: *\nAllow: /\nDisallow: /api/\nDisallow: /admin\nSitemap: https://mbravobycarolina.com/sitemap.xml\n");
+});
+
 // Persistent file-backed order store to preserve data during sandbox testing and server restarts
 // On Railway with a persistent volume mounted at /app/data/, write to /app/data/orders.json. Fall back to current directory otherwise.
 const getOrdersFilePath = () => {
