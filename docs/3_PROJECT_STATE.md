@@ -223,6 +223,8 @@ Respondendo às últimas solicitações de otimização de fluxo e consistência
         *   **Geração Automática de XML (`generateGoogleMerchantXmlFeed`)**: Criado o gerador dinamicamente alimentado por `loadCatalog()` (com cache HTTP de 1 hora) nas rotas `GET /feed.xml` e `GET /api/v1/products/feed.xml`.
         *   **Mapeamento de Metadados de Luxo M★BRAVO**: Exporta atributos padrão *Google Shopping RSS 2.0* (`<g:id>`, `<g:title>`, `<g:description>`, `<g:link>`, `<g:image_link>`, `<g:price>`, `<g:availability>`, `<g:condition>`, `<g:brand>`, `<g:google_product_category>`), sincronizando preços e stocks instantaneamente em tempo real sem qualquer manutenção manual.
         *   **Permissão em `robots.txt`**: Adicionada exceção `Allow: /feed.xml` e `Allow: /api/v1/products/feed.xml` para garantir que os robôs do Google Merchant Center leiam o feed sem restrições.
+    38. **Detalhamento da Política de Envios no Modal de Informações Legais (`LegalModal.tsx`):**
+        *   **Conformidade de Transparência Google Shopping**: Atualizada a seção "Custos de Envio" no modal `LegalModal.tsx` com uma tabela visual em grelha detalhando os valores exatos e prazos das 4 tabelas de frete da marca (Portugal Continental: 4,50€ / 1-5 dias; Espanha: 6,50€ / 2-5 dias; Europa UE: 11,90€ / 2-8 dias; Internacional: 24,90€ / 5-12 dias), tanto em Português como em Inglês.
 
 ---
 
