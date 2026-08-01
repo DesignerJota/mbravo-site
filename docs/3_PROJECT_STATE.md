@@ -218,6 +218,10 @@ Respondendo às últimas solicitações de otimização de fluxo e consistência
         *   **Microsoft Clarity (Heatmaps & Replay)**: Integrado o snippet oficial do Microsoft Clarity (`xuu4fvcodg`) para gravação de sessões e mapas de calor de utilizadores.
         *   **Ponte de Unificação de Sessão SPA (`window.trackSPAPageView`)**: Criada a função global de rastreio de SPA em `index.html` que invoca atomicamente `clarity("pageview", path)`, `gtag("event", "page_view", ...)` e `dataLayer.push({ event: "virtual_page_view", ... })`. Esta bridge garante gravações de sessão contínuas e unificadas no Clarity sem gerar múltiplos blocos ou sessões fragmentadas durante a navegação em React.
         *   **Proteção do Subdomínio da API (`api.mbravobycarolina.com`)**: Implementada rota `/robots.txt` no Express e mantida a injeção do cabeçalho HTTP `X-Robots-Tag: noindex, nofollow` em todas as rotas direcionadas para `api.` e `/api/`, bloqueando 100% a indexação do backend pelos motores de busca.
+    37. **Feed Dinâmico RSS 2.0 XML para Google Merchant Center (`server.ts`):**
+        *   **Geração Automática de XML (`generateGoogleMerchantXmlFeed`)**: Criado o gerador dinamicamente alimentado por `loadCatalog()` (com cache HTTP de 1 hora) nas rotas `GET /feed.xml` e `GET /api/v1/products/feed.xml`.
+        *   **Mapeamento de Metadados de Luxo M★BRAVO**: Exporta atributos padrão *Google Shopping RSS 2.0* (`<g:id>`, `<g:title>`, `<g:description>`, `<g:link>`, `<g:image_link>`, `<g:price>`, `<g:availability>`, `<g:condition>`, `<g:brand>`, `<g:google_product_category>`), sincronizando preços e stocks instantaneamente em tempo real sem qualquer manutenção manual.
+        *   **Permissão em `robots.txt`**: Adicionada exceção `Allow: /feed.xml` e `Allow: /api/v1/products/feed.xml` para garantir que os robôs do Google Merchant Center leiam o feed sem restrições.
 
 ---
 
