@@ -45,8 +45,37 @@ const LegalModal = ({ type, onClose }: LegalModalProps) => {
                                 <span>Todos os envios são realizados através de transportadora registada. Assim que a sua encomenda for expedida, receberá um e-mail com o respetivo código de rastreamento (tracking number) para acompanhar a entrega.</span>
                             </li>
                             <li className="flex flex-col gap-1">
-                                <strong className="font-medium text-forest text-xs uppercase tracking-wider">Custos de Envio</strong>
-                                <span>Os custos de transporte são calculados de forma automática no momento do checkout, variando consoante o destino e a distância da entrega.</span>
+                                <strong className="font-medium text-forest text-xs uppercase tracking-wider">Tabela de Custos e Prazos de Envio</strong>
+                                <div className="mt-2 grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs font-sans text-forest/80">
+                                    <div className="bg-forest/[0.03] p-2.5 rounded-lg border border-forest/10 flex justify-between items-center">
+                                        <div>
+                                            <span className="font-medium block">Portugal Continental</span>
+                                            <span className="text-[10px] text-forest/50">1 a 5 dias úteis</span>
+                                        </div>
+                                        <span className="font-mono font-semibold text-[#C5A059]">4,50 €</span>
+                                    </div>
+                                    <div className="bg-forest/[0.03] p-2.5 rounded-lg border border-forest/10 flex justify-between items-center">
+                                        <div>
+                                            <span className="font-medium block">Espanha</span>
+                                            <span className="text-[10px] text-forest/50">2 a 5 dias úteis</span>
+                                        </div>
+                                        <span className="font-mono font-semibold text-[#C5A059]">6,50 €</span>
+                                    </div>
+                                    <div className="bg-forest/[0.03] p-2.5 rounded-lg border border-forest/10 flex justify-between items-center">
+                                        <div>
+                                            <span className="font-medium block">Europa (União Europeia)</span>
+                                            <span className="text-[10px] text-forest/50">2 a 8 dias úteis</span>
+                                        </div>
+                                        <span className="font-mono font-semibold text-[#C5A059]">11,90 €</span>
+                                    </div>
+                                    <div className="bg-forest/[0.03] p-2.5 rounded-lg border border-forest/10 flex justify-between items-center">
+                                        <div>
+                                            <span className="font-medium block">Internacional (Resto do Mundo)</span>
+                                            <span className="text-[10px] text-forest/50">5 a 12 dias úteis</span>
+                                        </div>
+                                        <span className="font-mono font-semibold text-[#C5A059]">24,90 €</span>
+                                    </div>
+                                </div>
                             </li>
                         </ul>
                     </div>
@@ -156,8 +185,37 @@ const LegalModal = ({ type, onClose }: LegalModalProps) => {
                                 <span>All orders are shipped via registered courier. Once dispatched, you will receive an email with your tracking number.</span>
                             </li>
                             <li className="flex flex-col gap-1">
-                                <strong className="font-medium text-forest text-xs uppercase tracking-wider">Shipping Fees</strong>
-                                <span>Shipping costs are automatically calculated at checkout based on destination and delivery region.</span>
+                                <strong className="font-medium text-forest text-xs uppercase tracking-wider">Shipping Rates & Delivery Times</strong>
+                                <div className="mt-2 grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs font-sans text-forest/80">
+                                    <div className="bg-forest/[0.03] p-2.5 rounded-lg border border-forest/10 flex justify-between items-center">
+                                        <div>
+                                            <span className="font-medium block">Mainland Portugal</span>
+                                            <span className="text-[10px] text-forest/50">1 to 5 business days</span>
+                                        </div>
+                                        <span className="font-mono font-semibold text-[#C5A059]">4,50 €</span>
+                                    </div>
+                                    <div className="bg-forest/[0.03] p-2.5 rounded-lg border border-forest/10 flex justify-between items-center">
+                                        <div>
+                                            <span className="font-medium block">Spain</span>
+                                            <span className="text-[10px] text-forest/50">2 to 5 business days</span>
+                                        </div>
+                                        <span className="font-mono font-semibold text-[#C5A059]">6,50 €</span>
+                                    </div>
+                                    <div className="bg-forest/[0.03] p-2.5 rounded-lg border border-forest/10 flex justify-between items-center">
+                                        <div>
+                                            <span className="font-medium block">Europe (EU)</span>
+                                            <span className="text-[10px] text-forest/50">2 to 8 business days</span>
+                                        </div>
+                                        <span className="font-mono font-semibold text-[#C5A059]">11,90 €</span>
+                                    </div>
+                                    <div className="bg-forest/[0.03] p-2.5 rounded-lg border border-forest/10 flex justify-between items-center">
+                                        <div>
+                                            <span className="font-medium block">International (Rest of World)</span>
+                                            <span className="text-[10px] text-forest/50">5 to 12 business days</span>
+                                        </div>
+                                        <span className="font-mono font-semibold text-[#C5A059]">24,90 €</span>
+                                    </div>
+                                </div>
                             </li>
                         </ul>
                     </div>
