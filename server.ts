@@ -986,30 +986,79 @@ const getCatalogFilePath = () => {
 
 const CATALOG_FILE = getCatalogFilePath();
 
+const OFFICIAL_PRODUCT_PRICES: { [key: string]: number } = {
+  'h1': 4.00,
+  'h1c': 4.00,
+  'h1f': 4.00,
+  'h1_classic': 4.00,
+  'h2b': 40.00,
+  'b1': 37.00,
+  'b1b': 13.00,
+  'b1_airpods': 16.00,
+  'b2_sling': 47.00,
+  'b2_shell': 22.00,
+  'v1': 67.00,
+  'v1b': 37.00,
+  'v2b': 57.00,
+  'v2c': 72.00,
+  'alma_cardigan': 97.00,
+  'mini_alma_cardigan': 57.00,
+  'v3': 30.00,
+  'v3b': 27.00,
+  'h3': 19.00,
+  'v3c': 32.00
+};
+
 function loadCatalog() {
+  let catalogData: any[] | null = null;
+
   if (fs.existsSync(CATALOG_FILE)) {
     try {
       const data = JSON.parse(fs.readFileSync(CATALOG_FILE, 'utf8'));
       if (Array.isArray(data) && data.length > 0) {
-        console.log(`[CATALOG DATABASE READ-ONLY BOOT] Loaded ${data.length} catalog items from persistent store (${CATALOG_FILE})`);
-        return data;
+        catalogData = data;
       }
     } catch (err) {
       console.error("[CATALOG DATABASE ERROR] Failed to load catalog.json", err);
     }
   }
 
-  const localFallbackPath = path.join(process.cwd(), "catalog.json");
-  if (fs.existsSync(localFallbackPath)) {
-    try {
-      const localData = JSON.parse(fs.readFileSync(localFallbackPath, 'utf8'));
-      if (Array.isArray(localData) && localData.length > 0) return localData;
-    } catch (err) {
-      console.warn("[CATALOG DATABASE FALLBACK ERROR]", err);
+  if (!catalogData) {
+    const localFallbackPath = path.join(process.cwd(), "catalog.json");
+    if (fs.existsSync(localFallbackPath)) {
+      try {
+        const localData = JSON.parse(fs.readFileSync(localFallbackPath, 'utf8'));
+        if (Array.isArray(localData) && localData.length > 0) catalogData = localData;
+      } catch (err) {
+        console.warn("[CATALOG DATABASE FALLBACK ERROR]", err);
+      }
     }
   }
 
-  return null;
+  if (catalogData) {
+    let updated = false;
+    for (const cat of catalogData) {
+      if (!cat.products || !Array.isArray(cat.products)) continue;
+      for (const prod of cat.products) {
+        const targetPrice = OFFICIAL_PRODUCT_PRICES[prod.id];
+        if (targetPrice !== undefined) {
+          const formattedTarget = `${targetPrice}€`;
+          if (prod.price !== targetPrice && prod.price !== formattedTarget) {
+            prod.price = formattedTarget;
+            updated = true;
+          }
+        }
+      }
+    }
+    if (updated && fs.existsSync(CATALOG_FILE)) {
+      try {
+        fs.writeFileSync(CATALOG_FILE, JSON.stringify(catalogData, null, 2), 'utf8');
+        console.log("[CATALOG DATABASE] Updated product prices in catalog.json store");
+      } catch (e) {}
+    }
+  }
+
+  return catalogData;
 }
 
 function saveCatalog(catalog: any[]) {
@@ -1609,7 +1658,8 @@ function generateGoogleMerchantXmlFeed(): string {
       const rawDesc = prod.description || `Peça artesanal M★BRAVO ${prod.name} feita à mão com amor e precisão.`;
       const description = String(rawDesc).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
       
-      const priceNum = typeof prod.price === 'number' ? prod.price : parseFloat(String(prod.price || '0').replace(/[^0-9.,]/g, '').replace(',', '.')) || 0;
+      const officialPrice = OFFICIAL_PRODUCT_PRICES[prod.id] || OFFICIAL_PRODUCT_PRICES[rawId];
+      const priceNum = officialPrice !== undefined ? officialPrice : (typeof prod.price === 'number' ? prod.price : parseFloat(String(prod.price || '0').replace(/[^0-9.,]/g, '').replace(',', '.')) || 0);
       const priceFormatted = `${priceNum.toFixed(2)} EUR`;
       
       let imageUrl = prod.img || `/hero-bg-1-desktop.webp`;
