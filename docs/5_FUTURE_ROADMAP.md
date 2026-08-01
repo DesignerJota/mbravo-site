@@ -56,6 +56,8 @@ Este documento regista a visão estratégica de futuro para a evolução tecnol�
 *   [x] **Integração de Rastreio (GA4 `G-E3ZXEK6RGR`, GTM `GTM-NLQ2QXN6`, Clarity `xuu4fvcodg`):** Coleta de tráfego, funis de conversão, mapas de calor e gravações de sessão ativas no frontend.
 *   [x] **Proteção de Subdomínio & Bloqueio de Indexação da API (`api.mbravobycarolina.com`):** Implementação de `robots.txt` estrito e cabeçalhos `X-Robots-Tag: noindex, nofollow` no servidor Express.
 *   [x] **Feed Dinâmico Google Merchant Center (RSS 2.0 XML):** Endpoint `/feed.xml` e `/api/v1/products/feed.xml` com geração em tempo real alimentada diretamente por `loadCatalog()` no volume persistente.
+*   [x] **Conformidade de Envios Google Shopping (`LegalModal.tsx`):** Exibição transparente das 4 tabelas de frete (Portugal, Espanha, Europa UE e Internacional) e prazos de entrega no modal de Informações Legais.
+*   [x] **Ajuste do Catálogo de Preços & Feed XML Sincronizado (`src/App.tsx`, `server.ts` & `/catalog.json`):** Atualização dos preços base no catálogo e em `BASE_PRICES`, implementação da lógica de cálculo para conjuntos de Coasters (1und: 4€ até 8und: 34€ via `calculateItemPrice`) e propagação atómica para o feed RSS 2.0 XML do Google Merchant Center.
 *   [ ] **Telemetria de Visitantes em Tempo Real (Server-Sent Events - SSE):** Implementação de stream unidirecional leve `/api/admin/telemetry/live` para exibição de utilizadores ativos no site, peças visualizadas no momento e carrinhos em preparação no Painel Admin, com consumo ultrabaixo de recursos e zero sobrecarga de conexões persistentemente mantidas.
 
 ---
