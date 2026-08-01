@@ -73,10 +73,10 @@ app.get("/robots.txt", (req, res) => {
   if (host.toLowerCase().startsWith("api.")) {
     res.setHeader("X-Robots-Tag", "noindex, nofollow");
     res.type("text/plain");
-    return res.send("User-agent: *\nDisallow: /\n");
+    return res.send("User-agent: *\nDisallow: /\nAllow: /api/v1/products/feed.xml\n");
   }
   res.type("text/plain");
-  return res.send("User-agent: *\nAllow: /\nDisallow: /api/\nDisallow: /admin\nSitemap: https://mbravobycarolina.com/sitemap.xml\n");
+  return res.send("User-agent: *\nAllow: /\nDisallow: /api/\nAllow: /api/v1/products/feed.xml\nAllow: /feed.xml\nDisallow: /admin\nSitemap: https://mbravobycarolina.com/sitemap.xml\n");
 });
 
 // Persistent file-backed order store to preserve data during sandbox testing and server restarts
@@ -1591,6 +1591,73 @@ function restoreProductStockForOrder(order: any) {
 }
 
 // --- CMS & Inventory Endpoints ---
+function generateGoogleMerchantXmlFeed(): string {
+  const catalog = loadCatalog() || [];
+  const baseUrl = "https://mbravobycarolina.com";
+  
+  let itemsXml = "";
+  
+  for (const category of catalog) {
+    if (!category.products || !Array.isArray(category.products)) continue;
+    
+    for (const prod of category.products) {
+      if (!prod || !prod.name) continue;
+      
+      const rawId = String(prod.id || prod.name.toLowerCase().replace(/[^a-z0-9]+/g, '-'));
+      const prodId = rawId.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+      const title = String(prod.name).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+      const rawDesc = prod.description || `Peça artesanal M★BRAVO ${prod.name} feita à mão com amor e precisão.`;
+      const description = String(rawDesc).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+      
+      const priceNum = typeof prod.price === 'number' ? prod.price : parseFloat(String(prod.price || '0').replace(/[^0-9.,]/g, '').replace(',', '.')) || 0;
+      const priceFormatted = `${priceNum.toFixed(2)} EUR`;
+      
+      let imageUrl = prod.img || `/hero-bg-1-desktop.webp`;
+      if (!imageUrl.startsWith('http://') && !imageUrl.startsWith('https://')) {
+        if (!imageUrl.startsWith('/')) imageUrl = `/${imageUrl}`;
+        imageUrl = `${baseUrl}${imageUrl}`;
+      }
+      imageUrl = imageUrl.replace(/&/g, '&amp;');
+      
+      const isAvailable = prod.stock === undefined || prod.stock === null || (typeof prod.stock === 'number' ? prod.stock > 0 : parseInt(String(prod.stock), 10) > 0);
+      const availability = isAvailable ? "in_stock" : "out_of_stock";
+      const productLink = `${baseUrl}/#catalogo`;
+      
+      const materialXml = prod.material ? `\n      <g:material>${String(prod.material).replace(/&/g, '&amp;')}</g:material>` : '';
+
+      itemsXml += `
+    <item>
+      <g:id>${prodId}</g:id>
+      <g:title>${title}</g:title>
+      <g:description>${description}</g:description>
+      <g:link>${productLink}</g:link>
+      <g:image_link>${imageUrl}</g:image_link>
+      <g:price>${priceFormatted}</g:price>
+      <g:availability>${availability}</g:availability>
+      <g:condition>new</g:condition>
+      <g:brand>M★BRAVO</g:brand>${materialXml}
+      <g:google_product_category>Apparel &amp; Accessories &gt; Handbags, Wallets &amp; Cases &gt; Handbags</g:google_product_category>
+    </item>`;
+    }
+  }
+
+  return `<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:g="http://base.google.com/ns/1.0">
+  <channel>
+    <title>M★BRAVO | Atelier &amp; Peças Únicas</title>
+    <link>${baseUrl}</link>
+    <description>Catálogo Oficial M★BRAVO - Peças em crochet e acessórios artesanais de luxo.</description>
+    ${itemsXml}
+  </channel>
+</rss>`;
+}
+
+app.get(["/feed.xml", "/api/v1/products/feed.xml"], (req, res) => {
+  res.setHeader("Content-Type", "application/xml; charset=utf-8");
+  res.setHeader("Cache-Control", "public, max-age=3600");
+  res.send(generateGoogleMerchantXmlFeed());
+});
+
 app.get("/api/catalog", (req, res) => {
   const catalog = loadCatalog();
   if (!catalog) {
