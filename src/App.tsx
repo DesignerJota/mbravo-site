@@ -148,29 +148,29 @@ const WHATSAPP_NUMBER = '351912828182';
 
 // --- Pricing & Customization Logic ---
 const BASE_PRICES: { [key: string]: number | string } = {
-    'alma cardigan': 95,
-    'm★bravo cardigan': 95,
+    'alma cardigan': 97,
+    'm★bravo cardigan': 97,
     'geometric poncho': 75,
-    'cozy mesh poncho': 55,
-    'mesh poncho': 55,
-    'signature granny poncho': 70,
-    'mini alma cardigan': 55,
+    'cozy mesh poncho': 57,
+    'mesh poncho': 57,
+    'signature granny poncho': 72,
+    'mini alma cardigan': 57,
     'granny square bag': 75,
-    'granny square sling bag': 45,
-    'marea bikini set': 65,
+    'granny square sling bag': 47,
+    'marea bikini set': 67,
     'luxury clutch': 45,
-    'coral bikini top': 35,
-    'crystalline top': 35,
-    'african flower pouch': 35,
-    'mini pouches': 12,
-    'mini shell pouch': 20,
-    'airpods case': 15,
+    'coral bikini top': 37,
+    'crystalline top': 37,
+    'african flower pouch': 37,
+    'mini pouches': 13,
+    'mini shell pouch': 22,
+    'airpods case': 16,
     'booksleeve': 32,
-    'stella cushion': 38,
-    'dragonfly bandana': 28,
-    'classic bandana': 25,
-    'scarf hip bandana': 30,
-    'dragonfly headband': 18,
+    'stella cushion': 40,
+    'dragonfly bandana': 30,
+    'classic bandana': 27,
+    'scarf hip bandana': 32,
+    'dragonfly headband': 19,
     'placemats': 18,
     'bookmarks': 12,
     'daisycoasters': 4,
@@ -181,6 +181,23 @@ const BASE_PRICES: { [key: string]: number | string } = {
     'pinkcoasters': 4,
     'classiccoasters': 4
 };
+
+export function calculateItemPrice(productName: string, basePrice: number, quantityStr: string, hasQuantity: boolean): number {
+    if (!hasQuantity) return basePrice;
+    const isCoaster = (productName || '').toLowerCase().includes('coasters');
+    const qty = parseInt(quantityStr) || 1;
+    if (isCoaster) {
+        switch (qty) {
+            case 1: return 4.0;
+            case 2: return 9.0;
+            case 4: return 17.0;
+            case 6: return 26.0;
+            case 8: return 34.0;
+            default: return basePrice * qty;
+        }
+    }
+    return basePrice * qty;
+}
 
 const getApprovedPrice = (name: string): number | string => {
     const n = name.toLowerCase().trim().replace(/\s+/g, '');
@@ -2473,8 +2490,10 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({ product: rawProduct,
             }));
         }
     }, [product.id, availableColorOptions.join(',')]);
-    const totalPrice = typeof rawPrice === 'number' 
-        ? `${rawPrice * (hasQuantity ? (parseInt(selections.quantidade) || 1) : 1)}`
+    const rawPriceVal = typeof rawPrice === 'number' ? rawPrice : (parseFloat(String(rawPrice).replace(/[^0-9.]/g, '')) || 0);
+    const calculatedPriceNum = calculateItemPrice(product.name, rawPriceVal, selections.quantidade, hasQuantity);
+    const totalPrice = typeof rawPrice === 'number' || !isNaN(rawPriceVal)
+        ? `${calculatedPriceNum}`
         : 'Sob Consulta';
     const cardRef = useRef<HTMLDivElement>(null);
     const [activeImgIndex, setActiveImgIndex] = useState(0);
@@ -2545,9 +2564,9 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({ product: rawProduct,
 
                 let amountInCents = 5000;
                 try {
-                    const priceVal = typeof rawPrice === 'number' ? rawPrice : parseFloat(String(rawPrice).replace(/[^0-9.]/g, ''));
-                    const qty = hasQuantity ? (parseInt(selections.quantidade) || 1) : 1;
-                    amountInCents = Math.round(priceVal * qty * 100);
+                    const priceVal = typeof rawPrice === 'number' ? rawPrice : parseFloat(String(rawPrice).replace(/[^0-9.]/g, '')) || 0;
+                    const calculatedTotal = calculateItemPrice(product.name, priceVal, selections.quantidade, hasQuantity);
+                    amountInCents = Math.round(calculatedTotal * 100);
                 } catch (e) {
                     amountInCents = 5000;
                 }
@@ -2745,8 +2764,8 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({ product: rawProduct,
             return price;
         }
 
-        const qty = hasQuantity ? (parseInt(selections.quantidade) || 1) : 1;
-        const total = price * qty;
+        const baseNum = typeof price === 'number' ? price : parseFloat(String(price)) || 0;
+        const total = calculateItemPrice(product.name, baseNum, selections.quantidade, hasQuantity);
         return `Total: ${total}€`;
     };
 
@@ -3695,7 +3714,8 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({ product: rawProduct,
 
                                             let amountInCents = 0;
                                              try {
-                                                 const rawPriceNum = typeof rawPrice === 'number' ? rawPrice * (hasQuantity ? (parseInt(selections.quantidade) || 1) : 1) : 50;
+                                                 const priceVal = typeof rawPrice === 'number' ? rawPrice : parseFloat(String(rawPrice).replace(/[^0-9.]/g, '')) || 50;
+                                                 const rawPriceNum = calculateItemPrice(product.name, priceVal, selections.quantidade, hasQuantity);
                                                  amountInCents = Math.round(rawPriceNum * 100);
                                              } catch (e) {
                                                  amountInCents = 5000;
@@ -3713,7 +3733,8 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({ product: rawProduct,
                                                     }
 
                                                     // Calculate price in cents
-                                                    const rawPriceNum = typeof rawPrice === 'number' ? rawPrice * (hasQuantity ? (parseInt(selections.quantidade) || 1) : 1) : 50; // default 50€ fallback
+                                                    const priceVal = typeof rawPrice === 'number' ? rawPrice : parseFloat(String(rawPrice).replace(/[^0-9.]/g, '')) || 50;
+                                                    const rawPriceNum = calculateItemPrice(product.name, priceVal, selections.quantidade, hasQuantity); // default 50€ fallback
                                                     amountInCents = Math.round(rawPriceNum * 100);
                                                 } catch (stripeErr: any) {
                                                     setIsPaying(false);
@@ -5768,9 +5789,10 @@ const ProductDetailPage = ({ pathname }: { pathname: string }) => {
             ? (selections.cor || `${formatColorName(selections.corPrincipal)} & ${formatColorName(selections.corDetalhe)}`)
             : selections.cor);
     const quantity = hasQuantity ? selections.quantidade : '1';
-
     const qtyMultiplier = hasQuantity ? (parseInt(selections.quantidade) || 1) : 1;
-    const calculatedPriceNum = typeof rawPrice === 'number' ? rawPrice * qtyMultiplier : 50;
+
+    const rawPriceVal = typeof rawPrice === 'number' ? rawPrice : (parseFloat(String(rawPrice).replace(/[^0-9.]/g, '')) || 50);
+    const calculatedPriceNum = calculateItemPrice(productTranslated.name, rawPriceVal, selections.quantidade, hasQuantity);
     const totalPrice = `${calculatedPriceNum}`;
     const amountInCents = Math.round(calculatedPriceNum * 100);
 
@@ -5779,7 +5801,8 @@ const ProductDetailPage = ({ pathname }: { pathname: string }) => {
         if (typeof price === 'string') {
             return price;
         }
-        const total = price * qtyMultiplier;
+        const baseNum = typeof price === 'number' ? price : parseFloat(String(price)) || 0;
+        const total = calculateItemPrice(productTranslated.name, baseNum, selections.quantidade, hasQuantity);
         return `${total}€`;
     };
     const currentPrice = calculatePriceText();
