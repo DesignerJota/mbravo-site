@@ -1,11 +1,15 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence, useScroll, useTransform, useSpring, useVelocity, useMotionValue, animate } from 'motion/react';
-import { Menu, X, Instagram, Facebook, ArrowRight, ArrowLeft, ChevronLeft, ChevronRight, Share2, Mail, MessageCircle, Sparkles, Feather, Palette, Heart, Maximize2 } from 'lucide-react';
+import { Menu, X, Instagram, Facebook, ArrowRight, ArrowLeft, ChevronLeft, ChevronRight, Share2, Mail, MessageCircle, Sparkles, Feather, Palette, Heart, Maximize2, ShoppingBag, MapPin } from 'lucide-react';
 import { loadStripe } from '@stripe/stripe-js';
 import Lenis from 'lenis';
 const AdminDashboardModal = React.lazy(() => import('./components/AdminDashboardModal'));
 const LegalModal = React.lazy(() => import('./components/LegalModal'));
+import { CartProvider, useCart } from './context/CartContext';
+import { SHIPPING_ZONES } from './types';
+import { AtelierCartDrawer } from './components/AtelierCartDrawer';
+import { CartCheckoutModal } from './components/CartCheckoutModal';
 import { 
   useLanguage, 
   translateProduct, 
@@ -278,11 +282,11 @@ export function getShippingEstimate(product: any, lang: 'pt' | 'en') {
   if (stock > 0) {
     return {
       inStock: true,
-      title: lang === 'pt' ? 'Artigo em Stock' : 'Item in Stock',
+      title: lang === 'pt' ? 'Disponível em Atelier' : 'Available in Atelier',
       desc: lang === 'pt' 
-        ? 'Esta peça já se encontra produzida no nosso atelier. O envio será processado no prazo imediato de 24h a 48h úteis.' 
-        : 'This piece is already crafted by us. Shipping will be processed immediately within 24h to 48h business hours.',
-      badge: lang === 'pt' ? 'Envio em 24h/48h' : 'Shipping 24h/48h'
+        ? 'Esta peça já se encontra produzida no nosso atelier. Envio expresso processado em 1 a 3 dias úteis.' 
+        : 'This piece is already crafted in our atelier. Express shipping processed in 1 to 3 business days.',
+      badge: lang === 'pt' ? 'Envio 1-3 dias' : 'Shipping 1-3 days'
     };
   } else {
     const craftingDays = product.craftingTime !== undefined && product.craftingTime !== null && product.craftingTime !== '' ? parseInt(product.craftingTime, 10) : 10;
@@ -968,6 +972,7 @@ const Navbar = ({ currentPage, setCurrentPage, pathname, isAppLoading = false }:
     const [isDarkBg, setIsDarkBg] = useState(true);
     const { lang: activeLang, t } = useLanguage();
     const lang = activeLang.toUpperCase() as 'PT' | 'EN';
+    const { setIsCartOpen, totalItemCount } = useCart();
 
     useEffect(() => {
         if (mobileMenuOpen) {
@@ -1181,22 +1186,55 @@ const Navbar = ({ currentPage, setCurrentPage, pathname, isAppLoading = false }:
             >
               EN
             </button>
+
+            {/* Cart Bag Trigger Button */}
+            <button
+              onClick={() => setIsCartOpen(true)}
+              className={`relative p-2 ml-4 rounded-full transition-all cursor-pointer hover:scale-110 flex items-center justify-center ${
+                isDarkBg ? 'text-cream hover:text-[#C5A059]' : 'text-forest hover:text-[#C5A059]'
+              }`}
+              title="Saco de Compras / Shopping Bag"
+            >
+              <ShoppingBag size={20} />
+              {totalItemCount > 0 && (
+                <span className="absolute -top-1 -right-1 bg-[#C5A059] text-forest font-sans text-[9px] font-extrabold w-4 h-4 rounded-full flex items-center justify-center shadow-xs">
+                  {totalItemCount}
+                </span>
+              )}
+            </button>
           </motion.div>
         </div>
 
-        {/* Mobile Toggle */}
-        {!mobileMenuOpen && (
-          <motion.button 
-            initial={{ opacity: 0, x: 20 }}
-            animate={isAppLoading ? { opacity: 0, x: 20 } : { opacity: 1, x: 0 }}
-            transition={{ delay: 0.2, duration: 0.6 }}
-            className={`lg:hidden transition-colors duration-200 ${textColor}`}
-            onClick={() => setMobileMenuOpen(true)}
-            aria-label={lang === 'PT' ? 'Abrir Menu' : 'Open Menu'}
+        {/* Mobile Right Controls */}
+        <div className="lg:hidden flex items-center gap-3">
+          <button
+            onClick={() => setIsCartOpen(true)}
+            className={`relative p-2 rounded-full transition-all cursor-pointer flex items-center justify-center ${
+              isDarkBg ? 'text-cream' : 'text-forest'
+            }`}
+            title="Saco de Compras"
           >
-            <Menu size={24} />
-          </motion.button>
-        )}
+            <ShoppingBag size={22} />
+            {totalItemCount > 0 && (
+              <span className="absolute -top-1 -right-1 bg-[#C5A059] text-forest font-sans text-[9px] font-extrabold w-4 h-4 rounded-full flex items-center justify-center shadow-xs">
+                {totalItemCount}
+              </span>
+            )}
+          </button>
+
+          {!mobileMenuOpen && (
+            <motion.button 
+              initial={{ opacity: 0, x: 20 }}
+              animate={isAppLoading ? { opacity: 0, x: 20 } : { opacity: 1, x: 0 }}
+              transition={{ delay: 0.2, duration: 0.6 }}
+              className={`transition-colors duration-200 ${textColor}`}
+              onClick={() => setMobileMenuOpen(true)}
+              aria-label={lang === 'PT' ? 'Abrir Menu' : 'Open Menu'}
+            >
+              <Menu size={24} />
+            </motion.button>
+          )}
+        </div>
       </div>
 
       {/* Mobile Menu Overlay - Refined with Forest theme */}
@@ -2399,6 +2437,7 @@ interface ProductCardProps {
 
 const ProductCardComponent: React.FC<ProductCardProps> = ({ product: rawProduct, i, isFocused, isSubdued, onFocus, onPrevProduct, onNextProduct }) => {
     const { lang, t } = useLanguage();
+    const { addToCart, setIsCheckoutOpen, selectedShippingZone, setSelectedShippingZone } = useCart();
     const product = translateProduct(rawProduct, lang);
     const n = product.name.toLowerCase();
     const isVestuario = n.includes('bikini') || n.includes('top') || n.includes('cardigan') || n.includes('poncho') || n.includes('belt') || n.includes('bandana') || n.includes('headband');
@@ -3078,7 +3117,7 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({ product: rawProduct,
             {/* b) Área de Informação (Details / Sidebar and custom features) */}
             <div className="w-full lg:w-[38%] h-auto lg:h-full bg-[#FCFBF9] flex flex-col px-5 py-6 lg:py-8 text-forest relative box-border lg:overflow-hidden">
                 {isCheckingOut ? (
-                    <div data-lenis-prevent className="flex-1 flex flex-col lg:h-full bg-[#FCFBF9] text-forest select-text p-1 animate-fadeIn lg:overflow-y-auto overflow-y-visible max-h-full h-auto scrollbar-thin scrollbar-thumb-forest/10">
+                    <div data-lenis-prevent className="flex-1 flex flex-col lg:h-full bg-[#FCFBF9] text-forest select-text p-1 animate-fadeIn lg:overflow-y-auto overflow-y-visible max-h-full h-auto">
                         {/* Header with Back button */}
                         <div className="flex justify-between items-center border-b border-forest/10 pb-4 mb-4">
                             <button 
@@ -3318,25 +3357,100 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({ product: rawProduct,
                             <div className="space-y-6 pb-12 lg:pb-6 text-left flex-grow flex flex-col justify-between">
                                 <div className="space-y-6">
                                     {/* Product Summary Mini Card */}
-                                    <div className="bg-forest/5 rounded-2xl p-4 border border-forest/5 flex justify-between items-center gap-4">
-                                        <div className="flex items-center gap-3">
-                                            <img 
-                                                src={productImages[0]} 
-                                                alt="" 
-                                                loading="lazy"
-                                                decoding="async"
-                                                style={{ imageRendering: 'crisp-edges' }}
-                                                className="w-12 h-12 rounded-lg object-cover border border-forest/5 antialiased" 
-                                            />
-                                            <div>
-                                                <span className="font-serif font-light text-sm text-forest block">{product.name}</span>
-                                                <span className="text-[10px] text-forest/50 uppercase tracking-wider">
-                                                    {(colorType !== 'fixed' && selectedColor) ? `${translateColor(selectedColor, lang)} ` : ''}{hasSize && `| ${translateSize(selections.tamanho, lang)}`}
-                                                </span>
+                                    {(() => {
+                                        const rawPriceVal = getApprovedPrice(product.name);
+                                        const baseNum = typeof rawPriceVal === 'number' ? rawPriceVal : (parseFloat(String(rawPriceVal)) || 0);
+                                        const numericSubtotal = calculateItemPrice(product.name, baseNum, selections.quantidade, hasQuantity);
+                                        const directShippingFee = numericSubtotal >= 100 ? 0 : selectedShippingZone.price;
+                                        const directFinalTotal = numericSubtotal + directShippingFee;
+
+                                        return (
+                                            <div className="bg-forest/5 rounded-2xl p-4 border border-forest/5 space-y-3">
+                                                <div className="flex justify-between items-center gap-4">
+                                                    <div className="flex items-center gap-3">
+                                                        <img 
+                                                            src={productImages[0]} 
+                                                            alt="" 
+                                                            loading="lazy"
+                                                            decoding="async"
+                                                            style={{ imageRendering: 'crisp-edges' }}
+                                                            className="w-12 h-12 rounded-lg object-cover border border-forest/5 antialiased" 
+                                                        />
+                                                        <div>
+                                                            <span className="font-serif font-light text-sm text-forest block">{product.name}</span>
+                                                            <span className="text-[10px] text-forest/50 uppercase tracking-wider">
+                                                                {(colorType !== 'fixed' && selectedColor) ? `${translateColor(selectedColor, lang)} ` : ''}{hasSize && `| ${translateSize(selections.tamanho, lang)}`}
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                    <span className="font-serif text-sm font-medium text-forest/80">{numericSubtotal.toFixed(2)}€</span>
+                                                </div>
+
+                                                {/* Region Selector */}
+                                                <div className="pt-2 border-t border-forest/10 flex justify-between items-center text-xs font-sans">
+                                                    <span className="text-[10px] uppercase tracking-wider text-forest/60 font-medium">
+                                                        {lang === 'pt' ? 'Região de Envio' : 'Shipping Region'}:
+                                                    </span>
+                                                    <select
+                                                        value={selectedShippingZone.id}
+                                                        onChange={(e) => {
+                                                            const found = SHIPPING_ZONES.find((z) => z.id === e.target.value);
+                                                            if (found) setSelectedShippingZone(found);
+                                                        }}
+                                                        className="bg-transparent border-b border-forest/20 text-xs font-medium text-forest focus:outline-none cursor-pointer py-0.5"
+                                                    >
+                                                        {SHIPPING_ZONES.map((zone) => (
+                                                            <option key={zone.id} value={zone.id} className="bg-[#FCFBF9] text-forest">
+                                                                {zone.name[lang === 'pt' ? 'pt' : 'en']} ({zone.price.toFixed(2)}€)
+                                                            </option>
+                                                        ))}
+                                                    </select>
+                                                </div>
+
+                                                {/* Timelines Breakdown */}
+                                                {(() => {
+                                                    const stockNum = product.stock !== undefined && product.stock !== null && product.stock !== '' ? parseInt(product.stock, 10) : 0;
+                                                    const craftingNum = product.craftingTime !== undefined && product.craftingTime !== null && product.craftingTime !== '' ? parseInt(product.craftingTime, 10) : (product.production_time ? parseInt(product.production_time, 10) : 10);
+                                                    const itemLeadTime = stockNum > 0 ? 0 : craftingNum;
+
+                                                    return (
+                                                        <div className="py-1.5 space-y-1 text-[10px] font-sans text-forest/70 border-t border-forest/5">
+                                                            <div className="flex justify-between items-center">
+                                                                <span className="text-forest/60">{lang === 'pt' ? 'Produção Manual:' : 'Handcrafted Production:'}</span>
+                                                                <span className="font-serif font-medium text-forest">
+                                                                    {itemLeadTime === 0
+                                                                        ? (lang === 'pt' ? 'Disponível em Atelier' : 'Available in Atelier')
+                                                                        : (lang === 'pt' ? `${itemLeadTime} ${itemLeadTime === 1 ? 'dia útil' : 'dias úteis'}` : `${itemLeadTime} ${itemLeadTime === 1 ? 'business day' : 'business days'}`)
+                                                                    }
+                                                                </span>
+                                                            </div>
+                                                            <div className="flex justify-between items-center">
+                                                                <span className="text-forest/60">{lang === 'pt' ? 'Envio Expresso (CTT):' : 'Express Shipping (CTT):'}</span>
+                                                                <span className="font-serif font-medium text-forest">
+                                                                    {itemLeadTime === 0
+                                                                        ? (lang === 'pt' ? '1 a 3 dias úteis' : '1 to 3 business days')
+                                                                        : (lang === 'pt' ? '1 a 3 dias úteis (após produção)' : '1 to 3 business days (post-production)')
+                                                                    }
+                                                                </span>
+                                                            </div>
+                                                        </div>
+                                                    );
+                                                })()}
+
+                                                <div className="flex justify-between items-baseline text-xs font-sans text-forest/70">
+                                                    <span>{lang === 'pt' ? 'Portes de Envio' : 'Shipping Fee'}</span>
+                                                    <span className="font-serif font-medium text-forest">
+                                                        {directShippingFee === 0 ? (lang === 'pt' ? 'Cortesia' : 'Courtesy') : `${directShippingFee.toFixed(2)}€`}
+                                                    </span>
+                                                </div>
+
+                                                <div className="pt-1.5 border-t border-forest/10 flex justify-between items-baseline font-serif text-sm font-bold text-forest">
+                                                    <span>{lang === 'pt' ? 'Total Final' : 'Final Total'}</span>
+                                                    <span>{directFinalTotal.toFixed(2)}€</span>
+                                                </div>
                                             </div>
-                                        </div>
-                                        <span className="font-serif text-base font-semibold text-forest">{currentPrice}</span>
-                                    </div>
+                                        );
+                                    })()}
 
                                     {/* Shipping Details form */}
                                     <div className="space-y-3">
@@ -3347,7 +3461,7 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({ product: rawProduct,
                                         <div className="space-y-2">
                                             <input 
                                                 type="text" 
-                                                placeholder={lang === 'pt' ? "Nome Completo" : "Full Name"} 
+                                                placeholder={lang === 'pt' ? "Nome completo do destinatário" : "Full recipient name"} 
                                                 required
                                                 value={checkoutForm.nome}
                                                 onChange={(e) => setCheckoutForm(prev => ({ ...prev, nome: e.target.value }))}
@@ -3357,7 +3471,7 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({ product: rawProduct,
                                                 <div className="flex flex-col gap-1">
                                                     <input 
                                                         type="email" 
-                                                        placeholder={lang === 'pt' ? "E-mail" : "Email Address"} 
+                                                        placeholder={lang === 'pt' ? "nome@dominio.com" : "name@domain.com"} 
                                                         required
                                                         value={checkoutForm.email}
                                                         onChange={(e) => setCheckoutForm(prev => ({ ...prev, email: e.target.value }))}
@@ -3371,7 +3485,7 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({ product: rawProduct,
                                                 <div className="flex flex-col gap-1">
                                                     <input 
                                                         type="tel" 
-                                                        placeholder={lang === 'pt' ? "Telemóvel" : "Phone Number"} 
+                                                        placeholder={lang === 'pt' ? "9xx xxx xxx" : "Phone number"} 
                                                         required
                                                         value={checkoutForm.telefone}
                                                         onChange={(e) => setCheckoutForm(prev => ({ ...prev, telefone: e.target.value.replace(/[^0-9+]/g, '') }))}
@@ -3384,7 +3498,7 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({ product: rawProduct,
                                             <div className="mt-2">
                                                 <input 
                                                     type="text" 
-                                                    placeholder={lang === 'pt' ? "NIF (Opcional - Para Fatura/Recibo)" : "NIF (Optional - For Receipt)"} 
+                                                    placeholder={lang === 'pt' ? "NIF (Opcional - Fatura)" : "Tax ID (Optional)"} 
                                                     maxLength={9}
                                                     value={checkoutForm.nif}
                                                     onChange={(e) => setCheckoutForm(prev => ({ ...prev, nif: e.target.value.replace(/\D/g, '') }))}
@@ -3430,7 +3544,7 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({ product: rawProduct,
                                             )}
                                             <input 
                                                 type="text" 
-                                                placeholder={lang === 'pt' ? "Morada de Envio" : "Shipping Address"} 
+                                                placeholder={lang === 'pt' ? "Morada completa de entrega" : "Full shipping address"} 
                                                 required
                                                 value={checkoutForm.morada}
                                                 onChange={(e) => setCheckoutForm(prev => ({ ...prev, morada: e.target.value }))}
@@ -3439,7 +3553,7 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({ product: rawProduct,
                                             <div className="grid grid-cols-2 gap-2">
                                                 <input 
                                                     type="text" 
-                                                    placeholder={lang === 'pt' ? "Código Postal" : "Postal Code"} 
+                                                    placeholder="XXXX-XXX" 
                                                     required
                                                     maxLength={8}
                                                     value={checkoutForm.codigoPostal}
@@ -3448,7 +3562,7 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({ product: rawProduct,
                                                 />
                                                 <input 
                                                     type="text" 
-                                                    placeholder={lang === 'pt' ? "Cidade" : "City"} 
+                                                    placeholder={lang === 'pt' ? "Cidade / Localidade" : "City / Location"} 
                                                     required
                                                     value={checkoutForm.cidade}
                                                     onChange={(e) => setCheckoutForm(prev => ({ ...prev, cidade: e.target.value }))}
@@ -3713,13 +3827,15 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({ product: rawProduct,
                                             }
 
                                             let amountInCents = 0;
-                                             try {
-                                                 const priceVal = typeof rawPrice === 'number' ? rawPrice : parseFloat(String(rawPrice).replace(/[^0-9.]/g, '')) || 50;
-                                                 const rawPriceNum = calculateItemPrice(product.name, priceVal, selections.quantidade, hasQuantity);
-                                                 amountInCents = Math.round(rawPriceNum * 100);
-                                             } catch (e) {
-                                                 amountInCents = 5000;
-                                             }
+                                            let modalShippingFee = 0;
+                                            try {
+                                                const priceVal = typeof rawPrice === 'number' ? rawPrice : parseFloat(String(rawPrice).replace(/[^0-9.]/g, '')) || 50;
+                                                const rawPriceNum = calculateItemPrice(product.name, priceVal, selections.quantidade, hasQuantity);
+                                                modalShippingFee = rawPriceNum >= 100 ? 0 : selectedShippingZone.price;
+                                                amountInCents = Math.round((rawPriceNum + modalShippingFee) * 100);
+                                            } catch (e) {
+                                                amountInCents = 5000;
+                                            }
 
                                             if (paymentMethod === 'card') {
                                                 try {
@@ -3734,8 +3850,9 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({ product: rawProduct,
 
                                                     // Calculate price in cents
                                                     const priceVal = typeof rawPrice === 'number' ? rawPrice : parseFloat(String(rawPrice).replace(/[^0-9.]/g, '')) || 50;
-                                                    const rawPriceNum = calculateItemPrice(product.name, priceVal, selections.quantidade, hasQuantity); // default 50€ fallback
-                                                    amountInCents = Math.round(rawPriceNum * 100);
+                                                    const rawPriceNum = calculateItemPrice(product.name, priceVal, selections.quantidade, hasQuantity);
+                                                    modalShippingFee = rawPriceNum >= 100 ? 0 : selectedShippingZone.price;
+                                                    amountInCents = Math.round((rawPriceNum + modalShippingFee) * 100);
                                                 } catch (stripeErr: any) {
                                                     setIsPaying(false);
                                                     setCheckoutError(stripeErr.message || (lang === 'pt' ? 'Erro ao validar os detalhes do cartão.' : 'Error validating card details.'));
@@ -3751,11 +3868,13 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({ product: rawProduct,
                                                         product: {
                                                             id: product.id,
                                                             name: product.name,
-                                                            price: currentPrice
+                                                            price: `${(amountInCents / 100).toFixed(2)}€`
                                                         },
                                                         selections,
                                                         checkoutForm,
                                                         paymentMethod,
+                                                        shippingFee: modalShippingFee,
+                                                        shippingZone: selectedShippingZone,
                                                         amountInCents
                                                     })
                                                 });
@@ -3890,7 +4009,7 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({ product: rawProduct,
                         )}
                     </div>
                 ) : (
-                    <div data-lenis-prevent className="flex-1 overflow-y-visible lg:overflow-y-auto space-y-5 pr-1 select-text pb-32 lg:pb-4 scrollbar-thin scrollbar-thumb-forest/10 scrollbar-track-transparent">
+                    <div data-lenis-prevent className="flex-1 overflow-y-visible lg:overflow-y-auto space-y-5 pr-1 select-text pb-32 lg:pb-4">
                         
                         {/* Title & Navigation/Close Controls */}
                         <div className="flex justify-between items-start gap-4">
@@ -4317,26 +4436,61 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({ product: rawProduct,
                             </div>
                             
                             <div className="space-y-2">
+                                {/* Primary CTA: Add to Cart */}
                                 <motion.button 
                                     onClick={() => {
-                                        const rand = Math.floor(100000 + Math.random() * 900000);
-                                        setOrderId(`MB-${rand}`);
-                                        setIsCheckingOut(true);
+                                        addToCart({
+                                            productId: product.id || product.name,
+                                            productName: product.name,
+                                            categoryName: product.category,
+                                            img: (product.images && product.images[0]) || product.img || '',
+                                            unitPrice: calculatedPriceNum,
+                                            quantity: 1,
+                                            leadTimeDays: (product as any).tempoProducao ? parseInt((product as any).tempoProducao) || 3 : 3,
+                                            selections,
+                                            hasSize,
+                                            hasQuantity
+                                        });
                                     }}
                                     whileHover={{ scale: 1.01 }}
                                     whileTap={{ scale: 0.99 }}
-                                    className="w-full rounded-full py-2.5 px-4 sm:py-3.5 sm:px-6 md:py-4 md:px-8 text-center font-bold bg-[#C5A059] text-[#343E2C] hover:bg-[#d5b069] active:scale-95 text-[9px] sm:text-[10px] md:text-[11px] uppercase tracking-widest cursor-pointer shadow-[0_4px_15px_rgba(197,160,89,0.3)] border border-[#C5A059]/10 block transition-all duration-300 font-sans"
+                                    className="w-full rounded-full py-3 px-4 sm:py-3.5 sm:px-6 text-center font-bold bg-[#C5A059] text-[#343E2C] hover:bg-[#d5b069] active:scale-95 text-[9px] sm:text-[10px] md:text-[11px] uppercase tracking-widest cursor-pointer shadow-[0_4px_15px_rgba(197,160,89,0.3)] border border-[#C5A059]/10 flex items-center justify-center gap-2 transition-all duration-300 font-sans"
                                 >
-                                    {t('product.instant_buy')}
+                                    <ShoppingBag size={14} />
+                                    <span>{lang === 'pt' ? 'Adicionar ao Carrinho' : 'Add to Cart'}</span>
                                 </motion.button>
                                 
+                                {/* Secondary CTA: Direct Buy Now */}
+                                <motion.button 
+                                    onClick={() => {
+                                        addToCart({
+                                            productId: product.id || product.name,
+                                            productName: product.name,
+                                            categoryName: product.category,
+                                            img: (product.images && product.images[0]) || product.img || '',
+                                            unitPrice: calculatedPriceNum,
+                                            quantity: 1,
+                                            leadTimeDays: (product as any).tempoProducao ? parseInt((product as any).tempoProducao) || 3 : 3,
+                                            selections,
+                                            hasSize,
+                                            hasQuantity
+                                        });
+                                        setIsCheckoutOpen(true);
+                                    }}
+                                    whileHover={{ scale: 1.01 }}
+                                    whileTap={{ scale: 0.99 }}
+                                    className="w-full rounded-full py-2.5 px-4 text-center font-medium bg-transparent text-[#FCFBF9] hover:bg-white/10 active:scale-95 text-[8px] sm:text-[9px] md:text-[10px] uppercase tracking-widest cursor-pointer border border-white/20 block transition-all duration-300 font-sans"
+                                >
+                                    {lang === 'pt' ? 'Comprar Agora' : 'Buy Now'}
+                                </motion.button>
+
                                 <motion.a 
                                     href={whatsappUrl}
                                     target="_blank"
                                     rel="noopener noreferrer"
                                     whileHover={{ scale: 1.01 }}
                                     whileTap={{ scale: 0.99 }}
-                                    className="w-full rounded-full py-2 px-4 sm:py-2.5 sm:px-6 md:py-3 md:px-8 text-center font-bold bg-transparent text-[#FCFBF9] hover:bg-white/5 active:scale-95 text-[8px] sm:text-[9px] md:text-[10px] uppercase tracking-widest cursor-pointer border border-[#C5A059]/30 block transition-all duration-300 font-sans"
+                                    className="w-full rounded-full py-2 px-4 sm:py-2.5 sm:px-6 text-center font-medium bg-transparent text-white/60 hover:text-white hover:bg-white/5 active:scale-95 text-[8px] sm:text-[9px] uppercase tracking-widest cursor-pointer border border-white/10 block transition-all duration-300 font-sans"
                                 >
                                     {t('product.customize_design')}
                                 </motion.a>
@@ -4352,22 +4506,54 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({ product: rawProduct,
                     className="lg:hidden sticky bottom-0 left-0 right-0 z-[60] bg-[#FCFBF9]/95 backdrop-blur-md border-t border-forest/10 px-6 py-4 flex flex-col gap-3 shadow-[0_-12px_45px_rgba(31,42,24,0.08)] w-full shrink-0"
                     style={{ paddingBottom: 'max(1rem, env(safe-area-inset-bottom))' }}
                 >
-                    <div className="flex items-center justify-between w-full">
-                        <div className="flex flex-col text-left">
+                    <div className="flex items-center justify-between w-full gap-2">
+                        <div className="flex flex-col text-left shrink-0">
                             <span className="text-[8px] uppercase tracking-[0.2em] text-[#A68244] font-bold font-sans">{t('product.total_amount')}</span>
-                            <span className="text-xl sm:text-2xl font-serif text-forest font-semibold tracking-tight">{currentPrice}</span>
+                            <span className="text-lg sm:text-xl font-serif text-forest font-semibold tracking-tight">{currentPrice}</span>
                         </div>
                         <motion.button 
                             onClick={() => {
-                                const rand = Math.floor(100000 + Math.random() * 900000);
-                                setOrderId(`MB-${rand}`);
-                                setIsCheckingOut(true);
+                                addToCart({
+                                    productId: product.id || product.name,
+                                    productName: product.name,
+                                    categoryName: product.category,
+                                    img: (product.images && product.images[0]) || product.img || '',
+                                    unitPrice: calculatedPriceNum,
+                                    quantity: 1,
+                                    leadTimeDays: (product as any).tempoProducao ? parseInt((product as any).tempoProducao) || 3 : 3,
+                                    selections,
+                                    hasSize,
+                                    hasQuantity
+                                });
                             }}
                             whileHover={{ scale: 1.01 }}
                             whileTap={{ scale: 0.99 }}
-                            className="flex-1 max-w-[190px] xs:max-w-[210px] sm:max-w-[240px] rounded-full py-2 px-3 sm:py-3 sm:px-6 md:py-3.5 md:px-8 text-center font-bold bg-[#C5A059] text-[#343E2C] hover:bg-[#d5b069] text-[9px] sm:text-[10px] md:text-[11px] uppercase tracking-widest cursor-pointer shadow-[0_4px_15px_rgba(197,160,89,0.35)] border border-[#C5A059]/10 block font-sans"
+                            className="flex-1 rounded-full py-2.5 px-3 text-center font-bold bg-[#C5A059] text-[#343E2C] hover:bg-[#d5b069] text-[9px] sm:text-[10px] uppercase tracking-widest cursor-pointer shadow-md border border-[#C5A059]/10 flex items-center justify-center gap-1.5 font-sans"
                         >
-                            {t('product.instant_buy')}
+                            <ShoppingBag size={13} />
+                            <span>{lang === 'pt' ? 'Adicionar' : 'Add to Cart'}</span>
+                        </motion.button>
+                        <motion.button 
+                            onClick={() => {
+                                addToCart({
+                                    productId: product.id || product.name,
+                                    productName: product.name,
+                                    categoryName: product.category,
+                                    img: (product.images && product.images[0]) || product.img || '',
+                                    unitPrice: calculatedPriceNum,
+                                    quantity: 1,
+                                    leadTimeDays: (product as any).tempoProducao ? parseInt((product as any).tempoProducao) || 3 : 3,
+                                    selections,
+                                    hasSize,
+                                    hasQuantity
+                                });
+                                setIsCheckoutOpen(true);
+                            }}
+                            whileHover={{ scale: 1.01 }}
+                            whileTap={{ scale: 0.99 }}
+                            className="rounded-full py-2.5 px-3 text-center font-bold bg-forest text-cream text-[9px] uppercase tracking-widest cursor-pointer shadow-sm font-sans"
+                        >
+                            {lang === 'pt' ? 'Comprar' : 'Buy'}
                         </motion.button>
                     </div>
                     <motion.a 
@@ -5256,7 +5442,7 @@ const TestimonialsSection = () => {
                         {t('testimonials.subtitle')}
                     </p>
                     <a
-                        href={`${API_BASE_URL}/api/write-review`}
+                        href="https://g.page/r/Cdo7JGP_Xpc3EBM/review"
                         target="_blank"
                         rel="noopener noreferrer"
                         className="inline-flex items-center gap-2 px-4 py-1.5 border border-forest/15 hover:border-[#C5A059] text-forest/75 hover:text-forest text-[9px] uppercase tracking-widest font-semibold rounded-full bg-cream/30 hover:bg-cream/70 transition-all duration-300 shadow-sm cursor-pointer"
@@ -5602,6 +5788,7 @@ const ProductDetailPage = ({ pathname }: { pathname: string }) => {
     }
 
     const { product, category } = match;
+    const { addToCart, selectedShippingZone, setSelectedShippingZone } = useCart();
     const translatedCategory = translateCategory(category, lang);
     const productTranslated = translateProduct(product, lang);
     const productImages = productTranslated.images || [productTranslated.img];
@@ -6567,15 +6754,109 @@ const ProductDetailPage = ({ pathname }: { pathname: string }) => {
                                     <div className="space-y-5">
                                         <div className="flex justify-between items-center border-b border-forest/10 pb-3 mb-2">
                                             <span className="text-[10px] uppercase tracking-[0.25em] font-bold text-forest/70">
-                                                {lang === 'pt' ? 'Dados de Faturação & Envio' : 'Billing & Shipping Details'}
+                                                {lang === 'pt' ? 'Resumo & Dados de Faturação' : 'Summary & Billing Details'}
                                             </span>
                                             <button 
                                                 onClick={() => setIsCheckingOut(false)}
-                                                className="text-forest/40 hover:text-forest text-[10px] uppercase tracking-widest font-bold"
+                                                className="text-forest/40 hover:text-forest text-[10px] uppercase tracking-widest font-bold cursor-pointer"
                                             >
                                                 {lang === 'pt' ? 'Cancelar' : 'Cancel'}
                                             </button>
                                         </div>
+
+                                        {/* 1. REGION SELECTOR & ITEM RECALCULATION SUMMARY CARD */}
+                                        {(() => {
+                                            const rawPriceVal = getApprovedPrice(productTranslated.name);
+                                            const baseNum = typeof rawPriceVal === 'number' ? rawPriceVal : (parseFloat(String(rawPriceVal)) || 0);
+                                            const numericSubtotal = calculateItemPrice(productTranslated.name, baseNum, selections.quantidade, hasQuantity);
+                                            const directShippingFee = numericSubtotal >= 100 ? 0 : selectedShippingZone.price;
+                                            const directFinalTotal = numericSubtotal + directShippingFee;
+
+                                            const stockNum = (product as any).stock !== undefined && (product as any).stock !== null && (product as any).stock !== '' ? parseInt((product as any).stock, 10) : 0;
+                                            const craftingNum = (product as any).craftingTime !== undefined && (product as any).craftingTime !== null && (product as any).craftingTime !== '' ? parseInt((product as any).craftingTime, 10) : ((product as any).production_time ? parseInt((product as any).production_time, 10) : 10);
+                                            const itemLeadTime = stockNum > 0 ? 0 : craftingNum;
+
+                                            return (
+                                                <div className="bg-[#FAF7F2] border border-[#C5A059]/30 rounded-2xl p-4 space-y-3 shadow-sm font-sans">
+                                                    <div className="flex justify-between items-center gap-3 border-b border-forest/10 pb-2.5">
+                                                        <div className="flex items-center gap-3">
+                                                            <img 
+                                                                src={currentImg} 
+                                                                alt="" 
+                                                                className="w-12 h-12 rounded-lg object-cover border border-forest/10 shrink-0" 
+                                                            />
+                                                            <div>
+                                                                <span className="font-serif font-medium text-sm text-forest block">{productTranslated.name}</span>
+                                                                <span className="text-[10px] text-forest/50 uppercase tracking-wider">
+                                                                    {(colorType !== 'fixed' && selectedColor) ? `${translateColor(selectedColor, lang)} ` : ''}{hasSize && `| ${translateSize(selections.tamanho, lang)}`}
+                                                                </span>
+                                                            </div>
+                                                        </div>
+                                                        <span className="font-serif text-sm font-bold text-forest">{numericSubtotal.toFixed(2)}€</span>
+                                                    </div>
+
+                                                    {/* Region Selector Dropdown */}
+                                                    <div className="pt-1 flex justify-between items-center text-xs font-sans">
+                                                        <span className="text-[10px] uppercase tracking-wider text-forest/70 font-bold flex items-center gap-1">
+                                                            <MapPin size={12} className="text-[#C5A059]" />
+                                                            {lang === 'pt' ? 'Região de Envio' : 'Shipping Region'}:
+                                                        </span>
+                                                        <select
+                                                            value={selectedShippingZone.id}
+                                                            onChange={(e) => {
+                                                                const found = SHIPPING_ZONES.find((z) => z.id === e.target.value);
+                                                                if (found) setSelectedShippingZone(found);
+                                                            }}
+                                                            className="bg-white border border-forest/20 rounded-lg text-xs font-medium text-forest focus:outline-none cursor-pointer px-2.5 py-1 shadow-xs"
+                                                        >
+                                                            {SHIPPING_ZONES.map((zone) => (
+                                                                <option key={zone.id} value={zone.id} className="bg-[#FCFBF9] text-forest">
+                                                                    {zone.name[lang === 'pt' ? 'pt' : 'en']} ({numericSubtotal >= 100 && zone.id === 'PT' ? 'Cortesia 0.00€' : `${zone.price.toFixed(2)}€`})
+                                                                </option>
+                                                            ))}
+                                                        </select>
+                                                    </div>
+
+                                                    {/* Timelines Breakdown */}
+                                                    <div className="py-1.5 space-y-1 text-[10px] font-sans text-forest/70 border-t border-forest/5">
+                                                        <div className="flex justify-between items-center">
+                                                            <span className="text-forest/60">{lang === 'pt' ? 'Produção Manual:' : 'Handcrafted Production:'}</span>
+                                                            <span className="font-serif font-medium text-forest">
+                                                                {itemLeadTime === 0
+                                                                    ? (lang === 'pt' ? 'Disponível em Atelier' : 'Available in Atelier')
+                                                                    : (lang === 'pt' ? `${itemLeadTime} ${itemLeadTime === 1 ? 'dia útil' : 'dias úteis'}` : `${itemLeadTime} ${itemLeadTime === 1 ? 'business day' : 'business days'}`)}
+                                                            </span>
+                                                        </div>
+                                                        <div className="flex justify-between items-center">
+                                                            <span className="text-forest/60">{lang === 'pt' ? 'Envio Expresso (CTT):' : 'Express Shipping (CTT):'}</span>
+                                                            <span className="font-serif font-medium text-forest">
+                                                                {itemLeadTime === 0
+                                                                    ? (lang === 'pt' ? '1 a 3 dias úteis' : '1 to 3 business days')
+                                                                    : (lang === 'pt' ? '1 a 3 dias úteis (após produção)' : '1 to 3 business days (post-production)')}
+                                                            </span>
+                                                        </div>
+                                                    </div>
+
+                                                    <div className="flex justify-between items-baseline text-xs font-sans text-forest/70 border-t border-forest/5 pt-1">
+                                                        <span>{lang === 'pt' ? 'Portes de Envio CTT' : 'CTT Shipping Fee'}</span>
+                                                        <span className="font-serif font-medium text-forest">
+                                                            {directShippingFee === 0 ? (
+                                                                <span className="text-[#987834] uppercase text-[9px] tracking-wider font-bold bg-[#C5A059]/10 px-2 py-0.5 rounded-full">
+                                                                    {lang === 'pt' ? 'Cortesia M★BRAVO (0.00€)' : 'M★BRAVO Courtesy (0.00€)'}
+                                                                </span>
+                                                            ) : (
+                                                                `${directShippingFee.toFixed(2)}€`
+                                                            )}
+                                                        </span>
+                                                    </div>
+
+                                                    <div className="pt-1.5 border-t border-forest/10 flex justify-between items-baseline font-serif text-sm font-bold text-forest">
+                                                        <span>{lang === 'pt' ? 'Total Final com Envio' : 'Final Total with Shipping'}</span>
+                                                        <span className="text-base text-forest font-serif font-extrabold">{directFinalTotal.toFixed(2)}€</span>
+                                                    </div>
+                                                </div>
+                                            );
+                                        })()}
 
                                         {/* Inputs */}
                                         <div className="space-y-2.5">
@@ -6903,6 +7184,13 @@ const ProductDetailPage = ({ pathname }: { pathname: string }) => {
                                                     }
 
                                                     try {
+                                                        const rawPriceValPage = getApprovedPrice(productTranslated.name);
+                                                        const baseNumPage = typeof rawPriceValPage === 'number' ? rawPriceValPage : (parseFloat(String(rawPriceValPage)) || 0);
+                                                        const numericSubtotalPage = calculateItemPrice(productTranslated.name, baseNumPage, selections.quantidade, hasQuantity);
+                                                        const directShippingFeePage = numericSubtotalPage >= 100 ? 0 : selectedShippingZone.price;
+                                                        const totalPagePriceCalc = numericSubtotalPage + directShippingFeePage;
+                                                        const pageAmountInCents = Math.round(totalPagePriceCalc * 100);
+
                                                         const response = await fetch(`${API_BASE_URL}/api/payment/create-intent`, {
                                                             method: 'POST',
                                                             headers: { 'Content-Type': 'application/json' },
@@ -6910,12 +7198,14 @@ const ProductDetailPage = ({ pathname }: { pathname: string }) => {
                                                                 product: {
                                                                     id: productTranslated.id,
                                                                     name: productTranslated.name,
-                                                                    price: currentPrice
+                                                                    price: `${totalPagePriceCalc.toFixed(2)}€`
                                                                 },
                                                                 selections,
                                                                 checkoutForm,
                                                                 paymentMethod,
-                                                                amountInCents
+                                                                shippingFee: directShippingFeePage,
+                                                                shippingZone: selectedShippingZone,
+                                                                amountInCents: pageAmountInCents
                                                             })
                                                         });
 
@@ -7021,11 +7311,20 @@ const ProductDetailPage = ({ pathname }: { pathname: string }) => {
                                                         {lang === 'pt' ? 'A PROCESSAR...' : 'PROCESSING...'}
                                                     </span>
                                                 ) : (
-                                                    paymentMethod === 'mbway' 
-                                                        ? (lang === 'pt' ? `Pagar ${currentPrice} via MB WAY` : `Pay ${currentPrice} via MB WAY`)
-                                                        : paymentMethod === 'multibanco'
-                                                            ? (lang === 'pt' ? 'Gerar Referência Multibanco' : 'Generate Multibanco Reference')
-                                                            : (lang === 'pt' ? `Pagar ${currentPrice} com Cartão` : `Pay ${currentPrice} with Card`)
+                                                    (() => {
+                                                        const rawPriceValQuick = getApprovedPrice(productTranslated.name);
+                                                        const baseNumQuick = typeof rawPriceValQuick === 'number' ? rawPriceValQuick : (parseFloat(String(rawPriceValQuick)) || 0);
+                                                        const numericSubtotalQuick = calculateItemPrice(productTranslated.name, baseNumQuick, selections.quantidade, hasQuantity);
+                                                        const directShippingFeeQuick = numericSubtotalQuick >= 100 ? 0 : selectedShippingZone.price;
+                                                        const quickFinalTotal = numericSubtotalQuick + directShippingFeeQuick;
+                                                        const quickFinalPriceDisplay = `${quickFinalTotal.toFixed(2)}€`;
+
+                                                        return paymentMethod === 'mbway' 
+                                                            ? (lang === 'pt' ? `Pagar ${quickFinalPriceDisplay} via MB WAY` : `Pay ${quickFinalPriceDisplay} via MB WAY`)
+                                                            : paymentMethod === 'multibanco'
+                                                                ? (lang === 'pt' ? `Gerar Referência Multibanco (${quickFinalPriceDisplay})` : `Generate Multibanco Reference (${quickFinalPriceDisplay})`)
+                                                                : (lang === 'pt' ? `Pagar ${quickFinalPriceDisplay} com Cartão` : `Pay ${quickFinalPriceDisplay} with Card`);
+                                                    })()
                                                 )}
                                             </button>
                                         )}
@@ -7037,12 +7336,34 @@ const ProductDetailPage = ({ pathname }: { pathname: string }) => {
                         {/* Standalone CTAs Row (Pre-checkout) */}
                         {!isCheckingOut && (
                             <div className="flex flex-col gap-3 pt-2">
-                                {/* Buy Direct Simulator button */}
+                                {/* Primary CTA: Add to Cart */}
+                                <button
+                                    onClick={() => {
+                                        addToCart({
+                                            productId: productTranslated.id || productTranslated.name,
+                                            productName: productTranslated.name,
+                                            categoryName: translatedCategory,
+                                            img: productImages[0] || productTranslated.img || '',
+                                            unitPrice: calculatedPriceNum,
+                                            quantity: 1,
+                                            leadTimeDays: (productTranslated as any).tempoProducao ? parseInt((productTranslated as any).tempoProducao) || 3 : 3,
+                                            selections,
+                                            hasSize,
+                                            hasQuantity
+                                        });
+                                    }}
+                                    className="w-full rounded-full py-4 px-6 text-center text-xs uppercase tracking-widest font-bold bg-[#C5A059] text-[#343E2C] hover:bg-[#d5b069] transition-all cursor-pointer border border-[#C5A059]/20 shadow-lg shadow-[#C5A059]/15 flex items-center justify-center gap-2.5 focus:outline-none font-sans"
+                                >
+                                    <ShoppingBag size={16} />
+                                    <span>{lang === 'pt' ? 'Adicionar ao Carrinho' : 'Add to Cart'}</span>
+                                </button>
+
+                                {/* Secondary CTA: Direct Buy Now */}
                                 <button
                                     onClick={() => setIsCheckingOut(true)}
-                                    className="w-full rounded-full py-4 px-6 text-center text-xs uppercase tracking-widest font-bold bg-[#343E2C] text-[#C5A059] hover:bg-[#22291d] transition-all cursor-pointer border border-[#C5A059]/10 shadow-lg shadow-forest/10 focus:outline-none"
+                                    className="w-full rounded-full py-3.5 px-6 text-center text-xs uppercase tracking-widest font-bold bg-[#343E2C] text-[#FCFBF9] hover:bg-[#22291d] transition-all cursor-pointer border border-[#C5A059]/10 shadow-md shadow-forest/10 focus:outline-none font-sans"
                                 >
-                                    {lang === 'pt' ? 'Comprar Agora' : 'Buy Now'}
+                                    {lang === 'pt' ? 'Comprar Agora (Checkout Rápido)' : 'Buy Now (Instant Checkout)'}
                                 </button>
                                 
                                 {/* WhatsApp Button */}
@@ -7229,7 +7550,7 @@ const AdminPage = () => {
 
 // --- Main App ---
 
-export default function App() {
+function AppContent() {
   const [loading, setLoading] = useState(true);
   const [activeLegal, setActiveLegal] = useState<'envios' | 'privacidade' | 'termos' | null>(null);
   const [showAdmin, setShowAdmin] = useState(false);
@@ -7241,27 +7562,38 @@ export default function App() {
 
   // Dynamic catalog loader & seed trigger
   useEffect(() => {
-    const fetchCatalog = async () => {
-      try {
-        const response = await fetch(`${API_BASE_URL}/api/catalog`);
-        const data = await response.json();
-        if (data.success) {
-          if (data.empty) {
-            // Seed the server with our initial categories array
-            await fetch(`${API_BASE_URL}/api/admin/catalog/seed`, {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ categories: SHOP_CATEGORIES })
-            });
-          } else if (data.categories && data.categories.length > 0) {
-            // Override global SHOP_CATEGORIES array to sync dynamically
-            SHOP_CATEGORIES.length = 0;
-            SHOP_CATEGORIES.push(...data.categories);
-            setCatalogVersion(v => v + 1);
+    let isMounted = true;
+    const fetchCatalog = async (retries = 3, delayMs = 500) => {
+      for (let attempt = 1; attempt <= retries; attempt++) {
+        try {
+          const response = await fetch(`${API_BASE_URL}/api/catalog`);
+          if (!response.ok) throw new Error(`HTTP ${response.status}`);
+          const data = await response.json();
+          if (!isMounted) return;
+
+          if (data.success) {
+            if (data.empty) {
+              // Seed the server with our initial categories array
+              await fetch(`${API_BASE_URL}/api/admin/catalog/seed`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ categories: SHOP_CATEGORIES })
+              });
+            } else if (data.categories && data.categories.length > 0) {
+              // Override global SHOP_CATEGORIES array to sync dynamically
+              SHOP_CATEGORIES.length = 0;
+              SHOP_CATEGORIES.push(...data.categories);
+              setCatalogVersion(v => v + 1);
+            }
+          }
+          return; // Success
+        } catch (err) {
+          if (attempt === retries) {
+            console.warn("[CATALOG SYNC] Server catalog endpoint unavailable, using static fallback catalog.");
+          } else {
+            await new Promise(res => setTimeout(res, delayMs * attempt));
           }
         }
-      } catch (err) {
-        console.error("[CATALOG LOAD ERROR] Failed to fetch active catalog:", err);
       }
     };
     fetchCatalog();
@@ -7271,6 +7603,7 @@ export default function App() {
     };
     window.addEventListener('catalog-updated', handleCatalogUpdate);
     return () => {
+      isMounted = false;
       window.removeEventListener('catalog-updated', handleCatalogUpdate);
     };
   }, []);
@@ -7615,7 +7948,19 @@ export default function App() {
                     </motion.div>
                 )}
             </AnimatePresence>
+
+            {/* Atelier Cart Slide-Over Drawer & Multi-Item Checkout Modal */}
+            <AtelierCartDrawer />
+            <CartCheckoutModal />
       </main>
     </div>
+  );
+}
+
+export default function App() {
+  return (
+    <CartProvider>
+      <AppContent />
+    </CartProvider>
   );
 }
