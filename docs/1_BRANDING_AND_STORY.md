@@ -55,3 +55,9 @@ O site distingue-se por vários acabamentos visuais ricos que evocam o toque fí
     *   Utilização da biblioteca `motion` (de `motion/react`) para criar micro-interações elegantes.
     *   Classe `.transition-svg` para transições suaves de 1000ms com curvas cubic-bezier ao alterar estados de cor ou logótipos.
     *   Transições de suavização de scroll controladas pelo motor **Lenis Scroll** (`(window as any).lenis`) para garantir uma navegação fluida em desktop e mobile.
+5.  **Otimização do Hero e Imagens Principais (LCP & Acessibilidade):**
+    *   Substituição do `backgroundImage` CSS por uma tag `<img>` nativa no slider do Hero com os atributos `fetchPriority="high"`, `loading="eager"` e `decoding="async"`, garantindo a otimização direta do Largest Contentful Paint (LCP) em dispositivos móveis e desktop.
+    *   Acessibilidade e SEO aprimorados com descrições semânticas detalhadas na propriedade `alt` das imagens e conformidade com os critérios do Lighthouse (score de Acessibilidade 90+).
+6.  **Registo Oficial de Identidade de Marca (Variação de Estrelas):**
+    *   **Estrela Preenchida / Sólida ("★"):** Variação soberana e principal. Utilizada obrigatoriamente em SEO, tag `<title>`, Meta Tags, Open Graph, ícones de marca e cabeçalhos de marca (`M★BRAVO`).
+    *   **Estrela Contorno / Vazia ("☆"):** Variação estilística secundária. Utilizada em micro-detalhes de UI/UX, acabamentos decorativos no carrinho, detalhes de peças no catálogo e pontos de destaque visual.
