@@ -57,9 +57,13 @@ Respondendo às últimas solicitações de otimização de fluxo e consistência
 2.  **Contador de Itens Simplificado:**
     *   A expressão original *"X peças únicas"* que exibia o número de artigos da categoria foi considerada em desalinho com o tom premium e profissional pretendido.
     *   **Nova Expressão:** **"X Produtos"** (PT) e *"X Products"* (EN), mantendo o número dinâmico reativo aos filtros.
-3.  **Ajuste da Label do 2.º Seletor de Cor na African Flower Pouch:**
+3. **Ajuste da Label do 2.º Seletor de Cor na African Flower Pouch:**
     *   Ajustado de "COR DO CORDÃO" para "COR DO DETALHE" (ou rótulo configurado no catálogo), reservando "COR DO CORDÃO" unicamente a peças com fio/cordão (como Mini Pouches).
-4.  **Seleção Dinâmica de Produtos/Cores no Registo Manual de Encomendas & Abatimento de Stock Bicolor:**
+4.  **Otimização Nativa de Scroll e Lenis Isolation no Modal & Drawer de Checkout:**
+    *   **Atribuição do Atributo `data-lenis-prevent`:** Adicionado aos containers e wrappers de modais (`CartCheckoutModal.tsx`, `AtelierCartDrawer.tsx` e `App.tsx`) impedindo que o scroll global do Lenis interfira com o movimento interno das listas e formulários.
+    *   **Barra de Scroll Estética e Fluida M★BRAVO:** Substituídas as regras rígidas `scrollbar-thin` por uma scrollbar ultradelicada e responsiva em `index.css` (6px com thumb arredondado `#243119` a 18% de opacidade e transição para 40% em hover), mantendo a inércia tátil e scroll nativo suave em desktop e dispositivos móveis (`-webkit-overflow-scrolling: touch` e `overscroll-behavior: contain`).
+    *   **Purga de Dados Falsos e Placeholders Limpos:** Todos os formulários de checkout no site e na gaveta do carrinho foram sanitizados para exibir campos rigorosamente limpos com placeholders genéricos oficiais em Português e Inglês (ex: `"Nome completo do destinatário"`, `"nome@dominio.com"`, `"9xx xxx xxx"`, `"Morada completa de entrega"`, `"XXXX-XXX"` e `"Cidade / Localidade"`). Zero dados simulados ou pré-preenchidos.
+5.  **Seleção Dinâmica de Produtos/Cores no Registo Manual de Encomendas & Abatimento de Stock Bicolor:**
     *   Substituição de texto livre por dropdowns dinâmicos ligados ao catálogo e desmembramento automático do par de cores bicolores para abatimento proporcional no inventário de matérias-primas.
 5.  **Cópia Oculta (BCC) dos E-mails de Expedição para o Atelier:**
     *   Configurado em `src/lib/emailService.ts` o envio automático em BCC para `handmade.mbravo@gmail.com` e `encomendas@mbravobycarolina.com`.
@@ -67,6 +71,25 @@ Respondendo às últimas solicitações de otimização de fluxo e consistência
     *   Criado o endpoint `GET /api/admin/orders/:orderId/email-preview` no `server.ts` e integrada modal no `AdminDashboardModal.tsx` com renderização fidedigna em `<iframe>` e opção "Abrir em Nova Aba".
 7.  **Modalidade "Entrega em Mão / Concluído":**
     *   Adicionado o botão "Entrega em Mão" no painel administrativo para encomendas "No Atelier", permitindo transitar para "Entregue" sem exigir código CTT.
+
+8.  **Reestruturação Visual do Checkout e Carrinho em Mobile/Tablet ("Full-Screen / Bottom Sheet Luxury Standard"):**
+    *   **Reformulação Completa do `CartCheckoutModal.tsx` & `AtelierCartDrawer.tsx`:** Substituídos os modais flutuantes cortados por um layout *Slide-up Bottom Sheet* de luxo que ocupa 100% da largura do ecrã e ~92% da altura em dispositivos móveis e tablets (`h-[92dvh] rounded-t-[28px] md:rounded-none md:w-[420px]`).
+    *   **Header Fixo (Sticky Header) com Barra Indicadora de Arraste:** Título da encomenda, indicador visual de marca M★BRAVO e botão de fechar (X) fixos e acessíveis no topo com pega de toque (`drag indicator handle`).
+    *   **Corpo com Scroll Nativo e Inércia Tátil Livre:** Conteúdo interno isolado com o atributo `data-lenis-prevent` e classe `touch-pan-y`, garantindo que o scroll de toque de produtos e formulários flui naturalmente sem travar nem acionar o scroll do corpo da página.
+    *   **Footer Fixo (Sticky Footer CTA):** Resumo financeiro, seletor de portes e o botão principal de ação (*"Concluir Encomenda • 71.30€"*) permanecem fixos e imediatamente acessíveis pelo polegar no fundo do ecrã.
+    *   **Limpeza Tipográfica & Espaçamentos Editoriais:** Inputs com peso visual suavizado, sombras suaves, bordas delutadas em verde floresta (#243119/10) e ecrã de sucesso responsivo com botões fáceis de tocar.
+    *   **Unificação Absoluta do Componente de Pagamento da Loja (`CartCheckoutModal.tsx`):** Eliminada a duplicidade de interfaces entre o botão "Comprar Agora" do produto e o checkout do carrinho. O "Comprar Agora" adiciona o produto e abre de imediato o `CartCheckoutModal.tsx` oficial. Toda a loja opera agora sob uma única e sofisticada interface de checkout Slide-Up Bottom Sheet com Header fixo e Sticky Footer de pagamento.
+    *   **Conformidade de Marca (Apple Pay / Google Pay Brand Guidelines), Deteção Dinâmica de Ecossistema e Adaptabilidade Landscape (`CartCheckoutModal.tsx`):** Integração rigorosa dos vetores oficiais e padrões de marca Apple Pay e Google Pay em fundo preto luxo sem texto secundário. Implementada deteção dinâmica de ecossistema (`isApple` vs `isAndroid`) para renderizar os botões relevantes por dispositivo, isolamento estrito de eventos (`e.stopPropagation()` com `activeExpressWallet`) impedindo reações visuais cruzadas, e adaptabilidade fluida a orientação horizontal (`landscape:h-[95dvh]`, paddings ajustados e travamento de corte em ecrãs com baixa altura vertical).
+    *   **Validação Inteligente e Sugestão de Correção de E-mail:** Inclusão de verificação de erros ortográficos comuns em domínios de e-mail (ex: `gmai.com` -> `gmail.com`) com sugestão interativa de correção automática de 1-clique.
+    *   **Injeção de Google Avaliações do Consumidor (Merchant Center Opt-in) & Link Oficial (`CartCheckoutModal.tsx` & `App.tsx`):** Injeção do script oficial do Google Customer Reviews no ecrã de confirmação de encomenda (Thank You Page) com script de Opt-in do Merchant Center (ID: `535728392`) e cartão interativo com 5 estrelas douradas direcionado para o link oficial de avaliação Google Maps (`https://g.page/r/Cdo7JGP_Xpc3EBM/review`).
+    *   **Sitelinks e SEO de Luxo (`index.html`):** Atualizada a tag `<title>` para `M★BRAVO | Handmade With Love` e refinadas as meta tags e Schema.org com a estrela oficial "M★BRAVO" para otimização de Sitelinks e autoridade de marca no Google.
+    *   **Registo Oficial da Identidade de Marca (Variações de Estrelas):** Documentado oficialmente que a marca utiliza a Estrela Preenchida ("★") como variação soberana para SEO, `<title>`, Meta Tags e Og Tags, e a Estrela Contorno ("☆") como variação estilística secundária para detalhes de UI/UX e catálogo.
+    *   **Ajuste do Checkout Expresso (Apple Pay & Google Pay SVGs) & Suporte Landscape:** Corrigidos os viewBoxes dos SVGs das carteiras digitais (Apple Pay: `viewBox="0 0 220 80"`, Google Pay: `viewBox="0 0 82 28"`), eliminando qualquer corte de texto ou distorção. Implementado suporte responsivo avançado para orientação horizontal (mobile landscape) no `CartCheckoutModal.tsx` e `AtelierCartDrawer.tsx` com botões de fechar (X) e rodapés acionáveis sempre fixos e acessíveis (`shrink-0 z-30`).
+    *   **Isolamento Total via React Portal (`createPortal`):** `CartCheckoutModal.tsx` e `AtelierCartDrawer.tsx` renderizados exclusivamente no nó raiz do DOM (`document.body`), garantindo isolamento total de stacking context e eliminando interrupções visuais ou de scroll.
+    *   **Gestão Mutuamente Exclusiva de Modais & Body Scroll Lock:** `CartContext.tsx` garante que apenas um modal exista no viewport por vez, bloqueando ativamente o scroll do corpo da página (`document.body.style.overflow = 'hidden'`) enquanto o checkout/carrinho está ativo.
+    *   **Arquitetura Flex-Layout Adaptável (Landscape & Dispositivos Móveis):** Estrutura vertical rígida em Flexbox (`h-full max-h-[92dvh] landscape:max-h-[95dvh]`) com Header fixo (`shrink-0`), Corpo de formulário com scroll isolado (`flex-1 min-h-0 overflow-y-auto touch-pan-y`) e Footer fixo (`shrink-0`).
+    *   **Padronização do Bloco do Botão Expresso:** Container rígido flexível (`w-full h-12 bg-black rounded-lg flex items-center justify-center`) com SVG nativo centralizado (`h-6 w-auto`), sem distorções de aspeto em qualquer ecrã.
+    *   **Purga de Formulários Inline de Faturação:** Removida qualquer interface de faturação inline no `ProductModal` (`App.tsx`), consolidando toda a experiência de compra no portal unificado do `CartCheckoutModal.tsx`.
 
 ---
 
@@ -118,6 +141,12 @@ Respondendo às últimas solicitações de otimização de fluxo e consistência
         *   Criação do **Seletor Inteligente de Cores no CMS do Catálogo**: substituição do input de texto livre por badges interativos dinâmicos com contagem de stock em tempo real de novelos Safran e Paris, botões de atalho ("Selecionar Todas", "Limpar") e campo de edição direta, garantindo alinhamento perfeito de 100% no abatimento automático de stock do Atelier.
     14. **Miniaturas de Amostras Visuais (Swatches 28x28px & 20x20px) extraídas da Encomenda #18241 (`AdminDashboardModal.tsx`):**
         *   Integração do componente `YarnSwatch` e tabela de mapeamento de cores exatas (`YARN_COLOR_MAP`) com os tons e texturas autênticos extraídos diretamente do PDF da Encomenda #18241 do Armazém das Manualidades.
+    15. **Correção Crítica do Fluxo do Carrinho, Totais com Portes em "Comprar Agora", Responsividade Mobile e Ajuste de Copy:**
+        *   **Fluxo Completo "Concluir Encomenda":** O botão de ação no Atelier Cart Drawer abre de forma fluida o modal de Checkout (`CartCheckoutModal.tsx`), apresentando o formulário completo de dados de envio, morada e seleção de pagamentos (MB WAY, Cartão Stripe, Multibanco) com o resumo do pedido e portes por região sempre visíveis.
+        *   **Sincronização do Total no "Comprar Agora" (Checkout Rápido):** Corrigido o cálculo e injeção do valor total recalculado (subtotal + portes da região selecionada, ex: 67,00€ + 4,30€ = 71,30€) no botão verde de pagamento e em todos os seletores de método (`MB WAY`, `Cartão`, `Multibanco`), garantindo que o valor cobrado e processado no Stripe/backend é rigorosamente o valor final correto.
+        *   **Restauração da UI Editorial Mobile/Tablet & Remoção do Blur Exagerado:** Removido o filtro de blur escuro denso do fundo, substituído por um overlay translúcido discreto e limpo (`bg-forest/20`). Reconfigurado o container móvel (`max-h-[88dvh]`, `min-h-0`, `touch-pan-y`) para garantir scroll tátil nativo suave sem bloqueios de ecrã ou botões cortados em qualquer resolução.
+        *   **Ajuste de Copy Editorial:** Atualizada a frase do balão promocional no carrinho de "Portes fixos para a sua seleção" para **"Portes fixos para a sua encomenda"**.
+        *   **Garantia de Não-Regressão de Pagamentos e E-mails:** Mantidas operacionais a 100% todas as integrações de pagamento e os disparos assíncronos de e-mails de confirmação.
         *   **Tabela de Stock de Matérias-Primas**: exibe amostragem visual de 28x28px (`w-7 h-7`) com cantos arredondados, gradiente e textura tátil de fio ao lado de cada referência (ex: `[Swatch Visual] Ref. 18 - Natural`).
         *   **CMS de Edição de Produtos**: exibe amostragem miniatura discreta de 20x20px (`w-5 h-5`) dentro de cada badge interativo de seleção de cor, mantendo a janela do CMS limpa, legível e altamente funcional.
     15. **Consolidação de Ficheiros JSON em `/app/data/` & Lógica de Smart Upsert no Boot (`server.ts`):**
@@ -231,6 +260,24 @@ Respondendo às últimas solicitações de otimização de fluxo e consistência
         *   **Sincronização Automática e Imutável no Feed Google Merchant Center**: Integrada a atualização automática e persistência em `/catalog.json` e no endpoint XML (`/feed.xml` e `/api/v1/products/feed.xml`), garantindo que o Google Merchant Center consome instantaneamente os novos preços sem erros ou discrepâncias.
     40. **Correção do Erro de Referência em `ProductDetailPage` (`src/App.tsx`):**
         *   **Resolução do Crash na Rota `/produtos/:slug`**: Restaurada a variável `qtyMultiplier` no componente `ProductDetailPage`, corrigindo o `ReferenceError` que provocava a tela verde sem renderização de fotos, detalhes ou botões de compra ao aceder à página individual de um produto.
+    41. **Fase 5 — Arquitetura de Carrinho de Compras & Atelier Slide-Over Drawer (Redesign Editorial de Luxo & Alta Cordoaria):**
+        *   **Vocabulário Editorial Estrito (PT-PT Puro)**: Purga total de vocabulário industrial ou descontextualizado ("confeção", "aditamento", "SELECCIONADAS"). Adoção exclusiva da linguagem nobre de alta moda: "Saco de Compras", "A sua Seleção", "Produção Artesanal / Feito à Mão", "Envio Estimado" e "Atelier M★BRAVO".
+        *   **Atelier Slide-Over Drawer Redesenhado (`src/components/AtelierCartDrawer.tsx`)**: Painel lateral esguio e elegante (máx. 390px no desktop), fundo contínuo `#FCFBF9` sem caixas/quadrados aninhados pesados, divisores filiformes de 1px, tipografia serifada leve com letter-spacing amplo, e substituição da grelha pesada por um seletor de região minimalista e discreto em linha única.
+        *   **Preservação do Fundo & Atmosfera do Atelier**: Transparência suave (`bg-forest/20`) sem desfoques opacos agressivos, permitindo que o cliente continue a sentir o ambiente e as fotos do site enquanto consulta o saco de compras.
+        *   **Arquitetura Flexbox Sem Scroll Duplo**: Cabeçalho e rodapé cravados (topo e fundo), com área central de produtos fluida e barra de scroll nativa oculta (`no-scrollbar`).
+        *   **Proporções Delicadas de Botões & Stepper**: Botão de finalização "Finalizar Encomenda" e ajustadores de quantidade redesenhados com escala e acolchoamento delicados e harmoniosos.
+        *   **Modal de Checkout Multi-Item (`src/components/CartCheckoutModal.tsx`)**: Interface de fecho de encomenda coesa, com terminologia editorial nobre, formulário otimizado para ecrãs táteis e integração direta com a API de pagamentos.
+    42. **Seletor Discreto de Região no Topo dos Formulários & Transparência do "Comprar Agora" (`src/components/CartCheckoutModal.tsx` e `src/App.tsx`):**
+        *   **Transparência Total no Checkout Rápido "Comprar Agora"**: Integrado o seletor discreto de região de envio no topo do cartão de resumo antes dos dados do cliente e opções de pagamento, exibindo o custo exato do frete (ou "Gratuito" para pedidos >=100€) e o Total Final recalculado em tempo real.
+        *   **Modal de Checkout Global Reforçada (`CartCheckoutModal.tsx`)**: Integrado o mesmo seletor discreto de região no topo do resumo da encomenda no modal de checkout do carrinho, permitindo ao cliente alterar a região de destino e ver instantaneamente o valor total ajustado antes da confirmação do pagamento.
+        *   **Lógica de Incentivo de Portes Grátis (100€)**: Sincronização em tempo real do estado `isFreeShipping` e cálculo dinâmico do montante em falta para frete grátis no carrinho global e checkout individual.
+    43. **Correção do Erro de Referência em `CartContext` (`src/context/CartContext.tsx`):**
+        *   **Resolução do `ReferenceError: Cannot access 'subtotal' before initialization`**: Reordenada a inicialização de variáveis no `CartContext`, calculando o `subtotal` previamente antes de determinar a elegibilidade a portes grátis (`isFreeShipping` e `amountNeededForFreeShipping`), eliminando a exceção em tempo de execução ao carregar a aplicação.
+    44. **Ajustes de Usabilidade Responsiva (100dvh), Tom de Marca M★BRAVO e Prazos Transparentes (`AtelierCartDrawer.tsx`, `CartCheckoutModal.tsx`, `App.tsx`):**
+        *   **Responsividade Dinâmica 100dvh & Landscape**: Transição para `h-[100dvh] max-h-[100dvh]` no gaveto/drawer e `max-h-[92dvh]` no modal, garantindo cabeçalhos e botões de fecho/checkout 100% fixos (`shrink-0`) em qualquer ecrã/orientação com scroll exclusivo na área central.
+        *   **Tom de Marca M★BRAVO Touch**: Atualização do incentivo de portes para *"Faltam [X]€ para usufruir de Envio Cortesia M★BRAVO"* e *"Parabéns, a sua encomenda beneficia de Envio Cortesia M★BRAVO"*.
+        *   **Separação Clara de Prazos (Produção vs Envio)**: Purga total da palavra "Confeção" e discriminação transparente e nobre: *"Produção Manual: 10 a 15 dias úteis"* e *"Envio Expresso (CTT): 1 a 3 dias úteis (após produção)"*.
+        *   **Confirmação do Seletor no "Comprar Agora"**: Reafirmação do seletor discreto de região de envio no topo da mini-card de resumo do checkout rápido, recalculando em tempo real o valor do frete e o total final.
 
 ---
 
@@ -243,12 +290,15 @@ Para que o repositório no GitHub fique 100% sincronizado com a versão final de
 2. **`src/lib/emailService.ts`** (Templates de e-mail de luxo limpos, `formatPhoneReadable`, especificações dinâmicas de produto)
 
 ### B. Interface Frontend
-3. **`src/components/AdminDashboardModal.tsx`** (Máscara `formatPhoneReadable`, auto-código postal, purga de termos sandbox, CRM Instagram limpo, ações de cancelamento e eliminação)
-4. **`src/App.tsx`** (Checkout com validações limpas, remoção de rótulos sandbox nos botões de pagamento, tratamento condicional de tamanhos `hasSize`)
-5. **`src/translations.ts`** (Dicionário bilíngue PT/EN higienizado e livre de termos de sandbox)
-6. **`vite.config.ts`** (Code-splitting e estratégia de bundling estável)
-7. **`index.html`** (Preload de imagens WebP e otimizações LCP)
-8. **`src/index.css`** (Aceleração GPU e regras WebKit iOS)
+3. **`src/context/CartContext.tsx`** (Gestão de estado global de carrinho multi-peça com persistência em localStorage)
+4. **`src/components/AtelierCartDrawer.tsx`** (Gaveta deslizante Slide-Over de luxo com seletor de região minimalista e tom editorial)
+5. **`src/components/CartCheckoutModal.tsx`** (Modal de checkout multi-item com integração Stripe e opções de pagamento)
+6. **`src/components/AdminDashboardModal.tsx`** (Máscara `formatPhoneReadable`, auto-código postal, purga de termos sandbox, CRM Instagram limpo, ações de cancelamento e eliminação)
+7. **`src/App.tsx`** (Checkout com validações limpas, remoção de rótulos sandbox nos botões de pagamento, tratamento condicional de tamanhos `hasSize`, integração de botões Adicionar ao Carrinho + Comprar Agora)
+8. **`src/translations.ts`** (Dicionário bilíngue PT/EN higienizado e livre de termos de sandbox)
+9. **`vite.config.ts`** (Code-splitting e estratégia de bundling estável)
+10. **`index.html`** (Preload de imagens WebP e otimizações LCP)
+11. **`src/index.css`** (Aceleração GPU e regras WebKit iOS)
 
 ### C. Documentação Técnica (`/docs`)
 9. **`docs/2_ARCHITECTURE_AND_ADMIN.md`** (Arquitetura atualizada: boot Read-Only, validação estrita, formatação de telemóvel, e-mails de luxo e CRM)
@@ -256,6 +306,15 @@ Para que o repositório no GitHub fique 100% sincronizado com a versão final de
 11. **`docs/5_FUTURE_ROADMAP.md`** (Roteiro futuro de infraestrutura, backups automatizados e observabilidade)
 
 ---
+
+*   [x] **Refatoração Integral do Modal e Drawer do Carrinho (100dvh, Layout Fixo & Prazos Dinâmicos):**
+    *   **Layout Fixo Mobile/Landscape (100dvh):** O modal do carrinho (`AtelierCartDrawer.tsx` e `CartCheckoutModal.tsx`) passou a utilizar altura dinâmica `100dvh` e `max-h-[100dvh]` com cabeçalho (`shrink-0`) e rodapé (`shrink-0`) 100% fixos e travados no ecrã. O scroll é exclusivamente interno na lista central de artigos, prevenindo cortes do botão de fechar e dados de pagamento em telemóveis e tablets na horizontal/landscape.
+    *   **Prazos Dinâmicos de Produção (Zero Hardcode):** Eliminados todos os textos estáticos "10 a 15 dias úteis". Os tempos de produção são lidos dinamicamente dos dados de cada peça (`product.stock` e `product.craftingTime` / `leadTimeDays` / `production_time`). Se o artigo tem stock em atelier (`leadTimeDays === 0`), exibe *"Disponível em Atelier"* + *"Envio Expresso (CTT): 1 a 3 dias úteis"*. Caso contrário, exibe *"Produção Manual: [X] dias úteis"* + *"Envio Expresso (CTT): 1 a 3 dias úteis (após produção)"*. No carrinho com múltiplos artigos, o prazo global assume automaticamente o valor máximo do lote (`maxLeadTimeDays`).
+    *   **Transparência de Portes no Checkout Rápido ("Comprar Agora"):** O seletor discreto de região de envio surge no topo do resumo do checkout rápido em `App.tsx` antes dos campos de faturação, calculando os portes e exibindo o total final transparente antes do preenchimento de dados de envio ou pagamento.
+    *   **Linguagem Editorial e Vocabulário de Luxo M★BRAVO:**
+        *   Título do Drawer atualizado de "A sua Seleção" para **"A sua Encomenda"**.
+        *   Incentivo de envio grátis padronizado como **"Faltam [X]€ para usufruir de Envio Cortesia M★BRAVO"** e **"Parabéns, a sua encomenda beneficia de Envio Cortesia M★BRAVO"**.
+        *   Limpeza integral de termos industriais e eliminação de grafias antigas ("Confeção" $\rightarrow$ "Produção Manual", "Selecção" $\rightarrow$ "Encomenda").
 
 ## 4. Próximos Passos Recomendados & Roteiro de Otimização Mobile
 
