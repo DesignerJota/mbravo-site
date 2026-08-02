@@ -462,9 +462,9 @@ Com fecho ajustável em cordão e um acabamento delicado handmade, é perfeito p
         id: 'b2_sling', 
         name: 'Granny Square Sling Bag', 
         price: calculateProductRange('Granny Square Sling Bag'), 
-        img: 'https://i.ibb.co/wNdC8NNG/Granny-square-sling-bag-20.png',
+        img: 'https://i.ibb.co/LzNKxCQR/Granny-square-sling-bag-20.png',
         images: [
-          'https://i.ibb.co/wNdC8NNG/Granny-square-sling-bag-20.png',
+          'https://i.ibb.co/LzNKxCQR/Granny-square-sling-bag-20.png',
           'https://i.ibb.co/1t3HW02t/Granny-square-sling-bag-12.png',
           'https://i.ibb.co/JjC82Njj/Granny-square-sling-bag-13.png',
           'https://i.ibb.co/Df0JxNDd/Granny-square-sling-bag-14.png'
