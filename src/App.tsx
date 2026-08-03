@@ -2624,28 +2624,28 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({ product: rawProduct,
                     requestPayerPhone: true,
                     requestShipping: true, // Native sheet autofills address from Apple Wallet / Google Pay
                     shippingOptions: [
-                        {
-                            id: 'pt-mainland',
-                            label: lang === 'en' ? 'Portugal (Mainland & Islands)' : 'Portugal (Continental e Ilhas)',
-                            detail: lang === 'en' ? 'Handcrafted Production + CTT Express (1 to 3 business days)' : 'Produção Artesanal + Envio CTT (1 a 3 dias úteis)',
-                            amount: 0
-                        }
-                    ]
-                });
+      {
+        id: 'pt-mainland',
+        label: String(typeof lang === 'object' ? (lang as any)?.code || 'pt' : lang).toLowerCase() === 'en' ? 'Portugal (Mainland & Islands)' : 'Portugal (Continental e Ilhas)',
+        detail: String(typeof lang === 'object' ? (lang as any)?.code || 'pt' : lang).toLowerCase() === 'en' ? 'Handcrafted Production + CTT Express (1 to 3 business days)' : 'Produção Artesanal + Envio CTT (1 a 3 dias úteis)',
+        amount: 0
+      }
+    ]
+  });
 
-                paymentRequest.on('shippingaddresschange', (ev) => {
-                    ev.updateWith({
-                        status: 'success',
-                        shippingOptions: [
-                            {
-                                id: 'pt-mainland',
-                                label: lang === 'en' ? 'Portugal (Mainland & Islands)' : 'Portugal (Continental e Ilhas)',
-                                detail: lang === 'en' ? 'Handcrafted Production + CTT Express (1 to 3 business days)' : 'Produção Artesanal + Envio CTT (1 a 3 dias úteis)',
-                                amount: 0
-                            }
-                        ]
-                    });
-                });
+  paymentRequest.on('shippingaddresschange', (ev) => {
+    ev.updateWith({
+      status: 'success',
+      shippingOptions: [
+        {
+          id: 'pt-mainland',
+          label: String(typeof lang === 'object' ? (lang as any)?.code || 'pt' : lang).toLowerCase() === 'en' ? 'Portugal (Mainland & Islands)' : 'Portugal (Continental e Ilhas)',
+          detail: String(typeof lang === 'object' ? (lang as any)?.code || 'pt' : lang).toLowerCase() === 'en' ? 'Handcrafted Production + CTT Express (1 to 3 business days)' : 'Produção Artesanal + Envio CTT (1 a 3 dias úteis)',
+          amount: 0
+        }
+      ]
+    });
+  });
 
                 const result = await paymentRequest.canMakePayment();
                 if (result && active) {
