@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'motion/react';
+import { loadStripe, Stripe, PaymentRequest } from '@stripe/stripe-js';
 import { 
   X, Plus, Minus, Trash2, ArrowRight, ArrowLeft, MapPin, Sparkles, 
   ShieldCheck, CheckCircle2, Lock, CreditCard, Phone, Building, AlertTriangle,
@@ -103,6 +104,11 @@ export const AtelierCartDrawer: React.FC = () => {
     cardCvv: ''
   });
 
+  // Stripe & Wallet Refs for Native Payment Sheet
+  const stripeRef = useRef<Stripe | null>(null);
+  const paymentRequestRef = useRef<PaymentRequest | null>(null);
+  const walletTypeRef = useRef<'Apple Pay' | 'Google Pay'>('Apple Pay');
+
   // Strict Ecosystem Detection: Apple Ecosystem -> ONLY Apple Pay | Android/Chrome/Windows -> ONLY Google Pay
   const [detectedEcosystem, setDetectedEcosystem] = useState<'apple' | 'google'>('google');
 
@@ -119,7 +125,7 @@ export const AtelierCartDrawer: React.FC = () => {
   useEffect(() => {
     if (typeof window !== 'undefined') {
       const ua = window.navigator.userAgent.toLowerCase();
-      const isAppleDevice = /iphone|ipad|ipod|macintosh/.test(ua) || (window.ApplePaySession && window.ApplePaySession.canMakePayments());
+      const isAppleDevice = /iphone|ipad|ipod|macintosh/.test(ua) || (typeof (window as any).ApplePaySession !== 'undefined' && (window as any).ApplePaySession.canMakePayments());
       
       if (isAppleDevice) {
         setDetectedEcosystem('apple');
@@ -128,6 +134,195 @@ export const AtelierCartDrawer: React.FC = () => {
       }
     }
   }, []);
+
+  // Initialize and maintain Stripe Payment Request for Native Sheet (Apple/Google Pay)
+  useEffect(() => {
+    let isMounted = true;
+    const stripePubKey = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY || '';
+    if (!stripePubKey || !isOpen) return;
+
+    loadStripe(stripePubKey).then((stripe) => {
+      if (!stripe || !isMounted) return;
+      stripeRef.current = stripe;
+
+      const totalInCents = Math.round((totalPrice + shippingFee) * 100);
+      if (totalInCents <= 0) return;
+
+      const dynamicShippingLabel = lang === 'en'
+        ? (selectedShippingZone?.id === 'pt-islands' ? 'Portugal (Islands)' : selectedShippingZone?.id === 'eu' ? 'European Union' : 'Portugal (Mainland & Islands)')
+        : (selectedShippingZone?.name || 'Portugal (Continental e Ilhas)');
+
+      const dynamicShippingDetail = lang === 'en'
+        ? 'Handcrafted Production + CTT Express (1 to 3 business days)'
+        : 'Produção Artesanal + Envio CTT (1 a 3 dias úteis)';
+
+      const pr = stripe.paymentRequest({
+        country: 'PT',
+        currency: 'eur',
+        total: {
+          label: 'M★BRAVO Atelier',
+          amount: totalInCents,
+        },
+        requestPayerName: true,
+        requestPayerEmail: true,
+        requestPayerPhone: true,
+        requestShipping: true, // Native sheet autofills shipping address from Apple Wallet / Google Pay
+        shippingOptions: [
+          {
+            id: selectedShippingZone?.id || 'pt-mainland',
+            label: dynamicShippingLabel,
+            detail: dynamicShippingDetail,
+            amount: Math.round((shippingFee || 0) * 100)
+          }
+        ]
+      });
+
+      pr.canMakePayment().then((result) => {
+        if (result && isMounted) {
+          paymentRequestRef.current = pr;
+        }
+      });
+
+      pr.on('shippingaddresschange', (ev) => {
+        ev.updateWith({
+          status: 'success',
+          shippingOptions: [
+            {
+              id: selectedShippingZone?.id || 'pt-mainland',
+              label: dynamicShippingLabel,
+              detail: dynamicShippingDetail,
+              amount: Math.round((shippingFee || 0) * 100)
+            }
+          ]
+        });
+      });
+
+      pr.on('paymentmethod', async (ev) => {
+        console.log('[STRIPE WALLET NATIVE AUTHORIZED]', ev);
+        
+        const shipping = ev.shippingAddress || {};
+        const payerName = ev.payerName || shipping.recipient || checkoutForm.nome || 'Cliente Carteira Digital';
+        const payerEmail = ev.payerEmail || checkoutForm.email || 'encomendas@mbravobycarolina.com';
+        const payerPhone = ev.payerPhone || checkoutForm.telefone || '';
+
+        const addressLines = Array.isArray(shipping.addressLine)
+          ? shipping.addressLine.filter(Boolean).join(', ')
+          : (shipping.addressLine || checkoutForm.morada || 'Morada Registada na Carteira Digital');
+
+        const expressCustomer = {
+          nome: payerName,
+          email: payerEmail,
+          telefone: payerPhone,
+          morada: addressLines,
+          codigoPostal: shipping.postalCode || checkoutForm.codigoPostal || '1000-001',
+          cidade: shipping.city || checkoutForm.cidade || 'Lisboa',
+          pais: shipping.country || 'PT',
+          nif: checkoutForm.nif || '',
+          mbwayPhone: '',
+          cardNumber: '',
+          cardName: '',
+          cardExpiry: '',
+          cardCvv: ''
+        };
+
+        setIsPaying(true);
+        setErrorMessage('');
+
+        try {
+          const response = await fetch(`${API_BASE_URL}/api/payment/create-intent`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              cart,
+              items: cart,
+              product: {
+                name: cart.map(i => `${i.productName} (x${i.quantity})`).join(', '),
+                price: totalPrice
+              },
+              selections: {
+                cor: cart.map(i => i.selections?.cor || '').filter(Boolean).join(' | '),
+                quantidade: `${cart.reduce((s, i) => s + i.quantity, 0)}`
+              },
+              shippingFee,
+              shippingZone: selectedShippingZone,
+              amountInCents: totalInCents,
+              checkoutForm: expressCustomer,
+              paymentMethod: 'wallet',
+              walletType: walletTypeRef.current
+            })
+          });
+
+          const data = await response.json();
+          if (!response.ok || data.error) {
+            ev.complete('fail');
+            throw new Error(data.error || (isPt ? 'Erro ao processar intenção de pagamento no Stripe.' : 'Error creating payment intent in Stripe.'));
+          }
+
+          if (data.stripeClientSecret && stripeRef.current) {
+            const { paymentIntent, error: confirmError } = await stripeRef.current.confirmCardPayment(
+              data.stripeClientSecret,
+              { payment_method: ev.paymentMethod.id },
+              { handleActions: false }
+            );
+
+            if (confirmError) {
+              ev.complete('fail');
+              throw new Error(confirmError.message || (isPt ? 'Recusado pela entidade bancária.' : 'Bank declined transaction.'));
+            }
+
+            if (paymentIntent && paymentIntent.status === 'succeeded') {
+              ev.complete('success'); // Native green checkmark animation!
+
+              // Trigger webhook & email confirmations
+              await fetch(`${API_BASE_URL}/api/payment/webhook`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  orderId: data.orderId,
+                  event: 'payment_intent.succeeded'
+                })
+              });
+
+              setCompletedOrder(data.order || {
+                orderId: data.orderId,
+                total: totalPrice + shippingFee,
+                customer: expressCustomer,
+                shippingZone: selectedShippingZone,
+                paymentMethod: `wallet (${walletTypeRef.current})`
+              });
+              clearCart();
+              setStep('checkout');
+            } else {
+              ev.complete('fail');
+              throw new Error(isPt ? 'A transação não pôde ser completada.' : 'Transaction could not be completed.');
+            }
+          } else {
+            // Simulated/test fallback
+            ev.complete('success');
+            setCompletedOrder(data.order || {
+              orderId: data.orderId || `MB-${Math.floor(100000 + Math.random() * 900000)}`,
+              total: totalPrice + shippingFee,
+              customer: expressCustomer,
+              shippingZone: selectedShippingZone,
+              paymentMethod: `wallet (${walletTypeRef.current})`
+            });
+            clearCart();
+            setStep('checkout');
+          }
+        } catch (err: any) {
+          console.error('[STRIPE WALLET PROCESS ERROR]', err);
+          setErrorMessage(err.message || (isPt ? 'Erro ao autorizar pagamento por carteira digital.' : 'Digital wallet authorization error.'));
+        } finally {
+          setIsPaying(false);
+          setActiveExpressWallet(null);
+        }
+      });
+    });
+
+    return () => {
+      isMounted = false;
+    };
+  }, [totalPrice, shippingFee, selectedShippingZone, cart, isOpen]);
 
   if (!isOpen || typeof window === 'undefined') return null;
 
@@ -180,86 +375,224 @@ export const AtelierCartDrawer: React.FC = () => {
     (paymentMethod !== 'mbway' || checkoutForm.mbwayPhone.replace(/\D/g, '').length >= 9 || checkoutForm.telefone.replace(/\D/g, '').length >= 9) &&
     (paymentMethod !== 'card' || (checkoutForm.cardNumber.replace(/\D/g, '').length >= 15 && checkoutForm.cardExpiry && checkoutForm.cardCvv));
 
-  // Express Checkout Payment Handler
+  // Express Checkout Payment Handler - Invokes Native OS Payment Sheet (Apple Pay / Google Pay)
   const handleExpressWalletPay = async (e: React.MouseEvent, walletType: 'Apple Pay' | 'Google Pay') => {
     e.preventDefault();
     e.stopPropagation();
 
     if (isPaying) return;
     const targetWalletKey = walletType === 'Apple Pay' ? 'applepay' : 'googlepay';
-    
-    setIsPaying(true);
+    walletTypeRef.current = walletType;
     setActiveExpressWallet(targetWalletKey);
     setErrorMessage('');
     setPaymentMethod('wallet');
 
-    const expressForm = {
-      nome: checkoutForm.nome.trim() || `Cliente ${walletType}`,
-      email: isValidEmail(checkoutForm.email) ? checkoutForm.email : `express.${walletType.toLowerCase().replace(/\s+/g, '')}@mbravo.pt`,
-      telefone: checkoutForm.telefone || '910000000',
-      morada: checkoutForm.morada.trim() || 'Morada Registada na Carteira Digital',
-      codigoPostal: checkoutForm.codigoPostal || '1000-001',
-      cidade: checkoutForm.cidade || 'Lisboa',
-      nif: checkoutForm.nif || '',
-      mbwayPhone: '',
-      cardNumber: '',
-      cardName: '',
-      cardExpiry: '',
-      cardCvv: ''
-    };
+    // 1. If Stripe Payment Request instance is already ready, show native sheet directly
+    if (paymentRequestRef.current) {
+      try {
+        setIsPaying(true);
+        paymentRequestRef.current.show();
+        return;
+      } catch (showErr: any) {
+        console.warn('[STRIPE WALLET SHOW ERROR]', showErr);
+      }
+    }
+
+    // 2. Dynamic initialization fallback if not cached yet
+    const stripePubKey = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY || '';
+    if (!stripePubKey) {
+      setActiveExpressWallet(null);
+      setErrorMessage(
+        isPt 
+          ? 'Chave pública da Stripe não configurada.' 
+          : 'Stripe public key not configured.'
+      );
+      return;
+    }
 
     try {
-      const response = await fetch(`${API_BASE_URL}/api/payment/create-intent`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          cart,
-          items: cart,
-          product: {
-            name: cart.map(i => `${i.productName} (x${i.quantity})`).join(', '),
-            price: totalPrice
-          },
-          selections: {
-            cor: cart.map(i => i.selections?.cor || '').filter(Boolean).join(' | '),
-            quantidade: `${cart.reduce((s, i) => s + i.quantity, 0)}`
-          },
-          shippingFee,
-          shippingZone: selectedShippingZone,
-          amountInCents: Math.round(totalPrice * 100),
-          checkoutForm: expressForm,
-          paymentMethod: 'wallet',
-          walletType,
-          mode: 'test'
-        })
+      setIsPaying(true);
+      const stripe = stripeRef.current || (await loadStripe(stripePubKey));
+      if (!stripe) throw new Error('Stripe JS failed to initialize');
+      stripeRef.current = stripe;
+
+      const totalInCents = Math.round((totalPrice + shippingFee) * 100);
+      const dynamicShippingLabel = lang === 'en'
+        ? (selectedShippingZone?.id === 'pt-islands' ? 'Portugal (Islands)' : selectedShippingZone?.id === 'eu' ? 'European Union' : 'Portugal (Mainland & Islands)')
+        : (selectedShippingZone?.name || 'Portugal (Continental e Ilhas)');
+
+      const dynamicShippingDetail = lang === 'en'
+        ? 'Handcrafted Production + CTT Express (1 to 3 business days)'
+        : 'Produção Artesanal + Envio CTT (1 a 3 dias úteis)';
+
+      const pr = stripe.paymentRequest({
+        country: 'PT',
+        currency: 'eur',
+        total: {
+          label: 'M★BRAVO Atelier',
+          amount: totalInCents,
+        },
+        requestPayerName: true,
+        requestPayerEmail: true,
+        requestPayerPhone: true,
+        requestShipping: true,
+        shippingOptions: [
+          {
+            id: selectedShippingZone?.id || 'pt-mainland',
+            label: dynamicShippingLabel,
+            detail: dynamicShippingDetail,
+            amount: Math.round((shippingFee || 0) * 100)
+          }
+        ]
       });
 
-      const resText = await response.text();
-      let data: any = {};
-      try {
-        data = resText ? JSON.parse(resText) : {};
-      } catch (parseErr) {
-        console.error('[PAYMENT WALLET PARSE ERROR]', resText);
-        throw new Error(isPt ? 'Erro de formato na resposta do servidor de pagamentos.' : 'Invalid response format from payment gateway.');
+      const canPay = await pr.canMakePayment();
+      if (canPay) {
+        paymentRequestRef.current = pr;
+
+        pr.on('shippingaddresschange', (ev) => {
+          ev.updateWith({
+            status: 'success',
+            shippingOptions: [
+              {
+                id: selectedShippingZone?.id || 'pt-mainland',
+                label: dynamicShippingLabel,
+                detail: dynamicShippingDetail,
+                amount: Math.round((shippingFee || 0) * 100)
+              }
+            ]
+          });
+        });
+
+        pr.on('paymentmethod', async (ev) => {
+          console.log('[STRIPE WALLET DYNAMIC AUTHORIZED]', ev);
+          const shipping = ev.shippingAddress || {};
+          const payerName = ev.payerName || shipping.recipient || checkoutForm.nome || 'Cliente Carteira Digital';
+          const payerEmail = ev.payerEmail || checkoutForm.email || 'encomendas@mbravobycarolina.com';
+          const payerPhone = ev.payerPhone || checkoutForm.telefone || '';
+
+          const addressLines = Array.isArray(shipping.addressLine)
+            ? shipping.addressLine.filter(Boolean).join(', ')
+            : (shipping.addressLine || checkoutForm.morada || 'Morada Registada na Carteira Digital');
+
+          const expressCustomer = {
+            nome: payerName,
+            email: payerEmail,
+            telefone: payerPhone,
+            morada: addressLines,
+            codigoPostal: shipping.postalCode || checkoutForm.codigoPostal || '1000-001',
+            cidade: shipping.city || checkoutForm.cidade || 'Lisboa',
+            pais: shipping.country || 'PT',
+            nif: checkoutForm.nif || '',
+            mbwayPhone: '',
+            cardNumber: '',
+            cardName: '',
+            cardExpiry: '',
+            cardCvv: ''
+          };
+
+          try {
+            const response = await fetch(`${API_BASE_URL}/api/payment/create-intent`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                cart,
+                items: cart,
+                product: {
+                  name: cart.map(i => `${i.productName} (x${i.quantity})`).join(', '),
+                  price: totalPrice
+                },
+                selections: {
+                  cor: cart.map(i => i.selections?.cor || '').filter(Boolean).join(' | '),
+                  quantidade: `${cart.reduce((s, i) => s + i.quantity, 0)}`
+                },
+                shippingFee,
+                shippingZone: selectedShippingZone,
+                amountInCents: totalInCents,
+                checkoutForm: expressCustomer,
+                paymentMethod: 'wallet',
+                walletType: walletTypeRef.current
+              })
+            });
+
+            const data = await response.json();
+            if (!response.ok || data.error) {
+              ev.complete('fail');
+              throw new Error(data.error || 'Erro ao criar intenção de pagamento no Stripe.');
+            }
+
+            if (data.stripeClientSecret && stripeRef.current) {
+              const { paymentIntent, error: confirmError } = await stripeRef.current.confirmCardPayment(
+                data.stripeClientSecret,
+                { payment_method: ev.paymentMethod.id },
+                { handleActions: false }
+              );
+
+              if (confirmError) {
+                ev.complete('fail');
+                throw new Error(confirmError.message || 'Falha na confirmação do pagamento com o cartão.');
+              }
+
+              if (paymentIntent && paymentIntent.status === 'succeeded') {
+                ev.complete('success');
+
+                await fetch(`${API_BASE_URL}/api/payment/webhook`, {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({
+                    orderId: data.orderId,
+                    event: 'payment_intent.succeeded'
+                  })
+                });
+
+                setCompletedOrder(data.order || {
+                  orderId: data.orderId,
+                  total: totalPrice + shippingFee,
+                  customer: expressCustomer,
+                  shippingZone: selectedShippingZone,
+                  paymentMethod: `wallet (${walletTypeRef.current})`
+                });
+                clearCart();
+                setStep('checkout');
+              } else {
+                ev.complete('fail');
+                throw new Error('O pagamento por carteira digital não pôde ser completado.');
+              }
+            } else {
+              ev.complete('success');
+              setCompletedOrder(data.order || {
+                orderId: data.orderId || `MB-${Math.floor(100000 + Math.random() * 900000)}`,
+                total: totalPrice + shippingFee,
+                customer: expressCustomer,
+                shippingZone: selectedShippingZone,
+                paymentMethod: `wallet (${walletTypeRef.current})`
+              });
+              clearCart();
+              setStep('checkout');
+            }
+          } catch (err: any) {
+            ev.complete('fail');
+            setErrorMessage(err.message || 'Erro durante a confirmação de pagamento.');
+          } finally {
+            setIsPaying(false);
+            setActiveExpressWallet(null);
+          }
+        });
+
+        pr.show();
+      } else {
+        setIsPaying(false);
+        setActiveExpressWallet(null);
+        setErrorMessage(
+          isPt 
+            ? 'O Apple Pay / Google Pay exige um dispositivo compatível e o domínio verificado na Stripe. Por favor, avance para o preenchimento de morada ou selecione MB Way / Cartão.' 
+            : 'Apple Pay / Google Pay requires a compatible device and verified domain in Stripe.'
+        );
       }
-
-      if (!response.ok || data.error) {
-        throw new Error(data.error || (isPt ? 'Erro ao autorizar pagamento expresso.' : 'Error authorizing express payment.'));
-      }
-
-      setCompletedOrder(data.order || {
-        orderId: data.orderId || `MB-${Math.floor(100000 + Math.random() * 900000)}`,
-        total: totalPrice,
-        customer: expressForm,
-        shippingZone: selectedShippingZone,
-        paymentMethod: `wallet (${walletType})`
-      });
-
-      clearCart();
     } catch (err: any) {
-      setErrorMessage(err.message || (isPt ? 'Falha na ligação com a carteira digital.' : 'Digital wallet connection error.'));
-    } finally {
       setIsPaying(false);
       setActiveExpressWallet(null);
+      setErrorMessage(err.message || (isPt ? 'Erro ao iniciar Apple Pay / Google Pay.' : 'Error starting Apple Pay / Google Pay.'));
     }
   };
 
@@ -396,7 +729,7 @@ export const AtelierCartDrawer: React.FC = () => {
 
   return createPortal(
     <AnimatePresence>
-      <div className="fixed inset-0 z-[9990] flex items-end md:items-center md:justify-center p-0 md:p-6 overflow-hidden">
+      <div className="fixed inset-0 z-[9990] flex items-end md:items-center md:justify-center p-0 md:p-4 lg:p-6 landscape:p-2 landscape:md:p-4 overflow-hidden">
         {/* Soft Translucent Editorial Overlay */}
         <motion.div
           initial={{ opacity: 0 }}
@@ -418,8 +751,8 @@ export const AtelierCartDrawer: React.FC = () => {
             // Mobile: Step 1 opens as compact bottom sheet (~58vh), Step 2 opens as full sheet (94dvh)
             // Tablet & Desktop (md: 768px+): Compact floating centered modal with balanced proportions
             step === 'cart'
-              ? 'h-[58vh] max-h-[60vh] md:h-auto md:max-h-[640px]'
-              : 'h-[94dvh] max-h-[94dvh] md:h-auto md:max-h-[700px] lg:max-h-[740px]'
+              ? 'h-[58vh] max-h-[60vh] md:h-auto md:max-h-[640px] landscape:h-[88dvh] landscape:max-h-[88dvh]'
+              : 'h-[94dvh] max-h-[94dvh] md:h-auto md:max-h-[700px] lg:max-h-[740px] landscape:h-[92dvh] landscape:max-h-[92dvh] landscape:md:max-h-[88vh]'
           } md:w-[740px] lg:w-[860px] xl:w-[900px] md:max-w-[90vw] rounded-t-3xl md:rounded-3xl`}
         >
           {/* Mobile M★BRAVO Star Bidirectional Drag Badge (Half outside / Half inside top boundary) */}
@@ -766,7 +1099,7 @@ export const AtelierCartDrawer: React.FC = () => {
                           type="button"
                           disabled={isPaying}
                           onClick={(e) => handleExpressWalletPay(e, 'Apple Pay')}
-                          className={`w-full h-12 bg-black rounded-xl flex items-center justify-center transition-all hover:bg-black/90 cursor-pointer shadow-xs border border-black/80 px-4 py-2 ${
+                          className={`w-full h-10 max-h-[40px] bg-black rounded-sm flex items-center justify-center transition-all hover:bg-black/90 cursor-pointer shadow-xs border border-black/80 px-4 ${
                             activeExpressWallet === 'applepay' ? 'ring-2 ring-[#C5A059] scale-[0.99]' : 'active:scale-[0.98]'
                           } ${isPaying && activeExpressWallet !== 'applepay' ? 'opacity-50 cursor-not-allowed' : ''}`}
                           title={isPt ? 'Pagar com Apple Pay' : 'Pay with Apple Pay'}
@@ -784,7 +1117,7 @@ export const AtelierCartDrawer: React.FC = () => {
                           type="button"
                           disabled={isPaying}
                           onClick={(e) => handleExpressWalletPay(e, 'Google Pay')}
-                          className={`w-full h-12 bg-black rounded-xl flex items-center justify-center transition-all hover:bg-black/90 cursor-pointer shadow-xs border border-black/80 px-4 py-2 ${
+                          className={`w-full h-10 max-h-[40px] bg-black rounded-sm flex items-center justify-center transition-all hover:bg-black/90 cursor-pointer shadow-xs border border-black/80 px-4 ${
                             activeExpressWallet === 'googlepay' ? 'ring-2 ring-[#C5A059] scale-[0.99]' : 'active:scale-[0.98]'
                           } ${isPaying && activeExpressWallet !== 'googlepay' ? 'opacity-50 cursor-not-allowed' : ''}`}
                           title={isPt ? 'Pagar com Google Pay' : 'Pay with Google Pay'}
@@ -1074,7 +1407,7 @@ export const AtelierCartDrawer: React.FC = () => {
                     type="button"
                     disabled={!isFormValid || isPaying}
                     onClick={handleProcessOrder}
-                    className={`w-full py-3.5 px-5 rounded-full text-[10px] uppercase tracking-[0.25em] font-semibold transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer ${
+                    className={`w-full h-10 max-h-[40px] px-5 rounded-sm text-[10px] sm:text-[11px] uppercase tracking-[0.2em] font-medium transition-all shadow-xs flex items-center justify-center gap-2 cursor-pointer ${
                       isFormValid && !isPaying
                         ? 'bg-forest text-cream hover:bg-[#1C2713] active:scale-[0.99]'
                         : 'bg-forest/20 text-forest/40 cursor-not-allowed'
@@ -1237,7 +1570,7 @@ export const AtelierCartDrawer: React.FC = () => {
 
                       <button
                         onClick={() => setStep('checkout')}
-                        className="w-full py-3.5 px-6 bg-forest hover:bg-[#1C2713] text-cream rounded-full text-[10.5px] uppercase tracking-[0.25em] font-semibold transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer active:scale-[0.99] group mt-1"
+                        className="w-full h-10 max-h-[40px] px-5 bg-forest hover:bg-[#1C2713] text-cream rounded-sm text-[10px] sm:text-[11px] uppercase tracking-[0.2em] font-medium transition-all shadow-xs flex items-center justify-center gap-2 cursor-pointer active:scale-[0.99] group mt-1"
                       >
                         <span>{isPt ? 'Concluir Encomenda' : 'Proceed to Checkout'}</span>
                         <span className="w-1.5 h-1.5 rounded-full bg-[#C5A059]" />
@@ -1604,7 +1937,7 @@ export const AtelierCartDrawer: React.FC = () => {
                       type="button"
                       disabled={!isFormValid || isPaying}
                       onClick={handleProcessOrder}
-                      className={`w-full py-3.5 px-5 rounded-full text-[10px] uppercase tracking-[0.25em] font-semibold transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer ${
+                      className={`w-full h-10 max-h-[40px] px-5 rounded-sm text-[10px] sm:text-[11px] uppercase tracking-[0.2em] font-medium transition-all shadow-xs flex items-center justify-center gap-2 cursor-pointer ${
                         isFormValid && !isPaying
                           ? 'bg-forest text-cream hover:bg-[#1C2713] active:scale-[0.99]'
                           : 'bg-forest/20 text-forest/40 cursor-not-allowed'
