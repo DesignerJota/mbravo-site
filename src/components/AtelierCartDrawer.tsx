@@ -417,9 +417,16 @@ export const AtelierCartDrawer: React.FC = () => {
       stripeRef.current = stripe;
 
       const totalInCents = Math.round((totalPrice + shippingFee) * 100);
-      const dynamicShippingLabel = lang === 'en'
-        ? (selectedShippingZone?.id === 'pt-islands' ? 'Portugal (Islands)' : selectedShippingZone?.id === 'eu' ? 'European Union' : 'Portugal (Mainland & Islands)')
-        : (selectedShippingZone?.name || 'Portugal (Continental e Ilhas)');
+      const getZoneNameString = (zone: any, isEnglish: boolean) => {
+  if (!zone) return isEnglish ? 'Portugal (Mainland & Islands)' : 'Portugal (Continental e Ilhas)';
+  const rawName = zone.name || zone.label;
+  if (typeof rawName === 'object' && rawName !== null) {
+    return isEnglish ? (rawName.en || rawName.pt || '') : (rawName.pt || rawName.en || '');
+  }
+  return String(rawName || (isEnglish ? 'Portugal (Mainland & Islands)' : 'Portugal (Continental e Ilhas)'));
+};
+
+const dynamicShippingLabel = getZoneNameString(selectedShippingZone, (typeof lang === 'object' ? (lang as any)?.code : lang) === 'en');
 
       const dynamicShippingDetail = lang === 'en'
         ? 'Handcrafted Production + CTT Express (1 to 3 business days)'
