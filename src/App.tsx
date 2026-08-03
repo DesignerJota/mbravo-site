@@ -2966,7 +2966,7 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({ product: rawProduct,
         <div data-lenis-prevent className="w-full h-auto lg:h-[88vh] lg:max-w-6xl bg-[#FCFBF9] rounded-none md:rounded-[2rem] lg:rounded-[2.5rem] flex flex-col lg:flex-row shadow-2xl relative overflow-visible lg:overflow-hidden text-forest select-none">
             {/* a) Área de Visualização */}
             <div 
-                className="w-full lg:w-[62%] h-[52vh] sm:h-[56vh] lg:h-full shrink-0 border-b lg:border-b-0 lg:border-r border-forest/10 p-1 sm:p-2 lg:p-4 flex flex-col items-center justify-center overflow-hidden bg-[#F5F2ED] relative transition-colors duration-500"
+                className="w-full lg:w-[62%] h-[34vh] sm:h-[40vh] md:h-[44vh] lg:h-full shrink-0 border-b lg:border-b-0 lg:border-r border-forest/10 p-1 sm:p-2 lg:p-4 flex flex-col items-center justify-center overflow-hidden bg-[#F5F2ED] relative transition-colors duration-500"
                 style={{ touchAction: 'pan-y' }}
             >
                 {/* Floating label in top-left corner */}
@@ -3115,7 +3115,7 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({ product: rawProduct,
             </div>
 
             {/* b) Área de Informação (Details / Sidebar and custom features) */}
-            <div className="w-full lg:w-[38%] h-auto lg:h-full bg-[#FCFBF9] flex flex-col px-5 py-6 lg:py-8 text-forest relative box-border lg:overflow-hidden">
+            <div className="w-full lg:w-[38%] h-auto lg:h-full bg-[#FCFBF9] flex flex-col px-4 py-3.5 sm:px-5 sm:py-5 lg:py-8 text-forest relative box-border lg:overflow-hidden">
                 {isCheckingOut ? (
                     <div data-lenis-prevent className="flex-1 flex flex-col lg:h-full bg-[#FCFBF9] text-forest select-text p-1 animate-fadeIn lg:overflow-y-auto overflow-y-visible max-h-full h-auto">
                         {/* Header with Back button */}
