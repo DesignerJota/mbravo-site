@@ -67,6 +67,30 @@ html.lenis, html.lenis body {
   scrollbar-width: none;
 }
 
+/* Custom Refined Atelier Scrollbars for smooth, non-intrusive scrolling */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(36, 49, 25, 0.18);
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(36, 49, 25, 0.40);
+}
+
+/* Force smooth touch & wheel scrolling and prevent body bounce inside modals/drawers */
+[data-lenis-prevent],
+.overflow-y-auto,
+.overflow-x-auto {
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
 
 /* Smooth SVG transition effects for logo and texts */
 .transition-svg,
@@ -152,6 +176,29 @@ html.lenis, html.lenis body {
     /* Fine Golden Dashed/Stitched line */
     border: 1px dashed rgba(197, 160, 89, 0.4) !important; /* Elegant thin stitched line */
     pointer-events: none !important;
+}
+
+/* Luxury M★BRAVO Gold Shimmer Animation for Courtesy Shipping Progress Bar */
+@keyframes goldShimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.animate-gold-shimmer {
+  background: linear-gradient(
+    90deg,
+    #C5A059 0%,
+    #E5C17C 25%,
+    #FFF2D4 50%,
+    #E5C17C 75%,
+    #C5A059 100%
+  );
+  background-size: 200% 100%;
+  animation: goldShimmer 2.5s infinite linear;
 }
 
 
