@@ -2622,7 +2622,29 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({ product: rawProduct,
                     requestPayerName: true,
                     requestPayerEmail: true,
                     requestPayerPhone: true,
-                    requestShipping: false, // We collect customized PT address on checkout step 1 which is more accurate
+                    requestShipping: true, // Native sheet autofills address from Apple Wallet / Google Pay
+                    shippingOptions: [
+                        {
+                            id: 'pt-mainland',
+                            label: lang === 'en' ? 'Portugal (Mainland & Islands)' : 'Portugal (Continental e Ilhas)',
+                            detail: lang === 'en' ? 'Handcrafted Production + CTT Express (1 to 3 business days)' : 'Produção Artesanal + Envio CTT (1 a 3 dias úteis)',
+                            amount: 0
+                        }
+                    ]
+                });
+
+                paymentRequest.on('shippingaddresschange', (ev) => {
+                    ev.updateWith({
+                        status: 'success',
+                        shippingOptions: [
+                            {
+                                id: 'pt-mainland',
+                                label: lang === 'en' ? 'Portugal (Mainland & Islands)' : 'Portugal (Continental e Ilhas)',
+                                detail: lang === 'en' ? 'Handcrafted Production + CTT Express (1 to 3 business days)' : 'Produção Artesanal + Envio CTT (1 a 3 dias úteis)',
+                                amount: 0
+                            }
+                        ]
+                    });
                 });
 
                 const result = await paymentRequest.canMakePayment();
@@ -2661,16 +2683,27 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({ product: rawProduct,
                 paymentRequest.on('paymentmethod', async (ev) => {
                     console.log("[STRIPE WALLET SUCCESS] Wallet sheet authorized. Capturing buyer details:", ev.paymentMethod);
                     
-                    const buyerName = ev.payerName || checkoutForm.nome || "Cliente Carteira Digital";
+                    const shipping = ev.shippingAddress || {};
+                    const buyerName = ev.payerName || shipping.recipient || checkoutForm.nome || "Cliente Carteira Digital";
                     const buyerEmail = ev.payerEmail || checkoutForm.email || "encomendas@mbravobycarolina.com";
                     const buyerPhone = ev.payerPhone || checkoutForm.telefone || "";
+                    const streetAddress = Array.isArray(shipping.addressLine)
+                        ? shipping.addressLine.filter(Boolean).join(', ')
+                        : (shipping.addressLine || checkoutForm.morada || 'Morada Registada na Carteira Digital');
+
+                    const buyerAddress = streetAddress;
+                    const buyerPostalCode = shipping.postalCode || checkoutForm.codigoPostal || '1000-001';
+                    const buyerCity = shipping.city || checkoutForm.cidade || 'Lisboa';
 
                     // Synchronize React state
                     setCheckoutForm(prev => ({
                         ...prev,
                         nome: buyerName,
                         email: buyerEmail,
-                        telefone: buyerPhone
+                        telefone: buyerPhone,
+                        morada: buyerAddress,
+                        codigoPostal: buyerPostalCode,
+                        cidade: buyerCity
                     }));
 
                     setIsPaying(true);
@@ -2692,6 +2725,9 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({ product: rawProduct,
                                     nome: buyerName,
                                     email: buyerEmail,
                                     telefone: buyerPhone,
+                                    morada: buyerAddress,
+                                    codigoPostal: buyerPostalCode,
+                                    cidade: buyerCity
                                 },
                                 paymentMethod: 'wallet',
                                 amountInCents
@@ -2701,6 +2737,7 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({ product: rawProduct,
                         const data = await response.json();
 
                         if (!response.ok || data.error) {
+                            ev.complete('fail');
                             throw new Error(data.error || "Falha do servidor ao inicializar transação de carteira.");
                         }
 
@@ -2966,7 +3003,7 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({ product: rawProduct,
         <div data-lenis-prevent className="w-full h-auto lg:h-[88vh] lg:max-w-6xl bg-[#FCFBF9] rounded-none md:rounded-[2rem] lg:rounded-[2.5rem] flex flex-col lg:flex-row shadow-2xl relative overflow-visible lg:overflow-hidden text-forest select-none">
             {/* a) Área de Visualização */}
             <div 
-                className="w-full lg:w-[62%] h-[34vh] sm:h-[40vh] md:h-[44vh] lg:h-full shrink-0 border-b lg:border-b-0 lg:border-r border-forest/10 p-1 sm:p-2 lg:p-4 flex flex-col items-center justify-center overflow-hidden bg-[#F5F2ED] relative transition-colors duration-500"
+                className="w-full lg:w-[62%] sticky top-0 lg:relative z-20 h-[26vh] xs:h-[28vh] sm:h-[32vh] md:h-[36vh] max-h-[250px] lg:max-h-none lg:h-full shrink-0 border-b lg:border-b-0 lg:border-r border-forest/10 p-1 sm:p-2 lg:p-4 flex flex-col items-center justify-center overflow-hidden bg-[#F5F2ED] transition-colors duration-500 shadow-sm lg:shadow-none"
                 style={{ touchAction: 'pan-y' }}
             >
                 {/* Floating label in top-left corner */}
@@ -3451,6 +3488,26 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({ product: rawProduct,
                                             </div>
                                         );
                                     })()}
+
+                                    {/* Golden Badge: Commercial Incentive for Fixed Shipping Rate (Multipack Upsell) */}
+                                    <div className="p-3 rounded-2xl bg-[#F6F2EA] border border-[#C5A059]/35 text-forest font-sans shadow-xs space-y-1">
+                                        <div className="flex items-center gap-1.5 text-[#987834]">
+                                            <Sparkles size={12} className="shrink-0 text-[#C5A059]" />
+                                            <span className="text-[10px] font-bold uppercase tracking-wider">
+                                                {lang === 'pt' ? 'Nota de Envio' : 'Shipping Note'}
+                                            </span>
+                                        </div>
+                                        <p className="text-[11px] font-serif text-forest leading-snug">
+                                            {lang === 'pt' ? (
+                                                <>Pelo mesmo valor de portes (<strong className="font-bold text-[#A68244]">{selectedShippingZone.price === 0 ? '4,50€' : `${selectedShippingZone.price.toFixed(2)}€`}</strong>), pode incluir até <strong className="font-bold text-[#A68244]">3 peças</strong> na mesma encomenda!</>
+                                            ) : (
+                                                <>For the same shipping fee (<strong className="font-bold text-[#A68244]">{selectedShippingZone.price === 0 ? '4.50€' : `${selectedShippingZone.price.toFixed(2)}€`}</strong>), you can include up to <strong className="font-bold text-[#A68244]">3 items</strong> in one shipment!</>
+                                            )}
+                                        </p>
+                                        <p className="text-[9.5px] text-forest/60">
+                                            {lang === 'pt' ? 'Aproveite a mesma caixa e otimize o custo de transporte.' : 'Maximize your shipment box and optimize delivery value.'}
+                                        </p>
+                                    </div>
 
                                     {/* Shipping Details form */}
                                     <div className="space-y-3">
@@ -4012,12 +4069,12 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({ product: rawProduct,
                     <div data-lenis-prevent className="flex-1 overflow-y-visible lg:overflow-y-auto space-y-5 pr-1 select-text pb-32 lg:pb-4">
                         
                         {/* Title & Navigation/Close Controls */}
-                        <div className="flex justify-between items-start gap-4">
+                        <div className="flex justify-between items-start gap-3">
                             <div>
-                                <span className="text-[9px] uppercase tracking-[0.4em] text-[#C5A059] block mb-1 font-sans font-semibold">EDIÇÃO EXCLUSIVA M★BRAVO</span>
-                                <h3 className="text-3xl lg:text-3.5xl font-serif font-light text-forest leading-tight tracking-[0.05em] mb-1">{product.name}</h3>
+                                <span className="text-[8px] sm:text-[9px] uppercase tracking-[0.3em] text-[#C5A059] block mb-0.5 font-sans font-semibold">EDIÇÃO EXCLUSIVA M★BRAVO</span>
+                                <h3 className="text-2xl sm:text-3xl lg:text-3.5xl font-serif font-light text-forest leading-snug tracking-[0.03em] mb-0.5">{product.name}</h3>
                             </div>
-                            <div className="flex items-center gap-2 flex-shrink-0 z-30">
+                            <div className="flex items-center gap-1.5 flex-shrink-0 z-30">
                                 {onPrevProduct && onNextProduct && (
                                     <div className="flex items-center bg-forest/5 rounded-full p-1 border border-forest/10 shadow-sm backdrop-blur-sm">
                                         <button
@@ -4025,18 +4082,18 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({ product: rawProduct,
                                                 e.stopPropagation();
                                                 onPrevProduct();
                                             }}
-                                            className="p-1.5 rounded-full hover:bg-forest hover:text-cream transition-all bg-transparent text-forest cursor-pointer"
+                                            className="p-1 sm:p-1.5 rounded-full hover:bg-forest hover:text-cream transition-all bg-transparent text-forest cursor-pointer"
                                             title="Produto Anterior"
                                         >
                                             <ChevronLeft size={14} />
                                         </button>
-                                        <span className="text-[8px] uppercase tracking-widest font-black text-forest/45 px-1.5 pointer-events-none select-none">PEÇA</span>
+                                        <span className="text-[7px] sm:text-[8px] uppercase tracking-widest font-black text-forest/45 px-1 pointer-events-none select-none">PEÇA</span>
                                         <button
                                             onClick={(e) => {
                                                 e.stopPropagation();
                                                 onNextProduct();
                                             }}
-                                            className="p-1.5 rounded-full hover:bg-forest hover:text-cream transition-all bg-transparent text-forest cursor-pointer"
+                                            className="p-1 sm:p-1.5 rounded-full hover:bg-forest hover:text-cream transition-all bg-transparent text-forest cursor-pointer"
                                             title="Próximo Produto"
                                         >
                                             <ChevronRight size={14} />
@@ -4045,32 +4102,32 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({ product: rawProduct,
                                 )}
                                 <button 
                                     onClick={handleToggle}
-                                    className="p-2.5 rounded-full bg-forest/5 text-forest hover:bg-forest hover:text-cream transition-all border border-forest/10 shadow-sm cursor-pointer"
+                                    className="p-2 sm:p-2.5 rounded-full bg-forest/5 text-forest hover:bg-forest hover:text-cream transition-all border border-forest/10 shadow-sm cursor-pointer"
                                     title="Fechar"
                                 >
-                                    <X size={18} />
+                                    <X size={16} />
                                 </button>
                             </div>
                         </div>
 
                         {/* Descrição em Layout Editorial Expandido e Fluido */}
                         {product.description && (
-                            <p className="text-[13px] text-forest/75 leading-relaxed tracking-wide font-light font-sans whitespace-pre-line max-w-prose lg:max-w-[90%] w-full mb-6">
+                            <p className="text-[11px] sm:text-[12px] lg:text-[13px] text-forest/75 leading-relaxed tracking-wide font-light font-sans whitespace-pre-line max-w-prose lg:max-w-[90%] w-full mb-3 sm:mb-4 lg:mb-6">
                                 {product.description}
                             </p>
                         )}
 
                         {/* Detalhes do Produto */}
                         {product.details && (
-                            <div className="mb-6 text-left max-w-prose lg:max-w-[90%] w-full">
-                                <h5 className="text-[9px] uppercase tracking-[0.25em] font-bold text-forest/45 flex items-center gap-1.5 mb-3">
+                            <div className="mb-3 sm:mb-4 lg:mb-6 text-left max-w-prose lg:max-w-[90%] w-full">
+                                <h5 className="text-[8px] sm:text-[9px] uppercase tracking-[0.2em] font-bold text-forest/45 flex items-center gap-1.5 mb-1.5">
                                     <span className="text-[#C5A059] text-xs">●</span> {t('product.details_title')}
                                 </h5>
-                                <ul className="space-y-2 pl-0.5">
+                                <ul className="space-y-1 sm:space-y-1.5 pl-0.5">
                                     {product.details.split('\n').map((line: string, index: number) => {
                                         const cleaned = line.replace(/^[•\-\s]+/, '').trim();
                                         return (
-                                            <li key={index} className="flex items-start gap-2 text-[12px] text-forest/75 leading-relaxed font-light font-sans">
+                                            <li key={index} className="flex items-start gap-1.5 text-[11px] sm:text-[12px] text-forest/75 leading-snug font-light font-sans">
                                                 <span className="text-[#C5A059] mt-0.5 shrink-0 select-none">•</span>
                                                 <span>{cleaned}</span>
                                             </li>
@@ -4081,21 +4138,21 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({ product: rawProduct,
                         )}
 
                         {/* Customization Selection Panels */}
-                        <div className="space-y-6">
+                        <div className="space-y-3.5 sm:space-y-5">
                             {/* Container Comum para Seletores (Cores, Tamanho, Quantidade) com recuo explícito */}
-                            <div id="selection-selectors-group" className="space-y-6 text-left w-full">
+                            <div id="selection-selectors-group" className="space-y-3 sm:space-y-4 text-left w-full">
                                 {/* Cores: Conditional rendering based on colorType */}
                                 {colorType === 'single' && (
-                                    <div className="space-y-2">
+                                    <div className="space-y-1.5">
                                         <div className="flex justify-between items-center">
-                                            <h5 className="text-[9px] uppercase tracking-[0.25em] font-bold text-forest/45 flex items-center gap-1.5">
-                                                <span className="text-[#C5A059] text-xs">●</span> {t('product.color')}
+                                            <h5 className="text-[8.5px] sm:text-[9px] uppercase tracking-[0.2em] font-semibold text-forest/50 flex items-center gap-1.5">
+                                                <span className="text-[#C5A059] text-[10px]">●</span> {t('product.color')}
                                             </h5>
-                                            <span className="text-[9px] font-extrabold text-[#A68244] bg-[#FDF9F3] px-3 py-0.5 rounded-full border border-[#C5A059]/10 tracking-wider">
+                                            <span className="text-[9.5px] font-medium text-forest/70 uppercase tracking-wider">
                                                 {translateColor(selections.cor, lang)}
                                             </span>
                                         </div>
-                                        <div className="flex flex-wrap gap-2.5">
+                                        <div className="flex flex-wrap gap-1.5 sm:gap-2">
                                             {availableColorOptions.map(rawCol => {
                                                 const formattedName = formatColorName(rawCol);
                                                 const isActive = formatColorName(selections.cor) === formattedName || selections.cor === rawCol;
@@ -4105,15 +4162,15 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({ product: rawProduct,
                                                         key={rawCol}
                                                         type="button"
                                                         onClick={() => setSelections(prev => ({ ...prev, cor: rawCol, corPrincipal: rawCol }))}
-                                                        className={`w-8 h-8 rounded-full border transition-all p-0.5 cursor-pointer relative shadow-sm ${
+                                                        className={`w-5 h-5 sm:w-6 sm:h-6 rounded-full border transition-all p-0.5 cursor-pointer relative ${
                                                             isActive 
-                                                                ? 'ring-2 ring-offset-2 ring-[#C5A059] scale-110 shadow-md shadow-[#C5A059]/20 border-white' 
+                                                                ? 'ring-1 ring-offset-1 ring-forest border-white scale-105' 
                                                                 : 'border-forest/15 hover:scale-105 hover:border-[#C5A059]'
                                                         }`}
                                                         title={formattedName}
                                                     >
                                                         <div 
-                                                            className="w-full h-full rounded-full border border-black/10 shadow-inner" 
+                                                            className="w-full h-full rounded-full border border-black/10" 
                                                             style={{ background: swatchBg }}
                                                         />
                                                     </button>
@@ -4124,18 +4181,18 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({ product: rawProduct,
                                 )}
 
                                 {colorType === 'bicolor' && (
-                                    <div className="space-y-4">
+                                    <div className="space-y-3">
                                         {/* Row 1: Primary Color */}
-                                        <div className="space-y-2">
+                                        <div className="space-y-1.5">
                                             <div className="flex justify-between items-center">
-                                                <h5 className="text-[9px] uppercase tracking-[0.25em] font-bold text-forest/45 flex items-center gap-1.5">
-                                                    <span className="text-[#C5A059] text-xs">●</span> {lang === 'pt' ? 'Cor Principal' : 'Main Color'}
+                                                <h5 className="text-[8.5px] sm:text-[9px] uppercase tracking-[0.2em] font-semibold text-forest/50 flex items-center gap-1.5">
+                                                    <span className="text-[#C5A059] text-[10px]">●</span> {lang === 'pt' ? 'Cor Principal' : 'Main Color'}
                                                 </h5>
-                                                <span className="text-[9px] font-extrabold text-[#A68244] bg-[#FDF9F3] px-3 py-0.5 rounded-full border border-[#C5A059]/10 tracking-wider">
+                                                <span className="text-[9.5px] font-medium text-forest/70 uppercase tracking-wider">
                                                     {translateColor(selections.corPrincipal || availableColorOptions[0], lang)}
                                                 </span>
                                             </div>
-                                            <div className="flex flex-wrap gap-2.5">
+                                            <div className="flex flex-wrap gap-1.5 sm:gap-2">
                                                 {availableColorOptions.map(rawCol => {
                                                     const formattedName = formatColorName(rawCol);
                                                     const activePrim = selections.corPrincipal || availableColorOptions[0];
@@ -4155,15 +4212,15 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({ product: rawProduct,
                                                                     cor: combined
                                                                 }));
                                                             }}
-                                                            className={`w-8 h-8 rounded-full border transition-all p-0.5 cursor-pointer relative shadow-sm ${
+                                                            className={`w-5 h-5 sm:w-6 sm:h-6 rounded-full border transition-all p-0.5 cursor-pointer relative ${
                                                                 isActive 
-                                                                    ? 'ring-2 ring-offset-2 ring-[#C5A059] scale-110 shadow-md shadow-[#C5A059]/20 border-white' 
+                                                                    ? 'ring-1 ring-offset-1 ring-forest border-white scale-105' 
                                                                     : 'border-forest/15 hover:scale-105 hover:border-[#C5A059]'
                                                             }`}
                                                             title={formattedName}
                                                         >
                                                             <div 
-                                                                className="w-full h-full rounded-full border border-black/10 shadow-inner" 
+                                                                className="w-full h-full rounded-full border border-black/10" 
                                                                 style={{ background: swatchBg }}
                                                             />
                                                         </button>
@@ -4173,16 +4230,16 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({ product: rawProduct,
                                         </div>
 
                                         {/* Row 2: Detail / Cord Color */}
-                                        <div className="space-y-2">
+                                        <div className="space-y-1.5">
                                             <div className="flex justify-between items-center">
-                                                <h5 className="text-[9px] uppercase tracking-[0.25em] font-bold text-forest/45 flex items-center gap-1.5">
-                                                    <span className="text-[#C5A059] text-xs">●</span> {(product as any).secondColorLabel || (product as any).detailLabel || (product as any).corDetalheLabel || ((product.name.toLowerCase().includes('mini pouch') || product.name.toLowerCase().includes('mini pouches') || (product as any).hasCordao) ? (lang === 'pt' ? 'Cor do Cordão' : 'Drawstring Color') : (lang === 'pt' ? 'Cor do Detalhe' : 'Detail Color'))}
+                                                <h5 className="text-[8.5px] sm:text-[9px] uppercase tracking-[0.2em] font-semibold text-forest/50 flex items-center gap-1.5">
+                                                    <span className="text-[#C5A059] text-[10px]">●</span> {(product as any).secondColorLabel || (product as any).detailLabel || (product as any).corDetalheLabel || ((product.name.toLowerCase().includes('mini pouch') || product.name.toLowerCase().includes('mini pouches') || (product as any).hasCordao) ? (lang === 'pt' ? 'Cor do Cordão' : 'Drawstring Color') : (lang === 'pt' ? 'Cor do Detalhe' : 'Detail Color'))}
                                                 </h5>
-                                                <span className="text-[9px] font-extrabold text-[#A68244] bg-[#FDF9F3] px-3 py-0.5 rounded-full border border-[#C5A059]/10 tracking-wider">
+                                                <span className="text-[9.5px] font-medium text-forest/70 uppercase tracking-wider">
                                                     {translateColor(selections.corDetalhe || availableColorOptions[1] || availableColorOptions[0], lang)}
                                                 </span>
                                             </div>
-                                            <div className="flex flex-wrap gap-2.5">
+                                            <div className="flex flex-wrap gap-1.5 sm:gap-2">
                                                 {availableColorOptions.map(rawCol => {
                                                     const formattedName = formatColorName(rawCol);
                                                     const activeDet = selections.corDetalhe || availableColorOptions[1] || availableColorOptions[0];
@@ -4203,15 +4260,15 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({ product: rawProduct,
                                                                     cor: combined
                                                                 }));
                                                             }}
-                                                            className={`w-8 h-8 rounded-full border transition-all p-0.5 cursor-pointer relative shadow-sm ${
+                                                            className={`w-5 h-5 sm:w-6 sm:h-6 rounded-full border transition-all p-0.5 cursor-pointer relative ${
                                                                 isActive 
-                                                                    ? 'ring-2 ring-offset-2 ring-[#C5A059] scale-110 shadow-md shadow-[#C5A059]/20 border-white' 
+                                                                    ? 'ring-1 ring-offset-1 ring-forest border-white scale-105' 
                                                                     : 'border-forest/15 hover:scale-105 hover:border-[#C5A059]'
                                                             }`}
                                                             title={formattedName}
                                                         >
                                                             <div 
-                                                                className="w-full h-full rounded-full border border-black/10 shadow-inner" 
+                                                                className="w-full h-full rounded-full border border-black/10" 
                                                                 style={{ background: swatchBg }}
                                                             />
                                                         </button>
@@ -4224,19 +4281,19 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({ product: rawProduct,
 
                                 {/* Tamanho */}
                                 {hasSize && (
-                                    <div className="space-y-2">
-                                        <h5 className="text-[9px] uppercase tracking-[0.25em] font-bold text-forest/45 flex items-center gap-1.5">
-                                            <span className="text-[#C5A059] text-xs">●</span> {t('product.size')}
+                                    <div className="space-y-1.5">
+                                        <h5 className="text-[8.5px] sm:text-[9px] uppercase tracking-[0.2em] font-semibold text-forest/50 flex items-center gap-1.5">
+                                            <span className="text-[#C5A059] text-[10px]">●</span> {t('product.size')}
                                         </h5>
                                         <div className="flex flex-wrap gap-1.5">
                                             {sizes.map(opt => (
                                                 <button 
                                                     key={opt}
                                                     onClick={() => setSelections(prev => ({ ...prev, tamanho: opt }))}
-                                                    className={`rounded-full px-4 py-1.5 border border-forest/20 transition-all duration-300 text-xs font-bold cursor-pointer ${
+                                                    className={`rounded-sm px-2.5 py-1 border border-forest/20 transition-all duration-200 text-[10px] sm:text-[11px] uppercase tracking-wider font-medium cursor-pointer ${
                                                         selections.tamanho === opt 
-                                                            ? 'bg-forest text-cream border-forest shadow-sm scale-105' 
-                                                            : 'bg-white text-forest hover:bg-forest/5'
+                                                            ? 'bg-forest text-cream border-forest shadow-xs' 
+                                                            : 'bg-white/80 text-forest hover:bg-forest/5'
                                                     }`}
                                                 >
                                                     {translateSize(opt, lang)}
@@ -4248,19 +4305,19 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({ product: rawProduct,
 
                                 {/* Quantidade */}
                                 {hasQuantity && (
-                                    <div className="space-y-2">
-                                        <h5 className="text-[9px] uppercase tracking-[0.25em] font-bold text-forest/45 flex items-center gap-1.5">
-                                            <span className="text-[#C5A059] text-xs">●</span> {t('product.quantity')}
+                                    <div className="space-y-1.5">
+                                        <h5 className="text-[8.5px] sm:text-[9px] uppercase tracking-[0.2em] font-semibold text-forest/50 flex items-center gap-1.5">
+                                            <span className="text-[#C5A059] text-[10px]">●</span> {t('product.quantity')}
                                         </h5>
                                         <div className="flex flex-wrap gap-1.5">
                                             {quantities.map(opt => (
                                                 <button 
                                                     key={opt}
                                                     onClick={() => setSelections(prev => ({ ...prev, quantidade: opt }))}
-                                                    className={`rounded-full px-4 py-1.5 border border-forest/20 transition-all duration-300 text-xs font-bold cursor-pointer ${
+                                                    className={`rounded-sm px-2.5 py-1 border border-forest/20 transition-all duration-200 text-[10px] sm:text-[11px] uppercase tracking-wider font-medium cursor-pointer ${
                                                         selections.quantidade === opt 
-                                                            ? 'bg-forest text-cream border-forest shadow-sm scale-105' 
-                                                            : 'bg-white text-forest hover:bg-forest/5'
+                                                            ? 'bg-forest text-cream border-forest shadow-xs' 
+                                                            : 'bg-white/80 text-forest hover:bg-forest/5'
                                                     }`}
                                                 >
                                                     {translateQuantity(opt, lang)}
@@ -4454,9 +4511,9 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({ product: rawProduct,
                                     }}
                                     whileHover={{ scale: 1.01 }}
                                     whileTap={{ scale: 0.99 }}
-                                    className="w-full rounded-full py-3 px-4 sm:py-3.5 sm:px-6 text-center font-bold bg-[#C5A059] text-[#343E2C] hover:bg-[#d5b069] active:scale-95 text-[9px] sm:text-[10px] md:text-[11px] uppercase tracking-widest cursor-pointer shadow-[0_4px_15px_rgba(197,160,89,0.3)] border border-[#C5A059]/10 flex items-center justify-center gap-2 transition-all duration-300 font-sans"
+                                    className="w-full rounded-sm py-2 px-4 max-h-[40px] h-10 text-center font-medium bg-[#C5A059] text-[#343E2C] hover:bg-[#d5b069] active:scale-95 text-[11px] uppercase tracking-[0.2em] cursor-pointer shadow-xs border border-[#C5A059]/10 flex items-center justify-center gap-2 transition-all duration-200 font-sans"
                                 >
-                                    <ShoppingBag size={14} />
+                                    <ShoppingBag size={13} />
                                     <span>{lang === 'pt' ? 'Adicionar ao Carrinho' : 'Add to Cart'}</span>
                                 </motion.button>
                                 
@@ -4479,7 +4536,7 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({ product: rawProduct,
                                     }}
                                     whileHover={{ scale: 1.01 }}
                                     whileTap={{ scale: 0.99 }}
-                                    className="w-full rounded-full py-2.5 px-4 text-center font-medium bg-transparent text-[#FCFBF9] hover:bg-white/10 active:scale-95 text-[8px] sm:text-[9px] md:text-[10px] uppercase tracking-widest cursor-pointer border border-white/20 block transition-all duration-300 font-sans"
+                                    className="w-full rounded-sm py-1.5 px-4 max-h-[38px] h-9 text-center font-medium bg-transparent text-[#FCFBF9] hover:bg-white/10 active:scale-95 text-[10px] uppercase tracking-[0.2em] cursor-pointer border border-white/20 flex items-center justify-center transition-all duration-200 font-sans"
                                 >
                                     {lang === 'pt' ? 'Comprar Agora' : 'Buy Now'}
                                 </motion.button>
@@ -4490,7 +4547,7 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({ product: rawProduct,
                                     rel="noopener noreferrer"
                                     whileHover={{ scale: 1.01 }}
                                     whileTap={{ scale: 0.99 }}
-                                    className="w-full rounded-full py-2 px-4 sm:py-2.5 sm:px-6 text-center font-medium bg-transparent text-white/60 hover:text-white hover:bg-white/5 active:scale-95 text-[8px] sm:text-[9px] uppercase tracking-widest cursor-pointer border border-white/10 block transition-all duration-300 font-sans"
+                                    className="w-full rounded-sm py-1 px-3 max-h-[34px] h-8 text-center font-medium bg-transparent text-white/60 hover:text-white hover:bg-white/5 active:scale-95 text-[9px] uppercase tracking-[0.18em] cursor-pointer border border-white/10 flex items-center justify-center transition-all duration-200 font-sans"
                                 >
                                     {t('product.customize_design')}
                                 </motion.a>
@@ -4500,72 +4557,39 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({ product: rawProduct,
                 )}
             </div>
 
-            {/* Sticky Mobile/Tablet Checkout Footer Bar */}
+            {/* Ultra-Fine Minimalist Mobile/Tablet Sticky Checkout Footer Bar */}
             {!isCheckingOut && (
                 <div 
-                    className="lg:hidden sticky bottom-0 left-0 right-0 z-[60] bg-[#FCFBF9]/95 backdrop-blur-md border-t border-forest/10 px-6 py-4 flex flex-col gap-3 shadow-[0_-12px_45px_rgba(31,42,24,0.08)] w-full shrink-0"
-                    style={{ paddingBottom: 'max(1rem, env(safe-area-inset-bottom))' }}
+                    className="lg:hidden sticky bottom-0 left-0 right-0 z-[60] bg-[#FCFBF9]/95 backdrop-blur-md border-t border-forest/10 px-4 py-2 flex items-center justify-between gap-3 shadow-[0_-4px_20px_rgba(0,0,0,0.04)] w-full shrink-0"
+                    style={{ paddingBottom: 'max(0.5rem, env(safe-area-inset-bottom))' }}
                 >
-                    <div className="flex items-center justify-between w-full gap-2">
-                        <div className="flex flex-col text-left shrink-0">
-                            <span className="text-[8px] uppercase tracking-[0.2em] text-[#A68244] font-bold font-sans">{t('product.total_amount')}</span>
-                            <span className="text-lg sm:text-xl font-serif text-forest font-semibold tracking-tight">{currentPrice}</span>
-                        </div>
-                        <motion.button 
-                            onClick={() => {
-                                addToCart({
-                                    productId: product.id || product.name,
-                                    productName: product.name,
-                                    categoryName: product.category,
-                                    img: (product.images && product.images[0]) || product.img || '',
-                                    unitPrice: calculatedPriceNum,
-                                    quantity: 1,
-                                    leadTimeDays: (product as any).tempoProducao ? parseInt((product as any).tempoProducao) || 3 : 3,
-                                    selections,
-                                    hasSize,
-                                    hasQuantity
-                                });
-                            }}
-                            whileHover={{ scale: 1.01 }}
-                            whileTap={{ scale: 0.99 }}
-                            className="flex-1 rounded-full py-2.5 px-3 text-center font-bold bg-[#C5A059] text-[#343E2C] hover:bg-[#d5b069] text-[9px] sm:text-[10px] uppercase tracking-widest cursor-pointer shadow-md border border-[#C5A059]/10 flex items-center justify-center gap-1.5 font-sans"
-                        >
-                            <ShoppingBag size={13} />
-                            <span>{lang === 'pt' ? 'Adicionar' : 'Add to Cart'}</span>
-                        </motion.button>
-                        <motion.button 
-                            onClick={() => {
-                                addToCart({
-                                    productId: product.id || product.name,
-                                    productName: product.name,
-                                    categoryName: product.category,
-                                    img: (product.images && product.images[0]) || product.img || '',
-                                    unitPrice: calculatedPriceNum,
-                                    quantity: 1,
-                                    leadTimeDays: (product as any).tempoProducao ? parseInt((product as any).tempoProducao) || 3 : 3,
-                                    selections,
-                                    hasSize,
-                                    hasQuantity
-                                });
-                                setIsCheckoutOpen(true);
-                            }}
-                            whileHover={{ scale: 1.01 }}
-                            whileTap={{ scale: 0.99 }}
-                            className="rounded-full py-2.5 px-3 text-center font-bold bg-forest text-cream text-[9px] uppercase tracking-widest cursor-pointer shadow-sm font-sans"
-                        >
-                            {lang === 'pt' ? 'Comprar' : 'Buy'}
-                        </motion.button>
+                    <div className="flex flex-col text-left shrink-0">
+                        <span className="text-[7.5px] uppercase tracking-[0.2em] text-[#A68244] font-semibold font-sans">{t('product.total_amount')}</span>
+                        <span className="text-base font-serif text-forest font-semibold tracking-tight leading-none">{currentPrice}</span>
                     </div>
-                    <motion.a 
-                        href={whatsappUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
+
+                    <motion.button 
+                        onClick={() => {
+                            addToCart({
+                                productId: product.id || product.name,
+                                productName: product.name,
+                                categoryName: product.category,
+                                img: (product.images && product.images[0]) || product.img || '',
+                                unitPrice: calculatedPriceNum,
+                                quantity: 1,
+                                leadTimeDays: (product as any).tempoProducao ? parseInt((product as any).tempoProducao) || 3 : 3,
+                                selections,
+                                hasSize,
+                                hasQuantity
+                            });
+                        }}
                         whileHover={{ scale: 1.01 }}
                         whileTap={{ scale: 0.99 }}
-                        className="w-full rounded-full py-2 px-3 sm:py-2.5 sm:px-6 md:py-3 md:px-8 text-center font-medium bg-transparent text-forest hover:bg-forest/5 text-[8px] sm:text-[9px] uppercase tracking-widest cursor-pointer border border-[#C5A059]/30 block font-sans"
+                        className="rounded-sm h-9 max-h-[38px] px-5 bg-[#C5A059] text-[#343E2C] hover:bg-[#d5b069] text-[10px] uppercase tracking-[0.2em] font-medium cursor-pointer shadow-xs border border-[#C5A059]/20 flex items-center justify-center gap-1.5 font-sans"
                     >
-                        {t('product.customize_whatsapp')}
-                    </motion.a>
+                        <ShoppingBag size={12} />
+                        <span>{lang === 'pt' ? 'Adicionar' : 'Add'}</span>
+                    </motion.button>
                 </div>
             )}
         </div>
