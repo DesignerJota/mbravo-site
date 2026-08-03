@@ -619,7 +619,7 @@ export const AtelierCartDrawer: React.FC = () => {
           },
           shippingFee,
           shippingZone: selectedShippingZone,
-          amountInCents: Math.round(totalPrice * 100),
+          amountInCents: Math.round(Math.max(0, parseFloat(String(totalPrice || 0).replace(',', '.').replace(/[^0-9.]/g, '')) || 0) * 100),
           checkoutForm,
           paymentMethod,
           mode: 'test'
