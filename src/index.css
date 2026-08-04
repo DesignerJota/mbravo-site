@@ -24,6 +24,35 @@
   }
 }
 
+/* ==========================================
+   TICKET 3.1: TOUCH TARGETS & CONTRASTE (ACESSIBILIDADE)
+   ========================================== */
+
+/* 1. Área de toque mínima garantida de 44x44px em mobile (Padrão Apple/Android) */
+@media (max-width: 640px) {
+  button, 
+  a, 
+  input[type="button"], 
+  input[type="submit"],
+  [role="button"] {
+    min-height: 44px;
+    min-width: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+}
+
+/* 2. Anel de Foco Visível para Navegação por Teclado / Agentes de Acessibilidade */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 2px solid #243119 !important;
+  outline-offset: 2px !important;
+}
+
 /* Hardware Accelerated Composition Layers for Mobile GPU Smoothness */
 .gpu-accelerated,
 img,
@@ -39,7 +68,7 @@ svg,
 .noise-overlay {
   position: fixed;
   inset: 0;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3BaseFilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/feTurbulence%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/feTurbulence%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
   opacity: 0.04;
   pointer-events: none;
   z-index: 9999;
@@ -90,7 +119,6 @@ html.lenis, html.lenis body {
   overscroll-behavior: contain;
   -webkit-overflow-scrolling: touch;
 }
-
 
 /* Smooth SVG transition effects for logo and texts */
 .transition-svg,
@@ -164,17 +192,13 @@ html.lenis, html.lenis body {
 .colors-patch::after {
     content: "" !important;
     position: absolute !important;
-    /* Pushes the stitch closer to the edge for a cleaner look */
     top: 2px !important;
     left: 2px !important;
     right: 2px !important;
     bottom: 2px !important;
     
-    /* Matches the organic shape of the parent container */
     border-radius: inherit !important; 
-    
-    /* Fine Golden Dashed/Stitched line */
-    border: 1px dashed rgba(197, 160, 89, 0.4) !important; /* Elegant thin stitched line */
+    border: 1px dashed rgba(197, 160, 89, 0.4) !important;
     pointer-events: none !important;
 }
 
@@ -200,8 +224,3 @@ html.lenis, html.lenis body {
   background-size: 200% 100%;
   animation: goldShimmer 2.5s infinite linear;
 }
-
-
-
-
-
