@@ -1677,12 +1677,11 @@ const Hero = () => {
                         }}
                         className="absolute inset-0"
                     >
-                        {HERO_BACKGROUNDS.map((bgItem, index) => {
-            // Apenas renderiza a 1ª imagem OU a imagem que está ativa no momento
+                       {HERO_BACKGROUNDS.map((bgItem, index) => {
             const isFirstImage = index === 0;
             const isCurrentActive = index === bgIndex;
 
-            // Se não for a primeira e nem a ativa, não mete no DOM para não pesar no LCP
+            // Bloqueia as restantes imagens do DOM até serem necessárias
             if (!isFirstImage && !isCurrentActive) {
               return null;
             }
