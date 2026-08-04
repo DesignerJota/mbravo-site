@@ -2471,10 +2471,11 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({ product: rawProduct,
                 ? 'single'
                 : (isDualColor ? 'bicolor' : (isCoaster && !isClassicCoasters ? 'fixed' : 'single'))));
 
-    const rawColorsList: string[] = Array.isArray((product as any).availableColors)
-        ? (product as any).availableColors
-        : (typeof (product as any).availableColors === 'string' && (product as any).availableColors.trim()
-            ? (product as any).availableColors.split(',').map((s: string) => s.trim()).filter(Boolean)
+    const cmsColorsRaw = (product as any).availableColors || (product as any).colors || (product as any).cores;
+    const rawColorsList: string[] = Array.isArray(cmsColorsRaw)
+        ? cmsColorsRaw.map((item: any) => typeof item === 'string' ? item : (item?.name || item?.label || String(item)))
+        : (typeof cmsColorsRaw === 'string' && cmsColorsRaw.trim()
+            ? cmsColorsRaw.split(/[,;\n]+/).map((s: string) => s.trim()).filter(Boolean)
             : []);
 
     const defaultColorsList = [
@@ -2564,6 +2565,41 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({ product: rawProduct,
     const [isShipping, setIsShipping] = useState(false);
     const [canUseWallet, setCanUseWallet] = useState(false);
     const prButtonRef = useRef<any>(null);
+
+    // Google Merchant Center Customer Reviews Opt-in Script Injection on Thank You Page
+    useEffect(() => {
+        if (paymentCompleted && orderId && checkoutForm.email) {
+            try {
+                (window as any).renderGoogleOptIn = function() {
+                    if ((window as any).gapi && (window as any).gapi.surveyoptin) {
+                        (window as any).gapi.surveyoptin.render({
+                            "MERCHANT_ID": 538917849,
+                            "ORDER_ID": orderId,
+                            "EMAIL": checkoutForm.email,
+                            "DELIVERY_COUNTRY": "PT",
+                            "ESTIMATED_DELIVERY_DATE": new Date(Date.now() + 5 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+                            "OPT_IN_STYLE": "CENTER_DIALOG"
+                        });
+                    }
+                };
+
+                const scriptId = 'google-customer-reviews-optin';
+                let existingScript = document.getElementById(scriptId);
+                if (!existingScript) {
+                    const script = document.createElement('script');
+                    script.id = scriptId;
+                    script.src = 'https://apis.google.com/js/platform.js?onload=renderGoogleOptIn';
+                    script.async = true;
+                    script.defer = true;
+                    document.body.appendChild(script);
+                } else if ((window as any).gapi && (window as any).renderGoogleOptIn) {
+                    (window as any).renderGoogleOptIn();
+                }
+            } catch (e) {
+                console.warn('[GOOGLE MERCHANT REVIEWS] Script injection notice:', e);
+            }
+        }
+    }, [paymentCompleted, orderId, checkoutForm.email]);
 
     const handleShipOrder = async () => {
         if (!orderId) return;
@@ -3000,10 +3036,10 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({ product: rawProduct,
 
     return (
         <>
-        <div data-lenis-prevent className="w-full h-auto lg:h-[88vh] lg:max-w-6xl bg-[#FCFBF9] rounded-none md:rounded-[2rem] lg:rounded-[2.5rem] flex flex-col lg:flex-row shadow-2xl relative overflow-visible lg:overflow-hidden text-forest select-none">
+        <div data-lenis-prevent className="w-full h-auto lg:h-[88vh] lg:max-w-6xl bg-[#FCFBF9] rounded-none md:rounded-[2rem] lg:rounded-[2.5rem] flex flex-col lg:flex-row shadow-2xl relative overflow-visible lg:overflow-hidden text-forest select-none landscape:max-h-[92vh] modal-landscape-container">
             {/* a) Área de Visualização */}
             <div 
-                className="w-full lg:w-[62%] sticky top-0 lg:relative z-20 h-[26vh] xs:h-[28vh] sm:h-[32vh] md:h-[36vh] max-h-[250px] lg:max-h-none lg:h-full shrink-0 border-b lg:border-b-0 lg:border-r border-forest/10 p-1 sm:p-2 lg:p-4 flex flex-col items-center justify-center overflow-hidden bg-[#F5F2ED] transition-colors duration-500 shadow-sm lg:shadow-none"
+                className="w-full lg:w-[62%] sticky top-0 lg:relative z-20 h-[26vh] xs:h-[28vh] sm:h-[32vh] md:h-[36vh] max-h-[250px] landscape:max-h-[160px] lg:max-h-none lg:h-full shrink-0 border-b lg:border-b-0 lg:border-r border-forest/10 p-1 sm:p-2 lg:p-4 flex flex-col items-center justify-center overflow-hidden bg-[#F5F2ED] transition-colors duration-500 shadow-sm lg:shadow-none"
                 style={{ touchAction: 'pan-y' }}
             >
                 {/* Floating label in top-left corner */}
@@ -5386,44 +5422,10 @@ const EssenceHero = ({ onBackToHome }: { onBackToHome: () => void }) => {
 
 const TestimonialsSection = () => {
     const { lang, t } = useLanguage();
-    const [apiTestimonials, setApiTestimonials] = useState<any[]>([]);
+    const [reviews, setReviews] = useState<any[]>([]);
     const [activeIndex, setActiveIndex] = useState(0);
 
-    // Default translated testimonials
-    const defaultTestimonials = [
-        {
-            name: t('testimonial.1.name'),
-            text: t('testimonial.1.text'),
-            product: t('testimonial.1.product'),
-            rating: 5
-        },
-        {
-            name: t('testimonial.2.name'),
-            text: t('testimonial.2.text'),
-            product: t('testimonial.2.product'),
-            rating: 5
-        },
-        {
-            name: t('testimonial.3.name'),
-            text: t('testimonial.3.text'),
-            product: t('testimonial.3.product'),
-            rating: 5
-        },
-        {
-            name: t('testimonial.4.name'),
-            text: t('testimonial.4.text'),
-            product: t('testimonial.4.product'),
-            rating: 5
-        },
-        {
-            name: t('testimonial.5.name'),
-            text: t('testimonial.5.text'),
-            product: t('testimonial.5.product'),
-            rating: 5
-        }
-    ];
-
-    // Fetch persistent reviews globally from live back-end database
+    // Fetch live Google Places reviews and user submissions from back-end
     useEffect(() => {
         fetch(`${API_BASE_URL}/api/testimonials`)
             .then(res => {
@@ -5434,22 +5436,34 @@ const TestimonialsSection = () => {
             })
             .then(data => {
                 if (Array.isArray(data)) {
-                    setApiTestimonials(data);
+                    setReviews(data);
                 }
             })
             .catch(err => {
-                console.warn('[TESTIMONIALS FETCH ERROR] Fallback to default local testimonials.', err);
+                console.warn('[TESTIMONIALS FETCH ERROR]', err);
             });
     }, []);
 
-    const allTestimonials = [...defaultTestimonials, ...apiTestimonials];
+    const totalReviews = reviews.length;
+    const isMulti = totalReviews > 1;
 
     const nextTestimonial = () => {
-        setActiveIndex((prev) => (prev + 1) % allTestimonials.length);
+        if (!isMulti) return;
+        setActiveIndex((prev) => (prev + 1) % totalReviews);
     };
 
     const prevTestimonial = () => {
-        setActiveIndex((prev) => (prev - 1 + allTestimonials.length) % allTestimonials.length);
+        if (!isMulti) return;
+        setActiveIndex((prev) => (prev - 1 + totalReviews) % totalReviews);
+    };
+
+    const currentReview = totalReviews > 0 ? reviews[Math.min(activeIndex, totalReviews - 1)] : {
+        name: "M★BRAVO Atelier",
+        text: lang === 'pt'
+            ? "O seu apoio significa o mundo para o nosso atelier. Partilhe a sua experiência e deixe-nos a sua avaliação no Google!"
+            : "Your support means the world to our atelier. Share your experience and leave us a review on Google!",
+        product: "Google Verified Review",
+        rating: 5
     };
 
     return (
@@ -5475,22 +5489,22 @@ const TestimonialsSection = () => {
                     </a>
                 </div>
 
-                {/* Poetic single testimonial layout - minimalist, centered and floating */}
+                {/* Single review or multi-review slider container */}
                 <div className="relative max-w-lg sm:max-w-xl mx-auto px-4 py-0.5">
                     <div className="relative min-h-[145px] sm:min-h-[155px] flex items-center justify-center">
                         <AnimatePresence mode="wait">
                             <motion.div
-                                key={activeIndex}
+                                key={isMulti ? activeIndex : 'single'}
                                 initial={{ opacity: 0, x: 20 }}
                                 animate={{ opacity: 1, x: 0 }}
                                 exit={{ opacity: 0, x: -20 }}
                                 transition={{ duration: 0.4, ease: "easeInOut" }}
                                 className="w-full bg-transparent relative flex flex-col items-center justify-center text-center py-2"
                             >
-                                {/* Stars & Google credibility icon aligned perfectly together */}
+                                {/* Stars & Google credibility icon */}
                                 <div className="flex items-center gap-2 justify-center mb-2">
                                     <div className="flex items-center gap-0.5">
-                                        {[...Array(allTestimonials[activeIndex]?.rating || 5)].map((_, i) => (
+                                        {[...Array(currentReview?.rating || 5)].map((_, i) => (
                                             <svg key={i} className="w-3 h-3 text-[#C5A059]" fill="currentColor" viewBox="0 0 20 20">
                                                 <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
                                             </svg>
@@ -5507,77 +5521,83 @@ const TestimonialsSection = () => {
                                     </span>
                                 </div>
 
-                                {/* Tight, delicate, and compact 1px gold border around ONLY the comment text */}
+                                {/* Delicate gold border around comment text */}
                                 <div className="border border-[#C5A059]/20 rounded-xl px-4 py-1.5 w-[90%] md:w-full max-w-sm sm:max-w-md md:max-w-xl min-h-[44px] sm:min-h-[48px] flex items-center justify-center mx-auto bg-transparent relative shadow-[0_1px_6px_rgba(197,160,89,0.01)]">
-                                    <blockquote className="text-forest/85 text-xs sm:text-[13px] font-serif italic leading-relaxed select-text line-clamp-2 text-center px-1">
-                                        "{allTestimonials[activeIndex]?.text}"
+                                    <blockquote className="text-forest/85 text-xs sm:text-[13px] font-serif italic leading-relaxed select-text line-clamp-3 text-center px-1">
+                                        "{currentReview?.text}"
                                     </blockquote>
                                 </div>
 
-                                {/* Author info */}
+                                {/* Author & Product */}
                                 <div className="mt-2.5 flex flex-col items-center justify-center">
                                     <cite className="not-italic text-[8px] sm:text-[9px] font-semibold uppercase tracking-[0.2em] text-forest font-sans">
-                                        {allTestimonials[activeIndex]?.name}
+                                        {currentReview?.name}
                                     </cite>
-                                    {allTestimonials[activeIndex]?.product && (
+                                    {currentReview?.product && (
                                         <span className="text-[7.5px] uppercase tracking-[0.15em] text-[#C5A059] block font-mono mt-0.5">
-                                            {allTestimonials[activeIndex]?.product}
+                                            {currentReview?.product}
                                         </span>
                                     )}
                                 </div>
                             </motion.div>
                         </AnimatePresence>
 
-                        {/* Navigation Arrows for large screens */}
-                        <div className="absolute top-1/2 -translate-y-1/2 -left-12 hidden md:block">
+                        {/* Navigation Arrows for large screens ONLY if > 1 review */}
+                        {isMulti && (
+                            <>
+                                <div className="absolute top-1/2 -translate-y-1/2 -left-12 hidden md:block">
+                                    <button
+                                        onClick={prevTestimonial}
+                                        className="w-8 h-8 border border-forest/10 rounded-full flex items-center justify-center text-forest/55 hover:text-forest hover:border-forest hover:bg-forest/5 transition-all cursor-pointer"
+                                        aria-label="Previous testimonial"
+                                    >
+                                        <ChevronLeft size={14} />
+                                    </button>
+                                </div>
+                                <div className="absolute top-1/2 -translate-y-1/2 -right-12 hidden md:block">
+                                    <button
+                                        onClick={nextTestimonial}
+                                        className="w-8 h-8 border border-forest/10 rounded-full flex items-center justify-center text-forest/55 hover:text-forest hover:border-forest hover:bg-forest/5 transition-all cursor-pointer"
+                                        aria-label="Next testimonial"
+                                    >
+                                        <ChevronRight size={14} />
+                                    </button>
+                                </div>
+                            </>
+                        )}
+                    </div>
+
+                    {/* Navigation controls & Dots under the card ONLY if > 1 review */}
+                    {isMulti && (
+                        <div className="flex items-center justify-center gap-6 mt-2.5">
                             <button
                                 onClick={prevTestimonial}
-                                className="w-8 h-8 border border-forest/10 rounded-full flex items-center justify-center text-forest/55 hover:text-forest hover:border-forest hover:bg-forest/5 transition-all cursor-pointer"
+                                className="md:hidden w-8 h-8 border border-forest/10 rounded-full flex items-center justify-center text-forest/55 hover:text-forest hover:border-forest hover:bg-forest/5 transition-all cursor-pointer"
                                 aria-label="Previous testimonial"
                             >
-                                <ChevronLeft size={14} />
+                                <ChevronLeft size={12} />
                             </button>
-                        </div>
-                        <div className="absolute top-1/2 -translate-y-1/2 -right-12 hidden md:block">
+
+                            <div className="flex items-center gap-1.5">
+                                {reviews.map((_, i) => (
+                                    <button
+                                        key={i}
+                                        onClick={() => setActiveIndex(i)}
+                                        className={`h-1 rounded-full transition-all duration-300 ${i === activeIndex ? 'w-4 bg-[#C5A059]' : 'w-1.5 bg-forest/15 hover:bg-forest/30'}`}
+                                        aria-label={`Go to testimonial ${i + 1}`}
+                                    />
+                                ))}
+                            </div>
+
                             <button
                                 onClick={nextTestimonial}
-                                className="w-8 h-8 border border-forest/10 rounded-full flex items-center justify-center text-forest/55 hover:text-forest hover:border-forest hover:bg-forest/5 transition-all cursor-pointer"
+                                className="md:hidden w-8 h-8 border border-forest/10 rounded-full flex items-center justify-center text-forest/55 hover:text-forest hover:border-forest hover:bg-forest/5 transition-all cursor-pointer"
                                 aria-label="Next testimonial"
                             >
-                                <ChevronRight size={14} />
+                                <ChevronRight size={12} />
                             </button>
                         </div>
-                    </div>
-
-                    {/* Navigation controls & Dots under the card */}
-                    <div className="flex items-center justify-center gap-6 mt-2.5">
-                        <button
-                            onClick={prevTestimonial}
-                            className="md:hidden w-8 h-8 border border-forest/10 rounded-full flex items-center justify-center text-forest/55 hover:text-forest hover:border-forest hover:bg-forest/5 transition-all cursor-pointer"
-                            aria-label="Previous testimonial"
-                        >
-                            <ChevronLeft size={12} />
-                        </button>
-
-                        <div className="flex items-center gap-1.5">
-                            {allTestimonials.map((_, i) => (
-                                <button
-                                    key={i}
-                                    onClick={() => setActiveIndex(i)}
-                                    className={`h-1 rounded-full transition-all duration-300 ${i === activeIndex ? 'w-4 bg-[#C5A059]' : 'w-1.5 bg-forest/15 hover:bg-forest/30'}`}
-                                    aria-label={`Go to testimonial ${i + 1}`}
-                                />
-                            ))}
-                        </div>
-
-                        <button
-                            onClick={nextTestimonial}
-                            className="md:hidden w-8 h-8 border border-forest/10 rounded-full flex items-center justify-center text-forest/55 hover:text-forest hover:border-forest hover:bg-forest/5 transition-all cursor-pointer"
-                            aria-label="Next testimonial"
-                        >
-                            <ChevronRight size={12} />
-                        </button>
-                    </div>
+                    )}
                 </div>
             </div>
 
@@ -5851,10 +5871,11 @@ const ProductDetailPage = ({ pathname }: { pathname: string }) => {
                 ? 'single'
                 : (isDualColor ? 'bicolor' : (isCoaster && !isClassicCoasters ? 'fixed' : 'single'))));
 
-    const rawColorsList: string[] = Array.isArray((productTranslated as any).availableColors)
-        ? (productTranslated as any).availableColors
-        : (typeof (productTranslated as any).availableColors === 'string' && (productTranslated as any).availableColors.trim()
-            ? (productTranslated as any).availableColors.split(',').map((s: string) => s.trim()).filter(Boolean)
+    const cmsColorsRaw2 = (productTranslated as any).availableColors || (productTranslated as any).colors || (productTranslated as any).cores;
+    const rawColorsList: string[] = Array.isArray(cmsColorsRaw2)
+        ? cmsColorsRaw2.map((item: any) => typeof item === 'string' ? item : (item?.name || item?.label || String(item)))
+        : (typeof cmsColorsRaw2 === 'string' && cmsColorsRaw2.trim()
+            ? cmsColorsRaw2.split(/[,;\n]+/).map((s: string) => s.trim()).filter(Boolean)
             : []);
 
     const defaultColorsList = [
