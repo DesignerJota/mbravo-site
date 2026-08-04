@@ -135,6 +135,17 @@ export const AtelierCartDrawer: React.FC = () => {
     }
   }, []);
 
+  // Helper function to safely extract zone name string for Stripe payloads & UI
+  const getZoneNameFromString = (zone: any, isPtLang: boolean): string => {
+    if (!zone) return isPtLang ? 'Portugal (Continental e Ilhas)' : 'Portugal (Mainland & Islands)';
+    if (typeof zone === 'string') return zone;
+    if (typeof zone.name === 'string') return zone.name;
+    if (zone.name && typeof zone.name === 'object') {
+      return isPtLang ? (zone.name.pt || zone.name.en || 'Portugal') : (zone.name.en || zone.name.pt || 'Portugal');
+    }
+    return isPtLang ? 'Portugal (Continental e Ilhas)' : 'Portugal (Mainland & Islands)';
+  };
+
   // Initialize and maintain Stripe Payment Request for Native Sheet (Apple/Google Pay)
   useEffect(() => {
     let isMounted = true;
@@ -145,10 +156,11 @@ export const AtelierCartDrawer: React.FC = () => {
       if (!stripe || !isMounted) return;
       stripeRef.current = stripe;
 
-      const totalInCents = Math.round((totalPrice + shippingFee) * 100);
+      const rawTotalVal = Math.max(0, parseFloat(String(totalPrice + shippingFee || 0).replace(/[^0-9.]/g, '')) || 0);
+      const totalInCents = Math.round(rawTotalVal * 100);
       if (totalInCents <= 0) return;
 
-      const dynamicShippingLabel = getZoneNameString(selectedShippingZone, (typeof lang === 'object' ? (lang as any)?.code : lang) === 'en');
+      const dynamicShippingLabel = getZoneNameFromString(selectedShippingZone, isPt);
 
       const dynamicShippingDetail = lang === 'en'
         ? 'Handcrafted Production + CTT Express (1 to 3 business days)'
@@ -168,7 +180,7 @@ export const AtelierCartDrawer: React.FC = () => {
         shippingOptions: [
           {
             id: selectedShippingZone?.id || 'pt-mainland',
-            label: getZoneNameString(selectedShippingZone, (typeof lang === 'object' ? (lang as any)?.code : lang) === 'en'),
+            label: dynamicShippingLabel,
             detail: dynamicShippingDetail,
             amount: Math.round((shippingFee || 0) * 100)
           }
@@ -187,7 +199,7 @@ export const AtelierCartDrawer: React.FC = () => {
           shippingOptions: [
             {
               id: selectedShippingZone?.id || 'pt-mainland',
-              label: getZoneNameString(selectedShippingZone, (typeof lang === 'object' ? (lang as any)?.code : lang) === 'en'),
+              label: dynamicShippingLabel,
               detail: dynamicShippingDetail,
               amount: Math.round((shippingFee || 0) * 100)
             }
@@ -414,17 +426,9 @@ export const AtelierCartDrawer: React.FC = () => {
       if (!stripe) throw new Error('Stripe JS failed to initialize');
       stripeRef.current = stripe;
 
-      const totalInCents = Math.round((totalPrice + shippingFee) * 100);
-      const getZoneNameString = (zone: any, isEnglish: boolean) => {
-  if (!zone) return isEnglish ? 'Portugal (Mainland & Islands)' : 'Portugal (Continental e Ilhas)';
-  const rawName = zone.name || zone.label;
-  if (typeof rawName === 'object' && rawName !== null) {
-    return isEnglish ? (rawName.en || rawName.pt || '') : (rawName.pt || rawName.en || '');
-  }
-  return String(rawName || (isEnglish ? 'Portugal (Mainland & Islands)' : 'Portugal (Continental e Ilhas)'));
-};
-
-const dynamicShippingLabel = getZoneNameString(selectedShippingZone, (typeof lang === 'object' ? (lang as any)?.code : lang) === 'en');
+      const rawTotalVal = Math.max(0, parseFloat(String(totalPrice + shippingFee || 0).replace(/[^0-9.]/g, '')) || 0);
+      const totalInCents = Math.round(rawTotalVal * 100);
+      const dynamicShippingLabel = getZoneNameFromString(selectedShippingZone, isPt);
 
       const dynamicShippingDetail = lang === 'en'
         ? 'Handcrafted Production + CTT Express (1 to 3 business days)'
@@ -624,7 +628,7 @@ const dynamicShippingLabel = getZoneNameString(selectedShippingZone, (typeof lan
           },
           shippingFee,
           shippingZone: selectedShippingZone,
-          amountInCents: Math.round(Math.max(0, parseFloat(String(totalPrice || 0).replace(',', '.').replace(/[^0-9.]/g, '')) || 0) * 100),
+          amountInCents: Math.round(totalPrice * 100),
           checkoutForm,
           paymentMethod,
           mode: 'test'
@@ -813,7 +817,7 @@ const dynamicShippingLabel = getZoneNameString(selectedShippingZone, (typeof lan
 
               <button
                 onClick={handleClose}
-                className="p-2 rounded-full hover:bg-forest/5 text-forest/50 hover:text-forest transition-colors cursor-pointer shrink-0"
+                className="p-2 rounded-full hover:bg-forest/5 text-forest/50 hover:text-forest transition-colors cursor-pointer shrink-0 min-h-[44px] min-w-[44px] flex items-center justify-center"
                 title={isPt ? 'Fechar' : 'Close'}
               >
                 <X size={20} />
@@ -1031,7 +1035,7 @@ const dynamicShippingLabel = getZoneNameString(selectedShippingZone, (typeof lan
                       <span className="font-serif font-medium text-forest">{subtotal.toFixed(2)}€</span>
                     </div>
                     <div className="flex justify-between text-forest/70">
-                      <span>{isPt ? 'Portes de Envio' : 'Shipping'} ({selectedShippingZone.name[isPt ? 'pt' : 'en']})</span>
+                      <span>{isPt ? 'Portes de Envio' : 'Shipping'} ({getZoneNameFromString(selectedShippingZone, isPt)})</span>
                       <span className="font-serif font-medium">
                         {shippingFee === 0 ? (
                           <span className="text-[#987834] font-bold text-[10px] bg-[#C5A059]/15 px-2 py-0.5 rounded-full border border-[#C5A059]/30">
@@ -1550,7 +1554,7 @@ const dynamicShippingLabel = getZoneNameString(selectedShippingZone, (typeof lan
                         <span className="font-serif font-medium text-forest">{subtotal.toFixed(2)}€</span>
                       </div>
                       <div className="flex justify-between text-forest/70">
-                        <span>{isPt ? 'Portes de Envio' : 'Shipping'} ({selectedShippingZone.name[isPt ? 'pt' : 'en']})</span>
+                        <span>{isPt ? 'Portes de Envio' : 'Shipping'} ({getZoneNameFromString(selectedShippingZone, isPt)})</span>
                         <span className="font-serif font-medium">
                           {shippingFee === 0 ? (
                             <span className="text-[#987834] font-bold text-[10px] bg-[#C5A059]/15 px-2 py-0.5 rounded-full border border-[#C5A059]/30">
@@ -1643,7 +1647,7 @@ const dynamicShippingLabel = getZoneNameString(selectedShippingZone, (typeof lan
                               <span className="font-serif font-medium text-forest">{subtotal.toFixed(2)}€</span>
                             </div>
                             <div className="flex justify-between text-forest/70">
-                              <span>{isPt ? 'Portes de Envio CTT' : 'CTT Shipping'} ({selectedShippingZone.name[isPt ? 'pt' : 'en']})</span>
+                              <span>{isPt ? 'Portes de Envio CTT' : 'CTT Shipping'} ({getZoneNameFromString(selectedShippingZone, isPt)})</span>
                               <span className="font-serif font-medium">
                                 {shippingFee === 0 ? (
                                   <span className="text-[#987834] font-bold text-[10px]">{isPt ? 'Cortesia (0.00€)' : 'Courtesy (0.00€)'}</span>
@@ -1833,6 +1837,23 @@ const dynamicShippingLabel = getZoneNameString(selectedShippingZone, (typeof lan
                               className="w-full px-3 py-2 rounded-xl border border-forest/15 bg-white focus:outline-none focus:border-[#C5A059] text-xs text-forest placeholder-forest/30 transition-all"
                             />
                           </div>
+                        </div>
+
+                        {/* Golden Card Balloon: Shipping Notes & Instructions */}
+                        <div className="p-3 rounded-2xl bg-[#F6F2EA] border border-[#C5A059]/35 text-forest font-sans shadow-xs space-y-2 mt-2">
+                          <div className="flex items-center gap-1.5 text-[#987834]">
+                            <Sparkles size={12} className="shrink-0 text-[#C5A059]" />
+                            <span className="text-[10px] font-bold uppercase tracking-wider">
+                              {isPt ? 'Notas de Envio / Instruções' : 'Shipping Notes / Instructions'}
+                            </span>
+                          </div>
+                          <textarea
+                            placeholder={isPt ? "Ex: Entregar na parte da tarde / Nota para presente especial / Indicação de ajuste..." : "Ex: Afternoon delivery / Gift note / Customization request..."}
+                            rows={2}
+                            value={checkoutForm.notas || ''}
+                            onChange={(e) => setCheckoutForm({ ...checkoutForm, notas: e.target.value })}
+                            className="w-full bg-white/90 rounded-xl px-3 py-2 text-xs text-forest placeholder-forest/35 border border-[#C5A059]/25 focus:border-[#C5A059] focus:outline-none transition-all font-sans resize-none"
+                          />
                         </div>
                       </div>
                     </div>
