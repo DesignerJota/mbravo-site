@@ -2225,7 +2225,7 @@ const MadeWithTimeSection = () => {
                             className="w-full aspect-[3/4] relative rounded-2xl overflow-hidden shadow-[0_20px_40px_rgba(31,42,24,0.05)] group border border-forest/5"
                         >
                             <img 
-                                src="https://i.ibb.co/j9LHyxq6/Firefly-Gemini-Flash-Imagem-com-ambiente-cosy-tema-handmade-crochet-usar-o-logo-em-label-de-cartao.png" 
+                                src="/brand-craft-visual.webp" 
                                 alt="Destaque de textura de lã e rótulo M★Bravo" 
                                 loading="lazy"
                                 decoding="async"
@@ -7881,7 +7881,7 @@ function AppContent() {
                         className="absolute inset-0"
                     >
                         <img 
-                            src="https://i.ibb.co/xqh0LJ7g/Firefly-Gemini-Flash-Imagem-com-ambiente-cosy-tema-handmade-crochet-usar-o-logo-em-business-card.png" 
+                            src="/visual-interlude.webp" 
                             alt="Brand visual" 
                             loading="lazy"
                             decoding="async"
