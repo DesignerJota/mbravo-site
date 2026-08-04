@@ -1715,7 +1715,7 @@ const Hero = () => {
                       const parent = target.parentElement;
                       if (parent && parent.tagName === 'PICTURE') {
                         const sources = parent.querySelectorAll('source');
-                        sources.forEach(s => s.remove());
+                        sources.forEach((s) => s.remove());
                       }
                       if (target.src !== bgItem.fallback) {
                         target.src = bgItem.fallback;
