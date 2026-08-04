@@ -1678,8 +1678,8 @@ const Hero = () => {
                         className="absolute inset-0"
                     >
                        {HERO_BACKGROUNDS.map((bgItem, index) => {
-                           if (index !== 0 && index !== bgIndex) return null;
-            
+            if (index !== 0 && index !== bgIndex) return null;
+
             return (
               <motion.div
                 key={bgItem.mobile}
