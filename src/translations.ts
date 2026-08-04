@@ -244,7 +244,7 @@ export const translations = {
     // Interlude
     "interlude.quote": "\"A beleza está na alma que colocamos em cada gesto.\"",
     "interlude.sub": "\"Peças criadas com tempo, amor e memória.\"",
-    "instagram.feed.title": "Siga-nos no Instagram",
+    "instagram.feed.title": "DIÁRIO VISUAL",
     "instagram.feed.handle": "@mbravobycarolina",
     "instagram.feed.view_profile": "Ver Perfil",
     
@@ -473,7 +473,7 @@ export const translations = {
     // Interlude
     "interlude.quote": "\"Beauty is in the soul we put into every gesture.\"",
     "interlude.sub": "\"Pieces created with time, love, and memory.\"",
-    "instagram.feed.title": "Follow us on Instagram",
+    "instagram.feed.title": "VISUAL DIARY",
     "instagram.feed.handle": "@mbravobycarolina",
     "instagram.feed.view_profile": "View Profile",
     
@@ -639,7 +639,17 @@ export function formatColorName(colorStr: string): string {
   if (!colorStr) return '';
   let cleaned = colorStr.trim();
 
-  // Remove supplier/brand prefixes
+  // If there's a yarn brand/supplier prefix before a dash (e.g. "DROPS SAFIR - Natural"), extract color name
+  if (cleaned.includes(' - ')) {
+    const parts = cleaned.split(' - ');
+    cleaned = parts[parts.length - 1].trim();
+  } else if (cleaned.includes(' – ')) {
+    const parts = cleaned.split(' – ');
+    cleaned = parts[parts.length - 1].trim();
+  }
+
+  // Remove remaining supplier/brand prefixes if any
+  cleaned = cleaned.replace(/^(DROPS\s+[A-Za-z0-9\s]+?)\s*[-–—]?\s*/i, '');
   cleaned = cleaned.replace(/^(DROPS\s+(Safran|Paris|Loves\s+You\s*\d*)?|Safran|Paris)\s*[-–—]?\s*/i, '');
 
   // Remove leading numbers or code patterns (e.g., "16 - ", "01 - ", "16 ")
