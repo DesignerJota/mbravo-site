@@ -778,6 +778,18 @@ export default function AdminDashboardModal({ onClose, shopCategories = [] }: Ad
     }
   };
 
+  // Manage body scroll and Lenis scrolling when Admin Dashboard Modal is open
+  useEffect(() => {
+    (window as any).lenis?.stop();
+    const origOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+
+    return () => {
+      document.body.style.overflow = origOverflow;
+      (window as any).lenis?.start();
+    };
+  }, []);
+
   // Check saved session on mount
   useEffect(() => {
     const savedPass = localStorage.getItem('mbravo_admin_password');
@@ -1212,16 +1224,16 @@ export default function AdminDashboardModal({ onClose, shopCategories = [] }: Ad
   });
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-0 md:p-4 bg-forest/80 backdrop-blur-sm select-text w-full max-w-full overflow-hidden">
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-0 md:p-4 bg-forest/80 backdrop-blur-sm select-text w-full max-w-full overflow-y-auto pointer-events-auto modal-landscape-container">
       <motion.div 
         initial={{ scale: 0.95, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         exit={{ scale: 0.95, opacity: 0 }}
         transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-        className="relative w-full max-w-full md:max-w-6xl h-full md:h-[85vh] bg-[#FCFBF9] text-forest rounded-none md:rounded-[24px] shadow-2xl border-0 md:border border-[#C5A059]/10 flex flex-col overflow-hidden"
+        className="relative w-full max-w-full md:max-w-6xl h-full md:h-[85vh] landscape:max-h-[92vh] bg-[#FCFBF9] text-forest rounded-none md:rounded-[24px] shadow-2xl border-0 md:border border-[#C5A059]/10 flex flex-col overflow-hidden pointer-events-auto"
       >
         {/* HEADER RAIL */}
-        <div className="flex items-center justify-between px-3.5 sm:px-8 py-3.5 sm:py-5 border-b border-forest/5 bg-white/50 shrink-0">
+        <div className="flex items-center justify-between px-3.5 sm:px-8 py-3.5 sm:py-5 border-b border-forest/5 bg-white/50 shrink-0 sticky top-0 z-20 modal-landscape-header">
           <div className="flex items-center gap-2 sm:gap-3 min-w-0">
             <div className="w-2.5 h-2.5 rounded-full bg-[#C5A059] animate-pulse shrink-0" />
             <h3 className="font-serif text-xs sm:text-lg tracking-wider font-medium text-forest uppercase flex items-center gap-1.5 sm:gap-2 truncate">
@@ -1239,7 +1251,7 @@ export default function AdminDashboardModal({ onClose, shopCategories = [] }: Ad
             )}
             <button 
               onClick={onClose}
-              className="p-1 sm:p-1.5 hover:bg-forest/5 rounded-full transition-all cursor-pointer text-forest/60 hover:text-forest"
+              className="p-1 sm:p-1.5 hover:bg-forest/5 rounded-full transition-all cursor-pointer text-forest/60 hover:text-forest min-h-[44px] min-w-[44px] flex items-center justify-center"
               aria-label="Fechar Painel de Administração"
             >
               <X className="w-5 h-5" />
@@ -1248,7 +1260,10 @@ export default function AdminDashboardModal({ onClose, shopCategories = [] }: Ad
         </div>
 
         {/* CONTAINER CONTENT */}
-        <div data-lenis-prevent className="flex-1 overflow-y-auto overflow-x-hidden w-full max-w-full min-h-0">
+        <div 
+          data-lenis-prevent 
+          className="flex-1 overflow-y-auto overflow-x-hidden w-full max-w-full min-h-0 overscroll-contain touch-pan-y pointer-events-auto"
+        >
           {!isAuthenticated ? (
             /* LOGIN PANEL */
             <div className="h-full flex items-center justify-center p-6">
