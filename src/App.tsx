@@ -6817,9 +6817,10 @@ const ProductDetailPage = ({ pathname }: { pathname: string }) => {
                                                         </div>
                                                         <span className="font-serif text-sm font-bold text-forest">{numericSubtotal.toFixed(2)}€</span>
                                                       </div>
+                                                    </div>
                                                    </div>
                                                   );
-                                                })()}
+                                              })()}
                                       
                                                     {/* Region Selector Dropdown */}
                                                     <div className="pt-1 flex justify-between items-center text-xs font-sans">
