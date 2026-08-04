@@ -1722,7 +1722,7 @@ const Hero = () => {
                 </picture>
               </motion.div>
               );
-           })
+           })}
 
                         {/* Golden ambient studio lighting leak/flare overlay, adding richness and luxury with organic movement */}
                         <motion.div 
