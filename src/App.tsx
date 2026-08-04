@@ -5336,8 +5336,7 @@ const EssenceHero = ({ onBackToHome }: { onBackToHome: () => void }) => {
                                     <img 
                                         src="https://i.ibb.co/3907byLt/IMG-2738-2.jpg" 
                                         alt="Signature Granny Poncho" 
-                                        loading="eager"
-                                        fetchPriority="high"
+                                        loading="lazy"
                                         className="w-full h-full object-cover group-hover/heroimg:scale-105 transition-transform duration-700 ease-out"
                                     />
                                 </div>
@@ -6804,12 +6803,12 @@ const ProductDetailPage = ({ pathname }: { pathname: string }) => {
                                                 <div className="bg-[#FAF7F2] border border-[#C5A059]/30 rounded-2xl p-4 space-y-3 shadow-sm font-sans">
                                                     <div className="flex justify-between items-center gap-3 border-b border-forest/10 pb-2.5">
                                                         <div className="flex items-center gap-3">
-                                                            <img 
-                                                                src={currentImg} 
-                                                                alt="" 
-                                                                className="w-12 h-12 rounded-lg object-cover border border-forest/10 shrink-0" 
-                                                            />
-                                                            <div>
+                                                            <img
+                                                              src={currentImg}
+                                                              loading="lazy"
+                                                              alt=""
+                                                              className="w-12 h-12 rounded-lg object-cover border border-forest/10 shrink-0"
+                                                              />
                                                                 <span className="font-serif font-medium text-sm text-forest block">{productTranslated.name}</span>
                                                                 <span className="text-[10px] text-forest/50 uppercase tracking-wider">
                                                                     {(colorType !== 'fixed' && selectedColor) ? `${translateColor(selectedColor, lang)} ` : ''}{hasSize && `| ${translateSize(selections.tamanho, lang)}`}
