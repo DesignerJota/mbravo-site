@@ -1678,8 +1678,9 @@ const Hero = () => {
                         className="absolute inset-0"
                     >
                        {HERO_BACKGROUNDS.map((bgItem, index) => {
-  if (index !== 0 && index !== bgIndex) return null;
-  return (
+            if (index !== 0 && index !== bgIndex) return null;
+
+            return (
               <motion.div
                 key={bgItem.mobile}
                 style={{ y: bgY, scale: bgScale }}
@@ -1721,8 +1722,8 @@ const Hero = () => {
                   />
                 </picture>
               </motion.div>
-              );
-           })}
+            );
+          })}
 
                         {/* Golden ambient studio lighting leak/flare overlay, adding richness and luxury with organic movement */}
                         <motion.div 
