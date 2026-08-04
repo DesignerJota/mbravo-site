@@ -6812,8 +6812,8 @@ const ProductDetailPage = ({ pathname }: { pathname: string }) => {
                   <div>
                     <span className="font-serif font-medium text-sm text-forest block">{productTranslated.name}</span>
                     <span className="text-[10px] text-forest/50 uppercase tracking-wider">
-                      {colorType !== 'fixed' && selectedColor ? translateColor(selectedColor, lang) + ' ' : ''}
-                      {hasSize ? ` | ${translateSize(selections.tamanho, lang)}` : ''}
+                      {colorType !== 'fixed' && selectedColor ? translateColor(selectedColor, lang) : ''}
+                      {hasSize ? ' | ' + translateSize(selections.tamanho, lang) : ''}
                     </span>
                   </div>
                 </div>
