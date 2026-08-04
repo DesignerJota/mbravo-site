@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" style="background-color: #1F2A18;">
+<html lang="pt" style="background-color: #1F2A18;">
   <head>
     <meta charset="UTF-8" />
     
@@ -102,23 +102,23 @@
     </script>
     
     <!-- Meta Title and Brand Indexing Settings -->
-    <title>M★BRAVO | Handmade With Love</title>
-    <meta name="description" content="Cada ponto guarda uma memória. Peças feitas com tempo, amor e memória." />
+    <title>M★BRAVO | Crochet de Autor & Design Artesanal em Portugal</title>
+    <meta name="description" content="Cada ponto guarda uma memória. Peças exclusivas de crochet feitas à mão em Portugal por Carolina Bravo. Design contemporâneo, tempo e amor em cada detalhe." />
     <meta name="application-name" content="M★BRAVO" />
     <meta name="apple-mobile-web-app-title" content="M★BRAVO" />
     
     <!-- OpenGraph Brand Metas -->
-    <meta property="og:title" content="M★BRAVO | Handmade With Love" />
+    <meta property="og:title" content="M★BRAVO | Crochet de Autor & Design Artesanal" />
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://mbravobycarolina.com/" />
     <meta property="og:image" content="https://mbravobycarolina.com/android-chrome-512x512.png?v=2" />
-    <meta property="og:description" content="Cada ponto guarda uma memória. Peças feitas com tempo, amor e memória." />
+    <meta property="og:description" content="Cada ponto guarda uma memória. Peças exclusivas de crochet feitas à mão em Portugal por Carolina Bravo." />
     <meta property="og:site_name" content="M★BRAVO" />
 
     <!-- Twitter Card Metas -->
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="M★BRAVO | Handmade With Love" />
-    <meta name="twitter:description" content="Cada ponto guarda uma memória. Peças feitas com tempo, amor e memória." />
+    <meta name="twitter:title" content="M★BRAVO | Crochet de Autor & Design Artesanal" />
+    <meta name="twitter:description" content="Cada ponto guarda uma memória. Peças exclusivas de crochet feitas à mão em Portugal por Carolina Bravo." />
     <meta name="twitter:image" content="https://mbravobycarolina.com/android-chrome-512x512.png?v=2" />
     
     <!-- JSON-LD Schema Markup (Unificado com ★) -->
@@ -152,6 +152,18 @@
         padding: 0;
         overflow-x: hidden;
       }
+      /* Classe acessível de ocultação visual para H1 sem impactar o layout */
+      .sr-only-seo {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        white-space: nowrap;
+        border-width: 0;
+      }
     </style>
   </head>
   <body style="background-color: #1F2A18;">
@@ -159,6 +171,10 @@
     <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-NLQ2QXN6"
     height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <!-- End Google Tag Manager (noscript) -->
+
+    <!-- H1 Semântico e Acessível para Crawlers, Motores de Busca e Leitores de Ecrã -->
+    <h1 class="sr-only-seo">M★BRAVO — Crochet de Autor & Design Artesanal por Carolina Bravo</h1>
+
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
