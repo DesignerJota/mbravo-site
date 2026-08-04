@@ -193,7 +193,28 @@ A gestão e apresentação de testemunhos no e-commerce adota uma arquitetura de
 
 ---
 
-## 9. Roteiro Técnico de Solução iOS WebKit & Otimização Mobile (FASE 1 APLICADA)
+## 10. Sanitização de Montantes Stripe, Opt-in Google Merchant Reviews, CMS de Cores Dinâmico & Usabilidade Mobile Landscape
+
+Para reforçar a fiabilidade em produção e garantir uma experiência de luxo impecável em todos os dispositivos, a aplicação implementa:
+
+1. **Sanitização de Montantes e Resiliência Stripe (`amountInCents` & Zonas de Envio):**
+   * Em todos os fluxos de checkout (`AtelierCartDrawer.tsx`, `CartCheckoutModal.tsx`, `App.tsx`), o cálculo do montante enviado à API do Stripe e aos Payment Intents utiliza sanitização por expressão regular: `Math.max(0, parseFloat(String(totalPrice + shippingFee || 0).replace(/[^0-9.]/g, '')) || 0)`.
+   * A desserialização de zonas de envio (`selectedShippingZone`) utiliza a função de suporte `getZoneNameFromString`, garantindo compatibilidade total caso a zona seja representada como string de ID, string de nome ou objeto de zona com id/nome.
+2. **Opt-in de Avaliações Google Merchant Center (Consumidor) na Thank You Page:**
+   * Na página de confirmação de encomenda concluída (Thank You Page), o sistema injeta dinamicamente o script oficial do Google Consumer Surveys / Google Customer Reviews (`https://apis.google.com/js/platform.js?onload=renderGoogleOptIn`), apresentando o diálogo de opt-in ao cliente com os dados do ID da encomenda, e-mail e estimativa de entrega nos CTT.
+   * O widget de opiniões do site consome a origem de dados oficial do perfil Google: `https://g.page/r/Cdo7JGP_Xpc3EBM/review`.
+3. **Consumo Dinâmico do Array de Cores do CMS / Dashboard (100% Data-Driven):**
+   * A renderização de pílulas/variantes de cor no frontend público consome a 100% a propriedade configurada no CMS (`availableColors`, `colors` ou `cores`), suportando arrays de objetos, arrays de strings e listas separadas por vírgula, sem fallbacks estáticos ou cores hardcoded no código.
+4. **Suporte Completo a Orientação Horizontal Mobile (@media (orientation: landscape)):**
+   * Adicionada gestão de layout para ecrãs horizontais móveis com regulação da altura máxima dos modais (`landscape:max-h-[92vh]`) e scroll interno suave (`overflow-y-auto`, `touch-pan-y`).
+   * Headers e botões de fechar (X) mantêm-se fixos (`sticky top-0 z-20`) e visíveis sem cortar a navegação, garantindo áreas de toque tátil mínimas de 44x44px (`min-h-[44px] min-w-[44px]`).
+5. **Eliminação de Zonas Mortas de Scroll no Admin Dashboard:**
+   * A área do Painel de Administração (`AdminDashboardModal.tsx`) teve a interceção forçada de eventos de roda (`onWheel={(e) => e.stopPropagation()}`) removida do container principal, incorporando `pointer-events: auto`, `overflow-y: auto` e `touch-action: pan-y` em toda a extensão para scroll fluido por rato, touchpad e gestos táteis.
+6. **Sincronização 100% Real Google Places API & Carrossel Condicional em Testemunhos:**
+   * Eliminados todos os testemunhos hardcoded fictícios do frontend e do seed de backend.
+   * Ligar o componente `TestimonialsSection` exclusivamente a dados reais consumidos de `/api/testimonials` (Google Places API com Place ID M★BRAVO / submissões de clientes).
+   * Implementada lógica de UI responsiva condicional: quando `reviews.length === 1` (ou card convidativo de 1a review), o destaque é renderizado centralizado em cartão flutuante de luxo sem setas ou pontos de navegação; quando `reviews.length > 1`, ativa-se automaticamente o carrossel interativo com controlos laterais e paginação.
+
 
 ### A. Diagnóstico & Solução de Flicker de Imagens no iOS (Safari/WebKit) — [IMPLEMENTADO]
 *   **Causa Raiz no WebKit:** O motor Safari/WebKit em iOS impõe limites rigorosos de alocação de memória gráfica por aba. Durante o scroll rápido com inércia em grelhas de imagens, o WebKit descarta ativamente texturas descodificadas em memória GPU para evitar estoiros de memória (*tab crash*), resultando no efeito de piscar (*flicker*) quando as imagens voltam a ser compostas.
