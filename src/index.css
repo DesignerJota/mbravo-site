@@ -29,17 +29,34 @@
    ========================================== */
 
 /* 1. Área de toque mínima garantida de 44x44px em mobile (Padrão Apple/Android) */
-@media (max-width: 640px) {
+@media (max-width: 640px), (max-height: 500px) and (orientation: landscape) {
   button, 
   a, 
   input[type="button"], 
   input[type="submit"],
+  select,
   [role="button"] {
     min-height: 44px;
     min-width: 44px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
+  }
+}
+
+/* 1b. Mobile Landscape & Modal Ergonomics Support */
+@media (max-height: 500px) and (orientation: landscape) {
+  .modal-landscape-container,
+  [role="dialog"],
+  .drawer-container {
+    max-height: 92vh !important;
+    overflow-y: auto !important;
+  }
+  .modal-landscape-header {
+    position: sticky !important;
+    top: 0 !important;
+    z-index: 30 !important;
+    flex-shrink: 0 !important;
   }
 }
 
