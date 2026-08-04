@@ -6800,7 +6800,7 @@ const ProductDetailPage = ({ pathname }: { pathname: string }) => {
                                             const itemLeadTime = stockNum > 0 ? 0 : craftingNum;
 
                                             return (
-                                                <div className="bg-[#FAF7F2] border border-[#C5A059]/30 rounded-2xl p-4 space-y-3 shadow-sm font-sans">
+            <div className="bg-[#FAF7F2] border border-[#C5A059]/30 rounded-2xl p-4 space-y-3 shadow-sm font-sans">
               <div className="flex justify-between items-center gap-3 border-b border-forest/10 pb-2.5">
                 <div className="flex items-center gap-3">
                   <img
@@ -6812,7 +6812,8 @@ const ProductDetailPage = ({ pathname }: { pathname: string }) => {
                   <div>
                     <span className="font-serif font-medium text-sm text-forest block">{productTranslated.name}</span>
                     <span className="text-[10px] text-forest/50 uppercase tracking-wider">
-                      {(colorType !== 'fixed' && selectedColor) ? `${translateColor(selectedColor, lang)} ` : ''}{hasSize && ` | ${translateSize(selections.tamanho, lang)}`}
+                      {colorType !== 'fixed' && selectedColor ? translateColor(selectedColor, lang) + ' ' : ''}
+                      {hasSize ? ` | ${translateSize(selections.tamanho, lang)}` : ''}
                     </span>
                   </div>
                 </div>
