@@ -318,7 +318,7 @@ export let SHOP_CATEGORIES = [
     id: 'home',
     name: 'Casa',
     items: 'Coasters, Stella Cushion',
-    img: 'https://i.ibb.co/j9LHyxq6/Firefly-Gemini-Flash-Imagem-com-ambiente-cosy-tema-handmade-crochet-usar-o-logo-em-label-de-cartao.png',
+    image: '/category-casa.webp',
     products: [
       { 
         id: 'h1', 
@@ -408,7 +408,7 @@ export let SHOP_CATEGORIES = [
     id: 'bags',
     name: 'Malas',
     items: ' Mini Pouches, AirPods Case',
-    img: 'https://i.ibb.co/nM8RVGGt/Capa-Malas.png',
+    image: '/category-malas.webp',
     products: [
       { 
         id: 'b1', 
@@ -502,7 +502,7 @@ Compacta e prática, fecha com um botão de madeira com estrela, um detalhe espe
     id: 'vestuario',
     name: 'Vestuário',
     items: 'Bikini, Ponchos, Cardigans',
-    img: 'https://i.ibb.co/CKMWVc9L/IMG-2691.jpg',
+    image: '/category-vestuario.webp',
     products: [
       { 
         id: 'v1', 
@@ -600,7 +600,7 @@ Disponível em várias combinações de cores, foi criado para acompanhar os dia
     id: 'premium',
     name: 'Acessórios',
     items: 'Bandanas, Headbands,',
-    img: 'https://i.ibb.co/ZpMNXV24/Capa-Acessorios.jpg',
+    image: '/category-acessorios.webp',
     products: [
       { 
         id: 'v3', 
