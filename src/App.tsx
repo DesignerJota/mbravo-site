@@ -116,24 +116,24 @@ export function suggestCorrectEmail(email: string): string | null {
 // Hero background images for automatic rotation
 const HERO_BACKGROUNDS = [
   {
-    mobile: "/hero-bg-1-mobile.webp",
-    desktop: "/hero-bg-1-desktop.webp",
-    fallback: "https://i.ibb.co/KppF2KLq/Background.png"
+    mobile: "/hero-1.webp",
+    desktop: "/hero-1.webp",
+    fallback: "/hero-1.webp"
   },
   {
-    mobile: "/hero-bg-2-mobile.webp",
-    desktop: "/hero-bg-2-desktop.webp",
-    fallback: "https://i.ibb.co/Z6z6D2W9/Background04.png"
+    mobile: "/hero-2.webp",
+    desktop: "/hero-2.webp",
+    fallback: "/hero-2.webp"
   },
   {
-    mobile: "/hero-bg-3-mobile.webp",
-    desktop: "/hero-bg-3-desktop.webp",
-    fallback: "https://i.ibb.co/JjKC14LX/Backgrounde03.png"
+    mobile: "/hero-3.webp",
+    desktop: "/hero-3.webp",
+    fallback: "/hero-3.webp"
   },
   {
-    mobile: "/hero-bg-4-mobile.webp",
-    desktop: "/hero-bg-4-desktop.webp",
-    fallback: "https://i.ibb.co/nK7Y2Rc/Background06.png"
+    mobile: "/hero-4.webp",
+    desktop: "/hero-4.webp",
+    fallback: "/hero-4.webp"
   }
 ];
 
