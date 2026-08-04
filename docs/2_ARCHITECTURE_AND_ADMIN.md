@@ -210,10 +210,11 @@ Para reforçar a fiabilidade em produção e garantir uma experiência de luxo i
    * Headers e botões de fechar (X) mantêm-se fixos (`sticky top-0 z-20`) e visíveis sem cortar a navegação, garantindo áreas de toque tátil mínimas de 44x44px (`min-h-[44px] min-w-[44px]`).
 5. **Eliminação de Zonas Mortas de Scroll no Admin Dashboard:**
    * A área do Painel de Administração (`AdminDashboardModal.tsx`) teve a interceção forçada de eventos de roda (`onWheel={(e) => e.stopPropagation()}`) removida do container principal, incorporando `pointer-events: auto`, `overflow-y: auto` e `touch-action: pan-y` em toda a extensão para scroll fluido por rato, touchpad e gestos táteis.
-6. **Sincronização 100% Real Google Places API & Carrossel Híbrido Autoplay:**
+6. **Sincronização 100% Real Google Places API, Ícones Dourados & Carrossel Híbrido Autoplay:**
    * Eliminados todos os testemunhos fictícios estáticos do frontend e do seed de backend.
    * O convite para avaliação foi atualizado com a copy oficial: `"... para a M★BRAVO. Partilhe a sua experiência e deixe-nos a sua avaliação no Google!"` e assinatura limpa de marca `"M★BRAVO"` (com remoção do subtexto "ATELIER").
-   * O cartão de convite M★BRAVO permanece fixo como Slide #1 no carrossel unificado, antecedendo todas as avaliações reais trazidas da Google Places API (`/api/testimonials`, ex: avaliação da Karolina).
+   * O cartão de convite M★BRAVO inclui o ícone [G] dourado e o selo "GOOGLE REVIEWS", permanecendo fixo como Slide #1 no carrossel unificado.
+   * Os cartões de testemunhos reais (ex: avaliação da Karolina) exibem o ícone [G] dourado + selo de verificação (checkmark) + selo "GOOGLE VERIFIED REVIEW" em tom dourado refinado (`#C5A059`).
    * Ativação automática do slider (setas e indicadores de ponto) assim que existir pelo menos 1 avaliação real, com Autoplay de transição suave a cada 5 segundos e pausa ao passar o cursor (`pauseOnHover`).
 
 
