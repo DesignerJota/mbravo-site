@@ -6788,105 +6788,102 @@ const ProductDetailPage = ({ pathname }: { pathname: string }) => {
                                         </div>
 
                                         {/* 1. REGION SELECTOR & ITEM RECALCULATION SUMMARY CARD */}
-                                        {(() => {
-                                            const rawPriceVal = getApprovedPrice(productTranslated.name);
-                                            const baseNum = typeof rawPriceVal === 'number' ? rawPriceVal : (parseFloat(String(rawPriceVal)) || 0);
-                                            const numericSubtotal = calculateItemPrice(productTranslated.name, baseNum, selections.quantidade, hasQuantity);
-                                            const directShippingFee = numericSubtotal >= 100 ? 0 : selectedShippingZone.price;
-                                            const directFinalTotal = numericSubtotal + directShippingFee;
+{(() => {
+  const rawPriceVal = getApprovedPrice(productTranslated.name);
+  const baseNum = typeof rawPriceVal === 'number' ? rawPriceVal : (parseFloat(String(rawPriceVal)) || 0);
+  const numericSubtotal = calculateItemPrice(productTranslated.name, baseNum, selections.quantidade, hasQuantity);
+  const directShippingFee = numericSubtotal >= 100 ? 0 : selectedShippingZone.price;
+  const directFinalTotal = numericSubtotal + directShippingFee;
 
-                                            const stockNum = (product as any).stock !== undefined && (product as any).stock !== null && (product as any).stock !== '' ? parseInt((product as any).stock, 10) : 0;
-                                            const craftingNum = (product as any).craftingTime !== undefined && (product as any).craftingTime !== null && (product as any).craftingTime !== '' ? parseInt((product as any).craftingTime, 10) : ((product as any).production_time ? parseInt((product as any).production_time, 10) : 10);
-                                            const itemLeadTime = stockNum > 0 ? 0 : craftingNum;
+  const stockNum = (product as any).stock !== undefined && (product as any).stock !== null && (product as any).stock !== '' ? parseInt((product as any).stock, 10) : 0;
+  const craftingNum = (product as any).craftingTime !== undefined && (product as any).craftingTime !== null && (product as any).craftingTime !== '' ? parseInt((product as any).craftingTime, 10) : ((product as any).production_time ? parseInt((product as any).production_time, 10) : 10);
+  const itemLeadTime = stockNum > 0 ? 0 : craftingNum;
 
-                                            return (
-            <div className="bg-[#FAF7F2] border border-[#C5A059]/30 rounded-2xl p-4 space-y-3 shadow-sm font-sans">
-              <div className="flex justify-between items-center gap-3 border-b border-forest/10 pb-2.5">
-                <div className="flex items-center gap-3">
-                  <img
-                    src={currentImg}
-                    loading="lazy"
-                    alt=""
-                    className="w-12 h-12 rounded-lg object-cover border border-forest/10 shrink-0"
-                  />
-                  <div>
-                    <span className="font-serif font-medium text-sm text-forest block">{productTranslated.name}</span>
-                    <span className="text-[10px] text-forest/50 uppercase tracking-wider">
-                      {colorType !== 'fixed' && selectedColor ? translateColor(selectedColor, lang) : ''}
-                      {hasSize ? ' | ' + translateSize(selections.tamanho, lang) : ''}
-                    </span>
-                  </div>
-                </div>
-                <span className="font-serif text-sm font-bold text-forest">{numericSubtotal.toFixed(2)}€</span>
-              </div>
-            </div>
-          );
-        })()}
+  return (
+    <div className="bg-[#FAF7F2] border border-[#C5A059]/30 rounded-2xl p-4 space-y-3 shadow-sm font-sans">
+      <div className="flex justify-between items-center gap-3 border-b border-forest/10 pb-2.5">
+        <div className="flex items-center gap-3">
+          <img
+            src={currentImg}
+            loading="lazy"
+            alt=""
+            className="w-12 h-12 rounded-lg object-cover border border-forest/10 shrink-0"
+          />
+          <div>
+            <span className="font-serif font-medium text-sm text-forest block">{productTranslated.name}</span>
+            <span className="text-[10px] text-forest/50 uppercase tracking-wider">
+              {colorType !== 'fixed' && selectedColor ? translateColor(selectedColor, lang) : ''}
+              {hasSize ? ' | ' + translateSize(selections.tamanho, lang) : ''}
+            </span>
+          </div>
+        </div>
+        <span className="font-serif text-sm font-bold text-forest">{numericSubtotal.toFixed(2)}€</span>
+      </div>
+
+      {/* Region Selector Dropdown */}
+      <div className="pt-1 flex justify-between items-center text-xs font-sans">
+        <span className="text-[10px] uppercase tracking-wider text-forest/70 font-bold flex items-center gap-1">
+          <MapPin size={12} className="text-[#C5A059]" />
+          {lang === 'pt' ? 'Região de Envio' : 'Shipping Region'}:
+        </span>
+        <select
+          value={selectedShippingZone.id}
+          onChange={(e) => {
+            const found = SHIPPING_ZONES.find((z) => z.id === e.target.value);
+            if (found) setSelectedShippingZone(found);
+          }}
+          className="bg-white border border-forest/20 rounded-lg text-xs font-medium text-forest focus:outline-none cursor-pointer px-2.5 py-1 shadow-xs"
+        >
+          {SHIPPING_ZONES.map((zone) => (
+            <option key={zone.id} value={zone.id} className="bg-[#FCFBF9] text-forest">
+              {zone.name[lang === 'pt' ? 'pt' : 'en']} ({numericSubtotal >= 100 && zone.id === 'PT' ? 'Cortesia 0.00€' : `${zone.price.toFixed(2)}€`})
+            </option>
+          ))}
+        </select>
+      </div>
+
+      {/* Timelines Breakdown */}
+      <div className="py-1.5 space-y-1 text-[10px] font-sans text-forest/70 border-t border-forest/5">
+        <div className="flex justify-between items-center">
+          <span className="text-forest/60">{lang === 'pt' ? 'Produção Manual:' : 'Handcrafted Production:'}</span>
+          <span className="font-serif font-medium text-forest">
+            {itemLeadTime === 0
+              ? (lang === 'pt' ? 'Disponível em Atelier' : 'Available in Atelier')
+              : (lang === 'pt' ? `${itemLeadTime} ${itemLeadTime === 1 ? 'dia útil' : 'dias úteis'}` : `${itemLeadTime} ${itemLeadTime === 1 ? 'business day' : 'business days'}`)}
+          </span>
+        </div>
+        <div className="flex justify-between items-center">
+          <span className="text-forest/60">{lang === 'pt' ? 'Envio Expresso (CTT):' : 'Express Shipping (CTT):'}</span>
+          <span className="font-serif font-medium text-forest">
+            {itemLeadTime === 0
+              ? (lang === 'pt' ? '1 a 3 dias úteis' : '1 to 3 business days')
+              : (lang === 'pt' ? '1 a 3 dias úteis (após produção)' : '1 to 3 business days (post-production)')}
+          </span>
+        </div>
+      </div>
+
+      <div className="flex justify-between items-baseline text-xs font-sans text-forest/70 border-t border-forest/5 pt-1">
+        <span>{lang === 'pt' ? 'Portes de Envio CTT' : 'CTT Shipping Fee'}</span>
+        <span className="font-serif font-medium text-forest">
+          {directShippingFee === 0 ? (
+            <span className="text-[#987834] uppercase text-[9px] tracking-wider font-bold bg-[#C5A059]/10 px-2 py-0.5 rounded-full">
+              {lang === 'pt' ? 'Cortesia M★BRAVO (0.00€)' : 'M★BRAVO Courtesy (0.00€)'}
+            </span>
+          ) : (
+            `${directShippingFee.toFixed(2)}€`
+          )}
+        </span>
+      </div>
+
+      <div className="pt-1.5 border-t border-forest/10 flex justify-between items-baseline font-serif text-sm font-bold text-forest">
+        <span>{lang === 'pt' ? 'Total Final com Envio' : 'Final Total with Shipping'}</span>
+        <span className="text-base text-forest font-serif font-extrabold">{directFinalTotal.toFixed(2)}€</span>
+      </div>
+    </div>
+  );
+})()}
                                       
-                                                    {/* Region Selector Dropdown */}
-                                                    <div className="pt-1 flex justify-between items-center text-xs font-sans">
-                                                        <span className="text-[10px] uppercase tracking-wider text-forest/70 font-bold flex items-center gap-1">
-                                                            <MapPin size={12} className="text-[#C5A059]" />
-                                                            {lang === 'pt' ? 'Região de Envio' : 'Shipping Region'}:
-                                                        </span>
-                                                        <select
-                                                            value={selectedShippingZone.id}
-                                                            onChange={(e) => {
-                                                                const found = SHIPPING_ZONES.find((z) => z.id === e.target.value);
-                                                                if (found) setSelectedShippingZone(found);
-                                                            }}
-                                                            className="bg-white border border-forest/20 rounded-lg text-xs font-medium text-forest focus:outline-none cursor-pointer px-2.5 py-1 shadow-xs"
-                                                        >
-                                                            {SHIPPING_ZONES.map((zone) => (
-                                                                <option key={zone.id} value={zone.id} className="bg-[#FCFBF9] text-forest">
-                                                                    {zone.name[lang === 'pt' ? 'pt' : 'en']} ({numericSubtotal >= 100 && zone.id === 'PT' ? 'Cortesia 0.00€' : `${zone.price.toFixed(2)}€`})
-                                                                </option>
-                                                            ))}
-                                                        </select>
-                                                    </div>
-
-                                                    {/* Timelines Breakdown */}
-                                                    <div className="py-1.5 space-y-1 text-[10px] font-sans text-forest/70 border-t border-forest/5">
-                                                        <div className="flex justify-between items-center">
-                                                            <span className="text-forest/60">{lang === 'pt' ? 'Produção Manual:' : 'Handcrafted Production:'}</span>
-                                                            <span className="font-serif font-medium text-forest">
-                                                                {itemLeadTime === 0
-                                                                    ? (lang === 'pt' ? 'Disponível em Atelier' : 'Available in Atelier')
-                                                                    : (lang === 'pt' ? `${itemLeadTime} ${itemLeadTime === 1 ? 'dia útil' : 'dias úteis'}` : `${itemLeadTime} ${itemLeadTime === 1 ? 'business day' : 'business days'}`)}
-                                                            </span>
-                                                        </div>
-                                                        <div className="flex justify-between items-center">
-                                                            <span className="text-forest/60">{lang === 'pt' ? 'Envio Expresso (CTT):' : 'Express Shipping (CTT):'}</span>
-                                                            <span className="font-serif font-medium text-forest">
-                                                                {itemLeadTime === 0
-                                                                    ? (lang === 'pt' ? '1 a 3 dias úteis' : '1 to 3 business days')
-                                                                    : (lang === 'pt' ? '1 a 3 dias úteis (após produção)' : '1 to 3 business days (post-production)')}
-                                                            </span>
-                                                        </div>
-                                                    </div>
-
-                                                    <div className="flex justify-between items-baseline text-xs font-sans text-forest/70 border-t border-forest/5 pt-1">
-                                                        <span>{lang === 'pt' ? 'Portes de Envio CTT' : 'CTT Shipping Fee'}</span>
-                                                        <span className="font-serif font-medium text-forest">
-                                                            {directShippingFee === 0 ? (
-                                                                <span className="text-[#987834] uppercase text-[9px] tracking-wider font-bold bg-[#C5A059]/10 px-2 py-0.5 rounded-full">
-                                                                    {lang === 'pt' ? 'Cortesia M★BRAVO (0.00€)' : 'M★BRAVO Courtesy (0.00€)'}
-                                                                </span>
-                                                            ) : (
-                                                                `${directShippingFee.toFixed(2)}€`
-                                                            )}
-                                                        </span>
-                                                    </div>
-
-                                                    <div className="pt-1.5 border-t border-forest/10 flex justify-between items-baseline font-serif text-sm font-bold text-forest">
-                                                        <span>{lang === 'pt' ? 'Total Final com Envio' : 'Final Total with Shipping'}</span>
-                                                        <span className="text-base text-forest font-serif font-extrabold">{directFinalTotal.toFixed(2)}€</span>
-                                                    </div>
-                                                </div>
-                                            );
-                                        })()}
-
-                                        {/* Inputs */}
+                                      {/* Inputs */}
                                         <div className="space-y-2.5">
                                             <input 
                                                 type="text" 
