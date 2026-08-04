@@ -354,6 +354,16 @@ Para que o repositório no GitHub fique 100% sincronizado com a versão final de
         *   Incentivo de envio grátis padronizado como **"Faltam [X]€ para usufruir de Envio Cortesia M★BRAVO"** e **"Parabéns, a sua encomenda beneficia de Envio Cortesia M★BRAVO"**.
         *   Limpeza integral de termos industriais e eliminação de grafias antigas ("Confeção" $\rightarrow$ "Produção Manual", "Selecção" $\rightarrow$ "Encomenda").
 
+*   [x] **Sincronização e Lógica de Pílulas de Cores (Frontend vs. Backend):**
+    *   **Reatividade ao Inventário de Matérias-Primas (`inventory.json`):** As pílulas de seleção de cor na Página de Produto (PDP) e no Modal de Visualização Rápida reagem em tempo real aos níveis de stock do inventário do backend (`/api/inventory` e `/api/catalog`).
+    *   **Bloqueio e Desativação Visual de Cores sem Stock:** Se uma cor/matéria-prima apresentar quantidade `<= 0` ou estiver desativada no CMS (`outOfStockColors`), a pílula correspondente no frontend fica automaticamente desativada (`disabled`), com opacidade reduzida, risco discreto diagonal em tom de aviso e bloqueio de cliques.
+    *   **Exibição de Informação em Tooltip:** Ao passar o cursor ou tocar numa cor esgotada, a tooltip indica com clareza o estado indisponível (*"Nome da Cor (Sem Stock / Indisponível)"*).
+*   [x] **Campo de Notas / Instruções de Envio e Personalização no Checkout Rápido:**
+    *   **Integração no Modal de Comprar Agora:** Adicionado o campo de texto estilizado de *"INSTRUÇÕES DE ENVIO OU NOTAS (OPCIONAL)"* no modal de Checkout Rápido em `App.tsx`.
+    *   **Transmissão ao Backend e Intent de Pagamento:** Os dados introduzidos são associados ao estado `checkoutForm.notas` e transmitidos com segurança ao backend (`/api/payment/create-intent`), sendo salvos no registo da encomenda e refletidos nos e-mails e painel administrativo.
+*   [x] **UI de Luxo & Micro-interações nos Botões e Controles:**
+    *   **Proporções Minimalistas de Alta Moda:** Amostras de cor em `w-5 h-5` / `w-6 h-6` com micro-bordas de destaque, botões CTA ajustados com limites de altura elegante (`h-10 / max-h-[40px]`), cantos suaves e tipografia em caixa alta com rastreio amplo (`text-[10px] sm:text-[11px] uppercase tracking-[0.2em] font-medium`).
+
 ## 4. Próximos Passos Recomendados & Roteiro de Otimização Mobile
 
 ### A. Validação de Transição de Repositório & Persistência:
@@ -384,11 +394,40 @@ Para que o repositório no GitHub fique 100% sincronizado com a versão final de
     *   **Espaço Editorial & Proporção Visual:** Redução global de paddings e fontes em ~20% no PDP e Drawer em mobile/tablet, devolvendo o protagonismo visual à fotografia das peças artesanais M★BRAVO.
     *   **Paridade Promocional ("Nota de Envio"):** Padronização da nomenclatura e badge informativo ("NOTA DE ENVIO") informando no PDP e no Carrinho que o valor de portes é fixo para mais unidades.
 
+*   [x] **Restauração do Scroll por Rato/Touchpad no Admin Dashboard:**
+    *   **Pausa Temporária do Lenis Smooth Scroll:** Ao abrir o `AdminDashboardModal.tsx`, a biblioteca Lenis é pausada automaticamente (`lenis.stop()`) e o scroll da página principal é bloqueado (`body.style.overflow = 'hidden'`).
+    *   **Propagação Isolada de Eventos de Roda (`onWheel`):** O contentor interno de dados do painel recebeu `onWheel={(e) => e.stopPropagation()}` e `data-lenis-prevent`, garantindo a rolagem 100% nativa e suave com o scroll do rato ou touchpad.
+*   [x] **Fidelidade Dinâmica das Pílulas de Cor (Frontend vs. Admin Dashboard):**
+    *   **Consumo Direto do Objeto do Produto:** As pílulas de cores na PDP e no Checkout Rápido leem estritamente as cores e opções configuradas no AdminDashboard / `catalog.json` do produto (`availableColors`, `colors`, `cores`), sem qualquer fallback genérico forçado.
+    *   **Suporte Rigoroso a Cores sem Stock:** As cores com quantidade `<= 0` ou desativadas no CMS surgem desativadas (`disabled`), com opacidade reduzida (`opacity-40 grayscale`), risco discreto diagonal em tom de aviso e indicação explicativa em tooltip.
+*   [x] **Cartão Dourado de Notas de Envio / Instruções no Checkout Rápido & Carrinho:**
+    *   **Design Unificado de Luxo:** Integrado o cartão balão em tom dourado suave (`#F6F2EA`) com ícone `<Sparkles />` e rótulo *"Notas de Envio / Instruções Especial"* tanto no modal de Checkout Rápido ("Comprar Agora") como na gaveta principal do carrinho (`AtelierCartDrawer.tsx`).
+    *   **Persistência dos Dados:** Os comentários ou pedidos de personalização inseridos no `<textarea>` são associados a `checkoutForm.notas` e gravados na encomenda no Railway e e-mails de confirmação.
+
 *   [x] **Integração Fiel da Stripe Payment Request API para Express Checkout Nativo (Apple Pay / Google Pay):**
     *   **Invocação Direta da Folha Nativa do SO:** Corrigida a função `handleExpressWalletPay` em `src/components/AtelierCartDrawer.tsx` e `src/App.tsx` para invocar diretamente `paymentRequest.show()` ao clicar nos botões de Apple Pay e Google Pay.
     *   **Autopreenchimento de Dados de Envio & Contacto:** Ativado `requestShipping: true` com callback `shippingaddresschange`, garantindo que a janela nativa do iOS (Apple Pay Sheet) e do Android/Chrome (Google Pay Sheet) recolhe e transmite automaticamente a morada de envio completa, nome, email e telefone guardados na carteira do utilizador.
     *   **Validação Biométrica Obrigatória (Face ID / Touch ID / PIN):** O evento de autorização de pagamento `paymentmethod` só é emitido após a validação biométrica com sucesso no dispositivo do cliente.
     *   **Confirmação Bancária Estrita em Duas Fases:** A aplicação executa a intenção de pagamento no Stripe (`create-intent`), confirma a cobrança via `confirmCardPayment`, exibe a animação verde nativa de sucesso na carteira (`ev.complete('success')`) e SÓ ENTÃO transita o cliente para a ecrã de "Encomenda Confirmada" e dispara as notificações de e-mail/CTT.
+
+*   [x] **Sanitização de Montantes e Sincronização em Todos os Modais de Checkout (`amountInCents` & `shippingOptions`):**
+    *   Sincronizada em `CartCheckoutModal.tsx`, `AtelierCartDrawer.tsx` e `App.tsx` a conversão e sanitização rigorosa de montantes em cêntimos (`Math.max(0, parseFloat(String(totalPrice + shippingFee || 0).replace(/[^0-9.]/g, '')) || 0)`), garantindo rejeição zero em carteiras digitais (Apple Pay / Google Pay) e formulários com cartões/MBWay.
+    *   Tratamento seguro e bilingue das etiquetas `shippingOptions.label` e `detail` na API da Stripe.
+*   [x] **Suporte Completo a Orientação Horizontal Mobile (@media (orientation: landscape)):**
+    *   Adicionadas regras CSS media query e classes Tailwind para orientação landscape (`landscape:max-h-[92vh]`), preservando botões de fechar (X) e rodapés acionáveis fixos (`sticky top-0 z-20` e `sticky bottom-0 z-30`).
+    *   Ajustadas as áreas táticas mínimas para 44x44px em todos os controlos interativos de toque.
+*   [x] **Injeção do Opt-in de Avaliações Google Merchant Center (Consumidor) & Link de Opiniões:**
+    *   Injeção automática do script oficial do Google Consumer Surveys (`platform.js?onload=renderGoogleOptIn`) na página de confirmação de encomenda (Thank You Page), renderizando o diálogo de opt-in com MERCHANT_ID 538917849.
+    *   Atualizada a fonte do widget e cartão de avaliações para o link oficial Google Maps: `https://g.page/r/Cdo7JGP_Xpc3EBM/review`.
+*   [x] **Consumo 100% Dinâmico do Array de Cores do CMS / Dashboard:**
+    *   A amostragem e seleção de cores no frontend consome integralmente o array de cores configurado no CMS/Dashboard (`availableColors`, `colors`, `cores`), eliminando dependências de fallbacks estáticos hardcoded.
+*   [x] **Eliminação de Zonas Mortas de Scroll no Admin Dashboard:**
+    *   Removido o travamento forçado de `onWheel` e ativada rolagem fluida nativa com `pointer-events: auto`, `overflow-y: auto` e `-webkit-overflow-scrolling: touch` na totalidade do painel administrativo.
+*   [x] **Refatoração Dinâmica do Componente "Partilhado por Quem nos Escolhe" (Google Places API & UI Responsiva):**
+    *   Eliminação total do array hardcoded `defaultTestimonials` com testemunhos fictícios em `App.tsx` e remoção do pre-seed fictício no backend `server.ts`.
+    *   Ligação do componente exclusivamente a dados de avaliações reais consumidos da API (`/api/testimonials` / Google Places API).
+    *   Lógica de UI responsiva condicional: quando `reviews.length === 1` (ou card convidativo de 1a review), renderiza em destaque centralizado sem setas ou pontos de navegação; quando `reviews.length > 1`, ativa automaticamente os controlos de carrossel/slider (setas desktop/mobile e indicadores em ponto).
+    *   Manutenção do botão com link direto para a página oficial de avaliações do atelier no Google (`https://g.page/r/Cdo7JGP_Xpc3EBM/review`).
 
 ### B. Roteiro Técnico de Otimização Mobile & iOS WebKit (Meta: PageSpeed >90 - FASE 1 CONCLUÍDA):
 *   [x] **Aceleração Hardware-Backing para iOS WebKit:** Aplicado `-webkit-backface-visibility: hidden; transform: translateZ(0);` nos cartões de produtos e categorias para impedir a reciclagem agressiva de texturas da GPU pelo WebKit durante o scroll rápido em iPhones/iPads.
