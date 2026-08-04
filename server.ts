@@ -49,6 +49,23 @@ app.use((req, res, next) => {
   res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, PATCH, OPTIONS");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization, Accept, X-Admin-Password, X-Requested-With");
 
+  // CABEÇALHOS DE SEGURANÇA E PROTEÇÃO (TICKET 1.2)
+  res.setHeader('X-Frame-Options', 'DENY');
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+  res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains; preload');
+  res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+  res.setHeader(
+    'Content-Security-Policy',
+    "default-src 'self'; " +
+    "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.stripe.com https://cdn.jsdelivr.net; " +
+    "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; " +
+    "font-src 'self' https://fonts.gstatic.com data:; " +
+    "img-src 'self' data: blob: https:; " +
+    "connect-src 'self' https://api.stripe.com https://maps.googleapis.com wss: https:; " +
+    "frame-src 'self' https://js.stripe.com; " +
+    "object-src 'none';"
+  );
+
   // Prevent Google and search crawlers from indexing any requests directed to the API subdomain or raw API endpoints
   const host = req.headers.host || "";
   const isApiHost = host.toLowerCase().startsWith("api.");
