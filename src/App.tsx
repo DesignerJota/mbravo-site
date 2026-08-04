@@ -7989,11 +7989,3 @@ export default function App() {
     </CartProvider>
   );
 }
-
-Adobe Acrobat
-
-
-Resuma isto
-
-
-Perguntar ao Assistente de IA
