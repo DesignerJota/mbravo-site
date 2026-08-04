@@ -423,6 +423,12 @@ Para que o repositório no GitHub fique 100% sincronizado com a versão final de
     *   A amostragem e seleção de cores no frontend consome integralmente o array de cores configurado no CMS/Dashboard (`availableColors`, `colors`, `cores`), eliminando dependências de fallbacks estáticos hardcoded.
 *   [x] **Eliminação de Zonas Mortas de Scroll no Admin Dashboard:**
     *   Removido o travamento forçado de `onWheel` e ativada rolagem fluida nativa com `pointer-events: auto`, `overflow-y: auto` e `-webkit-overflow-scrolling: touch` na totalidade do painel administrativo.
+*   [x] **Refatoração Dinâmica da Galeria Instagram (Opção B - Behold API, Espaçamento "DIÁRIO VISUAL" & Escala Tipográfica Diferenciada):**
+    *   Consumo dinâmico dos posts reais da conta `@mbravobycarolina` via endpoint backend `/api/instagram` (integração Behold API `bsBrFKD7BzlZyS6ABOlJ` e fallback curado), eliminando iFrames genéricos e marcas de água.
+    *   Cabeçalho editorial de alta-costura com o título `"DIÁRIO VISUAL"` em tom bronze nobre (`#8C6D3B`) e espaçamento ampliado de respiração visual (`mb-12 sm:mb-16 lg:mb-20`), emoldurado por linhas finas douradas e a estrela M★BRAVO centrada acima do título.
+    *   Bloco [Ícone Instagram + Handle] `@mbravobycarolina` com alinhamento óptico vertical geométrico milimétrico (`inline-flex items-center justify-center leading-none align-middle`).
+    *   Harmonização das molduras Polaroid com janela interna `aspect-square`, mantendo o efeito de hover interativo com visualização de likes e comentários em tempo real.
+    *   Diferenciação escalar tipográfica entre Polaroids Pequenas (`text-[7.5px]` a `text-[8.5px]` com `truncate` e limitação de largura a 62%) e Polaroids Grandes (`text-[11px]` a `text-[12px]` a 70%), impedindo qualquer sobreposição ou toque nas margens brancas da moldura.
 *   [x] **Refatoração Dinâmica do Componente "Partilhado por Quem nos Escolhe" (Google Places API, Selos Dourados, Autoplay & UI Híbrida):**
     *   Eliminação total do array hardcoded `defaultTestimonials` com testemunhos fictícios em `App.tsx` e remoção do pre-seed fictício no backend `server.ts`.
     *   Atualização da copy do cartão de convite institucional para `"... para a M★BRAVO. Partilhe a sua experiência e deixe-nos a sua avaliação no Google!"` com assinatura limpa `"M★BRAVO"` (sem a palavra "ATELIER").
