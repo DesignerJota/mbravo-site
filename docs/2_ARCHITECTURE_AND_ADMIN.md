@@ -216,6 +216,12 @@ Para reforçar a fiabilidade em produção e garantir uma experiência de luxo i
    * O cartão de convite M★BRAVO inclui o ícone [G] dourado e o selo "GOOGLE REVIEWS", permanecendo fixo como Slide #1 no carrossel unificado.
    * Os cartões de testemunhos reais (ex: avaliação da Karolina) exibem o ícone [G] dourado + selo de verificação (checkmark) + selo "GOOGLE VERIFIED REVIEW" em tom dourado refinado (`#C5A059`).
    * Ativação automática do slider (setas e indicadores de ponto) assim que existir pelo menos 1 avaliação real, com Autoplay de transição suave a cada 5 segundos e pausa ao passar o cursor (`pauseOnHover`).
+7. **Galeria Instagram Personalizada com Feed Real Behold API, Espaçamento de Alta-Costura e Escala Tipográfica Diferenciada:**
+   * Endpoint de backend `GET /api/instagram` integrado para consumo em tempo real dos dados do perfil `@mbravobycarolina` (Behold API ID `bsBrFKD7BzlZyS6ABOlJ`), eliminando marcas de água e iFrames externos genéricos.
+   * Cabeçalho editorial de alta-costura com o título `"DIÁRIO VISUAL"` em tom bronze nobre (`#8C6D3B`) e espaçamento generoso de respiração visual (`mb-12 sm:mb-16 lg:mb-20`), emoldurado por linhas finas douradas e a estrela M★BRAVO centrada acima do título.
+   * Bloco do perfil `@mbravobycarolina` com ícone do Instagram (`#C5A059`) e texto perfeitamente centrados no eixo geométrico da altura da letra (`inline-flex items-center justify-center leading-none align-middle`).
+   * Molduras Polaroid unificadas com janela visual interna `aspect-square`, mantendo o efeito de hover interativo com visualização de likes e comentários em tempo real.
+   * Escala tipográfica calibrada por dimensão de cartão: Polaroids Pequenas (cards secundários) usam tipografia ultra-discreta (`text-[7.5px]` a `text-[8.5px]`) com limitação de largura e `truncate` automático para impedir toque nas margens brancas; Polaroids Grandes (cards principais) utilizam escala proporcional mais ampla (`text-[11px]` a `text-[12px]`).
 
 
 ### A. Diagnóstico & Solução de Flicker de Imagens no iOS (Safari/WebKit) — [IMPLEMENTADO]
