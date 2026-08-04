@@ -1678,14 +1678,8 @@ const Hero = () => {
                         className="absolute inset-0"
                     >
                        {HERO_BACKGROUNDS.map((bgItem, index) => {
-            const isFirstImage = index === 0;
-            const isCurrentActive = index === bgIndex;
-
-            // Bloqueia as restantes imagens do DOM até serem necessárias
-            if (!isFirstImage && !isCurrentActive) {
-              return null;
-            }
-
+                           if (index !== 0 && index !== bgIndex) return null;
+            
             return (
               <motion.div
                 key={bgItem.mobile}
@@ -1704,8 +1698,8 @@ const Hero = () => {
                     src={bgItem.desktop}
                     alt={`MBRAVO Background ${index + 1}`}
                     className="w-full h-full object-cover"
-                    fetchPriority={isFirstImage ? "high" : "low"}
-                    loading={isFirstImage ? "eager" : "lazy"}
+                    fetchPriority={index === 0 ? "high" : "low"}
+                    loading={index === 0 ? "eager" : "lazy"}
                     width={1920}
                     height={1080}
                     decoding="async"
