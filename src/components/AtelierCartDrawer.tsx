@@ -148,9 +148,7 @@ export const AtelierCartDrawer: React.FC = () => {
       const totalInCents = Math.round((totalPrice + shippingFee) * 100);
       if (totalInCents <= 0) return;
 
-      const dynamicShippingLabel = lang === 'en'
-        ? (selectedShippingZone?.id === 'pt-islands' ? 'Portugal (Islands)' : selectedShippingZone?.id === 'eu' ? 'European Union' : 'Portugal (Mainland & Islands)')
-        : (selectedShippingZone?.name || 'Portugal (Continental e Ilhas)');
+      const dynamicShippingLabel = getZoneNameString(selectedShippingZone, (typeof lang === 'object' ? (lang as any)?.code : lang) === 'en');
 
       const dynamicShippingDetail = lang === 'en'
         ? 'Handcrafted Production + CTT Express (1 to 3 business days)'
@@ -170,7 +168,7 @@ export const AtelierCartDrawer: React.FC = () => {
         shippingOptions: [
           {
             id: selectedShippingZone?.id || 'pt-mainland',
-            label: dynamicShippingLabel,
+            label: getZoneNameString(selectedShippingZone, (typeof lang === 'object' ? (lang as any)?.code : lang) === 'en'),
             detail: dynamicShippingDetail,
             amount: Math.round((shippingFee || 0) * 100)
           }
@@ -189,7 +187,7 @@ export const AtelierCartDrawer: React.FC = () => {
           shippingOptions: [
             {
               id: selectedShippingZone?.id || 'pt-mainland',
-              label: dynamicShippingLabel,
+              label: getZoneNameString(selectedShippingZone, (typeof lang === 'object' ? (lang as any)?.code : lang) === 'en'),
               detail: dynamicShippingDetail,
               amount: Math.round((shippingFee || 0) * 100)
             }
