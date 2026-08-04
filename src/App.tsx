@@ -1878,10 +1878,10 @@ const StorySection = () => {
     const opacityTrack = useTransform(smoothProgress, [0, 0.2, 0.8, 1], [0, 0.03, 0.03, 0]);
 
     const storyImages = [
-        "https://i.ibb.co/S48hcbDp/Firefly-Gemini-Flash-Imagem-com-ambiente-cosy-tema-handmade-crochet-usar-o-logo-em-label-costirado.png",
-        "https://i.ibb.co/9krmWqpD/organic-cotton-labels-1.png",
-        "https://i.ibb.co/XktWbR4R/laser-engraved-wood-tag-1.png"
-    ];
+  "/story-1.webp",
+  "/story-2.webp",
+  "/story-3.webp"
+];
 
     const [currentImg, setCurrentImg] = useState(0);
 
