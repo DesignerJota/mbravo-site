@@ -2334,52 +2334,6 @@ async function initDatabase() {
     `);
     console.log("[DATABASE SUCCESS] PostgreSQL testimonials table initialized successfully.");
 
-    // Pre-seed if empty
-    const checkEmpty = await dbPool.query("SELECT COUNT(*) FROM testimonials");
-    const count = parseInt(checkEmpty.rows[0].count, 10);
-    if (count === 0) {
-      console.log("[DATABASE SEED] Pre-seeding testimonials table with premium brand reviews...");
-      const seeds = [
-        {
-          name: "Maria S.",
-          text: "A mala Daisy é ainda mais bonita ao vivo... O trabalho e o detalhe das flores de crochet são admiráveis, nota-se o amor em cada linha.",
-          product: "Mala Daisy",
-          rating: 5
-        },
-        {
-          name: "Carolina P.",
-          text: "Os coasters dão um toque único à mesa. São super delicados, mas nota-se logo a excelente qualidade do material.",
-          product: "Daisy Coasters",
-          rating: 5
-        },
-        {
-          name: "Emma W.",
-          text: "A mala Granny Square superou todas as minhas expectativas. É lindíssima, super robusta e cabe perfeitamente tudo o que preciso no dia a dia.",
-          product: "Mala Granny Square",
-          rating: 5
-        },
-        {
-          name: "Joana R.",
-          text: "Comprei o biquíni Marea e o caimento é impecável. A minúcia do trabalho manual e o toque do algodão orgânico são indescritíveis.",
-          product: "Marea Bikini Set",
-          rating: 5
-        },
-        {
-          name: "Teresa B.",
-          text: "O cardigan Alma é uma peça intemporal de um conforto absoluto. Recebo elogios sempre que o uso, uma verdadeira obra de arte!",
-          product: "Alma Cardigan",
-          rating: 5
-        }
-      ];
-      for (const s of seeds) {
-        await dbPool.query(
-          `INSERT INTO testimonials (name, text, product, rating) VALUES ($1, $2, $3, $4)`,
-          [s.name, s.text, s.product, s.rating]
-        );
-      }
-      console.log("[DATABASE SEED] Pre-seeded 5 testimonials in PostgreSQL.");
-    }
-
     // Attempt Google Places API reviews sync if configured
     await syncGoogleReviews();
   } catch (err: any) {
