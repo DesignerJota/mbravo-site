@@ -5424,6 +5424,7 @@ const TestimonialsSection = () => {
     const { lang, t } = useLanguage();
     const [reviews, setReviews] = useState<any[]>([]);
     const [activeIndex, setActiveIndex] = useState(0);
+    const [isPaused, setIsPaused] = useState(false);
 
     // Fetch live Google Places reviews and user submissions from back-end
     useEffect(() => {
@@ -5444,7 +5445,18 @@ const TestimonialsSection = () => {
             });
     }, []);
 
-    const totalReviews = reviews.length;
+    const inviteCard = {
+        id: 'google-invite',
+        name: "M★BRAVO",
+        text: lang === 'pt'
+            ? "O seu apoio significa o mundo para a M★BRAVO. Partilhe a sua experiência e deixe-nos a sua avaliação no Google!"
+            : "Your support means the world to M★BRAVO. Share your experience and leave us a review on Google!",
+        product: "",
+        rating: 5
+    };
+
+    const allItems = [inviteCard, ...reviews];
+    const totalReviews = allItems.length;
     const isMulti = totalReviews > 1;
 
     const nextTestimonial = () => {
@@ -5457,14 +5469,18 @@ const TestimonialsSection = () => {
         setActiveIndex((prev) => (prev - 1 + totalReviews) % totalReviews);
     };
 
-    const currentReview = totalReviews > 0 ? reviews[Math.min(activeIndex, totalReviews - 1)] : {
-        name: "M★BRAVO Atelier",
-        text: lang === 'pt'
-            ? "O seu apoio significa o mundo para o nosso atelier. Partilhe a sua experiência e deixe-nos a sua avaliação no Google!"
-            : "Your support means the world to our atelier. Share your experience and leave us a review on Google!",
-        product: "Google Verified Review",
-        rating: 5
-    };
+    // Autoplay interval every 5s with pauseOnHover
+    useEffect(() => {
+        if (!isMulti || isPaused) return;
+
+        const interval = setInterval(() => {
+            setActiveIndex((prev) => (prev + 1) % totalReviews);
+        }, 5000);
+
+        return () => clearInterval(interval);
+    }, [isMulti, isPaused, totalReviews]);
+
+    const currentReview = allItems[Math.min(activeIndex, totalReviews - 1)] || inviteCard;
 
     return (
         <section id="testimonials" data-background="light" className="py-6 sm:py-8 md:py-10 bg-[#F6F1E5] relative overflow-hidden select-none border-t border-b border-forest/5">
@@ -5490,7 +5506,11 @@ const TestimonialsSection = () => {
                 </div>
 
                 {/* Single review or multi-review slider container */}
-                <div className="relative max-w-lg sm:max-w-xl mx-auto px-4 py-0.5">
+                <div 
+                    className="relative max-w-lg sm:max-w-xl mx-auto px-4 py-0.5"
+                    onMouseEnter={() => setIsPaused(true)}
+                    onMouseLeave={() => setIsPaused(false)}
+                >
                     <div className="relative min-h-[145px] sm:min-h-[155px] flex items-center justify-center">
                         <AnimatePresence mode="wait">
                             <motion.div
@@ -5579,7 +5599,7 @@ const TestimonialsSection = () => {
                             </button>
 
                             <div className="flex items-center gap-1.5">
-                                {reviews.map((_, i) => (
+                                {allItems.map((_, i) => (
                                     <button
                                         key={i}
                                         onClick={() => setActiveIndex(i)}
