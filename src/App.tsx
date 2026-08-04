@@ -113,7 +113,7 @@ export function suggestCorrectEmail(email: string): string | null {
   return null;
 }
 
-// Hero background images for automatic rotation
+// Hero background images - hero-1 é prioritária, as restantes carregam em diferido
 const HERO_BACKGROUNDS = [
   {
     mobile: "/hero-1.webp",
@@ -1677,50 +1677,60 @@ const Hero = () => {
                         }}
                         className="absolute inset-0"
                     >
-                        {HERO_BACKGROUNDS.map((bgItem, index) => (
-                            <motion.div 
-                                key={bgItem.mobile}
-                                style={{ y: bgY, scale: bgScale }}
-                                initial={{ opacity: index === 0 ? 0.93 : 0 }}
-                                animate={{ 
-                                    opacity: bgIndex === index ? 0.93 : 0,
-                                }}
-                                transition={{ duration: 2.2, ease: "easeInOut" }}
-                                className="absolute inset-0 brightness-[0.46] contrast-[1.40] saturate-[1.05]"
-                            >
-                                <picture className="w-full h-full block">
-                                    <source media="(max-width: 640px)" srcSet={bgItem.mobile} type="image/webp" />
-                                    <source media="(min-width: 641px)" srcSet={bgItem.desktop} type="image/webp" />
-                                    <img 
-                                        src={bgItem.desktop} 
-                                        alt={`M★BRAVO Background ${index + 1}`}
-                                        className="w-full h-full object-cover"
-                                        fetchPriority={index === 0 ? "high" : "low"}
-                                        loading={index === 0 ? "eager" : "lazy"}
-                                        width={1920}
-                                        height={1080}
-                                        decoding="async"
-                                        onError={(e) => {
-                                          const target = e.currentTarget;
-                                          const parent = target.parentElement;
-                                          if (parent && parent.tagName === 'PICTURE') {
-                                            const sources = parent.querySelectorAll('source');
-                                            sources.forEach(s => s.remove());
-                                          }
-                                          if (target.src !== bgItem.fallback) {
-                                            target.src = bgItem.fallback;
-                                          }
-                                        }}
-                                        style={{
-                                            WebkitBackfaceVisibility: 'hidden',
-                                            backfaceVisibility: 'hidden',
-                                            transform: 'translateZ(0)',
-                                        }}
-                                    />
-                                </picture>
-                            </motion.div>
-                        ))}
-                    </motion.div>
+                        {HERO_BACKGROUNDS.map((bgItem, index) => {
+            // Apenas renderiza a 1ª imagem OU a imagem que está ativa no momento
+            const isFirstImage = index === 0;
+            const isCurrentActive = index === bgIndex;
+
+            // Se não for a primeira e nem a ativa, não mete no DOM para não pesar no LCP
+            if (!isFirstImage && !isCurrentActive) {
+              return null;
+            }
+
+            return (
+              <motion.div
+                key={bgItem.mobile}
+                style={{ y: bgY, scale: bgScale }}
+                initial={{ opacity: index === 0 ? 0.93 : 0 }}
+                animate={{
+                  opacity: bgIndex === index ? 0.93 : 0,
+                }}
+                transition={{ duration: 2.2, ease: "easeInOut" }}
+                className="absolute inset-0 brightness-[0.58] contrast-[1.05] saturate-[1.05]"
+              >
+                <picture className="w-full h-full block">
+                  <source media="(max-width: 639px)" srcSet={bgItem.mobile} type="image/webp" />
+                  <source media="(min-width: 640px)" srcSet={bgItem.desktop} type="image/webp" />
+                  <img
+                    src={bgItem.desktop}
+                    alt={`MBRAVO Background ${index + 1}`}
+                    className="w-full h-full object-cover"
+                    fetchPriority={isFirstImage ? "high" : "low"}
+                    loading={isFirstImage ? "eager" : "lazy"}
+                    width={1920}
+                    height={1080}
+                    decoding="async"
+                    onError={(e) => {
+                      const target = e.currentTarget;
+                      const parent = target.parentElement;
+                      if (parent && parent.tagName === 'PICTURE') {
+                        const sources = parent.querySelectorAll('source');
+                        sources.forEach(s => s.remove());
+                      }
+                      if (target.src !== bgItem.fallback) {
+                        target.src = bgItem.fallback;
+                      }
+                    }}
+                    style={{
+                      WebkitBackfaceVisibility: 'hidden',
+                      backfaceVisibility: 'hidden',
+                      transform: 'translateZ(0)',
+                    }}
+                  />
+                </picture>
+              </motion.div>
+            );
+          })}
 
                         {/* Golden ambient studio lighting leak/flare overlay, adding richness and luxury with organic movement */}
                         <motion.div 
