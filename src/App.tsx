@@ -5022,114 +5022,146 @@ const MemoryContinuesSection = ({ onDiscoverEssence }: { onDiscoverEssence: () =
 
 const InstagramSection = () => {
     const { t } = useLanguage();
-    const beholdId = import.meta.env.VITE_BEHOLD_WIDGET_ID || "";
     
-    useEffect(() => {
-        if (beholdId) {
-            const existingScript = document.querySelector('script[src="https://w.behold.so/widget.js"]');
-            if (!existingScript) {
-                const script = document.createElement('script');
-                script.src = "https://w.behold.so/widget.js";
-                script.type = "module";
-                document.body.appendChild(script);
-            }
-        }
-    }, [beholdId]);
+    const gridClassNames = [
+        "col-span-1 md:col-span-1 lg:col-span-2 rotate-[1.5deg] mt-1 sm:mt-2 lg:-mt-4",
+        "col-span-1 md:col-span-1 lg:col-span-1 rotate-[-2deg] -mt-3 sm:-mt-5 lg:mt-6 lg:translate-x-2",
+        "col-span-1 md:col-span-1 lg:col-span-2 rotate-[1deg] mt-4 sm:mt-6 lg:-mt-10 lg:-ml-2",
+        "col-span-1 md:col-span-1 lg:col-span-1 rotate-[-3deg] -mt-2 sm:-mt-4 lg:mt-4 lg:-ml-6",
+        "col-span-1 md:col-span-1 lg:col-span-1 rotate-[2.5deg] mt-3 sm:mt-5 lg:mt-10 lg:-ml-4",
+        "col-span-1 md:col-span-1 lg:col-span-2 rotate-[-1.5deg] -mt-4 sm:-mt-6 lg:-mt-6 lg:-ml-2"
+    ];
 
-
-    
-    const posts = [
+    const [posts, setPosts] = useState<any[]>([
         {
-            id: 1,
+            id: '1',
             img: 'https://i.ibb.co/mCmVm2rL/mockup-coosters-luxury-1.png',
             alt: 'Daisy Coasters M★BRAVO',
-            likes: '48',
-            comments: '3',
-            className: "col-span-1 md:col-span-1 lg:col-span-2 aspect-[4/5] rotate-[1.5deg] mt-1 sm:mt-2 lg:-mt-4"
+            productName: 'Daisy Coasters Set',
+            likes: '68',
+            comments: '5',
+            permalink: 'https://instagram.com/mbravobycarolina/',
+            className: gridClassNames[0]
         },
         {
-            id: 2,
+            id: '2',
             img: 'https://i.ibb.co/NnCJyRTF/African-Flower-Pouch-10-1.png',
             alt: 'African Flower Pouch M★BRAVO',
-            likes: '64',
-            comments: '8',
-            className: "col-span-1 md:col-span-1 lg:col-span-1 aspect-[1/1] rotate-[-2deg] -mt-3 sm:-mt-5 lg:mt-6 lg:translate-x-2"
+            productName: 'African Flower Pouch',
+            likes: '84',
+            comments: '12',
+            permalink: 'https://instagram.com/mbravobycarolina/',
+            className: gridClassNames[1]
         },
         {
-            id: 3,
+            id: '3',
             img: 'https://i.ibb.co/zWNCP5Nx/Stella-Cushion-7-1.png',
             alt: 'Stella Cushion M★BRAVO',
-            likes: '72',
-            comments: '5',
-            className: "col-span-1 md:col-span-1 lg:col-span-2 aspect-[3/4] rotate-[1deg] mt-4 sm:mt-6 lg:-mt-10 lg:-ml-2"
+            productName: 'Stella Cushion',
+            likes: '92',
+            comments: '9',
+            permalink: 'https://instagram.com/mbravobycarolina/',
+            className: gridClassNames[2]
         },
         {
-            id: 4,
+            id: '4',
             img: 'https://i.ibb.co/wNdC8NNG/Granny-square-sling-bag-20.png',
             alt: 'Granny Square Sling Bag M★BRAVO',
-            likes: '59',
-            comments: '6',
-            className: "col-span-1 md:col-span-1 lg:col-span-1 aspect-[1/1] rotate-[-3deg] -mt-2 sm:-mt-4 lg:mt-4 lg:-ml-6"
+            productName: 'Granny Square Sling Bag',
+            likes: '79',
+            comments: '8',
+            permalink: 'https://instagram.com/mbravobycarolina/',
+            className: gridClassNames[3]
         },
         {
-            id: 5,
+            id: '5',
             img: 'https://i.ibb.co/kVZvr34t/Sunflower-coasters-5.png',
             alt: 'Sunflower Coasters M★BRAVO',
-            likes: '41',
-            comments: '2',
-            className: "col-span-1 md:col-span-1 lg:col-span-1 aspect-[4/3] rotate-[2.5deg] mt-3 sm:mt-5 lg:mt-10 lg:-ml-4"
+            productName: 'Sunflower Coasters Set',
+            likes: '56',
+            comments: '4',
+            permalink: 'https://instagram.com/mbravobycarolina/',
+            className: gridClassNames[4]
         },
         {
-            id: 6,
+            id: '6',
             img: 'https://i.ibb.co/VY1dx3nt/Mini-shell-Pouch.png',
             alt: 'Mini Shell Pouch M★BRAVO',
-            likes: '53',
-            comments: '4',
-            className: "col-span-1 md:col-span-1 lg:col-span-2 aspect-[4/5] rotate-[-1.5deg] -mt-4 sm:-mt-6 lg:-mt-6 lg:-ml-2"
+            productName: 'Mini Shell Pouch',
+            likes: '71',
+            comments: '7',
+            permalink: 'https://instagram.com/mbravobycarolina/',
+            className: gridClassNames[5]
         }
-    ];
+    ]);
+
+    useEffect(() => {
+        fetch('/api/instagram')
+            .then((res) => res.json())
+            .then((data) => {
+                if (Array.isArray(data) && data.length > 0) {
+                    const mapped = data.slice(0, 6).map((item, idx) => ({
+                        ...item,
+                        className: gridClassNames[idx % gridClassNames.length]
+                    }));
+                    setPosts(mapped);
+                }
+            })
+            .catch((err) => console.warn('[INSTAGRAM FRONTEND WARN]', err));
+    }, []);
 
     return (
         <section id="instagram-feed" className="py-6 sm:py-10 md:py-12 px-6 md:px-8 lg:px-16 bg-[#F6F1E5] border-t border-forest/5 relative overflow-hidden">
             <div className="w-full max-w-7xl mx-auto relative z-10">
-                <div className="text-center space-y-4 mb-8 sm:mb-12">
-                    <span className="text-[10px] uppercase tracking-[0.45em] font-semibold text-forest/35 block font-sans">
+                <div className="text-center space-y-3.5 mb-12 sm:mb-16 lg:mb-20">
+                    {/* High-fashion editorial badge frame for DIÁRIO VISUAL */}
+                    <div className="flex items-center justify-center gap-3 text-[#8C6D3B]">
+                        <div className="h-[1px] w-8 sm:w-12 bg-[#C5A059]/40" />
+                        <svg className="w-3 h-3 text-[#C5A059] fill-none stroke-current" viewBox="0 0 24 24" strokeWidth="1.5">
+                            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+                        </svg>
+                        <div className="h-[1px] w-8 sm:w-12 bg-[#C5A059]/40" />
+                    </div>
+                    
+                    <span className="text-[11px] sm:text-[12.5px] uppercase tracking-[0.45em] font-semibold text-[#8C6D3B] block font-sans">
                         {t('instagram.feed.title')}
                     </span>
-                    <a 
-                        href="https://instagram.com/mbravobycarolina/" 
-                        target="_blank" 
-                        rel="noopener noreferrer"
-                        className="inline-block text-lg md:text-xl lg:text-2xl font-serif text-[#C5A059] hover:text-[#B38E47] transition-colors duration-300 font-light select-none tracking-tight"
-                    >
-                        {t('instagram.feed.handle')}
-                    </a>
+
+                    {/* Optically Centered Handle & Instagram Icon */}
+                    <div className="flex items-center justify-center pt-1.5">
+                        <a 
+                            href="https://instagram.com/mbravobycarolina/" 
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center justify-center gap-2 text-lg md:text-xl lg:text-2xl font-serif text-[#C5A059] hover:text-[#B38E47] transition-colors duration-300 font-light select-none tracking-tight group leading-none"
+                        >
+                            <Instagram className="w-4 h-4 md:w-5 md:h-5 text-[#C5A059] group-hover:scale-110 transition-transform duration-300 shrink-0 inline-block align-middle stroke-[1.75]" />
+                            <span className="inline-block align-middle leading-none pt-[1px]">{t('instagram.feed.handle')}</span>
+                        </a>
+                    </div>
                 </div>
 
-                {beholdId ? (
-                    /* Dynamic Behold.so Feed */
-                    <div className="w-full">
-                        <div data-behold-id={beholdId}></div>
-                    </div>
-                ) : (
-                    /* Elegant Fallback Grid - Asymmetrical studio moodboard grid responsive on all devices */
-                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-9 gap-4 sm:gap-6 lg:gap-6 items-start">
-                        {posts.map((post, idx) => (
+                {/* Custom Polaroid Moodboard Grid - Real Feed Data via Behold API / backend */}
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-9 gap-4 sm:gap-6 lg:gap-6 items-start">
+                    {posts.map((post, idx) => {
+                        const isWide = post.className?.includes('col-span-2');
+                        return (
                             <motion.a
-                                key={post.id}
-                                href="https://instagram.com/mbravobycarolina/"
+                                key={post.id || idx}
+                                href={post.permalink || "https://instagram.com/mbravobycarolina/"}
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 initial={{ opacity: 0, y: 30 }}
                                 whileInView={{ opacity: 1, y: 0 }}
                                 viewport={{ once: true }}
                                 transition={{ duration: 1.2, delay: idx * 0.1, ease: [0.16, 1, 0.3, 1] }}
-                                className={`${post.className} group block relative bg-white p-2.5 pb-8 sm:pb-10 border border-forest/10 rounded-sm shadow-md hover:shadow-xl transition-all duration-500 ease-out`}
+                                className={`${post.className} group block relative bg-white p-2.5 sm:p-3 pb-3 sm:pb-3.5 border border-forest/10 rounded-sm shadow-md hover:shadow-xl transition-all duration-500 ease-out flex flex-col justify-between`}
                             >
-                                <div className="w-full h-full overflow-hidden relative aspect-square bg-forest/5 rounded-sm">
+                                {/* Photo Container with Uniform Frame Proportion */}
+                                <div className="w-full overflow-hidden relative aspect-square bg-forest/5 rounded-[1px]">
                                     <img 
                                         src={post.img} 
-                                        alt={post.alt}
+                                        alt={post.alt || post.productName || 'M★BRAVO Piece'}
                                         loading="lazy"
                                         decoding="async"
                                         className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
@@ -5139,7 +5171,7 @@ const InstagramSection = () => {
                                     <div className="absolute inset-0 bg-forest/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col items-center justify-center gap-2 text-cream z-10 p-2 text-center">
                                         <div className="flex items-center gap-1.5 text-sm font-sans font-medium">
                                             <Heart size={16} fill="currentColor" className="text-cream" />
-                                            <span>{post.likes}</span>
+                                            <span>{post.likes || '50'}</span>
                                         </div>
                                         <div className="flex items-center gap-1.5 text-xs font-sans font-medium opacity-90 mt-1">
                                             <Instagram size={14} className="text-cream" />
@@ -5147,15 +5179,30 @@ const InstagramSection = () => {
                                         </div>
                                     </div>
                                 </div>
-                                {/* Editorial specimen-like tag label underneath in the white area */}
-                                <div className="mt-3.5 text-left flex items-center justify-between border-t border-forest/5 pt-2 select-none pointer-events-none">
-                                    <span className="font-mono text-[8px] text-forest/45 tracking-widest uppercase">M★B_SPEC_0{post.id}</span>
-                                    <span className="font-serif italic text-[10px] text-forest/60">{post.alt.split(' ')[0]}</span>
+
+                                {/* Fine Gold Divider Line interrupted by hollow outline star */}
+                                <div className="mt-3 relative flex items-center justify-center select-none pointer-events-none">
+                                    <div className="h-[1px] bg-[#C5A059]/35 w-full" />
+                                    <span className="absolute bg-white px-1.5 text-[#C5A059] flex items-center justify-center">
+                                        <svg className="w-2.5 h-2.5 fill-none stroke-current" viewBox="0 0 24 24" strokeWidth="1.5">
+                                            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+                                        </svg>
+                                    </span>
+                                </div>
+
+                                {/* Refined Polaroid Bottom Captions with Distinct Typography Scale for Small vs Large Cards */}
+                                <div className="mt-2 sm:mt-2.5 text-left flex items-center justify-between select-none pointer-events-none px-1 gap-1">
+                                    <span className={`font-mono text-[#C5A059] tracking-[0.18em] uppercase font-medium shrink-0 ${isWide ? 'text-[8.5px] sm:text-[9px] lg:text-[9.5px]' : 'text-[6.5px] sm:text-[7px] lg:text-[7.5px]'}`}>
+                                        M★BRAVO
+                                    </span>
+                                    <span className={`font-serif italic text-forest/80 truncate text-right font-light ${isWide ? 'text-[11px] sm:text-[11.5px] lg:text-[12px] max-w-[70%]' : 'text-[7.5px] sm:text-[8px] lg:text-[8.5px] max-w-[62%]'}`}>
+                                        {post.productName || post.alt || 'M★BRAVO Piece'}
+                                    </span>
                                 </div>
                             </motion.a>
-                        ))}
-                    </div>
-                )}
+                        );
+                    })}
+                </div>
             </div>
         </section>
     );
