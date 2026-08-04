@@ -210,10 +210,11 @@ Para reforçar a fiabilidade em produção e garantir uma experiência de luxo i
    * Headers e botões de fechar (X) mantêm-se fixos (`sticky top-0 z-20`) e visíveis sem cortar a navegação, garantindo áreas de toque tátil mínimas de 44x44px (`min-h-[44px] min-w-[44px]`).
 5. **Eliminação de Zonas Mortas de Scroll no Admin Dashboard:**
    * A área do Painel de Administração (`AdminDashboardModal.tsx`) teve a interceção forçada de eventos de roda (`onWheel={(e) => e.stopPropagation()}`) removida do container principal, incorporando `pointer-events: auto`, `overflow-y: auto` e `touch-action: pan-y` em toda a extensão para scroll fluido por rato, touchpad e gestos táteis.
-6. **Sincronização 100% Real Google Places API & Carrossel Condicional em Testemunhos:**
-   * Eliminados todos os testemunhos hardcoded fictícios do frontend e do seed de backend.
-   * Ligar o componente `TestimonialsSection` exclusivamente a dados reais consumidos de `/api/testimonials` (Google Places API com Place ID M★BRAVO / submissões de clientes).
-   * Implementada lógica de UI responsiva condicional: quando `reviews.length === 1` (ou card convidativo de 1a review), o destaque é renderizado centralizado em cartão flutuante de luxo sem setas ou pontos de navegação; quando `reviews.length > 1`, ativa-se automaticamente o carrossel interativo com controlos laterais e paginação.
+6. **Sincronização 100% Real Google Places API & Carrossel Híbrido Autoplay:**
+   * Eliminados todos os testemunhos fictícios estáticos do frontend e do seed de backend.
+   * O convite para avaliação foi atualizado com a copy oficial: `"... para a M★BRAVO. Partilhe a sua experiência e deixe-nos a sua avaliação no Google!"` e assinatura limpa de marca `"M★BRAVO"` (com remoção do subtexto "ATELIER").
+   * O cartão de convite M★BRAVO permanece fixo como Slide #1 no carrossel unificado, antecedendo todas as avaliações reais trazidas da Google Places API (`/api/testimonials`, ex: avaliação da Karolina).
+   * Ativação automática do slider (setas e indicadores de ponto) assim que existir pelo menos 1 avaliação real, com Autoplay de transição suave a cada 5 segundos e pausa ao passar o cursor (`pauseOnHover`).
 
 
 ### A. Diagnóstico & Solução de Flicker de Imagens no iOS (Safari/WebKit) — [IMPLEMENTADO]
