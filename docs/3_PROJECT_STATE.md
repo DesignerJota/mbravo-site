@@ -423,11 +423,13 @@ Para que o repositório no GitHub fique 100% sincronizado com a versão final de
     *   A amostragem e seleção de cores no frontend consome integralmente o array de cores configurado no CMS/Dashboard (`availableColors`, `colors`, `cores`), eliminando dependências de fallbacks estáticos hardcoded.
 *   [x] **Eliminação de Zonas Mortas de Scroll no Admin Dashboard:**
     *   Removido o travamento forçado de `onWheel` e ativada rolagem fluida nativa com `pointer-events: auto`, `overflow-y: auto` e `-webkit-overflow-scrolling: touch` na totalidade do painel administrativo.
-*   [x] **Refatoração Dinâmica do Componente "Partilhado por Quem nos Escolhe" (Google Places API & UI Responsiva):**
+*   [x] **Refatoração Dinâmica do Componente "Partilhado por Quem nos Escolhe" (Google Places API, Autoplay & UI Híbrida):**
     *   Eliminação total do array hardcoded `defaultTestimonials` com testemunhos fictícios em `App.tsx` e remoção do pre-seed fictício no backend `server.ts`.
-    *   Ligação do componente exclusivamente a dados de avaliações reais consumidos da API (`/api/testimonials` / Google Places API).
-    *   Lógica de UI responsiva condicional: quando `reviews.length === 1` (ou card convidativo de 1a review), renderiza em destaque centralizado sem setas ou pontos de navegação; quando `reviews.length > 1`, ativa automaticamente os controlos de carrossel/slider (setas desktop/mobile e indicadores em ponto).
-    *   Manutenção do botão com link direto para a página oficial de avaliações do atelier no Google (`https://g.page/r/Cdo7JGP_Xpc3EBM/review`).
+    *   Atualização da copy do cartão de convite institucional para `"... para a M★BRAVO. Partilhe a sua experiência e deixe-nos a sua avaliação no Google!"` com assinatura limpa `"M★BRAVO"` (sem a palavra "ATELIER").
+    *   O cartão de convite institucional permanece fixo como Slide #1 no carrossel híbrido, seguido por todas as avaliações reais vindas da API (`/api/testimonials` / Google Places API, ex: avaliação da Karolina).
+    *   Ativação automática dos controlos de navegação (setas e indicadores de ponto) assim que existir pelo menos 1 avaliação real (`allItems.length > 1`).
+    *   Implementação de rotação automática suave (Autoplay) a cada 5 segundos com pausa ao passar o cursor (`pauseOnHover`).
+    *   Manutenção do botão com link direto para a página oficial de avaliações da M★BRAVO no Google (`https://g.page/r/Cdo7JGP_Xpc3EBM/review`).
 
 ### B. Roteiro Técnico de Otimização Mobile & iOS WebKit (Meta: PageSpeed >90 - FASE 1 CONCLUÍDA):
 *   [x] **Aceleração Hardware-Backing para iOS WebKit:** Aplicado `-webkit-backface-visibility: hidden; transform: translateZ(0);` nos cartões de produtos e categorias para impedir a reciclagem agressiva de texturas da GPU pelo WebKit durante o scroll rápido em iPhones/iPads.
