@@ -4830,7 +4830,7 @@ const ContactSection = () => {
         : "Hello! I saw the M★BRAVO website and would like to know more about your pieces.";
 
     return (
-        <section ref={containerRef} id="contacto" data-background="dark" className="py-[clamp(3rem,8vw,9rem)] bg-forest relative overflow-hidden px-6 md:px-8 lg:px-16">
+        <section ref={containerRef} id="contacto" data-background="dark" className="py-[clamp(4rem,9vw,10rem)] bg-forest relative overflow-hidden px-6 md:px-8 lg:px-16 border-t border-cream/5">
              {/* Large Script Background */}
              <motion.div 
                 style={{ x: xTrack, y: yTrack, opacity: opacityTrack, fontFamily: "'Cormorant Garamond', serif" }}
@@ -4846,40 +4846,50 @@ const ContactSection = () => {
                     viewport={{ once: true }}
                 >
                     <h2 className="text-3xl md:text-4xl lg:text-5xl font-serif text-cream mb-[clamp(1.5rem,4vw,3rem)] leading-tight">{t('contact.title_1')} <br /><span className="italic">{t('contact.title_2')}</span></h2>
-                    <p className="text-cream/50 text-lg md:text-xl lg:text-2xl font-light mb-[clamp(2rem,5vw,4rem)] leading-relaxed max-w-2xl mx-auto">
+                    <p className="text-cream/60 text-lg md:text-xl lg:text-2xl font-light mb-[clamp(2.5rem,5vw,4.5rem)] leading-relaxed max-w-2xl mx-auto">
                         {t('contact.subtitle')}
                     </p>
                     
-                    <div className="flex flex-col items-center gap-[clamp(1rem,3vw,3rem)]">
+                    {/* Direct Contact Links */}
+                    <div className="flex flex-col items-center gap-[clamp(1.25rem,3.5vw,3rem)]">
                         <a 
-                            href="mailto:handmade.mbravo@gmail.com?subject=Pedido de Informações - M★BRAVO"
-                            className="group flex items-center gap-[clamp(0.5rem,1.5vw,1rem)] text-[clamp(0.9rem,4vw,2.25rem)] font-serif text-cream hover:text-brand-green-light transition-all border-b border-cream/20 pb-[clamp(0.5rem,1.2vw,1rem)] break-all"
+                            href="mailto:encomendas@mbravobycarolina.com?subject=Pedido%20de%20Informa%C3%A7%C3%B5es%20-%20M%E2%98%85BRAVO"
+                            className="group flex items-center gap-[clamp(0.5rem,1.5vw,1rem)] text-[clamp(0.95rem,3.5vw,2.1rem)] font-serif text-cream hover:text-[#C5A059] transition-all border-b border-cream/20 pb-[clamp(0.5rem,1.2vw,1rem)] break-all"
                         >
-                            <Mail className="w-[clamp(1.25rem,4vw,2rem)] h-[clamp(1.25rem,4vw,2rem)] opacity-40 group-hover:opacity-100 transition-opacity flex-shrink-0" />
-                            handmade.mbravo@gmail.com
+                            <Mail className="w-[clamp(1.25rem,3.5vw,1.85rem)] h-[clamp(1.25rem,3.5vw,1.85rem)] opacity-50 group-hover:opacity-100 transition-opacity flex-shrink-0 text-[#C5A059]" />
+                            encomendas@mbravobycarolina.com
                         </a>
 
                         <a 
                             href={`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(whatsappMessage)}`}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="group flex items-center gap-[clamp(0.5rem,1.5vw,1rem)] text-[clamp(0.9rem,4vw,2.25rem)] font-serif text-cream hover:text-brand-green-light transition-all border-b border-cream/20 pb-[clamp(0.5rem,1.2vw,1rem)] break-all"
+                            className="group flex items-center gap-[clamp(0.5rem,1.5vw,1rem)] text-[clamp(0.95rem,3.5vw,2.1rem)] font-serif text-cream hover:text-[#C5A059] transition-all border-b border-cream/20 pb-[clamp(0.5rem,1.2vw,1rem)] break-all"
                         >
-                            <MessageCircle className="w-[clamp(1.25rem,4vw,2rem)] h-[clamp(1.25rem,4vw,2rem)] opacity-40 group-hover:opacity-100 transition-opacity flex-shrink-0" />
+                            <MessageCircle className="w-[clamp(1.25rem,3.5vw,1.85rem)] h-[clamp(1.25rem,3.5vw,1.85rem)] opacity-50 group-hover:opacity-100 transition-opacity flex-shrink-0 text-[#C5A059]" />
                             {t('contact.chat_whatsapp')}
                         </a>
                     </div>
                 </motion.div>
 
-                <div className="mt-[clamp(3rem,8vw,12rem)] flex flex-wrap justify-center gap-[clamp(1rem,4vw,4rem)]">
-                    <a href="https://instagram.com/mbravobycarolina/" target="_blank" rel="noopener noreferrer" className="text-[10px] uppercase tracking-[0.4em] text-cream/40 hover:text-cream transition-colors">
-                        Instagram
+                {/* Editorial Social Networks Line */}
+                <div className="mt-[clamp(3.5rem,8vw,6rem)] flex items-center justify-center gap-4 text-[11px] sm:text-[12px] uppercase tracking-[0.4em] font-medium text-cream/80">
+                    <a 
+                        href="https://instagram.com/mbravobycarolina/" 
+                        target="_blank" 
+                        rel="noopener noreferrer" 
+                        className="hover:text-[#C5A059] transition-colors duration-300"
+                    >
+                        INSTAGRAM
                     </a>
-                    <a href={MAILTO_LINK} className="text-[10px] uppercase tracking-[0.4em] text-cream/40 hover:text-cream transition-colors">
-                        E-mail
-                    </a>
-                    <a href={`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(whatsappMessage)}`} target="_blank" rel="noopener noreferrer" className="text-[10px] uppercase tracking-[0.4em] text-cream/40 hover:text-cream transition-colors">
-                        WhatsApp
+                    <span className="text-[#C5A059]/60 font-bold">·</span>
+                    <a 
+                        href="https://www.pinterest.com/mbravobycarolina/" 
+                        target="_blank" 
+                        rel="noopener noreferrer" 
+                        className="hover:text-[#C5A059] transition-colors duration-300"
+                    >
+                        PINTEREST
                     </a>
                 </div>
              </div>
@@ -4892,57 +4902,83 @@ const ContactSection = () => {
 const Footer = ({ onOpenLegal, onOpenAdmin }: { onOpenLegal: (type: 'envios' | 'privacidade' | 'termos') => void, onOpenAdmin?: () => void }) => {
     const { t } = useLanguage();
     return (
-        <footer className="bg-forest text-cream py-[clamp(2.5rem,6vw,4rem)] px-4 border-t border-cream/5">
-            <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col lg:flex-row justify-between items-center gap-10 lg:gap-16">
-                <div className="flex flex-col items-center lg:items-start gap-4">
-                    <Logo light className="opacity-50 h-[clamp(5rem,10vw,9rem)]" />
-                    {/* Minimalist Soft-Gold Payment Seals */}
-                    <div className="flex items-center gap-4 text-[#C5A059]/40 mt-1" title="Métodos de Pagamento Seguros">
-                        {/* MBWAY */}
-                        <svg width="42" height="26" viewBox="0 0 42 26" fill="none" xmlns="http://www.w3.org/2000/svg" className="h-5 w-auto transition-opacity hover:opacity-100" stroke="currentColor" strokeWidth="1.2">
-                            <rect x="1" y="1" width="40" height="24" rx="5" />
-                            <text x="50%" y="58%" textAnchor="middle" fontSize="7.5" fontWeight="900" fontFamily="sans-serif" fill="currentColor" letterSpacing="0.05em">MB WAY</text>
-                        </svg>
-                        {/* MULTIBANCO */}
-                        <svg width="42" height="26" viewBox="0 0 42 26" fill="none" xmlns="http://www.w3.org/2000/svg" className="h-5 w-auto transition-opacity hover:opacity-100" stroke="currentColor" strokeWidth="1.2">
-                            <rect x="1" y="1" width="40" height="24" rx="5" />
-                            <path d="M10 8H32M10 13H32M10 18H22" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round"/>
-                            <text x="27" y="20" fontSize="6.5" fontWeight="900" fontFamily="sans-serif" fill="currentColor">MB</text>
-                        </svg>
-                        {/* VISA */}
-                        <svg width="42" height="26" viewBox="0 0 42 26" fill="none" xmlns="http://www.w3.org/2000/svg" className="h-5 w-auto transition-opacity hover:opacity-100" stroke="currentColor" strokeWidth="1.2">
-                            <rect x="1" y="1" width="40" height="24" rx="5" />
-                            <text x="50%" y="60%" textAnchor="middle" fontSize="8" fontStyle="italic" fontWeight="900" fontFamily="sans-serif" fill="currentColor" letterSpacing="0.05em">VISA</text>
-                        </svg>
-                    </div>
+        <footer className="bg-forest text-cream pt-6 pb-12 sm:pb-16 relative z-10 w-full overflow-hidden">
+            {/* Full-Width Edge-to-Edge Signature Gold Divider Line with Prominent Outline Star */}
+            <div className="relative w-full mb-10 sm:mb-16 lg:mb-20 flex items-center justify-center">
+                <div className="absolute inset-0 flex items-center" aria-hidden="true">
+                    <div className="w-full border-t border-[#C5A059]/40" />
                 </div>
+                <div className="relative px-5 sm:px-6 py-3 sm:py-4 bg-forest flex items-center justify-center">
+                    <svg 
+                        width="32" 
+                        height="32" 
+                        viewBox="0 0 24 24" 
+                        fill="none" 
+                        stroke="#C5A059" 
+                        strokeWidth="1.3" 
+                        strokeLinecap="round" 
+                        strokeLinejoin="round" 
+                        className="w-5 h-5 sm:w-7 sm:h-7 lg:w-8 lg:h-8 text-[#C5A059] opacity-95 transition-transform duration-700 hover:rotate-90 cursor-default"
+                        title="M★BRAVO"
+                    >
+                        <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+                    </svg>
+                </div>
+            </div>
+
+            {/* Sub-Footer Layout: Single Column centered on Mobile & Tablet (<lg), 3-Column on Desktop (lg+) */}
+            <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 grid grid-cols-1 lg:grid-cols-[1fr_auto_1fr] gap-8 lg:gap-12 items-center overflow-hidden">
                 
-                <div className="flex flex-col sm:flex-row gap-6 sm:gap-12 text-[10px] uppercase tracking-[0.2em] font-medium text-cream/65 text-center lg:text-left items-center">
-                    <button onClick={() => onOpenLegal('envios')} className="hover:text-cream transition-colors cursor-pointer text-center lg:text-left uppercase tracking-[0.2em]">{t('footer.legal_shipping')}</button>
-                    <button onClick={() => onOpenLegal('privacidade')} className="hover:text-cream transition-colors cursor-pointer text-center lg:text-left uppercase tracking-[0.2em]">{t('footer.legal_privacy')}</button>
-                    <button onClick={() => onOpenLegal('termos')} className="hover:text-cream transition-colors cursor-pointer text-center lg:text-left uppercase tracking-[0.2em]">{t('footer.legal_terms')}</button>
+                {/* Coluna 1 (Esquerda no Desktop / Topo no Mobile/Tablet): Logótipo M★BRAVO Isolado */}
+                <div className="flex flex-col items-center lg:items-start justify-center text-center lg:text-left w-full">
+                    <Logo light className="opacity-95 h-18 sm:h-20 lg:h-22" />
                 </div>
 
-                <div className="text-[9px] uppercase tracking-[0.2em] text-cream/70 text-center lg:text-right flex flex-col gap-1 items-center lg:items-end">
-                    <div className="text-cream/50 text-[8px] tracking-[0.3em] uppercase mb-1">{t('footer.support')}</div>
-                    <a href={MAILTO_LINK} className="hover:text-cream transition-colors font-mono">{CONTACT_EMAIL}</a>
-                    <a href="tel:+351912828182" className="hover:text-cream transition-colors font-mono">+351 912 828 182</a>
-                    <div className="text-cream/45 mt-2 whitespace-pre-line text-center lg:text-right">
-                        <span 
-                            onClick={onOpenAdmin}
-                            className="cursor-pointer transition-colors hover:text-cream/80 select-none active:opacity-80"
-                            title="M★BRAVO Atelier"
-                        >
-                            {t('footer.made_in').split('\n')[0]}
-                        </span>
-                        {t('footer.made_in').includes('\n') && (
-                            <>
-                                <br />
-                                {t('footer.made_in').split('\n')[1]}
-                            </>
-                        )}
-                    </div>
+                {/* Coluna 2 (Centro): Links Institucionais Responsivos sem Overflow */}
+                <div className="flex flex-col sm:flex-row items-center justify-center gap-2.5 sm:gap-4 text-[10px] sm:text-[10.5px] lg:text-[11px] uppercase tracking-[0.18em] sm:tracking-[0.22em] font-medium text-cream/80 text-center my-auto w-full lg:w-auto px-2 max-w-full">
+                    <button onClick={() => onOpenLegal('envios')} className="hover:text-[#C5A059] transition-colors cursor-pointer text-cream/80 whitespace-nowrap">{t('footer.legal_shipping')}</button>
+                    <span className="text-[#C5A059]/60 font-bold select-none hidden sm:inline shrink-0">·</span>
+                    <button onClick={() => onOpenLegal('privacidade')} className="hover:text-[#C5A059] transition-colors cursor-pointer text-cream/80 whitespace-nowrap">{t('footer.legal_privacy')}</button>
+                    <span className="text-[#C5A059]/60 font-bold select-none hidden sm:inline shrink-0">·</span>
+                    <button onClick={() => onOpenLegal('termos')} className="hover:text-[#C5A059] transition-colors cursor-pointer text-cream/80 whitespace-nowrap">{t('footer.legal_terms')}</button>
                 </div>
+
+                {/* Coluna 3 (Direita no Desktop / Base no Mobile/Tablet): Bloco de Apoio ao Cliente Unificado e Compacto */}
+                <div className="flex flex-col items-center lg:items-end text-center lg:text-right gap-1 text-[10px] sm:text-[11px] text-cream/75 my-auto w-full px-2 max-w-full">
+                    <span className="text-cream/50 text-[9px] uppercase tracking-[0.3em] font-semibold mb-0.5 block">
+                        {t('footer.support')}
+                    </span>
+                    <a href={MAILTO_LINK} className="hover:text-[#C5A059] transition-colors font-mono tracking-wider break-all sm:break-normal max-w-full">
+                        {CONTACT_EMAIL}
+                    </a>
+                    <a href="tel:+351912828182" className="hover:text-[#C5A059] transition-colors font-mono tracking-wider whitespace-nowrap">
+                        +351 912 828 182
+                    </a>
+                </div>
+
+            </div>
+
+            {/* Sub-Footer Full-Width Edge-to-Edge Divider + Payment Icons + Copyright */}
+            <div className="w-full mt-10 sm:mt-12 pt-8 border-t border-cream/10 text-center px-6 flex flex-col items-center justify-center gap-4">
+                {/* 5 Cartões de Pagamento Discretos e Elegantes na Barra Inferior */}
+                <div className="flex items-center justify-center gap-3.5 sm:gap-4 opacity-75 hover:opacity-100 transition-opacity" title="Métodos de Pagamento Seguros">
+                    <img src="/icons/mbway.svg" alt="MB WAY" className="h-4 w-auto object-contain brightness-0 invert" />
+                    <img src="/icons/visa.svg" alt="VISA" className="h-4 w-auto object-contain brightness-0 invert" />
+                    <img src="/icons/mastercard.svg" alt="Mastercard" className="h-4 w-auto object-contain brightness-0 invert" />
+                    <img src="/icons/applepay.svg" alt="Apple Pay" className="h-4 w-auto object-contain brightness-0 invert" />
+                    <img src="/icons/googlepay.svg" alt="Google Pay" className="h-4 w-auto object-contain brightness-0 invert" />
+                </div>
+
+                <p className="text-cream/50 text-[9px] sm:text-[10px] uppercase tracking-[0.22em] sm:tracking-[0.25em] font-mono inline-block cursor-default select-none">
+                    <span 
+                        onClick={onOpenAdmin}
+                        className="transition-colors hover:text-cream/90 active:opacity-80"
+                        title="M★BRAVO Atelier"
+                    >
+                        © 2026 M★BRAVO
+                    </span>
+                    {" | HANDMADE WITH LOVE | CRIADO COM TEMPO, EM PORTUGAL."}
+                </p>
             </div>
         </footer>
     );
