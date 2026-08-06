@@ -137,6 +137,49 @@ const HERO_BACKGROUNDS = [
   }
 ];
 
+// Asymmetric organic floating balloons for interactive Hero image showcase
+const HERO_ORGANIC_BALLOONS = [
+    {
+        id: 'casa',
+        bgIndex: 0,
+        badgePt: '✦ NOVIDADES',
+        badgeEn: '✦ NEW IN',
+        titlePt: 'Casa de Verão',
+        titleEn: 'Summer Home Collection',
+        descPt: 'Bases de copos e elementos de decoração artesanal para elevar a atmosfera da casa.',
+        descEn: 'Coasters and artisanal home decor items to elevate your space.',
+        img: '/categories/category-casa.webp',
+        shape: 'rounded-[43%_57%_70%_30%_/_30%_45%_55%_70%]',
+        categoryFilter: 'Casa'
+    },
+    {
+        id: 'malas',
+        bgIndex: 1,
+        badgePt: '01. EXCLUSIVO',
+        badgeEn: '01. EXCLUSIVE',
+        titlePt: 'Edição Limitada',
+        titleEn: 'Limited Edition',
+        descPt: 'Pouches e malas icónicas em croché manual com tiragem numerada e reduzida.',
+        descEn: 'Iconic pouches and handmade bags in limited, numbered editions.',
+        img: '/categories/category-malas.webp',
+        shape: 'rounded-[55%_45%_33%_67%_/_58%_36%_64%_42%]',
+        categoryFilter: 'Malas'
+    },
+    {
+        id: 'acessorios',
+        bgIndex: 2,
+        badgePt: '02. DETALHES',
+        badgeEn: '02. DETAILS',
+        titlePt: 'Coleção Acessórios',
+        titleEn: 'Accessories Collection',
+        descPt: 'Bandanas, ponchos e acessórios finos em fios de algodão e linho natural.',
+        descEn: 'Bandanas, ponchos and fine accessories crafted in natural cotton and linen.',
+        img: '/categories/category-acessorios.webp',
+        shape: 'rounded-[38%_62%_63%_37%_/_41%_44%_56%_59%]',
+        categoryFilter: 'Acessórios'
+    }
+];
+
 // --- Constants & Types ---
 const NAV_LINKS = [
   { name: 'História', href: '#sobre' },
@@ -318,18 +361,18 @@ export let SHOP_CATEGORIES = [
     id: 'home',
     name: 'Casa',
     items: 'Coasters, Stella Cushion',
-    image: '/category-casa.webp',
+    image: '/categories/category-casa.webp',
     products: [
       { 
         id: 'h1', 
         name: 'Daisy Coasters', 
         price: calculateProductRange('Daisy Coasters'), 
-        img: 'https://i.ibb.co/mCmVm2rL/mockup-coosters-luxury-1.png',
+        img: '/products/daisy-coasters/1.webp',
         images: [
-          'https://i.ibb.co/mCmVm2rL/mockup-coosters-luxury-1.png',
-          'https://i.ibb.co/B2RnQ4cJ/mockup-coosters-luxury-4.png',
-          'https://i.ibb.co/tTzJFNwF/mockup-coosters-luxury-3.png',
-          'https://i.ibb.co/qL0PPg2G/mockup-coosters-luxury-2.png'
+          '/products/daisy-coasters/1.webp',
+          '/products/daisy-coasters/2.webp',
+          '/products/daisy-coasters/3.webp',
+          '/products/daisy-coasters/4.webp'
         ],
         description: "Bases em crochet inspiradas na delicadeza das margaridas e nos tons suaves da natureza. Um conjunto handmade pensado para trazer um toque cozy e acolhedor ao teu espaço.",
         material: "- Material: 100% algodão",
@@ -339,12 +382,12 @@ export let SHOP_CATEGORIES = [
         id: 'h1c', 
         name: 'Sunflower Coasters', 
         price: calculateProductRange('Sunflower Coasters'), 
-        img: 'https://i.ibb.co/kVZvr34t/Sunflower-coasters-5.png',
+        img: '/products/sunflower-coasters/1.webp',
         images: [
-          'https://i.ibb.co/kVZvr34t/Sunflower-coasters-5.png',
-          'https://i.ibb.co/7mtncnc/Sunflower-coasters-2.png',
-          'https://i.ibb.co/JWxHQQwY/Sunflower-coasters-3.png',
-          'https://i.ibb.co/27J2MWwz/Sunflower-coasters-4-4.png'
+          '/products/sunflower-coasters/1.webp',
+          '/products/sunflower-coasters/2.webp',
+          '/products/sunflower-coasters/3.webp',
+          '/products/sunflower-coasters/4.webp'
         ],
         description: "Bases em crochet inspiradas na beleza dos girassóis e nos seus tons quentes e acolhedores. Um conjunto handmade pensado para trazer um toque cozy e luminoso ao teu espaço.",
         material: "- Material: 100% algodão",
@@ -354,13 +397,13 @@ export let SHOP_CATEGORIES = [
         id: 'h1f', 
         name: 'Coraline Coasters', 
         price: calculateProductRange('Coraline Coasters'), 
-        img: 'https://i.ibb.co/ZzRSR1V8/Coraline-coasters-6.png',
+        img: '/products/coraline-coasters/1.webp',
         images: [
-          'https://i.ibb.co/ZzRSR1V8/Coraline-coasters-6.png',
-          'https://i.ibb.co/mVxVF0MM/Coraline-coasters-2.png',
-          'https://i.ibb.co/FqyRfSw2/Coraline-coasters-3.png',
-          'https://i.ibb.co/WvPWRnhs/Coraline-coasters-4.png',
-          'https://i.ibb.co/tpyY6NRY/Coraline-coasters-5.png'
+          '/products/coraline-coasters/1.webp',
+          '/products/coraline-coasters/2.webp',
+          '/products/coraline-coasters/3.webp',
+          '/products/coraline-coasters/4.webp',
+          '/products/coraline-coasters/5.webp'
         ],
         description: "Bases em crochet inspiradas no design Coraline, feitas à mão com todo o carinho para trazer um toque aconchegante, elegante e especial ao teu espaço.",
         material: "- Material: 100% algodão",
@@ -370,18 +413,13 @@ export let SHOP_CATEGORIES = [
         id: 'h1_classic', 
         name: 'Classic Coasters', 
         price: calculateProductRange('Classic Coasters'), 
-        img: 'https://i.ibb.co/qMXpNrT0/Blue-coasters-7.png',
+        img: '/products/classic-coasters/1.webp',
         images: [
-          'https://i.ibb.co/qMXpNrT0/Blue-coasters-7.png',
-          'https://i.ibb.co/PGmrtMMx/Pink-coasters4-2.png',
-          'https://i.ibb.co/WvBLxKxN/Pink-coasters5.png',
-          'https://i.ibb.co/Kc6bxwjq/Pink-coasters3.png',
-          'https://i.ibb.co/MypCdtFK/Blue-coasters5-2.png',
-          'https://i.ibb.co/93h01qf9/Blue-coasters4.png',
-          'https://i.ibb.co/BK4VfFCx/Blue-coasters6.png',
-          'https://i.ibb.co/spZcZY4b/Yellow-Coaster6.png',
-          'https://i.ibb.co/cXVG6sfL/Yellow-Coaster3.png',
-          'https://i.ibb.co/VY68YgyL/Yellow-Coaster4.png'
+          '/products/classic-coasters/1.webp',
+          '/products/classic-coasters/2.webp',
+          '/products/classic-coasters/3.webp',
+          '/products/classic-coasters/4.webp',
+          '/products/classic-coasters/5.webp'
         ],
         description: "Bases em crochet com um design floral clássico e delicado, pensadas para trazer um toque cozy e elegante ao teu espaço. Disponíveis em várias cores, mantendo sempre as pétalas brancas para um acabamento suave e delicado.",
         material: "- Material: 100% algodão",
@@ -391,12 +429,12 @@ export let SHOP_CATEGORIES = [
         id: 'h2b', 
         name: 'Stella Cushion', 
         price: calculateProductRange('Stella Cushion'), 
-        img: 'https://i.ibb.co/zWNCP5Nx/Stella-Cushion-7-1.png',
+        img: '/products/stella-cushion/1.webp',
         images: [
-          'https://i.ibb.co/zWNCP5Nx/Stella-Cushion-7-1.png',
-          'https://i.ibb.co/wFBSmPFt/Stella-Cushion-8.png',
-          'https://i.ibb.co/spPW5TxT/Stella-Cushion-9.png',
-          'https://i.ibb.co/KPtgjRk/Stella-Cushion-10.png'
+          '/products/stella-cushion/1.webp',
+          '/products/stella-cushion/2.webp',
+          '/products/stella-cushion/3.webp',
+          '/products/stella-cushion/4.webp'
         ],
         description: "Almofada decorativa em forma de estrela, feita à mão em crochet para dar um toque delicado e cozy a qualquer espaço. Perfeita para decorar camas, sofás, cadeiras, quartos infantis ou qualquer cantinho especial. Disponível em várias cores para combinar com diferentes estilos de decoração.",
         material: "- Material: 100% poliéster (Fio macio e estruturado, ideal para peças decorativas)",
@@ -408,18 +446,18 @@ export let SHOP_CATEGORIES = [
     id: 'bags',
     name: 'Malas',
     items: ' Mini Pouches, AirPods Case',
-    image: '/category-malas.webp',
+    image: '/categories/category-malas.webp',
     products: [
       { 
         id: 'b1', 
         name: 'African Flower Pouch', 
         price: calculateProductRange('African Flower Pouch'), 
-        img: 'https://i.ibb.co/NnCJyRTF/African-Flower-Pouch-10-1.png',
+        img: '/products/african-flower-pouch/1.webp',
         images: [
-          'https://i.ibb.co/NnCJyRTF/African-Flower-Pouch-10-1.png',
-          'https://i.ibb.co/TDL7gj28/African-Flower-Pouch-112-1.png',
-          'https://i.ibb.co/jk86rkbh/Firefly-7.jpg',
-          'https://i.ibb.co/PvjVXHPV/pouch-luxury-1.png',
+          '/products/african-flower-pouch/1.webp',
+          '/products/african-flower-pouch/2.webp',
+          '/products/african-flower-pouch/3.webp',
+          '/products/african-flower-pouch/4.webp'
         ],
         description: "Pouch em crochet com padrão African Flower, cuidadosamente feito à mão e forrado no interior para maior estrutura e proteção. Finalizado com fecho, é perfeito para guardar os teus essenciais do dia a dia com um toque cozy e handmade.",
         material: "- Material: 100% algodão\n- Detalhe: Forro interior em tecido",
@@ -430,12 +468,12 @@ export let SHOP_CATEGORIES = [
         id: 'b1b', 
         name: 'Mini Pouches', 
         price: calculateProductRange('Mini Pouches'), 
-        img: 'https://i.ibb.co/4RdPTkr4/Mini-pouches-CAPA.png',
+        img: '/products/mini-pouches/1.webp',
         images: [
-          'https://i.ibb.co/4RdPTkr4/Mini-pouches-CAPA.png',
-          'https://i.ibb.co/GfxGK5d3/Mini-pouches-9.jpg',
-          'https://i.ibb.co/1fcmcPSM/Mini-pouches-7.jpg',
-          'https://i.ibb.co/356r9hSN/Mini-pouches-12.jpg'
+          '/products/mini-pouches/1.webp',
+          '/products/mini-pouches/2.webp',
+          '/products/mini-pouches/3.webp',
+          '/products/mini-pouches/4.webp'
         ],
         description: `Mini pouch em crochet feito à mão, criado com um design simples e intemporal para guardar pequenos essenciais do dia a dia.
 Com fecho ajustável em cordão e um acabamento delicado handmade, é perfeito para moedas, cartões, joias, lip products ou pequenos tesouros do dia a dia.`,
@@ -449,11 +487,11 @@ Com fecho ajustável em cordão e um acabamento delicado handmade, é perfeito p
         id: 'b1_airpods', 
         name: 'AirPods Case', 
         price: calculateProductRange('AirPods Case'), 
-        img: 'https://i.ibb.co/b5QdC7vh/Air-Pods-case-9.jpg',
+        img: '/products/airpods-case/1.webp',
         images: [
-          'https://i.ibb.co/b5QdC7vh/Air-Pods-case-9.jpg',
-          'https://i.ibb.co/YBmMhjqX/Firefly-8.jpg',
-          'https://i.ibb.co/S4zY5CbT/Air-Pods-case-1.jpg'
+          '/products/airpods-case/1.webp',
+          '/products/airpods-case/2.webp',
+          '/products/airpods-case/3.webp'
         ],
         description: "Capa para AirPods em crochet feita à mão, criada para proteger os teus auriculares com charme, estilo e um toque cozy especial. Prática, delicada e perfeita para o dia a dia.",
         material: `- Design minimalista e intemporal
@@ -466,12 +504,12 @@ Com fecho ajustável em cordão e um acabamento delicado handmade, é perfeito p
         id: 'b2_sling', 
         name: 'Granny Square Sling Bag', 
         price: calculateProductRange('Granny Square Sling Bag'), 
-        img: 'https://i.ibb.co/LzNKxCQR/Granny-square-sling-bag-20.png',
+        img: '/products/granny-square-sling-bag/1.webp',
         images: [
-          'https://i.ibb.co/LzNKxCQR/Granny-square-sling-bag-20.png',
-          'https://i.ibb.co/1t3HW02t/Granny-square-sling-bag-12.png',
-          'https://i.ibb.co/JjC82Njj/Granny-square-sling-bag-13.png',
-          'https://i.ibb.co/Df0JxNDd/Granny-square-sling-bag-14.png'
+          '/products/granny-square-sling-bag/1.webp',
+          '/products/granny-square-sling-bag/2.webp',
+          '/products/granny-square-sling-bag/3.webp',
+          '/products/granny-square-sling-bag/4.webp'
         ],
         description: "Mala em crochet com padrão Granny Square floral, cuidadosamente feita à mão e forrada no interior para maior estrutura e durabilidade. Com alça ajustável e fecho de correr, pode ser usada à cintura, a tiracolo ou ao ombro, adaptando-se facilmente ao teu estilo e às tuas necessidades do dia a dia.\nDimensões aproximadas: 26 cm (largura) × 11 cm (altura)",
         material: "- Material: 100% algodão de alta qualidade\n- Detalhe: Forro interno macio para maior segurança e estrutura",
@@ -481,12 +519,12 @@ Com fecho ajustável em cordão e um acabamento delicado handmade, é perfeito p
         id: 'b2_shell', 
         name: 'Mini shell Pouch', 
         price: calculateProductRange('Mini shell Pouch'), 
-        img: 'https://i.ibb.co/VY1dx3nt/Mini-shell-Pouch.png',
+        img: '/products/mini-shell-pouch/1.webp',
         images: [
-          'https://i.ibb.co/VY1dx3nt/Mini-shell-Pouch.png',
-          'https://i.ibb.co/bRv6mfKC/Mini-shell-Pouch-1.png',
-          'https://i.ibb.co/N6QD0ksq/Mini-shell-Pouch-2.png',
-          'https://i.ibb.co/TDMrr2tc/Mini-shell-Pouch-3.png'
+          '/products/mini-shell-pouch/1.webp',
+          '/products/mini-shell-pouch/2.webp',
+          '/products/mini-shell-pouch/3.webp',
+          '/products/mini-shell-pouch/4.webp'
         ],
         description: `Mini pouch em crochet com design inspirado em conchas, cuidadosamente feita à mão.
 Compacta e prática, fecha com um botão de madeira com estrela, um detalhe especial que reflete a identidade da marca, sendo perfeita para guardar os teus essenciais do dia a dia com um toque cozy e handmade.`,
@@ -502,16 +540,17 @@ Compacta e prática, fecha com um botão de madeira com estrela, um detalhe espe
     id: 'vestuario',
     name: 'Vestuário',
     items: 'Bikini, Ponchos, Cardigans',
-    image: '/category-vestuario.webp',
+    image: '/categories/category-vestuario.webp',
     products: [
       { 
         id: 'v1', 
         name: 'Marea Bikini Set', 
         price: calculateProductRange('Marea Bikini Set'), 
-        img: 'https://i.ibb.co/whQzXMvv/Bikini-CAPA.png',
+        img: '/products/marea-bikini-set/frente.webp',
         images: [
-          'https://i.ibb.co/whQzXMvv/Bikini-CAPA.png',
-          'https://i.ibb.co/Dfzz9dm2/BIKINI-FRENTE.png'
+          '/products/marea-bikini-set/frente.webp',
+          '/products/marea-bikini-set/1.webp',
+          '/products/marea-bikini-set/2.webp'
         ],
         description: "Biquíni em crochet feito à mão, pensado para os dias de verão e momentos à beira-mar. O Marea Bikini combina um design de riscas delicadas com um ajuste confortável, criando um look handmade, minimalista e cozy. Disponível em várias combinações de cores.",
         material: "- Material: 100% algodão",
@@ -521,12 +560,12 @@ Compacta e prática, fecha com um botão de madeira com estrela, um detalhe espe
         id: 'v1b', 
         name: 'Coral Bikini Top', 
         price: calculateProductRange('Coral Bikini Top'), 
-        img: 'https://i.ibb.co/sv0rY2J1/IMG-3187.jpg',
+        img: '/products/coral-bikini-top/1.webp',
         images: [
-          'https://i.ibb.co/sv0rY2J1/IMG-3187.jpg',
-          'https://i.ibb.co/TBYpCxxR/IMG-2959.jpg',
-          'https://i.ibb.co/N2QHbvnL/IMG-3020.jpg',
-          'https://i.ibb.co/sd7FbbXr/IMG-2935-2.jpg'
+          '/products/coral-bikini-top/1.webp',
+          '/products/coral-bikini-top/2.webp',
+          '/products/coral-bikini-top/3.webp',
+          '/products/coral-bikini-top/4.webp'
         ],
         description: `Bikini top em crochet feito à mão, com um design triangular clássico e detalhes delicados.
 Ajustável no pescoço e nas costas para um ajuste confortável e personalizado.
@@ -535,10 +574,10 @@ Disponível em várias combinações de cores, foi criado para acompanhar os dia
         care: "- Lavar à mão\n- Secar à sombra"
       },
       { 
-        id: 'v2b', name: 'Mesh Poncho', price: calculateProductRange('Mesh Poncho'), img: 'https://i.ibb.co/Qj7Lgf1Q/Poncho-2.png',
+        id: 'v2b', name: 'Mesh Poncho', price: calculateProductRange('Mesh Poncho'), img: '/products/mesh-poncho/1.webp',
         images: [
-          'https://i.ibb.co/Qj7Lgf1Q/Poncho-2.png',
-          'https://i.ibb.co/TBWgdX6h/Poncho-3.png',
+          '/products/mesh-poncho/1.webp',
+          '/products/mesh-poncho/2.webp'
         ],
         description: "Poncho em crochet leve e delicado, feito à mão com um design de malha aberta para um look effortless and cozy. Perfeito para sobrepor a tops, vestidos ou biquínis, criando um toque elegante e descontraído ao outfit. Disponível em várias cores.",
         material: "- Material: 100% algodão",
@@ -548,14 +587,13 @@ Disponível em várias combinações de cores, foi criado para acompanhar os dia
         id: 'v2c', 
         name: 'Signature Granny Poncho', 
         price: calculateProductRange('Signature Granny Poncho'), 
-        img: 'https://i.ibb.co/3907byLt/IMG-2738-2.jpg',
+        img: '/products/signature-granny-poncho/1.webp',
         images: [
-          'https://i.ibb.co/3907byLt/IMG-2738-2.jpg',
-          'https://i.ibb.co/gbVfh1Nc/IMG-2858.jpg',
-          'https://i.ibb.co/TBVVLngk/IMG-2720.jpg',
-          'https://i.ibb.co/qMKY04T8/IMG-2806.jpg',
-          'https://i.ibb.co/YB0LYVMV/IMG-2891.jpg',
-          'https://i.ibb.co/RTggwnnR/IMG-2856.jpg'
+          '/products/signature-granny-poncho/1.webp',
+          '/products/signature-granny-poncho/2.webp',
+          '/products/signature-granny-poncho/3.webp',
+          '/products/signature-granny-poncho/4.webp',
+          '/products/signature-granny-poncho/5.webp'
         ],
         description: "Poncho em crochet feito à mão, criado com um clássico padrão granny stitch e combinação de duas cores para um look cozy e intemporal. Com um ajuste confortável e textura aconchegante, é perfeito para sobrepor a diferentes looks e acrescentar um toque handmade e effortless ao visual.",
         details: "• Ideal para layering em diferentes looks\n• Disponível em várias combinações de cores",
@@ -566,12 +604,12 @@ Disponível em várias combinações de cores, foi criado para acompanhar os dia
         id: 'alma_cardigan', 
         name: 'Alma Cardigan', 
         price: calculateProductRange('Alma Cardigan'), 
-        img: 'https://i.ibb.co/Xk8DF1Y7/Alma-Cardigan.jpg',
+        img: '/products/alma-cardigan/1.webp',
         images: [
-          'https://i.ibb.co/Xk8DF1Y7/Alma-Cardigan.jpg',
-          'https://i.ibb.co/bMHd2XWZ/Alma-Cardigan.png',
-          'https://i.ibb.co/N2jxrrx3/image.png',
-          'https://i.ibb.co/JR9rXrty/image-3.png'
+          '/products/alma-cardigan/1.webp',
+          '/products/alma-cardigan/2.webp',
+          '/products/alma-cardigan/3.webp',
+          '/products/alma-cardigan/4.webp'
         ],
         description: "Cardigan em crochet feito à mão com granny squares clássicos e um design cozy e intemporal. Uma peça confortável e delicada, perfeita para dias frescos de verão, outono ou para criar um look mais acolhedor e effortless. Disponível em várias combinações de cores e materiais.",
         material: "- Opção 1: 100% algodão (Leve, respirável e ideal para dias mais amenos ou meia-estação)\n- Opção 2: 50% algodão / 50% lã (Mais quente, macio e aconchegante, ideal para dias mais frios)",
@@ -582,11 +620,11 @@ Disponível em várias combinações de cores, foi criado para acompanhar os dia
         id: 'mini_alma_cardigan', 
         name: 'Mini Alma Cardigan', 
         price: calculateProductRange('Mini Alma Cardigan'), 
-        img: 'https://i.ibb.co/8nQtzsbY/Mini-Alma-Cardigan-1.jpg',
+        img: '/products/mini-alma-cardigan/1.webp',
         images: [
-          'https://i.ibb.co/8nQtzsbY/Mini-Alma-Cardigan-1.jpg',
-          'https://i.ibb.co/PzzS4Vm2/Mini-Alma-Cardigan-4.jpg',
-          'https://i.ibb.co/4nXVDvLh/Mini-Alma-Cardigan-3.jpg'
+          '/products/mini-alma-cardigan/1.webp',
+          '/products/mini-alma-cardigan/2.webp',
+          '/products/mini-alma-cardigan/3.webp'
         ],
         sizes: ['2 anos', '4 anos', '6 anos'],
         description: "Versão mini do Alma Cardigan, feita à mão em crochet com granny squares clássicos e um design cozy e intemporal. Pensado para os mais pequenos, combina conforto, delicadeza e um toque handmade especial. Disponível em várias combinações de cores and materiais.",
@@ -600,21 +638,18 @@ Disponível em várias combinações de cores, foi criado para acompanhar os dia
     id: 'premium',
     name: 'Acessórios',
     items: 'Bandanas, Headbands,',
-    image: '/category-acessorios.webp',
+    image: '/categories/category-acessorios.webp',
     products: [
       { 
         id: 'v3', 
         name: 'Dragonfly Bandana', 
         price: calculateProductRange('Dragonfly Bandana'), 
-        img: 'https://i.ibb.co/xqRg1L26/IMG-2833.jpg',
+        img: '/products/dragonfly-bandana/1.webp',
         images: [
-          'https://i.ibb.co/xqRg1L26/IMG-2833.jpg',
-          'https://i.ibb.co/Hs65ksV/IMG-2777.jpg',
-          'https://i.ibb.co/h1ZRfGbb/IMG-2770.jpg',
-          'https://i.ibb.co/XfWmYnYm/IMG-2753.jpg',
-          'https://i.ibb.co/nNbwppxF/Bandana-LIBELINHA-capa.png',
-          'https://i.ibb.co/M5hJdHrK/Dragonfly-Bandana-Libelinha-1.png',
-          'https://i.ibb.co/HDzn9x8m/Dragonfly-Bandana-Libelinha-3.png'
+          '/products/dragonfly-bandana/1.webp',
+          '/products/dragonfly-bandana/2.webp',
+          '/products/dragonfly-bandana/3.webp',
+          '/products/dragonfly-bandana/4.webp'
         ],
         description: "Bandana em crochet com delicado padrão de libelinhas, feita à mão para dar um toque cozy e especial ao teu look. Leve, confortável e versátil, perfeita para usar no dia a dia. Disponível em várias cores e em duas opções de material.",
         material: "- Opção 1: 100% algodão (opção leve)\n- Opção 2: 50% algodão, 50% lã (opção mais cozy)",
@@ -624,12 +659,12 @@ Disponível em várias combinações de cores, foi criado para acompanhar os dia
         id: 'v3b', 
         name: 'Classic Bandana', 
         price: calculateProductRange('Classic Bandana'), 
-        img: 'https://i.ibb.co/PZHFmt0D/Bandanas-2.png',
+        img: '/products/classic-bandana/1.webp',
         images: [
-          'https://i.ibb.co/PZHFmt0D/Bandanas-2.png',
-          'https://i.ibb.co/KxvZDqZY/Bandanas-6.png',
-          'https://i.ibb.co/JjHRR7vq/Bandanas-3.png',
-          'https://i.ibb.co/HfSJtngW/Bandanas-1.png'
+          '/products/classic-bandana/1.webp',
+          '/products/classic-bandana/2.webp',
+          '/products/classic-bandana/3.webp',
+          '/products/classic-bandana/4.webp'
         ],
         description: `Bandana em crochet feita à mão, com um design clássico em granny stitch.
 Leve, versátil e ajustável através de fitas, foi criada para complementar qualquer look com um toque artesanal e intemporal.
@@ -641,11 +676,11 @@ Disponível em várias cores.`,
         id: 'h3', 
         name: 'Dragonfly Headband', 
         price: calculateProductRange('Dragonfly Headband'), 
-        img: 'https://i.ibb.co/yckQG5rv/Dragonfly-Headband.png',
+        img: '/products/dragonfly-headband/1.webp',
         images: [
-          'https://i.ibb.co/yckQG5rv/Dragonfly-Headband.png',
-          'https://i.ibb.co/zWwqkHxZ/Dragonfly-Headband-Costas.png',
-          'https://i.ibb.co/xSf76VVQ/Dragonfly-Headband-2.png'
+          '/products/dragonfly-headband/1.webp',
+          '/products/dragonfly-headband/2.webp',
+          '/products/dragonfly-headband/3.webp'
         ],
         description: "Headband em crochet com delicado padrão de libelinhas, feita à mão para um toque leve e especial no dia a dia. Confortável, versátil e perfeita para complementar qualquer look com um detalhe handmade e cozy. Disponível em várias cores.",
         material: "- Material: 100% algodão",
@@ -655,12 +690,12 @@ Disponível em várias cores.`,
         id: 'v3c', 
         name: 'Scarf Hip Bandana', 
         price: calculateProductRange('Scarf Hip Bandana'), 
-        img: 'https://i.ibb.co/YFjN9D5K/Scarf-Hip-Bandana.png',
+        img: '/products/scarf-hip-bandana/1.webp',
         images: [
-          'https://i.ibb.co/YFjN9D5K/Scarf-Hip-Bandana.png',
-          'https://i.ibb.co/vCrXKGMM/Scarf-Hip-Bandana02.png',
-          'https://i.ibb.co/TD45GRqx/Scarf-Hip-Bandana03.png',
-          'https://i.ibb.co/yB5QZ0rP/Scarf-Hip-Bandana-20.png'
+          '/products/scarf-hip-bandana/1.webp',
+          '/products/scarf-hip-bandana/2.webp',
+          '/products/scarf-hip-bandana/3.webp',
+          '/products/scarf-hip-bandana/4.webp'
         ],
         description: `Peça em crochet leve e versátil, cuidadosamente feita à mão.
 Pode ser usada como hip scarf ou bandana, adicionando um toque boho e handmade a qualquer look.
@@ -1629,17 +1664,75 @@ const FioCondutor = () => {
 
 const Hero = () => {
     const { scrollY } = useScroll();
-    // Parallax background movement: background slowly slides up or down on scroll
+    // Parallax background movement & smooth cross-fade out on scroll
     const bgY = useTransform(scrollY, [0, 800], [0, 150]);
     const bgScale = useTransform(scrollY, [0, 800], [1.02, 1.12]);
+    const heroBgOpacity = useTransform(scrollY, [0, 500, 800], [1, 0.7, 0]);
+
     const logoScale = useTransform(scrollY, [0, 500], [1, 0.92]);
     const logoOpacity = useTransform(scrollY, [0, 400], [1, 0]);
     const contentY = useTransform(scrollY, [0, 500], [0, 60]);
-    const scrollYTransform = useTransform(scrollY, [0, 400], [0, -50]);
+
+    // Parallax, Shrink & Smooth fade-out curve for 'VER A COLEÇÃO' CTA button (floats down gracefully with scroll, shrinks and fades completely before next section)
+    const ctaY = useTransform(scrollY, [0, 300, 500], [0, 60, 120]);
+    const ctaScale = useTransform(scrollY, [0, 300, 500], [1, 0.85, 0.70]);
+    const ctaOpacity = useTransform(scrollY, [0, 160, 340], [1, 0.5, 0]);
+
+    // Natural scroll trajectory & staggered sequential exit for right-side organic triggers anchored to Hero
+    const heroBalloonsY = useTransform(scrollY, [0, 600], [0, 30]);
+    const balloon0Opacity = useTransform(scrollY, [0, 300, 440], [1, 0.7, 0]);
+    const balloon0Scale = useTransform(scrollY, [0, 300, 440], [1, 0.9, 0.7]);
+
+    const balloon1Opacity = useTransform(scrollY, [0, 340, 480], [1, 0.7, 0]);
+    const balloon1Scale = useTransform(scrollY, [0, 340, 480], [1, 0.9, 0.7]);
+
+    const balloon2Opacity = useTransform(scrollY, [0, 380, 520], [1, 0.7, 0]);
+    const balloon2Scale = useTransform(scrollY, [0, 380, 520], [1, 0.9, 0.7]);
+
+    const balloonTransforms = [
+        { opacity: balloon0Opacity, scale: balloon0Scale },
+        { opacity: balloon1Opacity, scale: balloon1Scale },
+        { opacity: balloon2Opacity, scale: balloon2Scale }
+    ];
+
+    // Track scroll past hero to collapse balloons into sticky floating widget
+    const [isPastHero, setIsPastHero] = useState(false);
+    const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+    const [hoveredBalloonIdx, setHoveredBalloonIdx] = useState<number | null>(null);
+    const [isWidgetPeeking, setIsWidgetPeeking] = useState(false);
 
     // Automatic rotating background slideshow
     const [bgIndex, setBgIndex] = useState(0);
-    const { t } = useLanguage();
+    const { t, lang } = useLanguage();
+    const isEn = typeof lang === 'string' && lang.toLowerCase() === 'en';
+
+    const handleScrollToCollection = () => {
+        const el = document.getElementById('colecao') || document.getElementById('collection');
+        if (el) {
+            el.scrollIntoView({ behavior: 'smooth' });
+        }
+    };
+
+    useEffect(() => {
+        const handleScroll = () => {
+            const heroHeight = window.innerHeight || 800;
+            setIsPastHero(window.scrollY > (heroHeight * 0.75));
+        };
+        window.addEventListener('scroll', handleScroll, { passive: true });
+        handleScroll();
+        return () => window.removeEventListener('scroll', handleScroll);
+    }, []);
+
+    // Ambient peek loop for the floating novelty widget
+    useEffect(() => {
+        if (!isPastHero) return;
+        const interval = setInterval(() => {
+            setIsWidgetPeeking(true);
+            const timeout = setTimeout(() => setIsWidgetPeeking(false), 2800);
+            return () => clearTimeout(timeout);
+        }, 7000);
+        return () => clearInterval(interval);
+    }, [isPastHero]);
 
     useEffect(() => {
         const timer = setInterval(() => {
@@ -1655,16 +1748,12 @@ const Hero = () => {
 
     return (
         <>
-            <section data-background="dark" className="relative z-20 min-h-[100dvh] lg:h-screen pt-28 pb-20 md:pt-24 lg:py-0 flex flex-col items-center justify-center overflow-hidden text-cream bg-[#1F2A18]" style={{ background: 'linear-gradient(to bottom, #1F2A18 0%, #1F2A18 85%, #24301d 100%)' }}>
-                {/* Ambient Overlay Image with Parallax & Slow Animation - Revealing more texture and matter with a bottom dissolution fade matching our background gradient transition */}
-                <div 
+            <section data-background="dark" className="relative z-20 min-h-[100dvh] lg:h-screen py-[clamp(2rem,5vh,6rem)] px-4 flex flex-col items-center justify-center overflow-hidden text-cream bg-[#1F2A18] landscape:py-3 landscape:min-h-[100dvh] landscape:justify-center" style={{ background: 'linear-gradient(to bottom, #1F2A18 0%, #1F2A18 85%, #24301d 100%)' }}>
+                {/* Ambient Overlay Image with Parallax, Smooth Cross-Fade & Slow Animation */}
+                <motion.div 
+                    style={{ opacity: heroBgOpacity }}
                     className="absolute inset-0 z-0 select-none pointer-events-none bg-[#1F2A18]"
-                    style={{
-                        WebkitMaskImage: 'linear-gradient(to bottom, black 0%, black calc(100% - 100px), transparent 100%)',
-                        maskImage: 'linear-gradient(to bottom, black 0%, black calc(100% - 100px), transparent 100%)'
-                    }}
                 >
-                    {/* Estado 1: Pulsing, dreaming fade-in of the background images with breathing texture depth, merging organically with our deep brand green */}
                     <motion.div
                         initial={{ opacity: 0 }}
                         animate={{
@@ -1722,139 +1811,372 @@ const Hero = () => {
                         ))}
                     </motion.div>
 
-                        {/* Golden ambient studio lighting leak/flare overlay, adding richness and luxury with organic movement */}
-                        <motion.div 
-                            animate={{ 
-                                opacity: [0.75, 0.95, 0.75],
-                                scale: [1, 1.04, 1],
-                            }}
-                            transition={{ duration: 20, repeat: Infinity, ease: "easeInOut" }}
-                            className="absolute inset-0 bg-[radial-gradient(circle_at_75%_35%,rgba(197,160,89,0.24)_0%,transparent_60%)] z-10 pointer-events-none mix-blend-color-dodge origin-top-right"
-                        />
-                        <motion.div 
-                            animate={{ 
-                                opacity: [0.50, 0.72, 0.50],
-                                x: [-20, 20, -20],
-                                y: [-10, 10, -10]
-                            }}
-                            transition={{ duration: 24, repeat: Infinity, ease: "easeInOut" }}
-                            className="absolute inset-0 bg-[radial-gradient(circle_at_25%_65%,rgba(197,160,89,0.15)_0%,transparent_50%)] z-10 pointer-events-none mix-blend-overlay"
-                        />
-         
-                        {/* Subtle volumetric ray of light sweeping slowly like workshop window sun shafts */}
-                        <motion.div 
-                            animate={{ 
-                                opacity: [0.38, 0.58, 0.38],
-                                rotate: [-1, 1, -1]
-                            }}
-                            transition={{ duration: 32, repeat: Infinity, ease: "easeInOut" }}
-                            className="absolute inset-0 bg-[radial-gradient(ellipse_at_35%_0%,rgba(255,251,240,0.15)_0%,transparent_45%)] z-10 pointer-events-none mix-blend-screen origin-top"
-                        />
-          
-                        {/* Handmade texture layer: Premium subtle cellulose/organic film grain */}
-                        <div 
-                            className="absolute inset-0 pointer-events-none z-10 opacity-[0.075] mix-blend-overlay"
-                            style={{
-                                backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 250 250' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.68' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`
-                            }}
-                        />
-                        
-                        {/* Soft bloom backglow centered right behind the signature to separate and spotlight the brand from the background */}
-                        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[850px] h-[850px] bg-[radial-gradient(circle_at_center,rgba(197,160,89,0.22)_0%,rgba(197,160,89,0.05)_45%,transparent_70%)] z-10 pointer-events-none mix-blend-screen" />
-         
-                        {/* Radial gradient vignette and linear gradients for ultimate depth and blend - bottom is completely transparent to flow into page below */}
-                        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_30%,#243119_90%)] z-10 pointer-events-none opacity-50 [mask-image:linear-gradient(to_bottom,black_75%,transparent_100%)]" />
-                        <div className="absolute inset-0 bg-gradient-to-b from-[#243119]/40 via-transparent to-transparent z-10 pointer-events-none" />
-                    </div>
-         
-                    {/* Cinematic Centered Editorial Content */}
+                    {/* Golden ambient studio lighting leak/flare overlay */}
                     <motion.div 
-                        style={{ 
-                            scale: logoScale, 
-                            y: contentY
+                        animate={{ 
+                            opacity: [0.75, 0.95, 0.75],
+                            scale: [1, 1.04, 1],
                         }}
-                        className="relative z-20 flex flex-col items-center px-6 text-center select-none"
-                    >
-                        {/* Scroll-fading content wrapper to keep the primary brand elements clean while scroll progresses */}
-                        <motion.div
-                            style={{ opacity: logoOpacity }}
-                            className="flex flex-col items-center"
-                        >
-                            {/* Estado 1: Official Logo M★Bravo - An elegant editorial brand signature, emerging naturally over 1.5s immediately when image is ready */}
-                            <motion.div
-                                initial={{ scale: 0.98, opacity: 0, filter: "blur(4px)", y: -8 }}
-                                animate={{ scale: 1.0, opacity: 1.0, filter: "blur(0px)", y: 0 }}
-                                transition={{ 
-                                    duration: 1.5,
-                                    delay: 0,
-                                    ease: [0.25, 1, 0.5, 1] 
-                                }}
-                                whileHover={{ opacity: 1, scale: 1.008, transition: { duration: 1.0 } }}
-                                style={{ 
-                                    filter: "drop-shadow(0 24px 54px rgba(18,26,13,0.95)) drop-shadow(0 4px 20px rgba(197,160,89,0.18))"
-                                }}
-                                className="h-28 xs:h-36 sm:h-[11rem] md:h-[12.5rem] lg:h-[14.4rem] xl:h-[17.5rem] mb-[5px] sm:mb-[7px] md:mb-[9.5px] lg:mb-[11.5px] -mt-3 md:-mt-5 origin-center select-none"
-                            >
-                                <Logo light className="h-full" />
-                            </motion.div>
-         
-                            {/* Estado 2: Headline: "Cada ponto guarda uma memória." - Refined to a luxury editorial masterwork with staggered word reveal starting exactly at t = 1.5s */}
-                            <h1
-                                style={{ 
-                                    fontFamily: "'Cormorant Garamond', serif",
-                                    textShadow: "0 15px 40px rgba(18, 26, 13, 0.95), 0 4px 12px rgba(18, 26, 13, 0.7)",
-                                    letterSpacing: "-0.012em"
-                                }}
-                                className="italic text-[clamp(1.1rem,4.5vw,2.85rem)] leading-relaxed font-normal mb-4 md:mb-5 antialiased selection:bg-[#C5A059]/30 flex flex-wrap justify-center gap-x-[0.22em] md:gap-x-[0.25em] max-w-none w-full"
-                            >
-                                {titleWords.map((word, i) => {
-                                    // Highlight the core brand word "memória." or "memory." in the signature gold color for stunning luxury contrast
-                                    const isGoldWord = word.toLowerCase().includes('memória') || word.toLowerCase().includes('memory');
-                                    return (
-                                        <motion.span
-                                            key={i}
-                                            initial={{ opacity: 0, y: 12, filter: "blur(4px)" }}
-                                            animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-                                            transition={{
-                                                delay: 1.5 + i * 0.25,
-                                                duration: 1.5,
-                                                ease: [0.25, 1, 0.5, 1]
-                                            }}
-                                            className={`inline-block ${isGoldWord ? 'text-[#C5A059] font-medium' : 'text-[#F5EEDC]'}`}
-                                        >
-                                            {word}
-                                        </motion.span>
-                                    );
-                                })}
-                            </h1>
-         
-                            {/* Estado 3: Subheadline: "Criado à mão, com tempo, amor e memórias." - Soft, quiet luxury whispering text layout starting at t = 4.0s */}
-                            <motion.p
-                                initial={{ opacity: 0, y: 8 }}
-                                animate={{ opacity: 0.58, y: 0 }}
-                                transition={{ delay: 4.0, duration: 2.0, ease: [0.16, 1, 0.3, 1] }}
+                        transition={{ duration: 20, repeat: Infinity, ease: "easeInOut" }}
+                        className="absolute inset-0 bg-[radial-gradient(circle_at_75%_35%,rgba(197,160,89,0.24)_0%,transparent_60%)] z-10 pointer-events-none mix-blend-color-dodge origin-top-right"
+                    />
+                    <motion.div 
+                        animate={{ 
+                            opacity: [0.50, 0.72, 0.50],
+                            x: [-20, 20, -20],
+                            y: [-10, 10, -10]
+                        }}
+                        transition={{ duration: 24, repeat: Infinity, ease: "easeInOut" }}
+                        className="absolute inset-0 bg-[radial-gradient(circle_at_25%_65%,rgba(197,160,89,0.15)_0%,transparent_50%)] z-10 pointer-events-none mix-blend-overlay"
+                    />
+     
+                    {/* Volumetric ray of light */}
+                    <motion.div 
+                        animate={{ 
+                            opacity: [0.38, 0.58, 0.38],
+                            rotate: [-1, 1, -1]
+                        }}
+                        transition={{ duration: 32, repeat: Infinity, ease: "easeInOut" }}
+                        className="absolute inset-0 bg-[radial-gradient(ellipse_at_35%_0%,rgba(255,251,240,0.15)_0%,transparent_45%)] z-10 pointer-events-none mix-blend-screen origin-top"
+                    />
+      
+                    {/* Organic film grain */}
+                    <div 
+                        className="absolute inset-0 pointer-events-none z-10 opacity-[0.075] mix-blend-overlay"
+                        style={{
+                            backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 250 250' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.68' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`
+                        }}
+                    />
+                    
+                    {/* Soft bloom backglow */}
+                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[850px] h-[850px] bg-[radial-gradient(circle_at_center,rgba(197,160,89,0.22)_0%,rgba(197,160,89,0.05)_45%,transparent_70%)] z-10 pointer-events-none mix-blend-screen" />
+     
+                    {/* Gradient vignettes */}
+                    <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_30%,#243119_90%)] z-10 pointer-events-none opacity-50 [mask-image:linear-gradient(to_bottom,black_75%,transparent_100%)]" />
+                    <div className="absolute inset-0 bg-gradient-to-b from-[#243119]/40 via-transparent to-transparent z-10 pointer-events-none" />
+                </motion.div>
+                <motion.div 
+                    style={{ y: heroBalloonsY }}
+                    className="flex absolute top-20 sm:top-28 md:top-36 right-3 sm:right-8 md:right-14 landscape:top-8 landscape:right-3 z-[40] flex-col items-end gap-2 sm:gap-3.5 pointer-events-auto max-w-[260px] sm:max-w-[320px]"
+                >
+                    {HERO_ORGANIC_BALLOONS.map((balloon, idx) => {
+                        const isCurrentAuto = bgIndex === balloon.bgIndex;
+                        const isHovered = hoveredBalloonIdx === idx;
+                        const isExpanded = isCurrentAuto || isHovered;
+                        const transform = balloonTransforms[idx];
+
+                        return (
+                            <motion.button
+                                key={balloon.id}
                                 style={{
-                                    fontFamily: "'Cormorant Garamond', serif",
-                                    textShadow: "0 4px 12px rgba(18, 26, 13, 0.25)",
-                                    letterSpacing: "0.024em"
+                                    opacity: transform.opacity,
+                                    scale: transform.scale
                                 }}
-                                className="italic text-xs sm:text-sm md:text-base font-light text-[#D4C3A3] max-w-[260px] sm:max-w-xs md:max-w-sm mx-auto leading-relaxed mb-0 antialiased"
+                                initial={{ opacity: 0, x: 28, scale: 0.9 }}
+                                animate={{ 
+                                    x: 0, 
+                                    y: [0, idx % 2 === 0 ? -5 : 5, 0]
+                                }}
+                                transition={{ 
+                                    delay: 0.8 + idx * 0.15, 
+                                    duration: 0.9, 
+                                    y: { duration: 4.5 + idx * 0.8, repeat: Infinity, ease: "easeInOut" } 
+                                }}
+                                onMouseEnter={() => {
+                                    setHoveredBalloonIdx(idx);
+                                    setBgIndex(balloon.bgIndex);
+                                }}
+                                onMouseLeave={() => setHoveredBalloonIdx(null)}
+                                onClick={() => {
+                                    setBgIndex(balloon.bgIndex);
+                                    setIsDrawerOpen(true);
+                                }}
+                                className={`group relative flex items-center transition-all duration-500 cursor-pointer select-none backdrop-blur-xl shadow-[0_8px_28px_rgba(0,0,0,0.4)] ${balloon.shape} ${
+                                    isExpanded 
+                                        ? 'bg-[#1C2A15]/95 border border-[#C5A059] text-white ring-1 ring-[#C5A059]/60 shadow-[0_0_28px_rgba(197,160,89,0.35)] px-2 py-1.5 sm:px-3.5 sm:py-2' 
+                                        : 'bg-[#121A0D]/75 hover:bg-[#182412]/95 border border-[#C5A059]/40 hover:border-[#C5A059]/90 text-[#F5EEDC] p-1 sm:p-1.5'
+                                }`}
+                                title={isEn ? balloon.titleEn : balloon.titlePt}
                             >
-                                {t('brand.subheadline')}
-                            </motion.p>
+                                <div className={`relative overflow-hidden border border-[#C5A059]/70 shrink-0 transition-all duration-500 ${balloon.shape} ${
+                                    isExpanded 
+                                        ? 'w-7 h-7 sm:w-9 sm:h-9 md:w-12 md:h-12 lg:w-14 lg:h-14 landscape:w-7 landscape:h-7' 
+                                        : 'w-9 h-9 sm:w-12 sm:h-12 md:w-16 md:h-16 lg:w-18 lg:h-18 landscape:w-9 landscape:h-9 md:landscape:w-12 md:landscape:h-12'
+                                }`}>
+                                    <img 
+                                        src={balloon.img} 
+                                        alt={balloon.titlePt}
+                                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-115"
+                                    />
+                                    <div className={`absolute inset-0 bg-gradient-to-tr from-[#C5A059]/30 to-transparent transition-opacity duration-500 ${isExpanded ? 'opacity-100' : 'opacity-0'}`} />
+                                </div>
+
+                                <AnimatePresence>
+                                    {isExpanded && (
+                                        <motion.div 
+                                            initial={{ opacity: 0, width: 0 }}
+                                            animate={{ opacity: 1, width: 'auto' }}
+                                            exit={{ opacity: 0, width: 0 }}
+                                            transition={{ duration: 0.35, ease: "easeInOut" }}
+                                            className="hidden sm:flex flex-col items-start text-left ml-3 pr-1 overflow-hidden whitespace-nowrap"
+                                        >
+                                            <span className="text-[9px] uppercase tracking-widest text-[#C5A059] font-sans font-semibold leading-none mb-0.5 flex items-center gap-1">
+                                                <span>✦</span> {isEn ? balloon.badgeEn : balloon.badgePt}
+                                            </span>
+                                            <span className="text-xs sm:text-sm font-serif italic text-white group-hover:text-[#C5A059] transition-colors leading-tight">
+                                                {isEn ? balloon.titleEn : balloon.titlePt}
+                                            </span>
+                                        </motion.div>
+                                    )}
+                                </AnimatePresence>
+
+                                {isCurrentAuto && (
+                                    <span className="w-1.5 h-1.5 rounded-full bg-[#C5A059] animate-pulse ml-1 sm:ml-1.5 shrink-0" />
+                                )}
+                            </motion.button>
+                        );
+                    })}
+                </motion.div>
+
+                {/* Cinematic Centered Editorial Content */}
+                <motion.div 
+                    style={{ 
+                        scale: logoScale, 
+                        y: contentY
+                    }}
+                    className="relative z-[20] flex flex-col items-center px-4 sm:px-6 text-center select-none max-w-full"
+                >
+                    {/* Scroll-fading content wrapper to keep primary brand elements clean while scroll progresses */}
+                    <motion.div
+                        style={{ opacity: logoOpacity }}
+                        className="flex flex-col items-center"
+                    >
+                        {/* Official Primary Logo M★Bravo - Imposing & Dominant across Desktop/Laptop/Tablet & Mobile */}
+                        <motion.div
+                            initial={{ scale: 0.98, opacity: 0, filter: "blur(4px)", y: -8 }}
+                            animate={{ scale: 1.0, opacity: 1.0, filter: "blur(0px)", y: 0 }}
+                            transition={{ 
+                                duration: 1.5,
+                                delay: 0.3,
+                                ease: [0.25, 1, 0.5, 1] 
+                            }}
+                            whileHover={{ opacity: 1, scale: 1.008, transition: { duration: 1.0 } }}
+                            style={{ 
+                                filter: "drop-shadow(0 28px 60px rgba(18,26,13,0.98)) drop-shadow(0 6px 24px rgba(197,160,89,0.22))"
+                            }}
+                            className="h-[clamp(7rem,18vh,14rem)] sm:h-[clamp(12rem,22vh,20rem)] md:h-[clamp(15rem,26vh,24rem)] lg:h-[clamp(18rem,30vh,28rem)] xl:h-[clamp(20rem,34vh,32rem)] landscape:h-[clamp(5.5rem,20vh,10rem)] sm:landscape:h-[clamp(8rem,25vh,14rem)] md:landscape:h-[clamp(12rem,30vh,22rem)] mb-2 sm:mb-3 md:mb-4 -mt-1 md:-mt-3 origin-center select-none shrink-0"
+                        >
+                            <Logo light className="h-full" />
                         </motion.div>
 
+                        {/* Slogan: "Cada ponto guarda uma memória." */}
+                        <h1
+                            style={{ 
+                                fontFamily: "'Cormorant Garamond', serif",
+                                textShadow: "0 18px 45px rgba(18, 26, 13, 0.98), 0 4px 14px rgba(18, 26, 13, 0.8)",
+                                letterSpacing: "-0.012em"
+                            }}
+                            className="italic text-[clamp(1.5rem,4.5vw,3.75rem)] lg:text-[clamp(2.5rem,5.5vw,4.5rem)] landscape:text-[clamp(1.1rem,3.5vh,1.8rem)] md:landscape:text-[clamp(1.8rem,5vh,3.2rem)] leading-tight sm:leading-relaxed font-normal mb-2 sm:mb-3 md:mb-4 antialiased selection:bg-[#C5A059]/30 flex flex-wrap justify-center gap-x-[0.24em] md:gap-x-[0.28em] max-w-none w-full"
+                        >
+                            {titleWords.map((word, i) => {
+                                const isGoldWord = word.toLowerCase().includes('memória') || word.toLowerCase().includes('memory');
+                                return (
+                                    <motion.span
+                                        key={i}
+                                        initial={{ opacity: 0, y: 12, filter: "blur(4px)" }}
+                                        animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+                                        transition={{
+                                            delay: 1.5 + i * 0.25,
+                                            duration: 1.5,
+                                            ease: [0.25, 1, 0.5, 1]
+                                        }}
+                                        className={`inline-block ${isGoldWord ? 'text-[#C5A059] font-medium' : 'text-[#F5EEDC]'}`}
+                                    >
+                                        {word}
+                                    </motion.span>
+                                );
+                            })}
+                        </h1>
 
+                        {/* Subheadline: "Peças feitas com tempo, amor e memória." */}
+                        <motion.p
+                            initial={{ opacity: 0, y: 8 }}
+                            animate={{ opacity: 0.8, y: 0 }}
+                            transition={{ delay: 3.2, duration: 1.8, ease: [0.16, 1, 0.3, 1] }}
+                            style={{
+                                fontFamily: "'Cormorant Garamond', serif",
+                                textShadow: "0 4px 12px rgba(18, 26, 13, 0.3)",
+                                letterSpacing: "0.03em"
+                            }}
+                            className="italic text-sm sm:text-lg md:text-xl landscape:text-xs md:landscape:text-sm lg:landscape:text-base font-light text-[#D4C3A3] max-w-[320px] sm:max-w-xl md:max-w-2xl mx-auto leading-relaxed mb-0 antialiased"
+                        >
+                            {t('brand.subheadline')}
+                        </motion.p>
                     </motion.div>
- 
-            {/* Corner Labels (Editorial feel) */}
-            <div className="absolute bottom-12 left-12 hidden lg:block z-20 pointer-events-none select-none">
-                <span className="text-[9px] uppercase tracking-[0.4em] text-cream/20 [writing-mode:vertical-rl] rotate-180">EST. 2026</span>
-            </div>
-            <div className="absolute bottom-12 right-12 hidden lg:block z-20 pointer-events-none select-none">
-                <span className="text-[9px] uppercase tracking-[0.4em] text-cream/20 [writing-mode:vertical-rl]">HANDMADE IN PORTUGAL</span>
-            </div>
-                </section>
+                </motion.div>
+
+                {/* Editorial Organic Glass Tag CTA Anchor ('VER A COLEÇÃO') */}
+                <motion.div
+                    style={{ y: ctaY, scale: ctaScale, opacity: ctaOpacity }}
+                    className="absolute bottom-12 sm:bottom-20 md:bottom-24 landscape:bottom-4 sm:landscape:bottom-8 md:landscape:bottom-12 left-1/2 -translate-x-1/2 z-[50] pointer-events-auto w-auto max-w-[90vw]"
+                >
+                    <motion.button
+                        initial={{ opacity: 0, y: 14, scale: 0.96 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        transition={{ delay: 3.8, duration: 1.2, ease: [0.22, 1, 0.36, 1] }}
+                        onClick={handleScrollToCollection}
+                        className="group relative inline-flex items-center justify-center gap-2 sm:gap-3 px-5 py-2.5 sm:px-8 sm:py-3.5 landscape:px-4 landscape:py-2 rounded-[22px_10px_20px_11px] sm:rounded-[30px_12px_26px_14px] bg-black/20 hover:bg-[#121A0D]/50 backdrop-blur-md border border-[#C5A059]/40 hover:border-[#C5A059] transition-all duration-500 shadow-[0_8px_32px_rgba(0,0,0,0.3),0_0_15px_rgba(197,160,89,0.15)] hover:shadow-[0_0_30px_rgba(197,160,89,0.35)] hover:scale-[1.03] active:scale-[0.97] cursor-pointer select-none w-auto antialiased whitespace-nowrap landscape:scale-95"
+                    >
+                        <span className="text-[#C5A059]/90 group-hover:text-[#C5A059] text-[10px] sm:text-xs transition-colors duration-300">✦</span>
+                        <span className="font-serif italic tracking-[0.26em] sm:tracking-[0.3em] text-[10px] sm:text-xs text-[#F5EEDC] group-hover:text-[#C5A059] font-normal uppercase transition-colors duration-300 whitespace-nowrap">
+                            {isEn ? 'VIEW COLLECTION' : 'VER A COLEÇÃO'}
+                        </span>
+                        <svg className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-[#C5A059]/80 group-hover:text-[#C5A059] transition-all duration-300 transform group-hover:translate-y-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+                        </svg>
+                    </motion.button>
+                </motion.div>
+  
+                {/* Corner Labels */}
+                <div className="absolute bottom-12 left-12 hidden lg:block z-20 pointer-events-none select-none">
+                    <span className="text-[9px] uppercase tracking-[0.4em] text-cream/20 [writing-mode:vertical-rl] rotate-180">EST. 2026</span>
+                </div>
+                <div className="absolute bottom-12 right-12 hidden lg:block z-20 pointer-events-none select-none">
+                    <span className="text-[9px] uppercase tracking-[0.4em] text-cream/20 [writing-mode:vertical-rl]">HANDMADE IN PORTUGAL</span>
+                </div>
+            </section>
+
+            {/* Scroll-Driven Sticky Novelty Floating Widget (Seamless Docking at bottom-right after scrolling past Hero) */}
+            <AnimatePresence>
+                {isPastHero && (
+                    <motion.button
+                        initial={{ opacity: 0, scale: 0.8, y: 30 }}
+                        animate={{ opacity: 1, scale: 1, y: 0 }}
+                        exit={{ opacity: 0, scale: 0.8, y: 30 }}
+                        transition={{ type: "spring", damping: 25, stiffness: 300 }}
+                        onClick={() => setIsDrawerOpen(true)}
+                        onMouseEnter={() => setIsWidgetPeeking(true)}
+                        onMouseLeave={() => setIsWidgetPeeking(false)}
+                        className={`fixed bottom-4 right-4 sm:bottom-6 sm:right-8 z-[60] bg-[#121A0D]/90 hover:bg-[#1C2A15] backdrop-blur-xl border border-[#C5A059]/60 hover:border-[#C5A059] text-[#F5EEDC] p-2 rounded-[28px_12px_24px_14px] shadow-[0_12px_36px_rgba(0,0,0,0.5)] flex items-center transition-all duration-500 cursor-pointer select-none group ring-1 ring-[#C5A059]/40 ${
+                            isWidgetPeeking ? 'pr-5 gap-3' : 'pr-2 hover:pr-5 hover:gap-3'
+                        }`}
+                        title={isEn ? "Open Limited Edition Showcase" : "Ver Edição Limitada"}
+                    >
+                        <div className="relative w-9 h-9 sm:w-10 sm:h-10 rounded-[22px_8px_18px_10px] overflow-hidden border border-[#C5A059] shrink-0">
+                            <img 
+                                src={HERO_ORGANIC_BALLOONS[bgIndex]?.img || '/categories/category-malas.webp'} 
+                                alt="M★BRAVO Showcase"
+                                className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                            />
+                            <span className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
+                        </div>
+                        <div className={`flex flex-col items-start text-left overflow-hidden transition-all duration-500 ${
+                            isWidgetPeeking ? 'max-w-[140px] opacity-100' : 'max-w-0 opacity-0 group-hover:max-w-[140px] group-hover:opacity-100 group-hover:ml-1'
+                        }`}>
+                            <span className="text-[9px] uppercase tracking-widest text-[#C5A059] font-sans font-semibold flex items-center gap-1 whitespace-nowrap">
+                                <span className="animate-pulse">✦</span> {isEn ? 'NEW IN' : 'NOVIDADES'}
+                            </span>
+                            <span className="text-xs sm:text-sm font-serif italic text-white group-hover:text-[#C5A059] transition-colors leading-none whitespace-nowrap">
+                                {isEn ? 'Limited Edition' : 'Edição Limitada'}
+                            </span>
+                        </div>
+                    </motion.button>
+                )}
+            </AnimatePresence>
+
+            {/* Limited Edition Showcase Drawer & Mobile Bottom Sheet */}
+            <AnimatePresence>
+                {isDrawerOpen && (
+                    <div className="fixed inset-0 z-[90] flex items-end md:items-stretch justify-center md:justify-end">
+                        <motion.div
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            onClick={() => setIsDrawerOpen(false)}
+                            className="absolute inset-0 bg-black/70 backdrop-blur-sm cursor-pointer z-[90]"
+                        />
+                        <motion.div
+                            initial={{ x: '100%', y: '100%' }}
+                            animate={{ x: 0, y: 0 }}
+                            exit={{ x: '100%', y: '100%' }}
+                            transition={{ type: 'spring', damping: 28, stiffness: 240 }}
+                            className="relative z-[91] w-full max-h-[85vh] md:max-h-full rounded-t-[28px] md:rounded-none md:max-w-md bg-[#121A0D] border-t md:border-t-0 md:border-l border-[#C5A059]/40 text-[#F5EEDC] h-auto md:h-full overflow-y-auto overscroll-contain p-6 flex flex-col justify-between shadow-2xl"
+                            onWheel={(e) => e.stopPropagation()}
+                            onTouchMove={(e) => e.stopPropagation()}
+                            style={{ WebkitOverflowScrolling: 'touch' }}
+                        >
+                            {/* Mobile Touch Drag Handle */}
+                            <div className="w-10 h-1 bg-[#C5A059]/40 rounded-full mx-auto -mt-2 mb-4 md:hidden" />
+
+                            <div>
+                                <div className="flex items-center justify-between pb-5 border-b border-[#C5A059]/20 mb-6">
+                                    <div className="flex items-center gap-2.5">
+                                        <span className="text-[#C5A059] text-sm">✦</span>
+                                        <span className="font-serif italic text-lg sm:text-xl text-[#F5EEDC]">
+                                            {isEn ? 'Limited Edition Showcase' : 'M★BRAVO — Edição Limitada'}
+                                        </span>
+                                    </div>
+                                    <button
+                                        onClick={() => setIsDrawerOpen(false)}
+                                        className="w-8 h-8 rounded-full border border-[#C5A059]/30 hover:border-[#C5A059] text-[#F5EEDC] hover:text-white flex items-center justify-center transition-all cursor-pointer"
+                                    >
+                                        ✕
+                                    </button>
+                                </div>
+                                
+                                <p className="text-xs sm:text-sm text-[#D4C3A3] font-serif italic mb-6 leading-relaxed">
+                                    {isEn 
+                                        ? 'Exclusive selection of artisanal crochet pieces crafted with time, care, and limited edition releases.' 
+                                        : 'Seleção exclusiva de peças artesanais em croché manual com tiragem reduzida e tempo de criação dedicado.'}
+                                </p>
+
+                                <div className="space-y-4">
+                                    {HERO_ORGANIC_BALLOONS.map((item) => (
+                                        <div 
+                                            key={item.id}
+                                            onClick={() => {
+                                                setIsDrawerOpen(false);
+                                                setBgIndex(item.bgIndex);
+                                                handleScrollToCollection();
+                                            }}
+                                            className="group p-4 rounded-2xl bg-[#1A2513]/70 hover:bg-[#223219] border border-[#C5A059]/30 hover:border-[#C5A059] transition-all duration-300 cursor-pointer flex gap-4 items-center"
+                                        >
+                                            <img 
+                                                src={item.img} 
+                                                alt={item.titlePt} 
+                                                className="w-16 h-16 sm:w-20 sm:h-20 rounded-xl object-cover border border-[#C5A059]/50 group-hover:scale-105 transition-transform duration-300"
+                                            />
+                                            <div className="flex-1">
+                                                <span className="text-[10px] uppercase tracking-wider text-[#C5A059] font-sans font-semibold">
+                                                    {isEn ? item.badgeEn : item.badgePt}
+                                                </span>
+                                                <h3 className="font-serif italic text-base sm:text-lg text-white group-hover:text-[#C5A059] transition-colors">
+                                                    {isEn ? item.titleEn : item.titlePt}
+                                                </h3>
+                                                <p className="text-xs text-[#D4C3A3]/80 font-sans mt-0.5 leading-snug">
+                                                    {isEn ? item.descEn : item.descPt}
+                                                </p>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+
+                            <div className="pt-6 border-t border-[#C5A059]/20 mt-6">
+                                <button
+                                    onClick={() => {
+                                        setIsDrawerOpen(false);
+                                        handleScrollToCollection();
+                                    }}
+                                    className="w-full py-3 rounded-full bg-[#C5A059] hover:bg-[#D4B06A] text-[#121A0D] font-sans text-xs uppercase tracking-widest font-semibold transition-all duration-300 text-center cursor-pointer shadow-lg"
+                                >
+                                    {isEn ? 'EXPLORE CATALOG' : 'VER TODA A COLECÇÃO'}
+                                </button>
+                            </div>
+                        </motion.div>
+                    </div>
+                )}
+            </AnimatePresence>
         </>
     );
 };
@@ -4683,7 +5005,8 @@ const CollectionSection = () => {
     const translatedCategoriesList = SHOP_CATEGORIES.map(cat => translateCategory(cat, lang));
 
     return (
-        <section ref={containerRef} id="collection" data-background="light" className="pt-10 xs:pt-12 sm:pt-16 lg:pt-20 xl:pt-24 pb-10 xs:pb-12 sm:pb-16 lg:pb-24 xl:pb-28 bg-[#F6F1E5] min-h-[80vh] relative overflow-hidden px-6 md:px-8 lg:px-16">
+        <section ref={containerRef} id="colecao" data-background="light" className="pt-10 xs:pt-12 sm:pt-16 lg:pt-20 xl:pt-24 pb-10 xs:pb-12 sm:pb-16 lg:pb-24 xl:pb-28 bg-[#F6F1E5] min-h-[80vh] relative overflow-hidden px-6 md:px-8 lg:px-16">
+            <div id="collection" className="absolute top-0 left-0 w-0 h-0 pointer-events-none" />
 
             <motion.div 
                 style={{ x: xTrack, y: yTrack, opacity: opacityTrack, fontFamily: "'Cormorant Garamond', serif" }}
@@ -4767,7 +5090,7 @@ const CollectionSection = () => {
                             onClick={() => navigateTo(getCategoryUrl(cat))}
                         >
                             <img 
-                                src={cat.img} 
+                                src={cat.image} 
                                 alt={cat.name} 
                                 loading={i < 2 ? "eager" : "lazy"}
                                 fetchPriority={i < 2 ? "high" : "auto"}
@@ -5874,7 +6197,7 @@ const CategoryPage = ({ pathname }: { pathname: string }) => {
             {/* Category Hero Header */}
             <div className="relative rounded-[12px] md:rounded-[16px] overflow-hidden aspect-[16/10] md:aspect-[21/9] mb-16 shadow-lg bg-forest/5 flex items-end">
                 <img 
-                    src={translatedCategory.img} 
+                    src={translatedCategory.image} 
                     alt={translatedCategory.name} 
                     width={1200}
                     height={600}
