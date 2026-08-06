@@ -132,6 +132,7 @@ export function translateCategory(category: any, lang: 'pt' | 'en') {
     ...category,
     name: match.name,
     items: match.items,
+    image: match.image || category.image,
     products: (category.products || [])
       .filter((p: any) => !p.hidden)
       .map((p: any) => translateProduct(p, lang))
@@ -142,7 +143,7 @@ export const translations = {
   pt: {
     "brand.slogan": "Cada ponto guarda uma memória.",
     "brand.subheadline": "Peças feitas com tempo, amor e memória.",
-    "loading.slogan": "Peças feitas com tempo, amor e memória.",
+    "loading.slogan": "Peças artesanais exclusivas feitas à mão com tempo e identidade.",
     
     // Navigation
     "nav.home": "Início",
@@ -370,8 +371,8 @@ export const translations = {
   },
   en: {
     "brand.slogan": "Every stitch holds a memory.",
-    "brand.subheadline": "Pieces crafted with time, love, and memory.",
-    "loading.slogan": "Pieces crafted with time, love, and memory.",
+    "brand.subheadline": "Pieces made with time, love and memory.",
+    "loading.slogan": "Exclusive handmade pieces crafted with time and identity.",
     
     // Navigation
     "nav.home": "Home",
@@ -833,25 +834,25 @@ export const translatedCategories = {
       id: 'home',
       name: 'Casa',
       items: 'Bases de Copos, Almofadas',
-      img: 'https://images.unsplash.com/photo-1601004890684-d8cbf643f5f2?auto=format&fit=crop&q=80&w=800',
+      image: '/categories/category-casa.webp',
     },
     {
       id: 'bags',
       name: 'Malas',
       items: 'Mini Pouches, AirPods Case',
-      img: 'https://images.unsplash.com/photo-1583847268964-b28dc8f51f92?auto=format&fit=crop&q=80&w=800',
+      image: '/categories/category-malas.webp',
     },
     {
       id: 'vestuario',
       name: 'Vestuário',
       items: 'Bikini, Ponchos, Cardigans',
-      img: 'https://images.unsplash.com/photo-1434389677669-e08b4cac3105?auto=format&fit=crop&q=80&w=800',
+      image: '/categories/category-vestuario.webp',
     },
     {
       id: 'premium',
       name: 'Acessórios',
       items: 'Bandanas, Headbands',
-      img: 'https://images.unsplash.com/photo-1523381210434-271e8be1f52b?auto=format&fit=crop&q=80&w=800',
+      image: '/categories/category-acessorios.webp',
     }
   ],
   en: [
@@ -859,25 +860,25 @@ export const translatedCategories = {
       id: 'home',
       name: 'Home',
       items: 'Coasters, Cushions',
-      img: 'https://images.unsplash.com/photo-1601004890684-d8cbf643f5f2?auto=format&fit=crop&q=80&w=800',
+      image: '/categories/category-casa.webp',
     },
     {
       id: 'bags',
       name: 'Bags',
       items: 'Mini Pouches, AirPods Case',
-      img: 'https://images.unsplash.com/photo-1583847268964-b28dc8f51f92?auto=format&fit=crop&q=80&w=800',
+      image: '/categories/category-malas.webp',
     },
     {
       id: 'vestuario',
       name: 'Clothing',
       items: 'Bikini, Ponchos, Cardigans',
-      img: 'https://images.unsplash.com/photo-1434389677669-e08b4cac3105?auto=format&fit=crop&q=80&w=800',
+      image: '/categories/category-vestuario.webp',
     },
     {
       id: 'premium',
       name: 'Accessories',
       items: 'Bandanas, Headbands',
-      img: 'https://images.unsplash.com/photo-1523381210434-271e8be1f52b?auto=format&fit=crop&q=80&w=800',
+      image: '/categories/category-acessorios.webp',
     }
   ]
 };
