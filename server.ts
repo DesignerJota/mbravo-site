@@ -2312,6 +2312,102 @@ app.post("/api/admin/customers/:email", verifyAdmin, (req, res) => {
   }
 });
 
+// --- PRIVATE STUDIO CREATIVE PASSPORTS PERSISTENCE ---
+const getPassportsFilePath = () => {
+  const railwayPersistentDir = "/app/data";
+  try {
+    if (!fs.existsSync(railwayPersistentDir)) {
+      fs.mkdirSync(railwayPersistentDir, { recursive: true });
+    }
+    return path.join(railwayPersistentDir, "passports.json");
+  } catch (e) {
+    return path.join(process.cwd(), "passports.json");
+  }
+};
+
+const PASSPORTS_FILE = getPassportsFilePath();
+
+function loadPassports(): any[] {
+  if (fs.existsSync(PASSPORTS_FILE)) {
+    try {
+      const data = JSON.parse(fs.readFileSync(PASSPORTS_FILE, 'utf8'));
+      if (Array.isArray(data)) return data;
+    } catch (err) {
+      console.error("[PASSPORTS DATABASE] Failed to load passports.json", err);
+    }
+  }
+  return [];
+}
+
+function savePassports(list: any[]) {
+  try {
+    fs.writeFileSync(PASSPORTS_FILE, JSON.stringify(list, null, 2), 'utf8');
+  } catch (err) {
+    console.error("[PASSPORTS DATABASE] Failed to save passports.json", err);
+  }
+}
+
+// Public Endpoint to register a new Creative Passport from Private Studio
+app.post("/api/private-studio/passports", (req, res) => {
+  try {
+    const { 
+      clientName, 
+      pieceType, 
+      yarnPalette, 
+      primaryYarn, 
+      secondaryYarn, 
+      isBicolor, 
+      hardware, 
+      estimatedHours, 
+      estimatedPrice, 
+      notes 
+    } = req.body;
+    
+    const passportId = `MB-PASS-${Math.floor(1000 + Math.random() * 9000)}`;
+    const newPassport = {
+      id: passportId,
+      timestamp: new Date().toISOString(),
+      clientName: sanitizeText(clientName) || 'Cliente M★BRAVO',
+      pieceType: sanitizeText(pieceType) || 'Peça Sob Medida',
+      yarnPalette: sanitizeText(yarnPalette) || 'Cru Natural',
+      primaryYarn: sanitizeText(primaryYarn) || '',
+      secondaryYarn: sanitizeText(secondaryYarn) || '',
+      isBicolor: Boolean(isBicolor),
+      hardware: sanitizeText(hardware) || 'Acabamento Padrão',
+      estimatedHours: parseInt(estimatedHours) || 20,
+      estimatedPrice: sanitizeText(estimatedPrice) || 'Consultar',
+      notes: sanitizeText(notes) || ''
+    };
+
+    const currentList = loadPassports();
+    currentList.unshift(newPassport);
+    savePassports(currentList.slice(0, 200)); // Preserve up to 200 recent passports
+
+    addAuditLog(
+      'manual_order_creation',
+      `Novo Passaporte Criativo registado (${passportId}) para ${newPassport.clientName}: ${newPassport.pieceType} (${newPassport.yarnPalette})`,
+      passportId,
+      newPassport
+    );
+
+    res.json({ success: true, passport: newPassport });
+  } catch (error: any) {
+    console.error("[PRIVATE STUDIO API ERROR] POST /api/private-studio/passports failed:", error);
+    res.status(500).json({ error: "Erro ao registar o Passaporte Criativo." });
+  }
+});
+
+// Admin Endpoint to consult registered Creative Passports
+app.get("/api/admin/passports", verifyAdmin, (req, res) => {
+  try {
+    const passports = loadPassports();
+    res.json({ success: true, passports });
+  } catch (error: any) {
+    console.error("[PRIVATE STUDIO API ERROR] GET /api/admin/passports failed:", error);
+    res.status(500).json({ error: "Erro ao carregar os Passaportes Criativos." });
+  }
+});
+
 
 // PostgreSQL Connection Pool & Initialization via Environment Variables
 const connectionString = process.env.DATABASE_URL;
