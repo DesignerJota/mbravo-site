@@ -14,9 +14,10 @@ import {
   Star, 
   Compass, 
   Store, 
-  Copy, 
   Users,
-  ExternalLink 
+  QrCode,
+  X,
+  Copy
 } from 'lucide-react';
 
 interface DigitalBusinessCardProps {
@@ -27,6 +28,8 @@ export const DigitalBusinessCard: React.FC<DigitalBusinessCardProps> = ({ onNavi
   const [copied, setCopied] = useState(false);
   const [recommendCopied, setRecommendCopied] = useState(false);
   const [vCardDownloaded, setVCardDownloaded] = useState(false);
+  const [showQrModal, setShowQrModal] = useState(false);
+  const [modalCopied, setModalCopied] = useState(false);
 
   // 1. Validated vCard download (.vcf) formatted for iOS & Android Contacts
   const handleDownloadVCard = () => {
@@ -35,10 +38,10 @@ VERSION:3.0
 N:Bravo;Carolina;;;
 FN:Carolina — M★BRAVO
 ORG:M★BRAVO Atelier
-TITLE:Fundadora & Diretora Criativa
+TITLE:Fundadora & Designer
 TEL;TYPE=CELL,VOICE;TYPE=pref:+351912828182
 EMAIL:encomendas@mbravobycarolina.com
-URL:https://mbravobycarolina.com
+URL:https://mbravobycarolina.com/card
 NOTE:Peças feitas com tempo\\, amor e memórias. Handmade in Portugal.
 END:VCARD`;
 
@@ -60,8 +63,8 @@ END:VCARD`;
   const handleShareCard = async () => {
     const shareData = {
       title: 'M★BRAVO — Cartão de Visita Digital',
-      text: 'Peças feitas com tempo, amor e memórias: https://mbravobycarolina.com/links',
-      url: 'https://mbravobycarolina.com/links',
+      text: 'Peças feitas com tempo, amor e memórias: https://mbravobycarolina.com/card',
+      url: 'https://mbravobycarolina.com/card',
     };
 
     if (navigator.share) {
@@ -83,11 +86,11 @@ END:VCARD`;
 
   // 3. Recommend to a friend action
   const handleRecommendToFriend = async () => {
-    const shareText = "Conhece a M★BRAVO — Peças feitas com tempo, amor e memórias: https://mbravobycarolina.com/links";
+    const shareText = "Conhece a M★BRAVO — Peças feitas com tempo, amor e memórias: https://mbravobycarolina.com/card";
     const shareData = {
       title: 'M★BRAVO Atelier',
       text: shareText,
-      url: 'https://mbravobycarolina.com/links',
+      url: 'https://mbravobycarolina.com/card',
     };
 
     if (navigator.share) {
@@ -104,6 +107,17 @@ END:VCARD`;
       } catch (e) {
         // Fallback
       }
+    }
+  };
+
+  // 4. Copy Modal Link
+  const handleCopyModalLink = async () => {
+    try {
+      await navigator.clipboard.writeText('https://mbravobycarolina.com/card');
+      setModalCopied(true);
+      setTimeout(() => setModalCopied(false), 3000);
+    } catch (e) {
+      // Fallback
     }
   };
 
@@ -153,14 +167,25 @@ END:VCARD`;
           <span>Voltar ao Site</span>
         </button>
 
-        <button
-          onClick={handleShareCard}
-          className="inline-flex items-center gap-2 text-[11px] sm:text-xs uppercase tracking-[0.2em] font-sans font-medium text-[#D4C3A3]/90 hover:text-[#C5A059] transition-colors py-2 px-3.5 rounded-full bg-white/5 hover:bg-white/10 backdrop-blur-md border border-[#C5A059]/25 cursor-pointer"
-          title="Partilhar Cartão Digital"
-        >
-          <Share2 size={14} className="text-[#C5A059]" />
-          <span>{copied ? 'Copiado!' : 'Partilhar'}</span>
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => setShowQrModal(true)}
+            className="inline-flex items-center gap-1.5 text-[11px] sm:text-xs uppercase tracking-[0.18em] font-sans font-medium text-[#C5A059] hover:text-[#F5EEDC] transition-colors py-2 px-3 rounded-full bg-[#C5A059]/10 hover:bg-[#C5A059]/25 backdrop-blur-md border border-[#C5A059]/40 cursor-pointer"
+            title="Mostrar QR Code de Partilha"
+          >
+            <QrCode size={14} className="text-[#C5A059]" />
+            <span>QR Code</span>
+          </button>
+
+          <button
+            onClick={handleShareCard}
+            className="inline-flex items-center gap-1.5 text-[11px] sm:text-xs uppercase tracking-[0.18em] font-sans font-medium text-[#D4C3A3]/90 hover:text-[#C5A059] transition-colors py-2 px-3 rounded-full bg-white/5 hover:bg-white/10 backdrop-blur-md border border-[#C5A059]/25 cursor-pointer"
+            title="Partilhar Cartão Digital"
+          >
+            <Share2 size={14} className="text-[#C5A059]" />
+            <span>{copied ? 'Copiado!' : 'Partilhar'}</span>
+          </button>
+        </div>
       </header>
 
       {/* Main Container */}
@@ -207,7 +232,7 @@ END:VCARD`;
             Carolina <span className="text-[#C5A059] font-serif">|</span> M<span className="text-[#C5A059] mx-0.5">★</span>BRAVO
           </h1>
           <p className="text-[10px] uppercase tracking-[0.4em] text-[#C5A059] font-sans font-semibold mt-1">
-            Atelier & Design Artesanal
+            Fundadora & Designer
           </p>
         </motion.div>
 
@@ -322,12 +347,12 @@ END:VCARD`;
             </span>
           </motion.a>
 
-          {/* 4. Instagram Oficial (@m.bravo_bycarolina) */}
+          {/* 4. Instagram Oficial (@mbravobycarolina) */}
           <motion.a
             initial={{ y: 15, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ delay: 0.56, duration: 0.7 }}
-            href="https://www.instagram.com/m.bravo_bycarolina/"
+            href="https://www.instagram.com/mbravobycarolina/"
             target="_blank"
             rel="noopener noreferrer"
             className="group relative w-full py-3.5 px-4 sm:px-5 rounded-2xl bg-[#1C2A15]/80 hover:bg-[#24361C]/90 backdrop-blur-xl border border-[#C5A059]/30 hover:border-[#C5A059] shadow-[0_4px_20px_rgba(0,0,0,0.3)] transition-all duration-300 hover:scale-[1.01] active:scale-[0.99] cursor-pointer flex items-center justify-between text-left"
@@ -341,7 +366,7 @@ END:VCARD`;
                   INSTAGRAM
                 </span>
                 <span className="block font-serif italic text-base sm:text-lg font-medium text-[#F5EEDC] group-hover:text-[#C5A059] transition-colors">
-                  @m.bravo_bycarolina
+                  @mbravobycarolina
                 </span>
               </div>
             </div>
@@ -350,11 +375,37 @@ END:VCARD`;
             </span>
           </motion.a>
 
-          {/* 5. Pinterest Oficial */}
+          {/* 5. QR Code de Partilha (Modal Conecta-te com a M★BRAVO) */}
+          <motion.button
+            initial={{ y: 15, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: 0.60, duration: 0.7 }}
+            onClick={() => setShowQrModal(true)}
+            className="group relative w-full py-3.5 px-4 sm:px-5 rounded-2xl bg-[#1C2A15]/80 hover:bg-[#24361C]/90 backdrop-blur-xl border border-[#C5A059]/40 hover:border-[#C5A059] shadow-[0_4px_20px_rgba(0,0,0,0.3)] transition-all duration-300 hover:scale-[1.01] active:scale-[0.99] cursor-pointer flex items-center justify-between text-left"
+          >
+            <div className="flex items-center gap-3.5">
+              <div className="w-10 h-10 rounded-xl bg-[#C5A059]/15 border border-[#C5A059]/40 flex items-center justify-center shrink-0 text-[#C5A059] group-hover:bg-[#C5A059] group-hover:text-[#121A0D] transition-colors">
+                <QrCode size={18} />
+              </div>
+              <div>
+                <span className="block text-[9px] uppercase tracking-[0.2em] font-sans font-semibold text-[#D4C3A3]/70">
+                  PARTILHA RÁPIDA
+                </span>
+                <span className="block font-serif italic text-base sm:text-lg font-medium text-[#F5EEDC] group-hover:text-[#C5A059] transition-colors">
+                  Mostrar QR Code de Partilha
+                </span>
+              </div>
+            </div>
+            <span className="text-[#C5A059] text-xs font-sans tracking-widest opacity-80 group-hover:translate-x-1 transition-transform">
+              ✦
+            </span>
+          </motion.button>
+
+          {/* 6. Pinterest Oficial */}
           <motion.a
             initial={{ y: 15, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
-            transition={{ delay: 0.63, duration: 0.7 }}
+            transition={{ delay: 0.65, duration: 0.7 }}
             href="https://www.pinterest.com/mbravobycarolina/"
             target="_blank"
             rel="noopener noreferrer"
@@ -378,12 +429,12 @@ END:VCARD`;
             </span>
           </motion.a>
 
-          {/* 6. Google / Avaliações & Perfil da Marca */}
+          {/* 7. Google / Avaliações & Perfil da Marca */}
           <motion.a
             initial={{ y: 15, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
-            transition={{ delay: 0.70, duration: 0.7 }}
-            href="https://www.google.com/search?q=M%E2%98%85BRAVO+by+Carolina"
+            transition={{ delay: 0.72, duration: 0.7 }}
+            href="https://g.page/r/Cdo7JGP_Xpc3EBM/review"
             target="_blank"
             rel="noopener noreferrer"
             className="group relative w-full py-3.5 px-4 sm:px-5 rounded-2xl bg-[#1C2A15]/80 hover:bg-[#24361C]/90 backdrop-blur-xl border border-[#C5A059]/30 hover:border-[#C5A059] shadow-[0_4px_20px_rgba(0,0,0,0.3)] transition-all duration-300 hover:scale-[1.01] active:scale-[0.99] cursor-pointer flex items-center justify-between text-left"
@@ -406,11 +457,11 @@ END:VCARD`;
             </span>
           </motion.a>
 
-          {/* 7. Merchant / Feed & Loja de Produtos */}
+          {/* 8. Merchant / Feed & Loja de Produtos */}
           <motion.button
             initial={{ y: 15, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
-            transition={{ delay: 0.77, duration: 0.7 }}
+            transition={{ delay: 0.79, duration: 0.7 }}
             onClick={() => {
               if (onNavigateHome) {
                 onNavigateHome();
@@ -438,11 +489,11 @@ END:VCARD`;
             </span>
           </motion.button>
 
-          {/* 8. Recomendar a um Amigo (Partilha do Cartão) */}
+          {/* 9. Recomendar a um Amigo (Partilha do Cartão) */}
           <motion.button
             initial={{ y: 15, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
-            transition={{ delay: 0.84, duration: 0.7 }}
+            transition={{ delay: 0.86, duration: 0.7 }}
             onClick={handleRecommendToFriend}
             className="group relative w-full py-3.5 px-4 sm:px-5 rounded-2xl bg-gradient-to-r from-[#1C2A15] via-[#2A3E20] to-[#1C2A15] hover:from-[#24361C] hover:to-[#24361C] backdrop-blur-xl border border-[#C5A059]/50 hover:border-[#C5A059] shadow-[0_4px_20px_rgba(197,160,89,0.15)] transition-all duration-300 hover:scale-[1.01] active:scale-[0.99] cursor-pointer flex items-center justify-between text-left mt-1"
           >
@@ -468,17 +519,120 @@ END:VCARD`;
       <footer className="w-full max-w-md flex flex-col items-center gap-2 z-20 pb-2 mt-6">
         <div className="flex items-center gap-2 text-[10px] uppercase tracking-[0.3em] font-sans font-medium text-[#C5A059]/90 bg-white/5 py-1.5 px-4 rounded-full border border-[#C5A059]/25 backdrop-blur-md">
           <ShieldCheck size={12} className="text-[#C5A059]" />
-          <span>BRAVO — Peças artesanais exclusivas</span>
+          <span>M★BRAVO — Peças artesanais exclusivas</span>
         </div>
         <p className="text-[9px] font-sans uppercase tracking-[0.25em] text-[#D4C3A3]/60 flex items-center gap-1.5">
           <span>Handmade in Portugal</span>
           <span>•</span>
           <Heart size={9} className="text-[#C5A059] inline fill-[#C5A059]" />
-          <span>Crafted with Time</span>
+          <span>Created with time</span>
         </p>
       </footer>
+
+      {/* MODAL QR CODE "Conecta-te com a M★BRAVO" */}
+      <AnimatePresence>
+        {showQrModal && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-black/80 backdrop-blur-md">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.9, y: 20 }}
+              transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+              className="relative w-full max-w-sm bg-[#121A0D] border border-[#C5A059]/50 rounded-3xl p-6 text-center shadow-[0_20px_50px_rgba(0,0,0,0.8)] overflow-hidden"
+            >
+              {/* Gold gradient glow effect */}
+              <div className="absolute top-0 left-1/2 -translate-x-1/2 w-48 h-24 bg-[radial-gradient(ellipse_at_top,rgba(197,160,89,0.3),transparent_70%)] pointer-events-none" />
+
+              {/* Close Button */}
+              <button
+                onClick={() => setShowQrModal(false)}
+                className="absolute top-4 right-4 w-9 h-9 rounded-full bg-white/5 border border-[#C5A059]/30 text-[#D4C3A3] hover:text-[#C5A059] hover:bg-white/10 flex items-center justify-center transition-colors cursor-pointer"
+                aria-label="Fechar Modal"
+              >
+                <X size={18} />
+              </button>
+
+              {/* Header Title */}
+              <div className="mt-2 mb-4">
+                <span className="text-[10px] uppercase tracking-[0.3em] font-sans font-semibold text-[#C5A059] block mb-1">
+                  ✦ CARTÃO DIGITAL M★BRAVO ✦
+                </span>
+                <h2 
+                  style={{ fontFamily: "'Cormorant Garamond', serif" }}
+                  className="text-2xl sm:text-3xl font-serif text-[#F5EEDC] font-normal"
+                >
+                  Conecta-te com a M★BRAVO
+                </h2>
+                <p className="text-xs text-[#D4C3A3]/70 font-sans mt-1 max-w-[260px] mx-auto leading-relaxed">
+                  Aaponta a câmara do telemóvel ao código para acederes instantaneamente ao nosso cartão de visita.
+                </p>
+              </div>
+
+              {/* High Quality Luxury QR Code Frame */}
+              <div className="relative my-5 mx-auto w-52 h-52 p-3 bg-[#F5EEDC] rounded-2xl shadow-[0_10px_30px_rgba(197,160,89,0.25)] border-2 border-[#C5A059] flex items-center justify-center overflow-hidden">
+                <svg className="w-full h-full text-[#121A0D]" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  {/* Outer Background Quiet Zone */}
+                  <rect width="200" height="200" fill="#F5EEDC" />
+                  
+                  {/* Top Left Finder Pattern */}
+                  <rect x="15" y="15" width="50" height="50" rx="6" fill="#121A0D" />
+                  <rect x="23" y="23" width="34" height="34" rx="3" fill="#F5EEDC" />
+                  <rect x="30" y="30" width="20" height="20" rx="2" fill="#121A0D" />
+
+                  {/* Top Right Finder Pattern */}
+                  <rect x="135" y="15" width="50" height="50" rx="6" fill="#121A0D" />
+                  <rect x="143" y="23" width="34" height="34" rx="3" fill="#F5EEDC" />
+                  <rect x="150" y="30" width="20" height="20" rx="2" fill="#121A0D" />
+
+                  {/* Bottom Left Finder Pattern */}
+                  <rect x="15" y="135" width="50" height="50" rx="6" fill="#121A0D" />
+                  <rect x="23" y="143" width="34" height="34" rx="3" fill="#F5EEDC" />
+                  <rect x="30" y="150" width="20" height="20" rx="2" fill="#121A0D" />
+
+                  {/* QR Data Pattern Cells for https://mbravobycarolina.com/card */}
+                  <path d="
+                    M 75 15 h 10 v 10 h -10 z M 95 15 h 10 v 10 h -10 z M 115 15 h 10 v 10 h -10 z
+                    M 75 35 h 10 v 10 h -10 z M 105 35 h 10 v 10 h -10 z M 115 35 h 10 v 10 h -10 z
+                    M 85 55 h 10 v 10 h -10 z M 95 55 h 10 v 10 h -10 z M 115 55 h 10 v 10 h -10 z
+                    M 15 75 h 10 v 10 h -10 z M 35 75 h 10 v 10 h -10 z M 55 75 h 10 v 10 h -10 z M 75 75 h 10 v 10 h -10 z M 95 75 h 10 v 10 h -10 z M 115 75 h 10 v 10 h -10 z M 135 75 h 10 v 10 h -10 z M 155 75 h 10 v 10 h -10 z M 175 75 h 10 v 10 h -10 z
+                    M 25 85 h 10 v 10 h -10 z M 45 85 h 10 v 10 h -10 z M 65 85 h 10 v 10 h -10 z M 85 85 h 10 v 10 h -10 z M 125 85 h 10 v 10 h -10 z M 145 85 h 10 v 10 h -10 z M 165 85 h 10 v 10 h -10 z
+                    M 15 95 h 10 v 10 h -10 z M 35 95 h 10 v 10 h -10 z M 75 95 h 10 v 10 h -10 z M 115 95 h 10 v 10 h -10 z M 135 95 h 10 v 10 h -10 z M 155 95 h 10 v 10 h -10 z M 175 95 h 10 v 10 h -10 z
+                    M 25 105 h 10 v 10 h -10 z M 55 105 h 10 v 10 h -10 z M 85 105 h 10 v 10 h -10 z M 105 105 h 10 v 10 h -10 z M 125 105 h 10 v 10 h -10 z M 165 105 h 10 v 10 h -10 z
+                    M 15 115 h 10 v 10 h -10 z M 35 115 h 10 v 10 h -10 z M 65 115 h 10 v 10 h -10 z M 75 115 h 10 v 10 h -10 z M 95 115 h 10 v 10 h -10 z M 115 115 h 10 v 10 h -10 z M 135 115 h 10 v 10 h -10 z M 155 115 h 10 v 10 h -10 z M 175 115 h 10 v 10 h -10 z
+                    M 75 135 h 10 v 10 h -10 z M 95 135 h 10 v 10 h -10 z M 115 135 h 10 v 10 h -10 z M 135 135 h 10 v 10 h -10 z M 155 135 h 10 v 10 h -10 z
+                    M 85 145 h 10 v 10 h -10 z M 105 145 h 10 v 10 h -10 z M 125 145 h 10 v 10 h -10 z M 165 145 h 10 v 10 h -10 z
+                    M 75 155 h 10 v 10 h -10 z M 95 155 h 10 v 10 h -10 z M 115 155 h 10 v 10 h -10 z M 135 155 h 10 v 10 h -10 z M 175 155 h 10 v 10 h -10 z
+                    M 85 165 h 10 v 10 h -10 z M 105 165 h 10 v 10 h -10 z M 145 165 h 10 v 10 h -10 z M 165 165 h 10 v 10 h -10 z
+                    M 75 175 h 10 v 10 h -10 z M 95 175 h 10 v 10 h -10 z M 115 175 h 10 v 10 h -10 z M 135 175 h 10 v 10 h -10 z M 155 175 h 10 v 10 h -10 z M 175 175 h 10 v 10 h -10 z
+                  " fill="#121A0D" />
+
+                  {/* Center Brand Emblem Badge */}
+                  <rect x="80" y="80" width="40" height="40" rx="8" fill="#121A0D" stroke="#C5A059" strokeWidth="2" />
+                  <text x="100" y="105" textAnchor="middle" fill="#C5A059" fontSize="20" fontWeight="bold">★</text>
+                </svg>
+              </div>
+
+              {/* Direct Link Copy Button */}
+              <div className="flex items-center justify-center gap-2 mt-4">
+                <button
+                  onClick={handleCopyModalLink}
+                  className="w-full py-2.5 px-4 rounded-xl bg-white/10 hover:bg-white/20 border border-[#C5A059]/40 text-[#F5EEDC] text-xs font-sans font-medium flex items-center justify-center gap-2 transition-all cursor-pointer"
+                >
+                  {modalCopied ? <Check size={14} className="text-[#C5A059]" /> : <Copy size={14} className="text-[#C5A059]" />}
+                  <span>{modalCopied ? 'Link Copiado!' : 'Copiar mbravobycarolina.com/card'}</span>
+                </button>
+              </div>
+
+              <p className="text-[10px] text-[#D4C3A3]/50 font-serif italic mt-3">
+                M★BRAVO — Peças feitas com tempo, amor e memórias.
+              </p>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };
 
 export default DigitalBusinessCard;
+
