@@ -158,21 +158,27 @@ Respondendo às últimas solicitações de otimização de fluxo e consistência
     *   **Física de Scroll Natural dos 3 Balões Flutuantes (`position: absolute`):** Ancorados estritamente dentro da camada do Hero com `position: absolute` e posição superior folgada (`top-20 sm:top-28 md:top-36 landscape:top-8 right-3 sm:right-8 md:right-14`), descendo e desvanecendo suavemente com a imagem do Hero durante a rolagem para nunca colidirem com o menu superior ou com o título principal. O Widget Flutuante Único pós-Hero (`fixed bottom-4 right-4 sm:bottom-6 sm:right-8 z-[60]`) só emerge após a área do Hero sair 75%-100% de vista.
     *   **Dimensão Adaptativa dos Widgets por Dispositivo:** Diâmetros compactos em Mobile/Landscape (`w-9 h-9` ~36px), Tablet (`sm:w-12 sm:h-12` ~48px) e Desktop (`md:w-16 md:h-16 lg:w-18 lg:h-18` ~72px), garantindo toque e visualização ergonómicos sem poluição.
 
-12. **Criação e Integração do Digital Business Card M★BRAVO (`/links` e `/card`):**
+12. **Criação, Polimento e Integração do Digital Business Card M★BRAVO (`/links` e `/card`):**
     *   **Componente Exclusivo (`src/components/DigitalBusinessCard.tsx`):** Hub de contactos e presença digital de luxo desenhado para a Bio do Instagram, cartões NFC/QR e partilha rápida em dispositivos móveis e desktop.
-    *   **Estética & Boas-Vindas de Atelier:** Retrato autoral da Carolina / Atelier em moldura dourada reluzente com brilho, frase calorosa de boas-vindas (*"Olá! Que bom ter-te por aqui. Cada peça M★BRAVO carrega tempo, intenção e alma. Leva-nos contigo."*) e a tagline original em fonte serifada (*"Peças feitas com tempo, amor e memórias."*).
+    *   **Estética & Boas-Vindas de Atelier:** Retrato autoral da Carolina / Atelier em moldura dourada reluzente com brilho, cargo oficial *"Fundadora & Designer"*, frase calorosa de boas-vindas (*"Olá! Que bom ter-te por aqui. Cada peça M★BRAVO carrega tempo, intenção e alma. Leva-nos contigo."*) e a tagline original em fonte serifada (*"Peças feitas com tempo, amor e memórias."*).
     *   **Ecosistema Completo de Ações & Links Integrados:**
         *   **Guardar Contacto na Agenda (vCard / `.vcf` Validado):** Ficheiro `.vcf` estruturado para iOS (Apple Contacts) e Android (Google Contacts) permitindo importar Carolina Bravo (M★BRAVO Atelier) com um clique.
         *   **Explorar Coleção Online:** Encaminhamento direto para o catálogo/loja oficial (`/#collection`).
         *   **Atendimento Privado via WhatsApp:** Conversação iniciada com mensagem personalizada pré-formatada.
-        *   **Instagram Oficial:** Ligação direta ao perfil `@m.bravo_bycarolina`.
+        *   **Instagram Oficial:** Ligação direta e atualizada ao perfil oficial `https://www.instagram.com/mbravobycarolina/` (`@mbravobycarolina`).
+        *   **Modal QR Code de Partilha ("Conecta-te com a M★BRAVO"):** Botão dedicado e modal de luxo em vidro escuro com moldura dourada, apresentando um QR Code vetorial SVG de alta resolução para `https://mbravobycarolina.com/links`, botão de cópia de link e instrução de leitura.
         *   **Pinterest Oficial:** Hub de inspiração visual da marca.
-        *   **Google / Avaliações & Perfil da Marca:** Botão de prova social apontando para o perfil e opiniões no Google.
-        *   **Merchant / Feed de Catálogo Oficial:** Acesso ao catálogo com envio nacional e internacional.
+        *   **Google / Avaliações & Perfil da Marca:** Botão de prova social apontando diretamente para a ficha de avaliações e perfil oficial no Google (`https://g.page/r/Cdo7JGP_Xpc3EBM/review`).
+        *   **Merchant / Feed de Catálogo Oficial:** Acesso ao catálogo de peças com envio nacional e internacional.
         *   **Recomendar a um Amigo (Partilha Activa):** Disparo nativo do `navigator.share` (ou cópia com toast de confirmação) da mensagem oficial de recomendação.
+        *   **Rodapé Institucional:** Marcação estrita `M★BRAVO — Peças artesanais exclusivas` e `Created with time`.
     *   **Navegação e Roteamento Imersivo (`App.tsx`):** Rotas `/links` e `/card` isoladas sem interferência de Navbar ou Footer convencionais, otimizadas para ecrãs móveis (375px–430px) e monitores com resposta tátil e fluida.
 
-13. **Atualização da Tagline Oficial do Preloader / Ecrã de Carregamento (`src/translations.ts` & `src/App.tsx`):**
+13. **Auditoria & Sincronização de APIs Externa (Google Reviews & Instagram Feed):**
+    *   **Seção Google Reviews ("Partilhado por Quem nos Escolhe"):** Configurado o endpoint `/api/testimonials` com sistema de 3 camadas de Alta Disponibilidade (PostgreSQL -> Google Places API -> Seed de Testemunhos Reais de Clientes M★BRAVO no Volume JSON), garantindo que a seção rende sempre avaliações de 5 estrelas mesmo perante latência de rede ou ausência temporária de chaves API externas.
+    *   **Seção Instagram Feed ("Diário Visual"):** Auditada e ligada à API Behold (`/api/instagram`) com fallback gracioso para fotos autorais do Atelier e direcionamento correto para `@mbravobycarolina`.
+
+14. **Atualização da Tagline Oficial do Preloader / Ecrã de Carregamento (`src/translations.ts` & `src/App.tsx`):**
     *   **Tagline Oficial M★BRAVO:** Substituição do texto genérico antigo pela mensagem institucional definitiva: *"Peças feitas com tempo, amor e memórias."* (em PT e EN: *"Pieces made with time, love and memories."*).
     *   **Tipografia Editorial e Casing:** Renderização fluida na fonte serifada *Cormorant Garamond* em tom dourado suave (`#D4C3A3`), com aspas artesanais (`&ldquo;...&rdquo;`) e formato natural de maiúsculas/minúsculas sem imposição de caixa alta (`uppercase`), garantindo leitura poética e acolhedora durante a contagem percentual de carregamento (0% a 100%).
 
@@ -515,6 +521,14 @@ Para que o repositório no GitHub fique 100% sincronizado com a versão final de
         *   *Apoio ao Cliente:* O título, e-mail (`encomendas@mbravobycarolina.com`) e contacto telefónico (`+351 912 828 182`) atuam num único bloco coeso e compacto (`flex flex-col gap-1`), eliminando qualquer salto em branco ou margem desproporcionada.
         *   *Links Legais:* Apresentados em linha no Desktop e em pilha vertical limpa e ritmada (`gap-2`) em Mobile, sem quebras desordenadas e com proteção estrita contra overflow (`px-4 sm:px-6 overflow-hidden max-w-full`).
     *   **Ajuste Crítico de Segurança e Discrição no Trigger do Admin:** O evento de clique oculto (`onClick={onOpenAdmin}`) foi circunscrito exclusivamente à expressão `© 2026 M★BRAVO`. O resto da frase (*" | HANDMADE WITH LOVE | CRIADO COM TEMPO, EM PORTUGAL."*) permanece texto estático com `cursor-default select-none` para total discrição.
+
+*   [x] **Sincronização e Conclusão do Cartão de Visita Digital M★BRAVO (`/card`):**
+    *   **Canal & Rota Oficial:** Rota soberana `/card` (`mbravobycarolina.com/card`) mapeada em `App.tsx` com redirecionamento automático de `/links` para `/card` sem quebrar acessos legados.
+    *   **QR Code Vetorial NATIVO & Modal de Partilha:** Atualizado o gerador dinâmico de QR Code SVG, modal de partilha e função de cópia direta para apontar rigorosamente para `https://mbravobycarolina.com/card`.
+    *   **Ficha vCard & Links do Ecossistema:** Inclusão dos acessos oficiais (Instagram `@mbravobycarolina`, Pinterest Oficial, Ficha Google Maps, Catálogo Merchant, WhatsApp e vCard) com o cargo oficial *"Fundadora & Designer"* e assinatura *"Created with time"*.
+*   [x] **Auditoria e Ativação de Dados em Direto via APIs Externas (Google Places & Behold Instagram):**
+    *   **Google Reviews ("Partilhado por Quem nos Escolhe"):** Refatorado o motor de 3 camadas no `server.ts` para consultar diretamente a Google Places API (`GOOGLE_PLACES_API_KEY` / `GOOGLE_PLACE_ID`) sempre que as chaves estejam presentes no ambiente, combinando as avaliações reais do Google com as submissões locais.
+    *   **Diário Visual Instagram (@mbravobycarolina):** Verificada e otimizada a rota `/api/instagram` que consome em tempo real as publicações e fotografias mais recentes do feed através da Behold API (`BEHOLD_FEED_ID` / `VITE_BEHOLD_WIDGET_ID`), mantendo fallback gracioso para garantir zero interrupção no site principal.
 
 ### B. Roteiro Técnico de Otimização Mobile & iOS WebKit (Meta: PageSpeed >90 - FASE 1 CONCLUÍDA):
 *   [x] **Aceleração Hardware-Backing para iOS WebKit:** Aplicado `-webkit-backface-visibility: hidden; transform: translateZ(0);` nos cartões de produtos e categorias para impedir a reciclagem agressiva de texturas da GPU pelo WebKit durante o scroll rápido em iPhones/iPads.
