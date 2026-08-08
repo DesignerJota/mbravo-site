@@ -8049,7 +8049,13 @@ function AppContent() {
   const [currentPage, setCurrentPage] = useState<'home' | 'essence'>('home');
   const [zoomedImage, setZoomedImage] = useState<string | null>(null);
   const { t } = useLanguage();
-  const [pathname, setPathname] = useState(window.location.pathname);
+  const [pathname, setPathname] = useState(() => {
+    if (typeof window !== 'undefined' && window.location.pathname === '/links') {
+      window.history.replaceState(null, '', '/card');
+      return '/card';
+    }
+    return window.location.pathname;
+  });
   const [catalogVersion, setCatalogVersion] = useState(0);
 
   // Dynamic catalog loader & seed trigger
@@ -8103,10 +8109,19 @@ function AppContent() {
   // Robust client-side custom router event and browser history state listeners
   useEffect(() => {
     const handlePopState = () => {
-      setPathname(window.location.pathname);
+      let p = window.location.pathname;
+      if (p === '/links') {
+        window.history.replaceState(null, '', '/card');
+        p = '/card';
+      }
+      setPathname(p);
     };
     const handleCustomNav = (e: Event) => {
-      const newPath = (e as CustomEvent).detail;
+      let newPath = (e as CustomEvent).detail;
+      if (newPath === '/links') {
+        window.history.replaceState(null, '', '/card');
+        newPath = '/card';
+      }
       setPathname(newPath);
       
       // Handle anchor-scrolling (e.g. #sobre) or reset page scroll
