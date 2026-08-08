@@ -4,17 +4,42 @@ Este documento regista a visão estratégica de futuro para a evolução tecnol�
 
 ---
 
-## 1. Passaporte Digital & Autenticidade "Tap & Verify" (NFC / QR Code)
-*   **Conceito:** Cada criação autoral M★BRAVO inclui um microchip NFC embutido de forma impercetível na etiqueta artesanal (ou QR Code de alta precisão).
-*   **Experiência do Cliente:** Ao aproximar o smartphone da etiqueta da mala ou peça de crochet, o cliente é instantaneamente direcionado para o Passaporte Digital de Autenticidade da sua peça.
+## 1. CRM de Memórias & Notificações (Atelier Loyalty)
+*   **Conceito:** Motor de inteligência relacional e fidelização VIP desenhado para acompanhar o ciclo de vida e a ligação afetiva de cada cliente com as suas peças M★BRAVO.
+*   **Experiência da Cliente:**
+    *   **Aniversário da Peça ("Memory Anniversary"):** Notificação elegante a assinalar 1 ano da conclusão e entrega da peça, acompanhada de conselhos de conservação e uma oferta de cortesia exclusiva.
+    *   **Curadoria de Cuidados Sazonais:** Envio de sugestões de limpeza e armazenamento adequadas à mudança de estação.
+    *   **Acesso Antecipado & Peças Únicas:** Convites privados para o lançamento de novas coleções de edição limitada, baseados no histórico de compras e paletas de cor preferidas.
 *   **Especificações Técnicas:**
-    *   **Certificado de Autenticidade Imutável:** Número de série único gravado em registo criptográfico ou base de dados segura.
-    *   **Ficha da Artesã & História:** Nome da artesã responsável pelo tecer da peça, número de horas dedicadas à confeção e data de conclusão no Atelier Carolina Bravo.
-    *   **Origem dos Materiais:** Rastreabilidade dos fios de algodão de luxo e ferragens.
+    *   Integração no AdminDashboard (`customers.json` / PostgreSQL) com tags de perfil (*LTV*, *Peças Adquiridas*, *Paleta Preferida*, *Data do Primeiro Pedido*).
+    *   Disparo assíncrono via Resend com templates de e-mail com tipografia editorial e estética de Atelier.
 
 ---
 
-## 2. Provador Virtual & Realidade Aumentada (AR Web-Based)
+## 2. Certificado de Autenticidade Digital & Proveniência "Tap & Verify"
+*   **Conceito:** Registo imutável de autenticidade e proveniência de cada peça artesanal M★BRAVO, acessível por QR Code de alta precisão ou NFC no rótulo da peça.
+*   **Experiência da Cliente:** Ao aproximar o smartphone ou ler o código da etiqueta, a cliente acede à Ficha de Autenticidade Oficial da sua criação M★BRAVO.
+*   **Especificações Técnicas:**
+    *   **Número de Série Único:** Hash e identificador imutável associado à encomenda no Volume Persistente / DB.
+    *   **Ficha do Atelier:** Nome da artesã (Carolina Bravo), número exato de horas dedicadas à confecção manual, data de selagem e origem dos fios de algodão de luxo.
+    *   **Verificação Pública Instantânea:** Página de validação pública no domínio oficial (`mbravobycarolina.com/verify/:serial`).
+
+---
+
+## 3. Atelier Private Studio (Consultoria Privada & Encomenda Sob Medida) — [x] IMPLEMENTADO
+*   **Conceito:** Ritual imersivo e interativo de co-criação digital disponível no Cartão Digital (`/card`) e no site oficial. Não se trata de um formulário estático, mas de uma experiência sensitiva de design participativo antes da sessão com a Carolina.
+*   **Status de Implementação:** Totalmente operacional (Fase 1 e Fase 2 concluídas). Disponível em `/card` e no site, equipado com Configurador Visual Dinâmico em tempo real por camadas SVG (`PieceVisualizerSVG`) para todas as tipologias de peças (Malas, Cardigans, Ponchos, Decor), suporte a combinações Monocolor e Bicolor Multi-Zona, geração de Passaporte Criativo, envio pré-formatado via WhatsApp Business do Atelier, salvaguarda persistente no backend (`/api/private-studio/passports` -> `/app/data/passports.json`) e separador dedicado "Passaportes Criativos" no Painel de Administração (`AdminDashboardModal.tsx`).
+*   **Experiência da Cliente:**
+    *   **Simulador Tátil e Visual por Camadas:** A cliente explora e visualiza virtualmente em tempo real a troca de cores por zonas (Corpo/Base vs. Aba/Bordos/Destaque), a paleta de fios de algodão, a textura dos pontos de crochet, o tipo de fecho (botão de madeira, íman ou fecho metálico) e o estilo de alça (crochet, pele genuína ou corrente de luxo).
+    *   **Estimativa em Tempo Real:** O simulador calcula dinamicamente a estimativa de horas de confecção manual e o intervalo orçamental da peça sob medida.
+    *   **Agendamento da Sessão de Design:** Finalização com agendamento direto de uma reunião privada de consultoria com a Carolina Bravo (presencial no Atelier ou por videochamada privada), com envio prévio do moodboard escolhido pela cliente.
+*   **Especificações Técnicas:**
+    *   Engine interativa React com transições fluidas e cálculo dinâmico de horas/material.
+    *   Integração direta com o WhatsApp Business do Atelier e envio de resumo da consulta em PDF/E-mail.
+
+---
+
+## 4. Provador Virtual & Realidade Aumentada (AR Web-Based)
 *   **Conceito:** Permite à cliente visualizar as malas e peças M★BRAVO em escala real (1:1) sobre a sua indumentária ou no seu ambiente antes de concluir a encomenda.
 *   **Experiência do Cliente:** Integração fluida no ecrã de detalhe do produto (`ProductDetailPage`) com botão "Projetar no seu Espaço / Provador Virtual".
 *   **Especificações Técnicas:**
@@ -23,17 +48,7 @@ Este documento regista a visão estratégica de futuro para a evolução tecnol�
 
 ---
 
-## 3. Configurador de Personalização 3D em Tempo Real
-*   **Conceito:** Atelier Digital de Co-Criação onde a cliente pode personalizar a sua peça M★BRAVO sob encomenda.
-*   **Experiência do Cliente:** Módulo interativo com rotação 360° da peça, permitindo selecionar combinações de cores e acabamentos antes de encomendar.
-*   **Opções de Personalização:**
-    *   **Paleta de Cores do Fio de Crochet:** Escolha entre tons sazonais e clássicos do Atelier.
-    *   **Alças & Acessórios:** Opção entre alça em crochet, pele genuína ou corrente metálica.
-    *   **Monograma Personalizado:** Gravação de iniciais em placa metálica ou etiqueta de couro artesanal.
-
----
-
-## 4. Passaporte de Manutenção e Reparações (Luxury Circularity)
+## 5. Passaporte de Manutenção e Reparações (Luxury Circularity)
 *   **Conceito:** Garantia de longevidade e economia circular de luxo. A M★BRAVO compromete-se com a durabilidade eterna das suas criações.
 *   **Experiência do Cliente:** Área do cliente e portal do passaporte onde é possível solicitar serviços de restauro e preservação.
 *   **Funcionalidades:**
