@@ -524,7 +524,7 @@ Para que o repositório no GitHub fique 100% sincronizado com a versão final de
 
 *   [x] **Sincronização e Conclusão do Cartão de Visita Digital M★BRAVO (`/card`):**
     *   **Canal & Rota Oficial:** Rota soberana `/card` (`mbravobycarolina.com/card`) mapeada em `App.tsx` com redirecionamento automático de `/links` para `/card` sem quebrar acessos legados.
-    *   **Otimização do Asset do QR Code (`qr-code.webp`):** Substituição do ficheiro PNG temporário pelo ficheiro WebP otimizado com fundo branco puro (#FFFFFF) em `src/assets/qr-code.webp` e `public/qr-code.webp`. Eliminação rigorosa de todos os ficheiros PNG antigos para manter o repositório limpo.
+    *   **Otimização do Asset do QR Code (`qr-code.webp`):** Utilização do caminho estático direto na pasta pública `/qr-code.webp` em `DigitalBusinessCard.tsx` com fundo branco puro (#FFFFFF), garantindo compatibilidade total no build do Vite em ambientes Linux/Railway sem dependência de imports estáticos.
     *   **Limpeza Minimalista de UI:** Removida a duplicação do botão na secção "PARTILHA RÁPIDA", mantendo o acesso exclusivo e elegante no botão `QR Code` do topo do cartão.
     *   **Textos & Branding do Modal:** Atualizados os textos oficiais do modal ("CARTÃO DE VISITA DIGITAL", "Conecta-te com a M★BRAVO" e instrução "Aponta a câmara do teu telemóvel para o código para acederes aos contactos e à história do Atelier.") mantendo a ação de cópia do link soberano.
     *   **Ficha vCard & Links do Ecossistema:** Inclusão dos acessos oficiais (Instagram `@mbravobycarolina`, Pinterest Oficial, Ficha Google Maps, Catálogo Merchant, WhatsApp e vCard) com o cargo oficial *"Fundadora & Designer"* e assinatura *"Created with time"*.
