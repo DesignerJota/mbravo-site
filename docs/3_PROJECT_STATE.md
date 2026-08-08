@@ -524,8 +524,21 @@ Para que o repositório no GitHub fique 100% sincronizado com a versão final de
 
 *   [x] **Sincronização e Conclusão do Cartão de Visita Digital M★BRAVO (`/card`):**
     *   **Canal & Rota Oficial:** Rota soberana `/card` (`mbravobycarolina.com/card`) mapeada em `App.tsx` com redirecionamento automático de `/links` para `/card` sem quebrar acessos legados.
-    *   **QR Code Vetorial NATIVO & Modal de Partilha:** Atualizado o gerador dinâmico de QR Code SVG, modal de partilha e função de cópia direta para apontar rigorosamente para `https://mbravobycarolina.com/card`.
+    *   **Otimização do Asset do QR Code (`qr-code.webp`):** Substituição do ficheiro PNG temporário pelo ficheiro WebP otimizado com fundo branco puro (#FFFFFF) em `src/assets/qr-code.webp` e `public/qr-code.webp`. Eliminação rigorosa de todos os ficheiros PNG antigos para manter o repositório limpo.
+    *   **Limpeza Minimalista de UI:** Removida a duplicação do botão na secção "PARTILHA RÁPIDA", mantendo o acesso exclusivo e elegante no botão `QR Code` do topo do cartão.
+    *   **Textos & Branding do Modal:** Atualizados os textos oficiais do modal ("CARTÃO DE VISITA DIGITAL", "Conecta-te com a M★BRAVO" e instrução "Aponta a câmara do teu telemóvel para o código para acederes aos contactos e à história do Atelier.") mantendo a ação de cópia do link soberano.
     *   **Ficha vCard & Links do Ecossistema:** Inclusão dos acessos oficiais (Instagram `@mbravobycarolina`, Pinterest Oficial, Ficha Google Maps, Catálogo Merchant, WhatsApp e vCard) com o cargo oficial *"Fundadora & Designer"* e assinatura *"Created with time"*.
+
+*   [x] **Atelier Private Studio & Configurador Visual Dinâmico (Co-Criação & Encomenda Sob Medida - FASE 1 & 2 CONCLUÍDAS):**
+    *   **Experiência Interativa de Co-Criação:** Criado e evoluído o componente de luxo `AtelierPrivateStudioModal.tsx` acessível diretamente através do botão com gradiente dourado no Cartão de Visita Digital (`/card`) e no site.
+    *   **Configurador Visual Dinâmico em Tempo Real (`PieceVisualizerSVG`):** Motor vetorial por camadas SVG, máscaras e filtros que simula em tempo real a troca de cores por zonas (Corpo/Base vs. Aba/Bordos/Destaque), textura dos pontos de crochet de algodão e acabamentos/hardware para TODAS as tipologias de peças (Malas/Pouches, Cardigans/Vestuário, Ponchos/Acessórios e Decor para a Casa).
+    *   **Modo Monocolor & Bicolor Multi-Zona:** Permite alternar entre peças de cor uniforme ou combinações bicolores com seleção tátil de paletas de fios de algodão virgem (Cru Natural, Verde Floresta M★BRAVO, Terracota Sol, Azul Marea, Creme Dourado).
+    *   **Simulador Tátil & Ferragens:** Seleção de acabamentos (Fecho Íman Oculto, Zíper Metálico Dourado, Alça Crochet Continuo, Alça Pele Genuína Removível) com representação visual no mockup.
+    *   **Cálculo Dinâmico de Dedicação & Orçamento:** Estimativa em tempo real de horas de confecção artesanal manual (12h a 35h) e intervalo orçamental com prazos de entrega do Atelier.
+    *   **Geração de Passaporte Criativo & Integração WhatsApp:** Ao clicar em "Reservar Sessão & Enviar Passaporte", é registado o Passaporte Criativo (ID único `MB-PASS-XXXX`) e disparada uma mensagem pré-formatada de alta postura para o WhatsApp oficial do Atelier com a especificação exata das zonas e cores escolhidas.
+    *   **Persistência Soberana e API Backend:** Endpoints dedicados `POST /api/private-studio/passports` e `GET /api/admin/passports` em `server.ts` que registam e persistem autonomamente todos os passaportes em `/app/data/passports.json` (Railway Volume Persistente) e `localStorage` para consulta da Carolina.
+    *   [x] **Separador Dedicado "Passaportes Criativos" no Painel Admin (`AdminDashboardModal.tsx`):** Módulo de consulta e gestão de Passaportes Criativos integrado no Painel de Administração. Permite à Carolina visualizar rapidamente os moodboards, paletas de fios monocolor/bicolor, especificações de hardware, orçamentos estimados e botão direto de contacto via WhatsApp para agendamento da consultoria privada.
+
 *   [x] **Auditoria e Ativação de Dados em Direto via APIs Externas (Google Places & Behold Instagram):**
     *   **Google Reviews ("Partilhado por Quem nos Escolhe"):** Refatorado o motor de 3 camadas no `server.ts` para consultar diretamente a Google Places API (`GOOGLE_PLACES_API_KEY` / `GOOGLE_PLACE_ID`) sempre que as chaves estejam presentes no ambiente, combinando as avaliações reais do Google com as submissões locais.
     *   **Diário Visual Instagram (@mbravobycarolina):** Verificada e otimizada a rota `/api/instagram` que consome em tempo real as publicações e fotografias mais recentes do feed através da Behold API (`BEHOLD_FEED_ID` / `VITE_BEHOLD_WIDGET_ID`), mantendo fallback gracioso para garantir zero interrupção no site principal.
@@ -539,9 +552,10 @@ Para que o repositório no GitHub fique 100% sincronizado com a versão final de
 
 ### C. Propostas Disruptivas de Inovação e Luxo E-commerce (Nível Marca Global):
 *   [x] **Roadmap Registado em `/docs/5_FUTURE_ROADMAP.md`**:
-    *   **Passaporte Digital & Autenticidade "Tap & Verify" (NFC / QR Code):** Autenticação da peça e ficha da artesã Carolina Bravo.
+    *   **CRM de Memórias & Notificações (Atelier Loyalty):** Gestão do ciclo de vida da cliente, lembretes de aniversário de peças e recomendações de cuidados sazonais.
+    *   **Certificado de Autenticidade Digital & Proveniência "Tap & Verify":** Registo imutável, número de série único, horas de confecção e artesã (Carolina Bravo).
+    *   [x] **Atelier Private Studio (Consultoria Privada & Encomenda Sob Medida - CONCLUÍDO):** Experiência de co-criação digital com simulação tátil de fios, estimativa de horas/orçamento e marcação de sessão de design exclusiva com a Carolina via WhatsApp + salvaguarda em backend.
     *   **Provador Virtual / Realidade Aumentada (AR Web-based):** Projeção da peça em escala 1:1.
-    *   **Configurador de Personalização 3D:** Personalização de cores do fio de crochet, alças e iniciais em tempo real.
     *   **Passaporte de Manutenção e Reparações (Luxury Circularity):** Portal de lavagem especializada, preservação e garantia vitalícia de pontos.
 *   [ ] **VIP Atelier Concierge & Agendamento Privado:** Módulo de contacto direto via WhatsApp/Vídeo com Carolina para encomendar peças à medida para noivas, eventos e edições limitadas.
 *   [ ] **Soundscape Atmosférico do Atelier:** Ativação opcional no topo do site de um ambiente sonoro suave e relaxante do atelier (ritmo do tear e ambiente acústico artesanal) elevando a experiência sensorial da marca.
