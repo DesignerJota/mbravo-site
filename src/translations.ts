@@ -142,8 +142,8 @@ export function translateCategory(category: any, lang: 'pt' | 'en') {
 export const translations = {
   pt: {
     "brand.slogan": "Cada ponto guarda uma memória.",
-    "brand.subheadline": "Peças feitas com tempo, amor e memória.",
-    "loading.slogan": "Peças artesanais exclusivas feitas à mão com tempo e identidade.",
+    "brand.subheadline": "Peças feitas com tempo, amor e memórias.",
+    "loading.slogan": "Peças feitas com tempo, amor e memórias.",
     
     // Navigation
     "nav.home": "Início",
@@ -371,8 +371,8 @@ export const translations = {
   },
   en: {
     "brand.slogan": "Every stitch holds a memory.",
-    "brand.subheadline": "Pieces made with time, love and memory.",
-    "loading.slogan": "Exclusive handmade pieces crafted with time and identity.",
+    "brand.subheadline": "Pieces made with time, love and memories.",
+    "loading.slogan": "Pieces made with time, love and memories.",
     
     // Navigation
     "nav.home": "Home",
