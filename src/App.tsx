@@ -7,6 +7,7 @@ import Lenis from 'lenis';
 const AdminDashboardModal = React.lazy(() => import('./components/AdminDashboardModal'));
 const LegalModal = React.lazy(() => import('./components/LegalModal'));
 import { CartProvider, useCart } from './context/CartContext';
+import { DigitalBusinessCard } from './components/DigitalBusinessCard';
 import { SHIPPING_ZONES } from './types';
 import { AtelierCartDrawer } from './components/AtelierCartDrawer';
 import { CartCheckoutModal } from './components/CartCheckoutModal';
@@ -966,9 +967,10 @@ const LoadingScreen = ({ onComplete }: { onComplete: () => void; key?: string })
         initial={{ opacity: 0, y: 15 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.5, duration: 0.9 }}
-        className="mt-3 sm:mt-5 landscape:mt-2 text-cream/80 font-serif italic tracking-[0.2em] sm:tracking-[0.35em] text-[10px] sm:text-xs uppercase text-center px-4 max-w-[90vw] leading-relaxed relative z-10"
+        style={{ fontFamily: "'Cormorant Garamond', serif" }}
+        className="mt-3 sm:mt-5 landscape:mt-2 text-[#D4C3A3] font-serif italic text-sm sm:text-base md:text-lg tracking-[0.06em] text-center px-4 max-w-[90vw] leading-relaxed relative z-10 antialiased drop-shadow-[0_2px_10px_rgba(0,0,0,0.5)]"
       >
-        {t('loading.slogan')}
+        &ldquo;{t('loading.slogan')}&rdquo;
       </motion.p>
 
       {/* Craft Loading Indicator with Numerical Progress (0% -> 100%) */}
@@ -1998,7 +2000,7 @@ const Hero = () => {
                             })}
                         </h1>
 
-                        {/* Subheadline: "Peças feitas com tempo, amor e memória." */}
+                        {/* Subheadline: "Peças feitas com tempo, amor e memórias." */}
                         <motion.p
                             initial={{ opacity: 0, y: 8 }}
                             animate={{ opacity: 0.8, y: 0 }}
@@ -2008,7 +2010,7 @@ const Hero = () => {
                                 textShadow: "0 4px 12px rgba(18, 26, 13, 0.3)",
                                 letterSpacing: "0.03em"
                             }}
-                            className="italic text-sm sm:text-lg md:text-xl landscape:text-xs md:landscape:text-sm lg:landscape:text-base font-light text-[#D4C3A3] max-w-[320px] sm:max-w-xl md:max-w-2xl mx-auto leading-relaxed mb-0 antialiased"
+                            className="font-serif italic text-sm sm:text-lg md:text-xl landscape:text-xs md:landscape:text-sm lg:landscape:text-base font-light text-[#D4C3A3] max-w-[320px] sm:max-w-xl md:max-w-2xl mx-auto leading-relaxed mb-0 antialiased"
                         >
                             {t('brand.subheadline')}
                         </motion.p>
@@ -8236,10 +8238,24 @@ function AppContent() {
       </AnimatePresence>
 
       <main className="flex flex-col">
-        <Navbar currentPage={pathname === '/essencia' || pathname === '/essence' ? 'essence' : 'home'} setCurrentPage={(p) => navigateTo(p === 'essence' ? '/essencia' : '/')} pathname={pathname} isAppLoading={loading} />
+        {pathname !== '/links' && pathname !== '/card' && (
+          <Navbar currentPage={pathname === '/essencia' || pathname === '/essence' ? 'essence' : 'home'} setCurrentPage={(p) => navigateTo(p === 'essence' ? '/essencia' : '/')} pathname={pathname} isAppLoading={loading} />
+        )}
             
             <AnimatePresence mode="wait">
-              {pathname === '/essencia' || pathname === '/essence' ? (
+              {pathname === '/links' || pathname === '/card' ? (
+                // DEDICATED DIGITAL BUSINESS CARD ROUTE
+                <motion.div
+                  key="digital-card"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.8 }}
+                  className="relative min-h-screen bg-[#121A0D]"
+                >
+                  <DigitalBusinessCard onNavigateHome={() => navigateTo('/')} />
+                </motion.div>
+              ) : pathname === '/essencia' || pathname === '/essence' ? (
                 <motion.div 
                   key="essence"
                   initial={{ opacity: 0 }}
@@ -8377,7 +8393,9 @@ function AppContent() {
               )}
             </AnimatePresence>
             
-            <Footer onOpenLegal={(type) => setActiveLegal(type)} onOpenAdmin={() => navigateTo('/admin')} />
+            {pathname !== '/links' && pathname !== '/card' && (
+              <Footer onOpenLegal={(type) => setActiveLegal(type)} onOpenAdmin={() => navigateTo('/admin')} />
+            )}
 
             <AnimatePresence>
                 {activeLegal && (
