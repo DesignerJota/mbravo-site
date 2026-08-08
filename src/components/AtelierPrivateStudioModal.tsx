@@ -7,10 +7,10 @@ import {
   Clock, 
   MessageCircle, 
   ShieldCheck, 
-  Palette, 
   Eye,
-  Sliders,
-  Layers
+  Layers,
+  Award,
+  Info
 } from 'lucide-react';
 
 interface AtelierPrivateStudioModalProps {
@@ -18,32 +18,185 @@ interface AtelierPrivateStudioModalProps {
   onClose: () => void;
 }
 
-// Yarns / Palettes of luxury cotton
+// 1. Official Raw Materials & Yarns from M★BRAVO Inventory (DROPS Safran & DROPS Paris)
 const YARN_PALETTES = [
-  { id: 'cru-natural', name: 'Cru Natural & Areia', hex: '#EAE3D2', borderHex: '#D4C3A3', desc: 'Fio de algodão virgem não tingido, textura orgânica e toque macio.' },
-  { id: 'verde-floresta', name: 'Verde Floresta M★BRAVO', hex: '#1C2A15', borderHex: '#8F723B', desc: 'A cor de assinatura do Atelier. Profunda, nobre e atemporal.' },
-  { id: 'terracota-sol', name: 'Terracota Sólido & Âmbar', hex: '#A8583B', borderHex: '#C5A059', desc: 'Pigmentação mineral calorosa inspirada na luz do entardecer.' },
-  { id: 'azul-marea', name: 'Azul Marea Profundo', hex: '#1E3A4C', borderHex: '#3B6B88', desc: 'Tom oceânico suave com reflexos aveludados em malha fechada.' },
-  { id: 'ouro-atelier', name: 'Creme Dourado & Mostarda', hex: '#D4B06A', borderHex: '#C5A059', desc: 'Toque de luminosidade artesanal para peças de festa e edições únicas.' }
+  { 
+    id: 'safran-18-natural', 
+    name: 'DROPS Safran 18 (Natural & Areia)', 
+    shortName: 'Safran Natural',
+    hex: '#F5EBE0', 
+    borderHex: '#D8C3A5', 
+    desc: '100% Algodão Egípcio Penteado. Textura suave e tom cru virgem de assinatura.' 
+  },
+  { 
+    id: 'safran-78-floresta', 
+    name: 'DROPS Safran 78 (Verde Floresta M★BRAVO)', 
+    shortName: 'Safran Verde Floresta',
+    hex: '#416335', 
+    borderHex: '#2E4825', 
+    desc: 'Cor nobre de assinatura do Atelier. Profunda, vegetal e atemporal.' 
+  },
+  { 
+    id: 'safran-68-cafe', 
+    name: 'DROPS Safran 68 (Café M★BRAVO)', 
+    shortName: 'Safran Café',
+    hex: '#5C3A21', 
+    borderHex: '#422815', 
+    desc: 'Pigmentação mineral castanha inspirada no grão de café e terra.' 
+  },
+  { 
+    id: 'safran-01-rosa', 
+    name: 'DROPS Safran 01 (Rosa do Deserto)', 
+    shortName: 'Safran Rosa Deserto',
+    hex: '#F4B3BA', 
+    borderHex: '#E39DA5', 
+    desc: 'Rosa terroso e delicado para detalhes sofisticados e femininos.' 
+  },
+  { 
+    id: 'safran-76-azul-po', 
+    name: 'DROPS Safran 76 (Azul Pó Marea)', 
+    shortName: 'Safran Azul Pó',
+    hex: '#B8D8EB', 
+    borderHex: '#9DC1D8', 
+    desc: 'Tom oceânico sereno com reflexos aveludados em malha fechada.' 
+  },
+  { 
+    id: 'paris-17-natural', 
+    name: 'DROPS Paris 17 (Natural Estruturado)', 
+    shortName: 'Paris Natural',
+    hex: '#F3EBE1', 
+    borderHex: '#DDD2C3', 
+    desc: '100% Algodão Virgem Encorpado (50g) ideal para peças de estrutura firme.' 
+  },
+  { 
+    id: 'paris-43-verde-musgo', 
+    name: 'DROPS Paris 43 (Verde Musgo)', 
+    shortName: 'Paris Verde Musgo',
+    hex: '#536D43', 
+    borderHex: '#3B502F', 
+    desc: 'Algodão rústico encorpado para mantas decorativas e grandes volumes.' 
+  },
+  { 
+    id: 'paris-35-baunilha', 
+    name: 'DROPS Paris 35 (Baunilha Dourada)', 
+    shortName: 'Paris Baunilha',
+    hex: '#F8C53A', 
+    borderHex: '#D9AA2B', 
+    desc: 'Tom sol de verão para destaques vibrantes e acabamentos de festa.' 
+  }
 ];
 
-// Product Types for Custom Order
+// 2. Official M★BRAVO Catalog Pieces with Real Pricing & Crafting Time Formulas
 const CUSTOM_PIECE_TYPES = [
-  { id: 'pouch-mala', name: 'Mala / Pouch Autoral', baseHours: 18, baseEstimate: '45€ - 85€', leadTime: '10-15 dias úteis' },
-  { id: 'cardigan-vestuario', name: 'Cardigan / Peça de Vestuário', baseHours: 35, baseEstimate: '95€ - 165€', leadTime: '15-20 dias úteis' },
-  { id: 'poncho-acessorio', name: 'Poncho / Acessório Nobre', baseHours: 22, baseEstimate: '55€ - 95€', leadTime: '10-15 dias úteis' },
-  { id: 'casa-decor', name: 'Decor / Peça por Medida para a Casa', baseHours: 12, baseEstimate: '35€ - 75€', leadTime: '7-12 dias úteis' }
+  { 
+    id: 'cardigan-alma', 
+    name: 'Cardigan Alma (Vestuário Autoral)', 
+    shortName: 'Cardigan Alma',
+    baseHours: 35, 
+    basePrice: 97, 
+    leadTime: '15-20 dias úteis',
+    desc: 'Peça de vestuário de alta-costura em crochet com abotoamento frontal e punhos canelados.'
+  },
+  { 
+    id: 'mala-b2-sling', 
+    name: 'Mala B2 Sling (Mala em Crochet)', 
+    shortName: 'Mala B2 Sling',
+    baseHours: 18, 
+    basePrice: 47, 
+    leadTime: '10-15 dias úteis',
+    desc: 'Mala de ombro utilitária e elegante com pala arredondada e estrutura reforçada.'
+  },
+  { 
+    id: 'pouch-b1-mini', 
+    name: 'Pouch B1 Mini (Mini Mala & Acessório)', 
+    shortName: 'Pouch B1 Mini',
+    baseHours: 12, 
+    basePrice: 37, 
+    leadTime: '7-12 dias úteis',
+    desc: 'Bolsa compacta para essenciais, porta-chaves ou Airpods com fecho artesanal.'
+  },
+  { 
+    id: 'poncho-v1', 
+    name: 'Poncho V1 / V2C (Acessório Nobre)', 
+    shortName: 'Poncho V1',
+    baseHours: 24, 
+    basePrice: 67, 
+    leadTime: '12-16 dias úteis',
+    desc: 'Capa envolvente de ombros com drapeado natural e gola estruturada.'
+  },
+  { 
+    id: 'decor-h2b', 
+    name: 'Almofada H2B (Decor para a Casa)', 
+    shortName: 'Almofada H2B',
+    baseHours: 15, 
+    basePrice: 40, 
+    leadTime: '8-12 dias úteis',
+    desc: 'Peça decorativa para a casa com borlas nos cantos e ponto rendado exclusivo.'
+  }
 ];
 
-// Finishing details
+// 3. Official Finishing Details & Accessories from Admin Catalog Rules
 const HARDWARE_OPTIONS = [
-  { id: 'fecho-imantado', name: 'Fecho Íman Oculto & Botão Madeira' },
-  { id: 'zip-metal', name: 'Fecho Zíper Metálico Dourado com Forro' },
-  { id: 'alca-crochet', name: 'Alça em Crochet Manual Continuo' },
-  { id: 'alca-pele', name: 'Alça em Pele Genuína Removível' }
+  { 
+    id: 'fecho-imantado', 
+    name: 'Fecho Íman Oculto & Botão Madeira M★BRAVO', 
+    shortName: 'Fecho Íman & Botão Madeira',
+    extraCost: 0,
+    desc: 'Fecho magnético invisível complementado com o icónico botão de madeira gravado.'
+  },
+  { 
+    id: 'zip-metal-forro', 
+    name: 'Fecho Zíper Metálico Dourado com Forro de Algodão', 
+    shortName: 'Zíper Dourado & Forro',
+    extraCost: 8,
+    desc: 'Zíper metálico de alta durabilidade com forro interno de algodão costurado à mão.'
+  },
+  { 
+    id: 'alca-crochet', 
+    name: 'Alça em Crochet Manual Contínuo Reforçado', 
+    shortName: 'Alça Crochet Contínua',
+    extraCost: 5,
+    desc: 'Alça tecida no mesmo ponto da peça com núcleo estrutural para não ceder.'
+  },
+  { 
+    id: 'alca-pele', 
+    name: 'Alça em Pele Genuína Removível com Mosquetões', 
+    shortName: 'Alça Pele Genuína',
+    extraCost: 12,
+    desc: 'Pele genuína em tom castanho nobre com ferragens metálicas douradas removíveis.'
+  }
 ];
 
-// Dynamic Multi-Zone Vector SVG Renderer
+// Admin Calculator Rules: Dynamically compute budget range, materials cost & labor hours
+function calculatePieceSpecs(
+  piece: typeof CUSTOM_PIECE_TYPES[0],
+  isBicolor: boolean,
+  hardware: typeof HARDWARE_OPTIONS[0]
+) {
+  let totalHours = piece.baseHours;
+  if (isBicolor) {
+    // Multi-zone bicolor weaving adds ~15% extra handcrafting time for thread changes & seamless joins
+    totalHours = Math.round(totalHours * 1.15);
+  }
+
+  const extraCost = hardware.extraCost || 0;
+  const minPrice = piece.basePrice + extraCost + (isBicolor ? 6 : 0);
+  const maxPrice = Math.round(minPrice * 1.35);
+
+  const materialsEst = Math.round(minPrice * 0.38);
+  const laborEst = minPrice - materialsEst;
+
+  return {
+    hours: totalHours,
+    minPrice,
+    maxPrice,
+    budgetRange: `${minPrice}€ - ${maxPrice}€`,
+    materialsEst,
+    laborEst
+  };
+}
+
+// Highly Refined Vector SVG Renderer simulating tactile crochet, realistic depth & metallic hardware
 const PieceVisualizerSVG: React.FC<{
   pieceId: string;
   primaryYarn: typeof YARN_PALETTES[0];
@@ -55,210 +208,220 @@ const PieceVisualizerSVG: React.FC<{
   const sColor = isBicolor ? secondaryYarn.hex : primaryYarn.hex;
 
   return (
-    <div className="relative w-full aspect-[4/3] bg-[#0E150B] border border-[#C5A059]/30 rounded-2xl overflow-hidden flex items-center justify-center shadow-inner group">
-      {/* Background Subtle Luxury Glow */}
+    <div className="relative w-full aspect-[4/3] bg-[#0A0F08] border border-[#C5A059]/40 rounded-2xl overflow-hidden flex items-center justify-center shadow-[inset_0_0_30px_rgba(0,0,0,0.9)] group">
+      {/* Soft Luxury Volumetric Lighting Behind Product */}
       <div 
-        className="absolute inset-0 opacity-20 transition-all duration-700 pointer-events-none"
+        className="absolute inset-0 opacity-25 transition-all duration-700 pointer-events-none"
         style={{
-          background: `radial-gradient(circle at 50% 50%, ${pColor} 0%, transparent 70%)`
+          background: `radial-gradient(circle at 50% 45%, ${pColor} 0%, rgba(197,160,89,0.15) 45%, transparent 75%)`
         }}
       />
 
+      {/* Grid Pattern Background for Atelier Technical Canvas */}
+      <div className="absolute inset-0 opacity-10 bg-[linear-gradient(to_right,#C5A059_1px,transparent_1px),linear-gradient(to_bottom,#C5A059_1px,transparent_1px)] bg-[size:16px_16px] pointer-events-none" />
+
       <svg 
-        viewBox="0 0 300 240" 
-        className="w-full h-full max-h-[220px] drop-shadow-[0_10px_20px_rgba(0,0,0,0.6)] transition-all duration-500"
+        viewBox="0 0 320 250" 
+        className="w-full h-full max-h-[230px] drop-shadow-[0_15px_25px_rgba(0,0,0,0.85)] transition-all duration-500 relative z-10"
       >
         <defs>
+          {/* Gold Metallic Shimmer Gradient */}
           <linearGradient id="goldGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor="#D4B06A" />
-            <stop offset="50%" stopColor="#C5A059" />
+            <stop offset="0%" stopColor="#E6CA85" />
+            <stop offset="35%" stopColor="#C5A059" />
+            <stop offset="70%" stopColor="#D4B06A" />
             <stop offset="100%" stopColor="#8F723B" />
           </linearGradient>
 
-          {/* Crochet Texture Pattern */}
-          <pattern id="crochetTexture" width="12" height="12" patternUnits="userSpaceOnUse">
-            <path d="M 0 6 Q 6 0 12 6 Q 6 12 0 6 Z" fill="none" stroke="rgba(0,0,0,0.12)" strokeWidth="0.8" />
+          {/* Leather Strap Shimmer Gradient */}
+          <linearGradient id="leatherGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stopColor="#7A4B2A" />
+            <stop offset="50%" stopColor="#5C3A21" />
+            <stop offset="100%" stopColor="#3D2412" />
+          </linearGradient>
+
+          {/* Dynamic Volumetric Shading for Primary Color */}
+          <radialGradient id="primary3D" cx="40%" cy="30%" r="70%">
+            <stop offset="0%" stopColor={pColor} />
+            <stop offset="100%" stopColor={pColor} style={{ filter: 'brightness(0.72)' }} />
+          </radialGradient>
+
+          {/* Dynamic Volumetric Shading for Secondary Color */}
+          <radialGradient id="secondary3D" cx="40%" cy="30%" r="70%">
+            <stop offset="0%" stopColor={sColor} />
+            <stop offset="100%" stopColor={sColor} style={{ filter: 'brightness(0.72)' }} />
+          </radialGradient>
+
+          {/* Tactile Interlocking Crochet Loop Pattern */}
+          <pattern id="crochetTexture" width="10" height="10" patternUnits="userSpaceOnUse">
+            <path d="M 0 5 Q 5 0 10 5 Q 5 10 0 5 Z" fill="none" stroke="rgba(0,0,0,0.18)" strokeWidth="0.9" />
+            <path d="M 5 0 Q 10 5 5 10 Q 0 5 5 0 Z" fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth="0.5" />
           </pattern>
         </defs>
 
-        {/* 1. MALA / POUCH AUTORAL */}
-        {pieceId === 'pouch-mala' && (
+        {/* 1. CARDIGAN ALMA */}
+        {pieceId === 'cardigan-alma' && (
           <g className="transition-all duration-500">
-            {/* Handle / Strap */}
-            {hardware.id === 'alca-pele' ? (
-              <path 
-                d="M 105 80 C 105 25, 195 25, 195 80" 
-                fill="none" 
-                stroke="#5C3A21" 
-                strokeWidth="7" 
-                strokeLinecap="round" 
-              />
-            ) : (
-              <path 
-                d="M 105 80 C 105 20, 195 20, 195 80" 
-                fill="none" 
-                stroke={sColor} 
-                strokeWidth="8" 
-                strokeDasharray="4 2" 
-                strokeLinecap="round" 
-              />
-            )}
-
-            {/* Main Pouch Body (Zone 1) */}
-            <rect 
-              x="70" 
-              y="80" 
-              width="160" 
-              height="115" 
-              rx="20" 
-              fill={pColor} 
-              stroke="#0B1008" 
-              strokeWidth="2.5" 
-            />
-            {/* Crochet Texture Overlay */}
-            <rect x="70" y="80" width="160" height="115" rx="20" fill="url(#crochetTexture)" />
-
-            {/* Flap / Accent Band (Zone 2 - Secondary Color if Bicolor) */}
+            {/* Main Torso & Body */}
             <path 
-              d="M 70 110 Q 150 155 230 110 L 230 80 Q 150 68 70 80 Z" 
-              fill={sColor} 
-              stroke="#0B1008" 
-              strokeWidth="2" 
-            />
-            <path d="M 70 110 Q 150 155 230 110 L 230 80 Q 150 68 70 80 Z" fill="url(#crochetTexture)" />
-
-            {/* Closure Hardware */}
-            {hardware.id === 'zip-metal' ? (
-              <rect x="75" y="77" width="150" height="5" rx="2.5" fill="url(#goldGradient)" />
-            ) : (
-              <circle cx="150" cy="118" r="8" fill="url(#goldGradient)" stroke="#5C3A21" strokeWidth="1.5" />
-            )}
-          </g>
-        )}
-
-        {/* 2. CARDIGAN / VESTUÁRIO */}
-        {pieceId === 'cardigan-vestuario' && (
-          <g className="transition-all duration-500">
-            {/* Main Torso & Sleeves (Zone 1 - Primary Color) */}
-            <path 
-              d="M 85 65 L 120 65 L 150 85 L 180 65 L 215 65 L 225 190 L 75 190 Z" 
-              fill={pColor} 
-              stroke="#0B1008" 
+              d="M 90 70 L 125 70 L 160 90 L 195 70 L 230 70 L 240 195 L 80 195 Z" 
+              fill="url(#primary3D)" 
+              stroke="#080C06" 
               strokeWidth="2.5" 
             />
             {/* Left Sleeve */}
-            <path d="M 85 65 L 48 130 L 75 140 L 98 88 Z" fill={pColor} stroke="#0B1008" strokeWidth="2" />
+            <path d="M 90 70 L 50 135 L 78 145 L 102 92 Z" fill="url(#primary3D)" stroke="#080C06" strokeWidth="2" />
             {/* Right Sleeve */}
-            <path d="M 215 65 L 252 130 L 225 140 L 202 88 Z" fill={pColor} stroke="#0B1008" strokeWidth="2" />
+            <path d="M 230 70 L 270 135 L 242 145 L 218 92 Z" fill="url(#primary3D)" stroke="#080C06" strokeWidth="2" />
 
-            {/* Knit Texture Overlay */}
+            {/* Crochet Texture Overlay */}
             <path 
-              d="M 85 65 L 120 65 L 150 85 L 180 65 L 215 65 L 225 190 L 75 190 Z" 
+              d="M 90 70 L 125 70 L 160 90 L 195 70 L 230 70 L 240 195 L 80 195 Z" 
               fill="url(#crochetTexture)" 
             />
 
-            {/* Ribbed Collar & Placket (Zone 2 - Secondary Color if Bicolor) */}
+            {/* Ribbed Placket & Collar (Secondary Color if Bicolor) */}
             <path 
-              d="M 120 65 L 150 108 L 180 65 L 162 190 L 138 190 Z" 
-              fill={sColor} 
-              stroke="#0B1008" 
-              strokeWidth="1.5" 
+              d="M 125 70 L 160 112 L 195 70 L 175 195 L 145 195 Z" 
+              fill="url(#secondary3D)" 
+              stroke="#080C06" 
+              strokeWidth="1.8" 
             />
-            {/* Cuffs */}
-            <rect x="48" y="128" width="27" height="12" rx="3" fill={sColor} stroke="#0B1008" strokeWidth="1" />
-            <rect x="225" y="128" width="27" height="12" rx="3" fill={sColor} stroke="#0B1008" strokeWidth="1" />
-            {/* Bottom Hem */}
-            <rect x="75" y="180" width="150" height="10" rx="3" fill={sColor} stroke="#0B1008" strokeWidth="1" />
+            {/* Sleeve Cuffs */}
+            <rect x="50" y="133" width="28" height="12" rx="3" fill="url(#secondary3D)" stroke="#080C06" strokeWidth="1" />
+            <rect x="242" y="133" width="28" height="12" rx="3" fill="url(#secondary3D)" stroke="#080C06" strokeWidth="1" />
+            {/* Hem Band */}
+            <rect x="80" y="185" width="160" height="10" rx="3" fill="url(#secondary3D)" stroke="#080C06" strokeWidth="1" />
 
-            {/* Buttons */}
-            <circle cx="150" cy="125" r="4.5" fill="#8F5C38" stroke="url(#goldGradient)" strokeWidth="1" />
-            <circle cx="150" cy="148" r="4.5" fill="#8F5C38" stroke="url(#goldGradient)" strokeWidth="1" />
-            <circle cx="150" cy="171" r="4.5" fill="#8F5C38" stroke="url(#goldGradient)" strokeWidth="1" />
+            {/* Wood Buttons or Zipper */}
+            {hardware.id === 'zip-metal-forro' ? (
+              <line x1="160" y1="112" x2="160" y2="185" stroke="url(#goldGradient)" strokeWidth="3" strokeDasharray="2 1" />
+            ) : (
+              <g>
+                <circle cx="160" cy="130" r="5" fill="#8F5C38" stroke="url(#goldGradient)" strokeWidth="1.2" />
+                <circle cx="160" cy="152" r="5" fill="#8F5C38" stroke="url(#goldGradient)" strokeWidth="1.2" />
+                <circle cx="160" cy="174" r="5" fill="#8F5C38" stroke="url(#goldGradient)" strokeWidth="1.2" />
+              </g>
+            )}
+
+            {/* M★BRAVO Leather Brand Tag */}
+            <rect x="86" y="172" width="22" height="10" rx="2" fill="url(#leatherGradient)" stroke="#8F723B" strokeWidth="0.8" />
+            <text x="97" y="179" fill="#E6CA85" fontSize="5" fontWeight="bold" textAnchor="middle" fontFamily="serif">M★B</text>
           </g>
         )}
 
-        {/* 3. PONCHO / ACESSÓRIO NOBRE */}
-        {pieceId === 'poncho-acessorio' && (
+        {/* 2. MALA B2 SLING */}
+        {pieceId === 'mala-b2-sling' && (
           <g className="transition-all duration-500">
-            {/* Main Draped Cape Body (Zone 1) */}
-            <path 
-              d="M 150 45 L 248 155 L 150 205 L 52 155 Z" 
-              fill={pColor} 
-              stroke="#0B1008" 
-              strokeWidth="2.5" 
-            />
-            <path d="M 150 45 L 248 155 L 150 205 L 52 155 Z" fill="url(#crochetTexture)" />
+            {/* Handle / Strap */}
+            {hardware.id === 'alca-pele' ? (
+              <g>
+                <path d="M 110 85 C 110 22, 210 22, 210 85" fill="none" stroke="url(#leatherGradient)" strokeWidth="7" strokeLinecap="round" />
+                <path d="M 110 85 C 110 22, 210 22, 210 85" fill="none" stroke="#E6CA85" strokeWidth="0.8" strokeDasharray="3 2" />
+                {/* Brass Carabiner Rings */}
+                <circle cx="110" cy="85" r="4.5" fill="none" stroke="url(#goldGradient)" strokeWidth="2" />
+                <circle cx="210" cy="85" r="4.5" fill="none" stroke="url(#goldGradient)" strokeWidth="2" />
+              </g>
+            ) : (
+              <path d="M 110 85 C 110 20, 210 20, 210 85" fill="none" stroke={sColor} strokeWidth="8" strokeDasharray="5 2" strokeLinecap="round" />
+            )}
 
-            {/* Neck Collar (Zone 2 if Bicolor) */}
-            <path 
-              d="M 122 45 C 132 68, 168 68, 178 45 Z" 
-              fill={sColor} 
-              stroke="#0B1008" 
-              strokeWidth="1.5" 
-            />
+            {/* Main Pouch Body */}
+            <rect x="75" y="85" width="170" height="120" rx="22" fill="url(#primary3D)" stroke="#080C06" strokeWidth="2.5" />
+            <rect x="75" y="85" width="170" height="120" rx="22" fill="url(#crochetTexture)" />
 
-            {/* Bottom Fringe Border (Zone 2 if Bicolor) */}
-            <path 
-              d="M 52 155 L 150 205 L 248 155 L 242 166 L 150 216 L 58 166 Z" 
-              fill={sColor} 
-              stroke="#0B1008" 
-              strokeWidth="1.5" 
-            />
+            {/* Flap / Accent Band */}
+            <path d="M 75 115 Q 160 160 245 115 L 245 85 Q 160 72 75 85 Z" fill="url(#secondary3D)" stroke="#080C06" strokeWidth="2" />
+            <path d="M 75 115 Q 160 160 245 115 L 245 85 Q 160 72 75 85 Z" fill="url(#crochetTexture)" />
 
-            {/* Star Brooch at Neck */}
-            <polygon points="150,52 152.5,58 158,58 153.5,61 155.5,67 150,63 144.5,67 146.5,61 142,58 147.5,58" fill="url(#goldGradient)" />
+            {/* Hardware Closure */}
+            {hardware.id === 'zip-metal-forro' ? (
+              <rect x="80" y="82" width="160" height="6" rx="3" fill="url(#goldGradient)" />
+            ) : (
+              <circle cx="160" cy="122" r="8.5" fill="url(#goldGradient)" stroke="#5C3A21" strokeWidth="1.5" />
+            )}
+
+            {/* Leather Tag on Flap */}
+            <rect x="148" y="148" width="24" height="11" rx="2" fill="url(#leatherGradient)" stroke="#8F723B" strokeWidth="0.8" />
+            <text x="160" y="155.5" fill="#E6CA85" fontSize="5.5" fontWeight="bold" textAnchor="middle" fontFamily="serif">M★BRAVO</text>
           </g>
         )}
 
-        {/* 4. DECOR / PEÇA PARA A CASA */}
-        {pieceId === 'casa-decor' && (
+        {/* 3. POUCH B1 MINI */}
+        {pieceId === 'pouch-b1-mini' && (
           <g className="transition-all duration-500">
-            {/* Outer Frame (Zone 2 if Bicolor) */}
-            <rect 
-              x="60" 
-              y="40" 
-              width="180" 
-              height="155" 
-              rx="18" 
-              fill={sColor} 
-              stroke="#0B1008" 
-              strokeWidth="2.5" 
-            />
-            {/* Inner Center Cushion/Throw (Zone 1) */}
-            <rect 
-              x="82" 
-              y="60" 
-              width="136" 
-              height="115" 
-              rx="10" 
-              fill={pColor} 
-              stroke="#0B1008" 
-              strokeWidth="1.5" 
-            />
-            <rect x="82" y="60" width="136" height="115" rx="10" fill="url(#crochetTexture)" />
+            {/* Small Wrist Strap */}
+            <path d="M 120 100 C 120 45, 160 45, 160 100" fill="none" stroke={sColor} strokeWidth="5" strokeDasharray="3 1.5" />
+
+            {/* Compact Body */}
+            <rect x="100" y="100" width="120" height="105" rx="16" fill="url(#primary3D)" stroke="#080C06" strokeWidth="2" />
+            <rect x="100" y="100" width="120" height="105" rx="16" fill="url(#crochetTexture)" />
+
+            {/* Mini Flap (Secondary Color if Bicolor) */}
+            <path d="M 100 120 Q 160 150 220 120 L 220 100 Q 160 90 100 100 Z" fill="url(#secondary3D)" stroke="#080C06" strokeWidth="1.5" />
+
+            {/* Wood Button Closure */}
+            <circle cx="160" cy="124" r="6" fill="#8F5C38" stroke="url(#goldGradient)" strokeWidth="1.2" />
+
+            {/* Leather Label */}
+            <rect x="148" y="165" width="24" height="10" rx="2" fill="url(#leatherGradient)" stroke="#8F723B" strokeWidth="0.8" />
+            <text x="160" y="172" fill="#E6CA85" fontSize="5" fontWeight="bold" textAnchor="middle" fontFamily="serif">M★B</text>
+          </g>
+        )}
+
+        {/* 4. PONCHO V1 */}
+        {pieceId === 'poncho-v1' && (
+          <g className="transition-all duration-500">
+            {/* Draped Cape Body */}
+            <path d="M 160 45 L 265 160 L 160 215 L 55 160 Z" fill="url(#primary3D)" stroke="#080C06" strokeWidth="2.5" />
+            <path d="M 160 45 L 265 160 L 160 215 L 55 160 Z" fill="url(#crochetTexture)" />
+
+            {/* Neck Collar */}
+            <path d="M 130 45 C 140 70, 180 70, 190 45 Z" fill="url(#secondary3D)" stroke="#080C06" strokeWidth="1.5" />
+
+            {/* Bottom Fringe Border */}
+            <path d="M 55 160 L 160 215 L 265 160 L 258 172 L 160 227 L 62 172 Z" fill="url(#secondary3D)" stroke="#080C06" strokeWidth="1.5" />
+
+            {/* Star Brooch Detail */}
+            <polygon points="160,52 162.5,58 168,58 163.5,61 165.5,67 160,63 154.5,67 156.5,61 152,58 157.5,58" fill="url(#goldGradient)" />
+          </g>
+        )}
+
+        {/* 5. ALMOFADA H2B */}
+        {pieceId === 'decor-h2b' && (
+          <g className="transition-all duration-500">
+            {/* Outer Frame Border */}
+            <rect x="65" y="45" width="190" height="160" rx="20" fill="url(#secondary3D)" stroke="#080C06" strokeWidth="2.5" />
+            {/* Inner Center Cushion Pattern */}
+            <rect x="88" y="65" width="144" height="120" rx="12" fill="url(#primary3D)" stroke="#080C06" strokeWidth="1.5" />
+            <rect x="88" y="65" width="144" height="120" rx="12" fill="url(#crochetTexture)" />
 
             {/* Corner Tassels */}
-            <circle cx="60" cy="40" r="6" fill="url(#goldGradient)" />
-            <circle cx="240" cy="40" r="6" fill="url(#goldGradient)" />
-            <circle cx="60" cy="195" r="6" fill="url(#goldGradient)" />
-            <circle cx="240" cy="195" r="6" fill="url(#goldGradient)" />
+            <circle cx="65" cy="45" r="6.5" fill="url(#goldGradient)" />
+            <circle cx="255" cy="45" r="6.5" fill="url(#goldGradient)" />
+            <circle cx="65" cy="205" r="6.5" fill="url(#goldGradient)" />
+            <circle cx="255" cy="205" r="6.5" fill="url(#goldGradient)" />
+
+            {/* Center Leather Patch */}
+            <rect x="148" y="115" width="24" height="10" rx="2" fill="url(#leatherGradient)" stroke="#8F723B" strokeWidth="0.8" />
+            <text x="160" y="122" fill="#E6CA85" fontSize="5" fontWeight="bold" textAnchor="middle" fontFamily="serif">M★BRAVO</text>
           </g>
         )}
       </svg>
 
-      {/* Floating Tag Overlay */}
-      <div className="absolute bottom-2.5 left-3 right-3 flex items-center justify-between text-[10px] font-mono bg-black/60 backdrop-blur-md px-3 py-1.5 rounded-xl border border-white/10 text-cream">
-        <div className="flex items-center gap-1.5">
-          <span className="w-2 h-2 rounded-full border" style={{ backgroundColor: pColor }} />
-          <span className="text-[#D4C3A3] font-sans font-medium line-clamp-1">
-            {isBicolor ? `Corpo: ${primaryYarn.name.split(' ')[0]}` : primaryYarn.name}
+      {/* Floating Canvas Tag Bar */}
+      <div className="absolute bottom-2.5 left-3 right-3 flex items-center justify-between text-[10px] font-mono bg-black/70 backdrop-blur-md px-3 py-1.5 rounded-xl border border-white/10 text-cream">
+        <div className="flex items-center gap-1.5 min-w-0">
+          <span className="w-2.5 h-2.5 rounded-full border shrink-0" style={{ backgroundColor: pColor }} />
+          <span className="text-[#D4C3A3] font-sans font-medium truncate">
+            {isBicolor ? `Corpo: ${primaryYarn.shortName}` : primaryYarn.shortName}
           </span>
         </div>
         {isBicolor && (
-          <div className="flex items-center gap-1.5">
-            <span className="w-2 h-2 rounded-full border" style={{ backgroundColor: sColor }} />
-            <span className="text-[#C5A059] font-sans font-medium line-clamp-1">
-              Destaque: {secondaryYarn.name.split(' ')[0]}
+          <div className="flex items-center gap-1.5 min-w-0 shrink-0">
+            <span className="w-2.5 h-2.5 rounded-full border shrink-0" style={{ backgroundColor: sColor }} />
+            <span className="text-[#C5A059] font-sans font-medium truncate">
+              Destaque: {secondaryYarn.shortName}
             </span>
           </div>
         )}
@@ -271,10 +434,10 @@ export const AtelierPrivateStudioModal: React.FC<AtelierPrivateStudioModalProps>
   isOpen,
   onClose
 }) => {
-  const [selectedPiece, setSelectedPiece] = useState(CUSTOM_PIECE_TYPES[0]);
+  const [selectedPiece, setSelectedPiece] = useState(CUSTOM_PIECE_TYPES[0]); // Cardigan Alma
   const [primaryYarn, setPrimaryYarn] = useState(YARN_PALETTES[1]); // Verde Floresta
-  const [secondaryYarn, setSecondaryYarn] = useState(YARN_PALETTES[0]); // Cru Natural
-  const [isBicolor, setIsBicolor] = useState(true); // Default to Bicolor multi-zone for rich customization
+  const [secondaryYarn, setSecondaryYarn] = useState(YARN_PALETTES[0]); // Natural
+  const [isBicolor, setIsBicolor] = useState(true); // Default Bicolor Multi-Zona
   const [selectedHardware, setSelectedHardware] = useState(HARDWARE_OPTIONS[0]);
   const [customNotes, setCustomNotes] = useState('');
   const [clientName, setClientName] = useState('');
@@ -283,12 +446,15 @@ export const AtelierPrivateStudioModal: React.FC<AtelierPrivateStudioModalProps>
 
   if (!isOpen) return null;
 
+  // Calculate real specs & budget using Admin Calculator formulas
+  const specs = calculatePieceSpecs(selectedPiece, isBicolor, selectedHardware);
+
   // Palette string representation
   const paletteText = isBicolor 
     ? `${primaryYarn.name} (Corpo) + ${secondaryYarn.name} (Destaque)`
     : primaryYarn.name;
 
-  // Generate creative passports text for WhatsApp
+  // Generate formatted WhatsApp Passaporte Criativo text
   const generateWhatsAppMessage = () => {
     const namePart = clientName.trim() ? `O meu nome é ${clientName.trim()}. ` : '';
     const notesPart = customNotes.trim() ? ` | Notas: "${customNotes.trim()}"` : '';
@@ -297,7 +463,7 @@ export const AtelierPrivateStudioModal: React.FC<AtelierPrivateStudioModalProps>
 ✦ Peça: ${selectedPiece.name}
 ✦ Paleta (${isBicolor ? 'Bicolor Multi-Zona' : 'Monocolor'}): ${paletteText}
 ✦ Detalhes/Acabamento: ${selectedHardware.name}
-✦ Dedicação Estimada: ~${selectedPiece.baseHours}h de confeção manual (${selectedPiece.baseEstimate})${notesPart}
+✦ Dedicação Estimada: ~${specs.hours}h de confeção manual (${specs.budgetRange})${notesPart}
 
 Gostaria de agendar a minha sessão privada de design com a Carolina.`;
   };
@@ -315,8 +481,9 @@ Gostaria de agendar a minha sessão privada de design com a Carolina.`;
       secondaryYarn: isBicolor ? secondaryYarn.name : '',
       isBicolor: isBicolor,
       hardware: selectedHardware.name,
-      estimatedHours: selectedPiece.baseHours,
-      estimatedPrice: selectedPiece.baseEstimate,
+      estimatedHours: `~${specs.hours} Horas`,
+      estimatedBudget: specs.budgetRange,
+      estimatedPrice: specs.budgetRange,
       notes: customNotes.trim()
     };
 
@@ -326,13 +493,13 @@ Gostaria de agendar a minha sessão privada de design com a Carolina.`;
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(passaporteCriativo)
-      }).catch(err => console.warn('[PRIVATE STUDIO API] Non-blocking submit notice:', err));
+      }).catch(err => console.warn('[PRIVATE STUDIO API] Submit notice:', err));
 
       const existing = JSON.parse(localStorage.getItem('mbravo_creative_passports') || '[]');
       existing.unshift(passaporteCriativo);
       localStorage.setItem('mbravo_creative_passports', JSON.stringify(existing.slice(0, 20)));
     } catch (err) {
-      console.warn('[PRIVATE STUDIO] Local storage save notice:', err);
+      console.warn('[PRIVATE STUDIO] Storage save notice:', err);
     }
 
     // 2. Open WhatsApp with structured message
@@ -384,7 +551,7 @@ Gostaria de agendar a minha sessão privada de design com a Carolina.`;
                 Atelier Private Studio
               </h2>
               <p className="text-xs text-[#D4C3A3]/80 font-sans mt-1">
-                Customize a sua peça com o simulador visual dinâmico e agende uma consultoria privada com Carolina Bravo.
+                Customize a sua peça com as matérias-primas reais M★BRAVO e agende a sua consultoria privada com a Carolina.
               </p>
             </div>
 
@@ -440,11 +607,11 @@ Gostaria de agendar a minha sessão privada de design com a Carolina.`;
                       Simulação Visual em Tempo Real
                     </span>
                     <span className="text-[9px] uppercase tracking-wider text-[#D4C3A3]/60 font-mono">
-                      {isBicolor ? 'Bicolor' : 'Monocolor'}
+                      {isBicolor ? 'Bicolor Multi-Zona' : 'Monocolor'}
                     </span>
                   </div>
 
-                  {/* Visualizer Canvas */}
+                  {/* Visualizer Canvas Component */}
                   <PieceVisualizerSVG 
                     pieceId={selectedPiece.id}
                     primaryYarn={primaryYarn}
@@ -453,27 +620,34 @@ Gostaria de agendar a minha sessão privada de design com a Carolina.`;
                     hardware={selectedHardware}
                   />
 
-                  {/* Real-time Summary Badge */}
-                  <div className="bg-[#1C2A15]/80 border border-[#C5A059]/30 rounded-2xl p-3.5 space-y-2 backdrop-blur-md text-left">
+                  {/* Real-time Summary Badge (Integrated Admin Pricing Formula) */}
+                  <div className="bg-[#1C2A15]/80 border border-[#C5A059]/30 rounded-2xl p-3.5 space-y-2.5 backdrop-blur-md text-left">
                     <div className="flex items-center justify-between border-b border-[#C5A059]/20 pb-2">
                       <span className="text-[10px] uppercase tracking-[0.2em] font-bold text-[#C5A059] flex items-center gap-1.5">
                         <ShieldCheck size={14} />
-                        Especificações da Peça
+                        Cálculo do Atelier (Calculadora Admin)
                       </span>
-                      <span className="text-[10px] font-mono text-[#D4C3A3]/70">
-                        {selectedPiece.name.split(' ')[0]}
+                      <span className="text-[10px] font-mono text-[#D4C3A3]/80 font-semibold">
+                        {selectedPiece.shortName}
                       </span>
                     </div>
 
                     <div className="grid grid-cols-2 gap-2 text-xs">
                       <div>
-                        <span className="block text-[9px] uppercase tracking-wider text-[#D4C3A3]/60">Dedicação</span>
-                        <span className="font-serif italic font-bold text-[#F5EEDC]">~{selectedPiece.baseHours} Horas Manuais</span>
+                        <span className="block text-[9px] uppercase tracking-wider text-[#D4C3A3]/60">Dedicação Artesanal</span>
+                        <span className="font-serif italic font-bold text-[#F5EEDC]">~{specs.hours} Horas Manuais</span>
                       </div>
                       <div>
-                        <span className="block text-[9px] uppercase tracking-wider text-[#D4C3A3]/60">Estimativa</span>
-                        <span className="font-serif italic font-bold text-[#C5A059]">{selectedPiece.baseEstimate}</span>
+                        <span className="block text-[9px] uppercase tracking-wider text-[#D4C3A3]/60">Estimativa Orçamento</span>
+                        <span className="font-serif italic font-bold text-[#C5A059]">{specs.budgetRange}</span>
                       </div>
+                    </div>
+
+                    <div className="pt-2 border-t border-white/10 flex items-center justify-between text-[10px] text-[#D4C3A3]/70 font-sans">
+                      <span className="flex items-center gap-1">
+                        <Award size={11} className="text-[#C5A059]" /> 100% Confecção Nacional
+                      </span>
+                      <span>Prazo: {selectedPiece.leadTime}</span>
                     </div>
                   </div>
                 </div>
@@ -484,7 +658,7 @@ Gostaria de agendar a minha sessão privada de design com a Carolina.`;
                   {/* 1. Escolha do Tipo de Peça */}
                   <div>
                     <label className="block text-[11px] uppercase tracking-[0.2em] font-sans font-bold text-[#C5A059] mb-2">
-                      1. Selecione a Tipologia de Peça
+                      1. Selecione a Tipologia do Catálogo M★BRAVO
                     </label>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                       {CUSTOM_PIECE_TYPES.map((piece) => {
@@ -505,12 +679,15 @@ Gostaria de agendar a minha sessão privada de design com a Carolina.`;
                               </span>
                               {isSelected && <Check size={14} className="text-[#C5A059]" />}
                             </div>
-                            <div className="flex items-center gap-2 text-[10px] text-[#D4C3A3]/70 font-sans mt-1">
+                            <p className="text-[10px] text-[#D4C3A3]/70 font-sans mt-1 line-clamp-1">
+                              {piece.desc}
+                            </p>
+                            <div className="flex items-center gap-2 text-[10px] text-[#C5A059] font-sans font-medium mt-1">
                               <span className="flex items-center gap-1">
-                                <Clock size={10} className="text-[#C5A059]" /> ~{piece.baseHours}h
+                                <Clock size={10} /> ~{piece.baseHours}h
                               </span>
                               <span>•</span>
-                              <span>{piece.baseEstimate}</span>
+                              <span>Desde {piece.basePrice}€</span>
                             </div>
                           </div>
                         );
@@ -518,12 +695,12 @@ Gostaria de agendar a minha sessão privada de design com a Carolina.`;
                     </div>
                   </div>
 
-                  {/* 2. Toggle Modo de Cor (Monocolor vs Bicolor) */}
-                  <div className="bg-white/5 p-3 rounded-2xl border border-white/10 space-y-3">
+                  {/* 2. Toggle Modo de Cor (Monocolor vs Bicolor Multi-Zona) */}
+                  <div className="bg-white/5 p-3.5 rounded-2xl border border-white/10 space-y-3.5">
                     <div className="flex items-center justify-between">
                       <label className="text-[11px] uppercase tracking-[0.2em] font-sans font-bold text-[#C5A059] flex items-center gap-1.5">
                         <Layers size={13} />
-                        2. Combinação de Cores & Zonas
+                        2. Fios de Algodão (DROPS Safran & Paris)
                       </label>
                       
                       {/* Toggle Buttons */}
@@ -548,7 +725,7 @@ Gostaria de agendar a minha sessão privada de design com a Carolina.`;
                               : 'text-[#D4C3A3]/60 hover:text-[#F5EEDC]'
                           }`}
                         >
-                          Bicolor (Multi-Zona)
+                          Bicolor Multi-Zona
                         </button>
                       </div>
                     </div>
@@ -557,18 +734,19 @@ Gostaria de agendar a minha sessão privada de design com a Carolina.`;
                     <div className="space-y-1.5">
                       <div className="flex items-center justify-between text-[10px] text-[#D4C3A3]">
                         <span className="font-bold uppercase tracking-wider text-[#C5A059]">
-                          {isBicolor ? '✦ Cor Principal (Corpo / Base)' : '✦ Cor da Peça'}
+                          {isBicolor ? '✦ Cor Principal (Corpo / Base)' : '✦ Cor Principal da Peça'}
                         </span>
                         <span className="font-serif italic text-[#F5EEDC]">{primaryYarn.name}</span>
                       </div>
-                      <div className="grid grid-cols-5 gap-1.5">
+                      <div className="grid grid-cols-4 sm:grid-cols-8 gap-1.5">
                         {YARN_PALETTES.map((yarn) => {
                           const isSelected = primaryYarn.id === yarn.id;
                           return (
                             <div
                               key={`p-${yarn.id}`}
                               onClick={() => setPrimaryYarn(yarn)}
-                              className={`p-2 rounded-xl border text-center cursor-pointer transition-all flex flex-col items-center gap-1 ${
+                              title={`${yarn.name} — ${yarn.desc}`}
+                              className={`p-1.5 rounded-xl border text-center cursor-pointer transition-all flex flex-col items-center gap-1 ${
                                 isSelected
                                   ? 'bg-[#1C2A15] border-[#C5A059] ring-1 ring-[#C5A059]'
                                   : 'bg-black/20 border-white/10 hover:border-[#C5A059]/40'
@@ -579,11 +757,11 @@ Gostaria de agendar a minha sessão privada de design com a Carolina.`;
                                 style={{ 
                                   backgroundColor: yarn.hex, 
                                   borderColor: yarn.borderHex,
-                                  transform: isSelected ? 'scale(1.15)' : 'scale(1)'
+                                  transform: isSelected ? 'scale(1.18)' : 'scale(1)'
                                 }}
                               />
-                              <span className="text-[9px] font-sans text-[#F5EEDC] line-clamp-1 leading-tight font-medium">
-                                {yarn.name.split(' ')[0]}
+                              <span className="text-[8px] font-sans text-[#F5EEDC] line-clamp-1 leading-tight font-medium">
+                                {yarn.shortName.split(' ')[1] || yarn.shortName}
                               </span>
                             </div>
                           );
@@ -605,14 +783,15 @@ Gostaria de agendar a minha sessão privada de design com a Carolina.`;
                           </span>
                           <span className="font-serif italic text-[#F5EEDC]">{secondaryYarn.name}</span>
                         </div>
-                        <div className="grid grid-cols-5 gap-1.5">
+                        <div className="grid grid-cols-4 sm:grid-cols-8 gap-1.5">
                           {YARN_PALETTES.map((yarn) => {
                             const isSelected = secondaryYarn.id === yarn.id;
                             return (
                               <div
                                 key={`s-${yarn.id}`}
                                 onClick={() => setSecondaryYarn(yarn)}
-                                className={`p-2 rounded-xl border text-center cursor-pointer transition-all flex flex-col items-center gap-1 ${
+                                title={`${yarn.name} — ${yarn.desc}`}
+                                className={`p-1.5 rounded-xl border text-center cursor-pointer transition-all flex flex-col items-center gap-1 ${
                                   isSelected
                                     ? 'bg-[#1C2A15] border-[#C5A059] ring-1 ring-[#C5A059]'
                                     : 'bg-black/20 border-white/10 hover:border-[#C5A059]/40'
@@ -623,11 +802,11 @@ Gostaria de agendar a minha sessão privada de design com a Carolina.`;
                                   style={{ 
                                     backgroundColor: yarn.hex, 
                                     borderColor: yarn.borderHex,
-                                    transform: isSelected ? 'scale(1.15)' : 'scale(1)'
+                                    transform: isSelected ? 'scale(1.18)' : 'scale(1)'
                                   }}
                                 />
-                                <span className="text-[9px] font-sans text-[#F5EEDC] line-clamp-1 leading-tight font-medium">
-                                  {yarn.name.split(' ')[0]}
+                                <span className="text-[8px] font-sans text-[#F5EEDC] line-clamp-1 leading-tight font-medium">
+                                  {yarn.shortName.split(' ')[1] || yarn.shortName}
                                 </span>
                               </div>
                             );
@@ -640,7 +819,7 @@ Gostaria de agendar a minha sessão privada de design com a Carolina.`;
                   {/* 3. Estilo de Acabamento & Ferragens */}
                   <div>
                     <label className="block text-[11px] uppercase tracking-[0.2em] font-sans font-bold text-[#C5A059] mb-2">
-                      3. Detalhes & Ferragens do Atelier
+                      3. Acabamentos & Ferragens do Atelier
                     </label>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                       {HARDWARE_OPTIONS.map((hw) => {
@@ -649,14 +828,24 @@ Gostaria de agendar a minha sessão privada de design com a Carolina.`;
                           <div
                             key={hw.id}
                             onClick={() => setSelectedHardware(hw)}
-                            className={`p-2.5 px-3 rounded-xl border text-left cursor-pointer transition-all flex items-center justify-between text-xs ${
+                            className={`p-3 rounded-xl border text-left cursor-pointer transition-all ${
                               isSelected
-                                ? 'bg-[#1C2A15] border-[#C5A059] text-[#F5EEDC] font-medium'
+                                ? 'bg-[#1C2A15] border-[#C5A059] text-[#F5EEDC] ring-1 ring-[#C5A059]'
                                 : 'bg-white/5 border-white/10 text-[#D4C3A3]/80 hover:border-[#C5A059]/40'
                             }`}
                           >
-                            <span className="line-clamp-1">{hw.name}</span>
-                            {isSelected && <Check size={14} className="text-[#C5A059] shrink-0" />}
+                            <div className="flex items-center justify-between text-xs font-semibold text-[#F5EEDC]">
+                              <span className="line-clamp-1">{hw.shortName}</span>
+                              {isSelected && <Check size={14} className="text-[#C5A059] shrink-0" />}
+                            </div>
+                            <p className="text-[10px] text-[#D4C3A3]/60 font-sans mt-0.5 line-clamp-1">
+                              {hw.desc}
+                            </p>
+                            {hw.extraCost > 0 && (
+                              <span className="inline-block mt-1 text-[9px] font-mono text-[#C5A059] font-bold">
+                                +{hw.extraCost}.00€ no orçamento
+                              </span>
+                            )}
                           </div>
                         );
                       })}
@@ -683,7 +872,7 @@ Gostaria de agendar a minha sessão privada de design com a Carolina.`;
                       </label>
                       <input
                         type="text"
-                        placeholder="Ex: Para casamento em Outubro, tons terrosos..."
+                        placeholder="Ex: Para evento em Outubro, tons terrosos..."
                         value={customNotes}
                         onChange={(e) => setCustomNotes(e.target.value)}
                         className="w-full bg-white/5 border border-white/15 rounded-xl px-3 py-2 text-xs text-[#F5EEDC] placeholder-[#D4C3A3]/40 focus:outline-none focus:border-[#C5A059]"
