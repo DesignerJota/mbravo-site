@@ -7,7 +7,7 @@ import {
   Package, ChevronRight, AlertTriangle, ShieldCheck, Plus,
   Download, ClipboardList, Trash, Trash2, Ban, Edit, Save, Check, EyeOff, Layers, Settings,
   BarChart3, Percent, TrendingUp, ArrowUpRight, Instagram,
-  Tag, Scissors, Disc, Box
+  Tag, Scissors, Disc, Box, Palette, Sparkles, MessageCircle
 } from 'lucide-react';
 const API_BASE_URL = import.meta.env.VITE_API_URL || '';
 
@@ -303,11 +303,17 @@ export default function AdminDashboardModal({ onClose, shopCategories = [] }: Ad
   const [isCreatingManual, setIsCreatingManual] = useState(false);
 
   // Audit Logs states
-  const [activeTab, setActiveTab] = useState<'orders' | 'logs' | 'catalog' | 'inventory' | 'analytics'>('analytics');
+  const [activeTab, setActiveTab] = useState<'orders' | 'logs' | 'catalog' | 'inventory' | 'analytics' | 'passports'>('analytics');
   const [logs, setLogs] = useState<any[]>([]);
   const [loadingLogs, setLoadingLogs] = useState(false);
   const [logsError, setLogsError] = useState<string | null>(null);
   const [logSearchQuery, setLogSearchQuery] = useState('');
+
+  // Private Studio Passports states
+  const [passports, setPassports] = useState<any[]>([]);
+  const [loadingPassports, setLoadingPassports] = useState(false);
+  const [passportsError, setPassportsError] = useState<string | null>(null);
+  const [passportSearchQuery, setPassportSearchQuery] = useState('');
 
   // CMS Catalog states
   const [catalog, setCatalog] = useState<any[]>([]);
@@ -809,10 +815,11 @@ export default function AdminDashboardModal({ onClose, shopCategories = [] }: Ad
         setOrders(data.orders || []);
         setPassword(savedPass);
         setIsAuthenticated(true);
-        // Also load logs, catalog and inventory
+        // Also load logs, catalog, inventory and passports
         fetchLogs(savedPass);
         fetchCatalog(savedPass);
         fetchInventory(savedPass);
+        fetchPassports(savedPass);
       } else {
         localStorage.removeItem('mbravo_admin_password');
       }
@@ -843,6 +850,7 @@ export default function AdminDashboardModal({ onClose, shopCategories = [] }: Ad
         fetchOrders(password);
         fetchCatalog(password);
         fetchInventory(password);
+        fetchPassports(password);
       } else {
         setLoginError(data.error || 'Palavra-passe incorreta. Tente novamente.');
       }
@@ -850,6 +858,26 @@ export default function AdminDashboardModal({ onClose, shopCategories = [] }: Ad
       setLoginError('Erro de conexão ao servidor administrativo.');
     } finally {
       setIsLoggingIn(false);
+    }
+  };
+
+  const fetchPassports = async (activePass = password) => {
+    setLoadingPassports(true);
+    setPassportsError(null);
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/admin/passports`, {
+        headers: { 'x-admin-password': activePass }
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        setPassports(data.passports || []);
+      } else {
+        setPassportsError(data.error || 'Erro ao carregar os Passaportes Criativos.');
+      }
+    } catch (err) {
+      setPassportsError('Não foi possível carregar os Passaportes Criativos.');
+    } finally {
+      setLoadingPassports(false);
     }
   };
 
@@ -942,6 +970,7 @@ export default function AdminDashboardModal({ onClose, shopCategories = [] }: Ad
         fetchLogs(activePass);
         fetchCatalog(activePass);
         fetchInventory(activePass);
+        fetchPassports(activePass);
       } else {
         setOrdersError(data.error || 'Erro ao carregar as encomendas.');
       }
@@ -1447,9 +1476,32 @@ export default function AdminDashboardModal({ onClose, shopCategories = [] }: Ad
                   >
                     <ClipboardList className="w-3.5 h-3.5 shrink-0" /> Auditoria
                   </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setActiveTab('passports');
+                      fetchPassports();
+                    }}
+                    className={`px-2.5 sm:px-3.5 py-1.5 sm:py-2 rounded-lg font-semibold text-[10px] sm:text-xs tracking-wider transition-all uppercase flex items-center gap-1.5 sm:gap-2 cursor-pointer shrink-0 whitespace-nowrap ${
+                      activeTab === 'passports'
+                        ? 'bg-[#243119] text-cream shadow-sm font-bold'
+                        : 'text-forest/60 hover:text-forest hover:bg-cream/50'
+                    }`}
+                  >
+                    <Palette className="w-3.5 h-3.5 shrink-0 text-[#C5A059]" /> Passaportes Criativos
+                  </button>
                 </div>
 
                 <div className="flex items-center gap-2 sm:gap-3 w-full sm:w-auto">
+                  {activeTab === 'passports' && (
+                    <button
+                      type="button"
+                      onClick={() => fetchPassports()}
+                      className="w-full sm:w-auto justify-center px-3.5 sm:px-4 py-2 sm:py-2.5 rounded-xl text-[11px] sm:text-xs tracking-wider font-bold transition-all bg-[#BACAA5] hover:bg-[#a3b38e] text-[#243119] flex items-center gap-2 shadow-sm uppercase cursor-pointer"
+                    >
+                      <RefreshCw className={`w-3.5 h-3.5 ${loadingPassports ? 'animate-spin' : ''}`} /> Atualizar Passaportes
+                    </button>
+                  )}
                   {activeTab === 'orders' && (
                     <button
                       type="button"
@@ -4638,6 +4690,164 @@ export default function AdminDashboardModal({ onClose, shopCategories = [] }: Ad
                       </div>
                     </div>
                   </div>
+                </div>
+              )}
+
+              {/* ATELIER PRIVATE STUDIO - PASSAPORTES CRIATIVOS TAB */}
+              {activeTab === 'passports' && (
+                <div className="space-y-6 text-left">
+                  {/* Top Info Banner */}
+                  <div className="bg-gradient-to-r from-[#243119] via-[#2d3d20] to-[#1f2b15] text-cream p-5 sm:p-6 rounded-[20px] shadow-md border border-[#C5A059]/30 relative overflow-hidden flex flex-col md:flex-row md:items-center justify-between gap-4">
+                    <div className="space-y-1 z-10 max-w-2xl">
+                      <div className="flex items-center gap-2">
+                        <Sparkles className="w-4 h-4 text-[#C5A059]" />
+                        <span className="text-[10px] font-bold uppercase tracking-widest text-[#C5A059]">Atelier Private Studio</span>
+                      </div>
+                      <h3 className="font-serif text-lg sm:text-xl font-medium tracking-tight text-white">
+                        Passaportes Criativos & Co-Criações Sob Medida
+                      </h3>
+                      <p className="text-xs text-cream/70 font-sans leading-relaxed">
+                        Consulte os moodboards, especificações e paletas de fios submetidas pelas clientes antes de cada sessão de consultoria privada com a Carolina Bravo.
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-2 shrink-0 z-10">
+                      <div className="bg-white/10 backdrop-blur-md px-4 py-2 rounded-xl border border-white/10 text-center">
+                        <span className="text-[9px] uppercase tracking-wider text-cream/60 font-mono block">Total Registado</span>
+                        <span className="font-serif text-lg font-bold text-[#C5A059]">{passports.length} {passports.length === 1 ? 'Passaporte' : 'Passaportes'}</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Search Bar */}
+                  <div className="bg-white border border-forest/5 p-4 rounded-[16px] shadow-sm flex flex-col sm:flex-row items-center justify-between gap-3">
+                    <div className="relative flex-1 w-full">
+                      <Search className="absolute left-3.5 top-3 w-4 h-4 text-forest/35" />
+                      <input
+                        type="text"
+                        placeholder="Pesquisar por Cliente, Peça, Fio ou Referência..."
+                        value={passportSearchQuery}
+                        onChange={(e) => setPassportSearchQuery(e.target.value)}
+                        className="w-full bg-cream/20 border border-forest/10 focus:border-[#C5A059] focus:outline-none rounded-xl pl-10 pr-4 py-2.5 text-xs transition-all"
+                      />
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => fetchPassports()}
+                      className="px-3.5 py-2.5 bg-forest/5 hover:bg-forest/10 text-forest rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-all shrink-0 cursor-pointer"
+                    >
+                      <RefreshCw className={`w-3.5 h-3.5 ${loadingPassports ? 'animate-spin' : ''}`} /> Atualizar
+                    </button>
+                  </div>
+
+                  {/* Passports List Grid */}
+                  {loadingPassports ? (
+                    <div className="py-20 text-center space-y-3">
+                      <RefreshCw className="w-8 h-8 animate-spin text-[#C5A059] mx-auto" />
+                      <p className="text-xs text-forest/50 font-sans">A carregar Passaportes Criativos do Atelier...</p>
+                    </div>
+                  ) : passportsError ? (
+                    <div className="bg-red-50 text-red-800 border border-red-200 p-4 rounded-xl text-xs text-center space-y-2">
+                      <p>{passportsError}</p>
+                      <button onClick={() => fetchPassports()} className="font-bold underline text-red-950 cursor-pointer">
+                        Tentar novamente
+                      </button>
+                    </div>
+                  ) : (
+                    (() => {
+                      const filteredPassports = passports.filter(p => {
+                        if (!passportSearchQuery) return true;
+                        const q = passportSearchQuery.toLowerCase();
+                        return (
+                          (p.id || '').toLowerCase().includes(q) ||
+                          (p.clientName || '').toLowerCase().includes(q) ||
+                          (p.pieceType || '').toLowerCase().includes(q) ||
+                          (p.notes || '').toLowerCase().includes(q)
+                        );
+                      });
+
+                      if (filteredPassports.length === 0) {
+                        return (
+                          <div className="bg-white border border-forest/5 p-12 rounded-[20px] text-center space-y-3 shadow-sm">
+                            <Palette className="w-10 h-10 text-[#C5A059]/40 mx-auto" />
+                            <h4 className="font-serif text-base font-medium text-forest">Nenhum Passaporte Encontrado</h4>
+                            <p className="text-xs text-forest/50 max-w-md mx-auto font-sans">
+                              {passportSearchQuery ? 'Não existem passaportes que correspondam à sua pesquisa.' : 'Ainda não foram registados Passaportes Criativos através do Cartão Digital ou Site.'}
+                            </p>
+                          </div>
+                        );
+                      }
+
+                      return (
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          {filteredPassports.map((p: any) => (
+                            <div key={p.id} className="bg-white border border-forest/10 p-5 rounded-[20px] shadow-sm space-y-4 hover:border-[#C5A059]/40 transition-all text-left flex flex-col justify-between">
+                              <div className="space-y-3">
+                                {/* Card Header */}
+                                <div className="flex items-start justify-between gap-2 border-b border-forest/5 pb-3">
+                                  <div>
+                                    <span className="text-[9px] font-mono font-bold uppercase tracking-widest text-[#C5A059] bg-[#FCF8F2] border border-[#C5A059]/20 px-2 py-0.5 rounded-md inline-block">
+                                      {p.id}
+                                    </span>
+                                    <h4 className="font-serif text-base font-bold text-forest mt-1.5">{p.clientName || 'Cliente sem nome'}</h4>
+                                    <span className="text-[10px] text-forest/40 font-mono block">
+                                      {p.createdAt ? new Date(p.createdAt).toLocaleString('pt-PT', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : 'Data n/d'}
+                                    </span>
+                                  </div>
+                                  <span className="text-xs font-bold text-forest/80 bg-forest/5 px-3 py-1 rounded-full border border-forest/10">
+                                    {p.pieceType || 'Sob Medida'}
+                                  </span>
+                                </div>
+
+                                {/* Spec Grid */}
+                                <div className="grid grid-cols-2 gap-2 text-xs">
+                                  <div className="bg-[#FCFBF9] border border-forest/5 p-2.5 rounded-xl space-y-0.5">
+                                    <span className="text-[9px] uppercase font-bold text-forest/40 block">Paleta / Cor</span>
+                                    <span className="font-medium text-forest font-sans">{p.yarnPalette || 'Não especificado'}</span>
+                                  </div>
+                                  <div className="bg-[#FCFBF9] border border-forest/5 p-2.5 rounded-xl space-y-0.5">
+                                    <span className="text-[9px] uppercase font-bold text-forest/40 block">Hardware / Acabamento</span>
+                                    <span className="font-medium text-forest font-sans">{p.hardware || 'Não especificado'}</span>
+                                  </div>
+                                  <div className="bg-[#FCFBF9] border border-forest/5 p-2.5 rounded-xl space-y-0.5">
+                                    <span className="text-[9px] uppercase font-bold text-forest/40 block">Dedicação Manual</span>
+                                    <span className="font-bold text-[#C5A059] font-serif">{p.estimatedHours || '~20 Horas'}</span>
+                                  </div>
+                                  <div className="bg-[#FCFBF9] border border-forest/5 p-2.5 rounded-xl space-y-0.5">
+                                    <span className="text-[9px] uppercase font-bold text-forest/40 block">Estimativa Orçamento</span>
+                                    <span className="font-bold text-forest font-serif">{p.estimatedBudget || '45€ - 85€'}</span>
+                                  </div>
+                                </div>
+
+                                {/* Notes / Moodboard */}
+                                {p.notes && (
+                                  <div className="bg-[#FCF8F2] border border-[#C5A059]/15 p-3 rounded-xl space-y-1">
+                                    <span className="text-[9px] font-bold uppercase tracking-wider text-[#C5A059] block">Inspiração / Notas da Cliente:</span>
+                                    <p className="text-xs text-forest/80 italic font-serif leading-relaxed">"{p.notes}"</p>
+                                  </div>
+                                )}
+                              </div>
+
+                              {/* Footer Actions */}
+                              <div className="pt-3 border-t border-forest/5 flex items-center justify-between gap-2">
+                                <span className="text-[9px] text-forest/40 font-mono">
+                                  Passaporte Pronto para Consultoria
+                                </span>
+                                <a
+                                  href={`https://wa.me/351917827458?text=${encodeURIComponent(`Olá ${p.clientName || 'Cliente'}! Fala a Carolina Bravo da M★BRAVO. Recebi o seu Passaporte Criativo ${p.id} (${p.pieceType}) e gostaria de agendar a nossa sessão privada de design!`)}`}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="px-3 py-1.5 bg-[#25D366] hover:bg-[#20bd5a] text-white rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all shadow-xs cursor-pointer"
+                                >
+                                  <MessageCircle className="w-3.5 h-3.5" />
+                                  Contactar via WhatsApp
+                                </a>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      );
+                    })()
+                  )}
                 </div>
               )}
 
