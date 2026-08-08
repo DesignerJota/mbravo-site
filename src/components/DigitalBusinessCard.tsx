@@ -17,8 +17,11 @@ import {
   Users,
   QrCode,
   X,
-  Copy
+  Copy,
+  Palette
 } from 'lucide-react';
+import qrCodeImg from '../assets/qr-code.webp';
+import AtelierPrivateStudioModal from './AtelierPrivateStudioModal';
 
 interface DigitalBusinessCardProps {
   onNavigateHome?: () => void;
@@ -30,6 +33,7 @@ export const DigitalBusinessCard: React.FC<DigitalBusinessCardProps> = ({ onNavi
   const [vCardDownloaded, setVCardDownloaded] = useState(false);
   const [showQrModal, setShowQrModal] = useState(false);
   const [modalCopied, setModalCopied] = useState(false);
+  const [showPrivateStudioModal, setShowPrivateStudioModal] = useState(false);
 
   // 1. Validated vCard download (.vcf) formatted for iOS & Android Contacts
   const handleDownloadVCard = () => {
@@ -319,11 +323,35 @@ END:VCARD`;
             </span>
           </motion.button>
 
-          {/* 3. Atendimento Privado via WhatsApp */}
+          {/* 3. Atelier Private Studio (Co-Criação & Encomenda Sob Medida) */}
+          <motion.button
+            initial={{ y: 15, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: 0.46, duration: 0.7 }}
+            onClick={() => setShowPrivateStudioModal(true)}
+            className="group relative w-full py-3.5 px-4 sm:px-5 rounded-2xl bg-gradient-to-r from-[#1C2A15] via-[#2A3E20] to-[#1C2A15] hover:from-[#24361C] hover:to-[#24361C] backdrop-blur-xl border border-[#C5A059]/60 hover:border-[#C5A059] shadow-[0_4px_24px_rgba(197,160,89,0.2)] transition-all duration-300 hover:scale-[1.015] active:scale-[0.985] cursor-pointer flex items-center justify-between text-left"
+          >
+            <div className="flex items-center gap-3.5 z-10">
+              <div className="w-10 h-10 rounded-xl bg-[#C5A059]/20 border border-[#C5A059]/50 flex items-center justify-center shrink-0 text-[#C5A059] group-hover:bg-[#C5A059] group-hover:text-[#121A0D] transition-colors">
+                <Palette size={18} />
+              </div>
+              <div>
+                <span className="block text-[9px] uppercase tracking-[0.25em] font-sans font-extrabold text-[#C5A059]">
+                  ✦ PRIVATE STUDIO & CO-CRIAÇÃO
+                </span>
+                <span className="block font-serif italic text-base sm:text-lg font-medium text-[#F5EEDC] group-hover:text-[#C5A059] transition-colors">
+                  Criar Passaporte & Agendar Sessão
+                </span>
+              </div>
+            </div>
+            <Sparkles size={16} className="text-[#C5A059] group-hover:rotate-12 transition-transform shrink-0 z-10" />
+          </motion.button>
+
+          {/* 4. Atendimento Privado via WhatsApp */}
           <motion.a
             initial={{ y: 15, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
-            transition={{ delay: 0.49, duration: 0.7 }}
+            transition={{ delay: 0.52, duration: 0.7 }}
             href="https://wa.me/351912828182?text=Ol%C3%A1%20Carolina%2C%20gostaria%20de%20saber%20mais%20sobre%20as%20pe%C3%A7as%20M%E2%98%85BRAVO."
             target="_blank"
             rel="noopener noreferrer"
@@ -375,37 +403,11 @@ END:VCARD`;
             </span>
           </motion.a>
 
-          {/* 5. QR Code de Partilha (Modal Conecta-te com a M★BRAVO) */}
-          <motion.button
-            initial={{ y: 15, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ delay: 0.60, duration: 0.7 }}
-            onClick={() => setShowQrModal(true)}
-            className="group relative w-full py-3.5 px-4 sm:px-5 rounded-2xl bg-[#1C2A15]/80 hover:bg-[#24361C]/90 backdrop-blur-xl border border-[#C5A059]/40 hover:border-[#C5A059] shadow-[0_4px_20px_rgba(0,0,0,0.3)] transition-all duration-300 hover:scale-[1.01] active:scale-[0.99] cursor-pointer flex items-center justify-between text-left"
-          >
-            <div className="flex items-center gap-3.5">
-              <div className="w-10 h-10 rounded-xl bg-[#C5A059]/15 border border-[#C5A059]/40 flex items-center justify-center shrink-0 text-[#C5A059] group-hover:bg-[#C5A059] group-hover:text-[#121A0D] transition-colors">
-                <QrCode size={18} />
-              </div>
-              <div>
-                <span className="block text-[9px] uppercase tracking-[0.2em] font-sans font-semibold text-[#D4C3A3]/70">
-                  PARTILHA RÁPIDA
-                </span>
-                <span className="block font-serif italic text-base sm:text-lg font-medium text-[#F5EEDC] group-hover:text-[#C5A059] transition-colors">
-                  Mostrar QR Code de Partilha
-                </span>
-              </div>
-            </div>
-            <span className="text-[#C5A059] text-xs font-sans tracking-widest opacity-80 group-hover:translate-x-1 transition-transform">
-              ✦
-            </span>
-          </motion.button>
-
-          {/* 6. Pinterest Oficial */}
+          {/* 5. Pinterest Oficial */}
           <motion.a
             initial={{ y: 15, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
-            transition={{ delay: 0.65, duration: 0.7 }}
+            transition={{ delay: 0.63, duration: 0.7 }}
             href="https://www.pinterest.com/mbravobycarolina/"
             target="_blank"
             rel="noopener noreferrer"
@@ -429,11 +431,11 @@ END:VCARD`;
             </span>
           </motion.a>
 
-          {/* 7. Google / Avaliações & Perfil da Marca */}
+          {/* 6. Google / Avaliações & Perfil da Marca */}
           <motion.a
             initial={{ y: 15, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
-            transition={{ delay: 0.72, duration: 0.7 }}
+            transition={{ delay: 0.70, duration: 0.7 }}
             href="https://g.page/r/Cdo7JGP_Xpc3EBM/review"
             target="_blank"
             rel="noopener noreferrer"
@@ -555,7 +557,7 @@ END:VCARD`;
               {/* Header Title */}
               <div className="mt-2 mb-4">
                 <span className="text-[10px] uppercase tracking-[0.3em] font-sans font-semibold text-[#C5A059] block mb-1">
-                  ✦ CARTÃO DIGITAL M★BRAVO ✦
+                  CARTÃO DE VISITA DIGITAL
                 </span>
                 <h2 
                   style={{ fontFamily: "'Cormorant Garamond', serif" }}
@@ -563,53 +565,18 @@ END:VCARD`;
                 >
                   Conecta-te com a M★BRAVO
                 </h2>
-                <p className="text-xs text-[#D4C3A3]/70 font-sans mt-1 max-w-[260px] mx-auto leading-relaxed">
-                  Aaponta a câmara do telemóvel ao código para acederes instantaneamente ao nosso cartão de visita.
+                <p className="text-xs text-[#D4C3A3]/70 font-sans mt-1.5 max-w-[270px] mx-auto leading-relaxed">
+                  Aponta a câmara do teu telemóvel para o código para acederes aos contactos e à história do Atelier.
                 </p>
               </div>
 
-              {/* High Quality Luxury QR Code Frame */}
-              <div className="relative my-5 mx-auto w-52 h-52 p-3 bg-[#F5EEDC] rounded-2xl shadow-[0_10px_30px_rgba(197,160,89,0.25)] border-2 border-[#C5A059] flex items-center justify-center overflow-hidden">
-                <svg className="w-full h-full text-[#121A0D]" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  {/* Outer Background Quiet Zone */}
-                  <rect width="200" height="200" fill="#F5EEDC" />
-                  
-                  {/* Top Left Finder Pattern */}
-                  <rect x="15" y="15" width="50" height="50" rx="6" fill="#121A0D" />
-                  <rect x="23" y="23" width="34" height="34" rx="3" fill="#F5EEDC" />
-                  <rect x="30" y="30" width="20" height="20" rx="2" fill="#121A0D" />
-
-                  {/* Top Right Finder Pattern */}
-                  <rect x="135" y="15" width="50" height="50" rx="6" fill="#121A0D" />
-                  <rect x="143" y="23" width="34" height="34" rx="3" fill="#F5EEDC" />
-                  <rect x="150" y="30" width="20" height="20" rx="2" fill="#121A0D" />
-
-                  {/* Bottom Left Finder Pattern */}
-                  <rect x="15" y="135" width="50" height="50" rx="6" fill="#121A0D" />
-                  <rect x="23" y="143" width="34" height="34" rx="3" fill="#F5EEDC" />
-                  <rect x="30" y="150" width="20" height="20" rx="2" fill="#121A0D" />
-
-                  {/* QR Data Pattern Cells for https://mbravobycarolina.com/card */}
-                  <path d="
-                    M 75 15 h 10 v 10 h -10 z M 95 15 h 10 v 10 h -10 z M 115 15 h 10 v 10 h -10 z
-                    M 75 35 h 10 v 10 h -10 z M 105 35 h 10 v 10 h -10 z M 115 35 h 10 v 10 h -10 z
-                    M 85 55 h 10 v 10 h -10 z M 95 55 h 10 v 10 h -10 z M 115 55 h 10 v 10 h -10 z
-                    M 15 75 h 10 v 10 h -10 z M 35 75 h 10 v 10 h -10 z M 55 75 h 10 v 10 h -10 z M 75 75 h 10 v 10 h -10 z M 95 75 h 10 v 10 h -10 z M 115 75 h 10 v 10 h -10 z M 135 75 h 10 v 10 h -10 z M 155 75 h 10 v 10 h -10 z M 175 75 h 10 v 10 h -10 z
-                    M 25 85 h 10 v 10 h -10 z M 45 85 h 10 v 10 h -10 z M 65 85 h 10 v 10 h -10 z M 85 85 h 10 v 10 h -10 z M 125 85 h 10 v 10 h -10 z M 145 85 h 10 v 10 h -10 z M 165 85 h 10 v 10 h -10 z
-                    M 15 95 h 10 v 10 h -10 z M 35 95 h 10 v 10 h -10 z M 75 95 h 10 v 10 h -10 z M 115 95 h 10 v 10 h -10 z M 135 95 h 10 v 10 h -10 z M 155 95 h 10 v 10 h -10 z M 175 95 h 10 v 10 h -10 z
-                    M 25 105 h 10 v 10 h -10 z M 55 105 h 10 v 10 h -10 z M 85 105 h 10 v 10 h -10 z M 105 105 h 10 v 10 h -10 z M 125 105 h 10 v 10 h -10 z M 165 105 h 10 v 10 h -10 z
-                    M 15 115 h 10 v 10 h -10 z M 35 115 h 10 v 10 h -10 z M 65 115 h 10 v 10 h -10 z M 75 115 h 10 v 10 h -10 z M 95 115 h 10 v 10 h -10 z M 115 115 h 10 v 10 h -10 z M 135 115 h 10 v 10 h -10 z M 155 115 h 10 v 10 h -10 z M 175 115 h 10 v 10 h -10 z
-                    M 75 135 h 10 v 10 h -10 z M 95 135 h 10 v 10 h -10 z M 115 135 h 10 v 10 h -10 z M 135 135 h 10 v 10 h -10 z M 155 135 h 10 v 10 h -10 z
-                    M 85 145 h 10 v 10 h -10 z M 105 145 h 10 v 10 h -10 z M 125 145 h 10 v 10 h -10 z M 165 145 h 10 v 10 h -10 z
-                    M 75 155 h 10 v 10 h -10 z M 95 155 h 10 v 10 h -10 z M 115 155 h 10 v 10 h -10 z M 135 155 h 10 v 10 h -10 z M 175 155 h 10 v 10 h -10 z
-                    M 85 165 h 10 v 10 h -10 z M 105 165 h 10 v 10 h -10 z M 145 165 h 10 v 10 h -10 z M 165 165 h 10 v 10 h -10 z
-                    M 75 175 h 10 v 10 h -10 z M 95 175 h 10 v 10 h -10 z M 115 175 h 10 v 10 h -10 z M 135 175 h 10 v 10 h -10 z M 155 175 h 10 v 10 h -10 z M 175 175 h 10 v 10 h -10 z
-                  " fill="#121A0D" />
-
-                  {/* Center Brand Emblem Badge */}
-                  <rect x="80" y="80" width="40" height="40" rx="8" fill="#121A0D" stroke="#C5A059" strokeWidth="2" />
-                  <text x="100" y="105" textAnchor="middle" fill="#C5A059" fontSize="20" fontWeight="bold">★</text>
-                </svg>
+              {/* High Quality Official QR Code Frame */}
+              <div className="relative my-5 mx-auto w-52 h-52 p-2.5 bg-white rounded-2xl shadow-[0_10px_30px_rgba(197,160,89,0.25)] border-2 border-[#C5A059] flex items-center justify-center overflow-hidden">
+                <img 
+                  src={qrCodeImg} 
+                  alt="QR Code M★BRAVO" 
+                  className="w-full h-full object-contain rounded-xl"
+                />
               </div>
 
               {/* Direct Link Copy Button */}
@@ -630,6 +597,12 @@ END:VCARD`;
           </div>
         )}
       </AnimatePresence>
+
+      {/* Atelier Private Studio Modal */}
+      <AtelierPrivateStudioModal
+        isOpen={showPrivateStudioModal}
+        onClose={() => setShowPrivateStudioModal(false)}
+      />
     </div>
   );
 };
