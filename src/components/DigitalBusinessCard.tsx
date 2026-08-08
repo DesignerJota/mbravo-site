@@ -20,7 +20,6 @@ import {
   Copy,
   Palette
 } from 'lucide-react';
-import qrCodeImg from '../assets/qr-code.webp';
 import AtelierPrivateStudioModal from './AtelierPrivateStudioModal';
 
 interface DigitalBusinessCardProps {
@@ -573,7 +572,7 @@ END:VCARD`;
               {/* High Quality Official QR Code Frame */}
               <div className="relative my-5 mx-auto w-52 h-52 p-2.5 bg-white rounded-2xl shadow-[0_10px_30px_rgba(197,160,89,0.25)] border-2 border-[#C5A059] flex items-center justify-center overflow-hidden">
                 <img 
-                  src={qrCodeImg} 
+                  src="/qr-code.webp" 
                   alt="QR Code M★BRAVO" 
                   className="w-full h-full object-contain rounded-xl"
                 />
