@@ -73,7 +73,7 @@ export const YARN_COLORS_DATABASE: YarnColor[] = [
     refCode: 'Ref. 18',
     name: 'Natural',
     colorHex: '#F5EFEB',
-    swatchUrl: '/safran-18.webp',
+    swatchUrl: '/swatches/safran-18.webp',
     textureType: 'cotton-fine'
   },
   {
@@ -82,7 +82,7 @@ export const YARN_COLORS_DATABASE: YarnColor[] = [
     refCode: 'Ref. 17',
     name: 'Branco',
     colorHex: '#FFFFFF',
-    swatchUrl: '/safran-17.webp',
+    swatchUrl: '/swatches/safran-17.webp',
     textureType: 'cotton-fine'
   },
   {
@@ -91,7 +91,7 @@ export const YARN_COLORS_DATABASE: YarnColor[] = [
     refCode: 'Ref. 68',
     name: 'Café',
     colorHex: '#4A3525',
-    swatchUrl: '/safran-68.webp',
+    swatchUrl: '/swatches/safran-68.webp',
     textureType: 'cotton-fine'
   },
   {
@@ -100,7 +100,7 @@ export const YARN_COLORS_DATABASE: YarnColor[] = [
     refCode: 'Ref. 01',
     name: 'Rosa do Deserto',
     colorHex: '#E2A9B0',
-    swatchUrl: '/safran-01.webp',
+    swatchUrl: '/swatches/safran-01.webp',
     textureType: 'cotton-fine'
   },
   {
@@ -109,7 +109,7 @@ export const YARN_COLORS_DATABASE: YarnColor[] = [
     refCode: 'Ref. 78',
     name: 'Verde Floresta',
     colorHex: '#2D442B',
-    swatchUrl: '/safran-78.webp',
+    swatchUrl: '/swatches/safran-78.webp',
     textureType: 'cotton-fine'
   },
   {
@@ -118,7 +118,7 @@ export const YARN_COLORS_DATABASE: YarnColor[] = [
     refCode: 'Ref. 60',
     name: 'Verde Musgo',
     colorHex: '#485935',
-    swatchUrl: '/safran-60.webp',
+    swatchUrl: '/swatches/safran-60.webp',
     textureType: 'cotton-fine'
   },
   {
@@ -127,7 +127,7 @@ export const YARN_COLORS_DATABASE: YarnColor[] = [
     refCode: 'Ref. 73',
     name: 'Azul Cobalto',
     colorHex: '#1E3862',
-    swatchUrl: '/safran-73.webp',
+    swatchUrl: '/swatches/safran-73.webp',
     textureType: 'cotton-fine'
   },
   {
@@ -136,7 +136,7 @@ export const YARN_COLORS_DATABASE: YarnColor[] = [
     refCode: 'Ref. 50',
     name: 'Menta',
     colorHex: '#9AC4B5',
-    swatchUrl: '/safran-50.webp',
+    swatchUrl: '/swatches/safran-50.webp',
     textureType: 'cotton-fine'
   },
   {
@@ -145,7 +145,7 @@ export const YARN_COLORS_DATABASE: YarnColor[] = [
     refCode: 'Ref. 19',
     name: 'Vermelho',
     colorHex: '#B8252A',
-    swatchUrl: '/safran-19.webp',
+    swatchUrl: '/swatches/safran-19.webp',
     textureType: 'cotton-fine'
   },
   {
@@ -154,7 +154,7 @@ export const YARN_COLORS_DATABASE: YarnColor[] = [
     refCode: 'Ref. 76',
     name: 'Azul Pó',
     colorHex: '#A0B4C8',
-    swatchUrl: '/safran-76.webp',
+    swatchUrl: '/swatches/safran-76.webp',
     textureType: 'cotton-fine'
   },
   {
@@ -163,7 +163,7 @@ export const YARN_COLORS_DATABASE: YarnColor[] = [
     refCode: 'Ref. 57',
     name: 'Rosa Claríssimo',
     colorHex: '#F2D3D8',
-    swatchUrl: '/safran-57.webp',
+    swatchUrl: '/swatches/safran-57.webp',
     textureType: 'cotton-fine'
   },
 
@@ -174,7 +174,7 @@ export const YARN_COLORS_DATABASE: YarnColor[] = [
     refCode: 'Ref. 16',
     name: 'Branco',
     colorHex: '#FAFAFA',
-    swatchUrl: '/paris-16.webp',
+    swatchUrl: '/swatches/paris-16.webp',
     textureType: 'cotton-thick'
   },
   {
@@ -183,7 +183,7 @@ export const YARN_COLORS_DATABASE: YarnColor[] = [
     refCode: 'Ref. 43',
     name: 'Verde',
     colorHex: '#355E3B',
-    swatchUrl: '/paris-43.webp',
+    swatchUrl: '/swatches/paris-43.webp',
     textureType: 'cotton-thick'
   },
   {
@@ -192,7 +192,7 @@ export const YARN_COLORS_DATABASE: YarnColor[] = [
     refCode: 'Ref. 25',
     name: 'Verde Musgo',
     colorHex: '#485935',
-    swatchUrl: '/paris-25.webp',
+    swatchUrl: '/swatches/paris-25.webp',
     textureType: 'cotton-thick'
   },
   {
@@ -201,7 +201,7 @@ export const YARN_COLORS_DATABASE: YarnColor[] = [
     refCode: 'Ref. 48',
     name: 'Petróleo',
     colorHex: '#2C4D59',
-    swatchUrl: '/paris-48.webp',
+    swatchUrl: '/swatches/paris-48.webp',
     textureType: 'cotton-thick'
   },
   {
@@ -210,7 +210,7 @@ export const YARN_COLORS_DATABASE: YarnColor[] = [
     refCode: 'Ref. 76',
     name: 'Azul Ternura',
     colorHex: '#89AEC6',
-    swatchUrl: '/paris-76.webp',
+    swatchUrl: '/swatches/paris-76.webp',
     textureType: 'cotton-thick'
   },
   {
@@ -219,7 +219,7 @@ export const YARN_COLORS_DATABASE: YarnColor[] = [
     refCode: 'Ref. 57',
     name: 'Rosa Claríssimo',
     colorHex: '#F2D3D8',
-    swatchUrl: '/paris-57.webp',
+    swatchUrl: '/swatches/paris-57.webp',
     textureType: 'cotton-thick'
   },
   {
@@ -228,7 +228,7 @@ export const YARN_COLORS_DATABASE: YarnColor[] = [
     refCode: 'Ref. 35',
     name: 'Baunilha',
     colorHex: '#F3E2B8',
-    swatchUrl: '/paris-35.webp',
+    swatchUrl: '/swatches/paris-35.webp',
     textureType: 'cotton-thick'
   },
   {
@@ -237,7 +237,7 @@ export const YARN_COLORS_DATABASE: YarnColor[] = [
     refCode: 'Ref. 19',
     name: 'Amarelo Claro',
     colorHex: '#F9E086',
-    swatchUrl: '/paris-19.webp',
+    swatchUrl: '/swatches/paris-19.webp',
     textureType: 'cotton-thick'
   },
   {
@@ -246,7 +246,7 @@ export const YARN_COLORS_DATABASE: YarnColor[] = [
     refCode: 'Ref. 44',
     name: 'Castanho',
     colorHex: '#5C4033',
-    swatchUrl: '/paris-44.webp',
+    swatchUrl: '/swatches/paris-44.webp',
     textureType: 'cotton-thick'
   },
   {
@@ -255,7 +255,7 @@ export const YARN_COLORS_DATABASE: YarnColor[] = [
     refCode: 'Ref. 12',
     name: 'Vermelho',
     colorHex: '#C41E3A',
-    swatchUrl: '/paris-12.webp',
+    swatchUrl: '/swatches/paris-12.webp',
     textureType: 'cotton-thick'
   },
   {
@@ -264,7 +264,7 @@ export const YARN_COLORS_DATABASE: YarnColor[] = [
     refCode: 'Ref. 15',
     name: 'Preto',
     colorHex: '#121212',
-    swatchUrl: '/paris-15.webp',
+    swatchUrl: '/swatches/paris-15.webp',
     textureType: 'cotton-thick'
   },
   {
@@ -273,7 +273,7 @@ export const YARN_COLORS_DATABASE: YarnColor[] = [
     refCode: 'Ref. 17',
     name: 'Natural',
     colorHex: '#F0EAD6',
-    swatchUrl: '/paris-17.webp',
+    swatchUrl: '/swatches/paris-17.webp',
     textureType: 'cotton-thick'
   }
 ];
