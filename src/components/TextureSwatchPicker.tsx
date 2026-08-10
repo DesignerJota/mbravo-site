@@ -157,7 +157,7 @@ export const TextureSwatchPicker: React.FC<TextureSwatchPickerProps> = ({
       <div className="grid grid-cols-5 sm:grid-cols-6 md:grid-cols-8 gap-2 relative">
         {swatchList.map((swatch) => {
           // Comparação normalizada para evitar falsas seleções múltiplas
-          const isSelected = cleanSelectedName.toLowerCase() === swatch.name.toLowerCase() || getCleanColorName(selectedColor).toLowerCase() === swatch.name.toLowerCase();
+          const isSelected = cleanSelectedName.trim().toLowerCase() === swatch.name.trim().toLowerCase();
           const isOOS = isColorOutOfStock(swatch.name, swatch);
           const rawImgUrl = swatch.swatchUrl || swatch.imageUrl;
 
