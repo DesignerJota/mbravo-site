@@ -112,6 +112,12 @@ export const TextureSwatchPicker: React.FC<TextureSwatchPickerProps> = ({
     setHoverPos({ x, y });
   };
 
+  // Helper para normalizar o caminho da imagem de forma segura
+  const getImageUrl = (url?: string) => {
+    if (!url) return '';
+    return url.startsWith('/') ? url : `/${url}`;
+  };
+
   return (
     <div className="space-y-2.5 w-full font-sans text-left">
       {/* Header Label + Selected Color Clean Name & OOS Tag */}
@@ -150,8 +156,10 @@ export const TextureSwatchPicker: React.FC<TextureSwatchPickerProps> = ({
       {/* Swatch Selection Grid */}
       <div className="grid grid-cols-5 sm:grid-cols-6 md:grid-cols-8 gap-2 relative">
         {swatchList.map((swatch) => {
-          const isSelected = getCleanColorName(selectedColor) === swatch.name || selectedColor === swatch.name;
+          // Comparação normalizada para evitar falsas seleções múltiplas
+          const isSelected = cleanSelectedName.toLowerCase() === swatch.name.toLowerCase() || getCleanColorName(selectedColor).toLowerCase() === swatch.name.toLowerCase();
           const isOOS = isColorOutOfStock(swatch.name, swatch);
+          const rawImgUrl = swatch.swatchUrl || swatch.imageUrl;
 
           return (
             <motion.div
@@ -184,9 +192,9 @@ export const TextureSwatchPicker: React.FC<TextureSwatchPickerProps> = ({
                 className="w-full h-full relative overflow-hidden bg-[#FAF8F5]"
                 style={{ backgroundColor: swatch.colorHex || '#D8C3A5' }}
               >
-                {(swatch.swatchUrl || swatch.imageUrl) && (
+                {rawImgUrl && (
                   <img
-                    src={swatch.swatchUrl || swatch.imageUrl}
+                    src={getImageUrl(rawImgUrl)}
                     alt={swatch.name}
                     loading="eager"
                     decoding="async"
@@ -263,7 +271,7 @@ export const TextureSwatchPicker: React.FC<TextureSwatchPickerProps> = ({
                 style={{
                   backgroundColor: hoveredSwatch.colorHex,
                   backgroundImage: (hoveredSwatch.imageUrl || hoveredSwatch.swatchUrl)
-                    ? `url("${hoveredSwatch.imageUrl || hoveredSwatch.swatchUrl}")`
+                    ? `url("${getImageUrl(hoveredSwatch.imageUrl || hoveredSwatch.swatchUrl)}")`
                     : 'none',
                   backgroundSize: '300%',
                   backgroundPosition: `${hoverPos.x}% ${hoverPos.y}%`
@@ -310,4 +318,3 @@ export const TextureSwatchPicker: React.FC<TextureSwatchPickerProps> = ({
     </div>
   );
 };
-
