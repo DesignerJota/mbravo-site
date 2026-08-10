@@ -1,7 +1,7 @@
 // /src/components/TextureSwatchPicker.tsx
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Sparkles, ZoomIn, Check, Ban, AlertCircle } from 'lucide-react';
+import { Sparkles, ZoomIn, Check, Ban, AlertCircle, X } from 'lucide-react';
 import { YARN_COLORS_DATABASE, YARN_LINES, YarnColor, getCleanColorName, findYarnColor } from '../data/yarns';
 import { getColorSwatchBg } from '../translations';
 
@@ -41,7 +41,10 @@ export const TextureSwatchPicker: React.FC<TextureSwatchPickerProps> = ({
     const clean = getCleanColorName(swatchName).toLowerCase();
     
     // Check yarnStockMap
-    if (yarnStockMap[clean] === false || yarnStockMap[swatchName] === false) return true;
+    if (yarnStockMap[clean] === false || yarnStockMap[swatchName] === false || yarnStockMap[swatchName.toLowerCase()] === false) return true;
+    if (swatchItem) {
+      if (yarnStockMap[swatchItem.id] === false || yarnStockMap[swatchItem.name.toLowerCase()] === false) return true;
+    }
     
     // Check outOfStockColors list
     return outOfStockColors.some(oos => {
@@ -50,12 +53,14 @@ export const TextureSwatchPicker: React.FC<TextureSwatchPickerProps> = ({
     });
   }, [outOfStockColors, yarnStockMap]);
 
-  // Filter swatches by yarnLineId or options provided
+  // Filter & strictly deduplicate swatches by yarnLineId or options provided
   const swatchList: YarnColor[] = React.useMemo(() => {
     // 1. Get database colors for the yarn line if yarnLineId is specified
     const lineColors = yarnLineId 
       ? YARN_COLORS_DATABASE.filter(item => item.yarnLineId === yarnLineId)
       : [];
+
+    let rawList: YarnColor[] = [];
 
     if (availableOptions && availableOptions.length > 0) {
       const mappedOptions = availableOptions.map(opt => {
@@ -65,39 +70,52 @@ export const TextureSwatchPicker: React.FC<TextureSwatchPickerProps> = ({
           return {
             ...found,
             name: found.name || clean,
-            swatchUrl: found.swatchUrl || found.imageUrl || (yarnLineId === 'drops-paris' ? '/paris-17.webp' : '/safran-18.webp')
+            swatchUrl: found.swatchUrl || found.imageUrl || (yarnLineId === 'drops-paris' ? '/swatches/paris-17.webp' : '/swatches/safran-18.webp')
           };
         }
         return {
-          id: `custom-${clean}`,
+          id: `custom-${clean.toLowerCase().replace(/\s+/g, '-')}`,
           yarnLineId: yarnLineId || 'drops-safran',
           refCode: '',
           name: clean,
           colorHex: getColorSwatchBg(opt),
-          swatchUrl: yarnLineId === 'drops-paris' ? '/paris-17.webp' : '/safran-18.webp',
+          swatchUrl: yarnLineId === 'drops-paris' ? '/swatches/paris-17.webp' : '/swatches/safran-18.webp',
           textureType: 'cotton-fine',
           inStock: true
         } as YarnColor;
       });
 
-      // If yarnLineId is set, merge lineColors into mappedOptions so ALL yarn line colors are present
+      rawList = [...mappedOptions];
+
+      // If yarnLineId is set, merge lineColors into rawList so ALL yarn line colors are present
       if (lineColors.length > 0) {
-        const fullList = [...mappedOptions];
         lineColors.forEach(lc => {
-          if (!fullList.some(item => item.id === lc.id || item.name.toLowerCase() === lc.name.toLowerCase())) {
-            fullList.push(lc);
-          }
+          rawList.push(lc);
         });
-        return fullList;
       }
-      return mappedOptions;
+    } else if (lineColors.length > 0) {
+      rawList = lineColors;
+    } else {
+      rawList = YARN_COLORS_DATABASE;
     }
 
-    if (lineColors.length > 0) {
-      return lineColors;
+    // Deduplicate strictly by normalized clean name AND by ID
+    const uniqueList: YarnColor[] = [];
+    const seenIds = new Set<string>();
+    const seenNames = new Set<string>();
+
+    for (const item of rawList) {
+      const cleanName = getCleanColorName(item.name).trim().toLowerCase();
+      const normId = item.id.trim().toLowerCase();
+
+      if (!seenNames.has(cleanName) && !seenIds.has(normId)) {
+        seenNames.add(cleanName);
+        seenIds.add(normId);
+        uniqueList.push(item);
+      }
     }
 
-    return YARN_COLORS_DATABASE;
+    return uniqueList;
   }, [availableOptions, yarnLineId]);
 
   const cleanSelectedName = getCleanColorName(selectedColor);
@@ -211,14 +229,13 @@ export const TextureSwatchPicker: React.FC<TextureSwatchPickerProps> = ({
               {/* Tactile Overlay Pattern */}
               <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-black/10 pointer-events-none" />
 
-              {/* OUT OF STOCK Visual Indicator: Red Diagonal Strike-Through & Banner */}
+              {/* OUT OF STOCK Visual Indicator: Red Overlay with X Icon & Indisponível Banner */}
               {isOOS && (
-                <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                  {/* Subtle Diagonal Line */}
-                  <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-red-600/70 to-transparent w-full h-[2px] rotate-45 top-1/2 -translate-y-1/2 shadow-xs" />
-                  <div className="absolute inset-0 bg-black/40 backdrop-blur-[0.5px]" />
-                  <div className="z-10 bg-red-950/80 text-red-200 text-[7px] font-bold px-1 py-0.2 rounded uppercase tracking-tighter border border-red-500/30 flex items-center gap-0.5">
-                    <Ban size={7} /> {lang === 'pt' ? 'ESGOTADO' : 'OOS'}
+                <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none z-10">
+                  <div className="absolute inset-0 bg-black/55 backdrop-blur-[0.5px]" />
+                  <div className="z-10 bg-red-950/90 text-red-100 text-[6.5px] sm:text-[7.5px] font-bold px-1 py-0.5 rounded uppercase tracking-tighter border border-red-500/40 flex items-center gap-0.5 shadow-md">
+                    <X size={9} strokeWidth={2.5} className="text-red-400 shrink-0" />
+                    <span>{lang === 'pt' ? 'Indisponível' : 'Out of Stock'}</span>
                   </div>
                 </div>
               )}
