@@ -9,6 +9,7 @@ import {
   BarChart3, Percent, TrendingUp, ArrowUpRight, Instagram,
   Tag, Scissors, Disc, Box, Palette, Sparkles, MessageCircle
 } from 'lucide-react';
+import { findYarnColor } from '../data/yarns';
 const API_BASE_URL = import.meta.env.VITE_API_URL || '';
 
 // Strict email validation checking standard format
@@ -225,17 +226,30 @@ function YarnSwatch({ id, name, size = 'w-7 h-7' }: { id?: string; name?: string
   }
 
   const swatch = getYarnSwatchColor(id, name);
+  const yarnMatch = findYarnColor(name || id || '');
+  const swatchImgUrl = yarnMatch ? (yarnMatch.swatchUrl || yarnMatch.imageUrl) : '';
+
   return (
     <span
       className={`${size} ${radiusClass} shrink-0 inline-block align-middle shadow-2xs relative overflow-hidden border`}
       style={{
         backgroundColor: swatch.bg,
-        borderColor: swatch.border || 'rgba(0,0,0,0.12)',
-        backgroundImage: 'linear-gradient(135deg, rgba(255,255,255,0.15) 0%, rgba(0,0,0,0.04) 100%)'
+        borderColor: swatch.border || 'rgba(0,0,0,0.12)'
       }}
       title={name || id}
     >
-      <span className="absolute inset-0 opacity-5 bg-[radial-gradient(#000_1px,transparent_1px)] [background-size:3px_3px] pointer-events-none" />
+      {swatchImgUrl ? (
+        <img
+          src={swatchImgUrl}
+          alt={name || id || ''}
+          className="w-full h-full object-cover transition-transform duration-300 hover:scale-110"
+          onError={(e) => {
+            (e.currentTarget as HTMLImageElement).style.display = 'none';
+          }}
+        />
+      ) : (
+        <span className="absolute inset-0 opacity-10 bg-[radial-gradient(#000_1px,transparent_1px)] [background-size:3px_3px] pointer-events-none" />
+      )}
     </span>
   );
 }
@@ -265,6 +279,7 @@ export default function AdminDashboardModal({ onClose, shopCategories = [] }: Ad
 
   // Manual Order states
   const [showManualForm, setShowManualForm] = useState(false);
+  const [editingOrderModal, setEditingOrderModal] = useState<any | null>(null);
   const [manualForm, setManualForm] = useState({
     selectedProductId: '',
     productName: '',
@@ -1201,6 +1216,45 @@ export default function AdminDashboardModal({ onClose, shopCategories = [] }: Ad
     }
   };
 
+  const handleSaveEditOrder = async (updatedOrder: any) => {
+    setActionLoading(prev => ({ ...prev, [updatedOrder.orderId]: true }));
+    setActionSuccess(prev => ({ ...prev, [updatedOrder.orderId]: '' }));
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/admin/orders/update`, {
+        method: 'POST',
+        headers: { 
+          'Content-Type': 'application/json',
+          'x-admin-password': password
+        },
+        body: JSON.stringify({
+          orderId: updatedOrder.orderId,
+          productName: updatedOrder.productName,
+          price: updatedOrder.price,
+          customer: updatedOrder.customer,
+          paymentMethod: updatedOrder.paymentMethod,
+          status: updatedOrder.status,
+          priority: updatedOrder.priority,
+          selections: updatedOrder.selections,
+          accessories: updatedOrder.accessories,
+          notes: updatedOrder.notes
+        })
+      });
+      
+      const data = await res.json();
+      if (res.ok && data.success) {
+        setActionSuccess(prev => ({ ...prev, [updatedOrder.orderId]: 'Venda / Encomenda atualizada com sucesso!' }));
+        setEditingOrderModal(null);
+        fetchOrders();
+      } else {
+        alert(data.error || 'Erro ao guardar alterações.');
+      }
+    } catch (err) {
+      alert('Erro de conexão ao guardar alterações.');
+    } finally {
+      setActionLoading(prev => ({ ...prev, [updatedOrder.orderId]: false }));
+    }
+  };
+
   // Helper to parse price string or number (e.g. "50.00€", "50€", or 16) to number
   const parsePrice = (priceVal: any): number => {
     if (priceVal === null || priceVal === undefined || priceVal === '') return 0;
@@ -1679,100 +1733,121 @@ export default function AdminDashboardModal({ onClose, shopCategories = [] }: Ad
                       <label className="font-bold uppercase tracking-wider text-[10px] text-forest/50">Cor & Variação *</label>
                       
                       {manualForm.corType === 'bicolor' ? (
-                        <div className="grid grid-cols-2 gap-2">
-                          <div>
-                            <span className="text-[9px] uppercase tracking-wider text-forest/40 block mb-0.5 font-bold">
-                              {selectedProductObj && selectedProductObj.name.toLowerCase().includes('african flower pouch') ? 'Cor da Base' : 'Cor Principal'}
-                            </span>
-                            <select
-                              value={manualForm.corPrincipal}
-                              onChange={(e) => setManualForm(prev => ({ ...prev, corPrincipal: e.target.value }))}
-                              className="w-full bg-white border border-forest/15 rounded-xl px-2.5 py-2 focus:outline-none focus:border-[#C5A059] text-xs font-medium"
-                            >
-                              <optgroup label="DROPS Safran (100% Algodão Egípcio · 50g/160m · Agulha 3mm)">
-                                {safranYarns.map((item: any) => (
-                                  <option key={`p_saf_${item.id}`} value={item.name}>
-                                    {item.name} ({item.quantity} {item.unit || 'novelos'})
-                                  </option>
-                                ))}
-                              </optgroup>
-                              <optgroup label="DROPS Paris (100% Algodão Reciclado · 50g/75m · Agulha 5mm)">
-                                {parisYarns.map((item: any) => (
-                                  <option key={`p_par_${item.id}`} value={item.name}>
-                                    {item.name} ({item.quantity} {item.unit || 'novelos'})
-                                  </option>
-                                ))}
-                              </optgroup>
-                              {otherProductColors.length > 0 && (
-                                <optgroup label="Outras Cores / Variações">
-                                  {otherProductColors.map(c => (
-                                    <option key={`p_oth_${c}`} value={c}>{c}</option>
+                        <div className="space-y-1.5">
+                          <div className="grid grid-cols-2 gap-2">
+                            <div>
+                              <span className="text-[9px] uppercase tracking-wider text-forest/40 block mb-0.5 font-bold">
+                                {selectedProductObj && selectedProductObj.name.toLowerCase().includes('african flower pouch') ? 'Cor da Base' : 'Cor Principal'}
+                              </span>
+                              <select
+                                value={manualForm.corPrincipal}
+                                onChange={(e) => setManualForm(prev => ({ ...prev, corPrincipal: e.target.value }))}
+                                className="w-full bg-white border border-forest/15 rounded-xl px-2.5 py-2 focus:outline-none focus:border-[#C5A059] text-xs font-medium"
+                              >
+                                <optgroup label="DROPS Safran (100% Algodão Egípcio · 50g/160m · Agulha 3mm)">
+                                  {safranYarns.map((item: any) => (
+                                    <option key={`p_saf_${item.id}`} value={item.name}>
+                                      {item.name} ({item.quantity} {item.unit || 'novelos'})
+                                    </option>
                                   ))}
                                 </optgroup>
-                              )}
-                            </select>
+                                <optgroup label="DROPS Paris (100% Algodão Reciclado · 50g/75m · Agulha 5mm)">
+                                  {parisYarns.map((item: any) => (
+                                    <option key={`p_par_${item.id}`} value={item.name}>
+                                      {item.name} ({item.quantity} {item.unit || 'novelos'})
+                                    </option>
+                                  ))}
+                                </optgroup>
+                                {otherProductColors.length > 0 && (
+                                  <optgroup label="Outras Cores / Variações">
+                                    {otherProductColors.map(c => (
+                                      <option key={`p_oth_${c}`} value={c}>{c}</option>
+                                    ))}
+                                  </optgroup>
+                                )}
+                              </select>
+                            </div>
+                            <div>
+                              <span className="text-[9px] uppercase tracking-wider text-forest/40 block mb-0.5 font-bold">
+                                {selectedProductObj && selectedProductObj.name.toLowerCase().includes('african flower pouch') ? 'Cor do Detalhe' : 'Cor do Cordão/Detalhe'}
+                              </span>
+                              <select
+                                value={manualForm.corDetalhe}
+                                onChange={(e) => setManualForm(prev => ({ ...prev, corDetalhe: e.target.value }))}
+                                className="w-full bg-white border border-forest/15 rounded-xl px-2.5 py-2 focus:outline-none focus:border-[#C5A059] text-xs font-medium"
+                              >
+                                <optgroup label="DROPS Safran (100% Algodão Egípcio · 50g/160m · Agulha 3mm)">
+                                  {safranYarns.map((item: any) => (
+                                    <option key={`d_saf_${item.id}`} value={item.name}>
+                                      {item.name} ({item.quantity} {item.unit || 'novelos'})
+                                    </option>
+                                  ))}
+                                </optgroup>
+                                <optgroup label="DROPS Paris (100% Algodão Reciclado · 50g/75m · Agulha 5mm)">
+                                  {parisYarns.map((item: any) => (
+                                    <option key={`d_par_${item.id}`} value={item.name}>
+                                      {item.name} ({item.quantity} {item.unit || 'novelos'})
+                                    </option>
+                                  ))}
+                                </optgroup>
+                                {otherProductColors.length > 0 && (
+                                  <optgroup label="Outras Cores / Variações">
+                                    {otherProductColors.map(c => (
+                                      <option key={`d_oth_${c}`} value={c}>{c}</option>
+                                    ))}
+                                  </optgroup>
+                                )}
+                              </select>
+                            </div>
                           </div>
-                          <div>
-                            <span className="text-[9px] uppercase tracking-wider text-forest/40 block mb-0.5 font-bold">
-                              {selectedProductObj && selectedProductObj.name.toLowerCase().includes('african flower pouch') ? 'Cor do Detalhe' : 'Cor do Cordão/Detalhe'}
-                            </span>
-                            <select
-                              value={manualForm.corDetalhe}
-                              onChange={(e) => setManualForm(prev => ({ ...prev, corDetalhe: e.target.value }))}
-                              className="w-full bg-white border border-forest/15 rounded-xl px-2.5 py-2 focus:outline-none focus:border-[#C5A059] text-xs font-medium"
-                            >
-                              <optgroup label="DROPS Safran (100% Algodão Egípcio · 50g/160m · Agulha 3mm)">
-                                {safranYarns.map((item: any) => (
-                                  <option key={`d_saf_${item.id}`} value={item.name}>
-                                    {item.name} ({item.quantity} {item.unit || 'novelos'})
-                                  </option>
-                                ))}
-                              </optgroup>
-                              <optgroup label="DROPS Paris (100% Algodão Reciclado · 50g/75m · Agulha 5mm)">
-                                {parisYarns.map((item: any) => (
-                                  <option key={`d_par_${item.id}`} value={item.name}>
-                                    {item.name} ({item.quantity} {item.unit || 'novelos'})
-                                  </option>
-                                ))}
-                              </optgroup>
-                              {otherProductColors.length > 0 && (
-                                <optgroup label="Outras Cores / Variações">
-                                  {otherProductColors.map(c => (
-                                    <option key={`d_oth_${c}`} value={c}>{c}</option>
-                                  ))}
-                                </optgroup>
-                              )}
-                            </select>
+                          <div className="flex items-center gap-2 pt-1.5 px-0.5">
+                            <div className="flex items-center gap-1 bg-white px-2 py-1 rounded-lg border border-forest/10 shadow-2xs">
+                              <YarnSwatch name={manualForm.corPrincipal} size="w-4 h-4 rounded-sm" />
+                              <span className="text-[10px] font-semibold text-forest">{manualForm.corPrincipal || 'Principal'}</span>
+                            </div>
+                            <span className="text-forest/40 text-[10px] font-bold">&</span>
+                            <div className="flex items-center gap-1 bg-white px-2 py-1 rounded-lg border border-forest/10 shadow-2xs">
+                              <YarnSwatch name={manualForm.corDetalhe} size="w-4 h-4 rounded-sm" />
+                              <span className="text-[10px] font-semibold text-forest">{manualForm.corDetalhe || 'Detalhe'}</span>
+                            </div>
                           </div>
                         </div>
                       ) : manualForm.corType === 'single' ? (
-                        <select
-                          value={manualForm.cor}
-                          onChange={(e) => setManualForm(prev => ({ ...prev, cor: e.target.value }))}
-                          className="w-full bg-white border border-forest/15 rounded-xl px-3 py-2.5 focus:outline-none focus:border-[#C5A059] text-xs font-medium"
-                        >
-                          <optgroup label="DROPS Safran (100% Algodão Egípcio · 50g/160m · Agulha 3mm)">
-                            {safranYarns.map((item: any) => (
-                              <option key={`s_saf_${item.id}`} value={item.name}>
-                                {item.name} ({item.quantity} {item.unit || 'novelos'})
-                              </option>
-                            ))}
-                          </optgroup>
-                          <optgroup label="DROPS Paris (100% Algodão Reciclado · 50g/75m · Agulha 5mm)">
-                            {parisYarns.map((item: any) => (
-                              <option key={`s_par_${item.id}`} value={item.name}>
-                                {item.name} ({item.quantity} {item.unit || 'novelos'})
-                              </option>
-                            ))}
-                          </optgroup>
-                          {otherProductColors.length > 0 && (
-                            <optgroup label="Outras Cores / Variações">
-                              {otherProductColors.map(c => (
-                                <option key={`s_oth_${c}`} value={c}>{c}</option>
+                        <div className="space-y-1.5">
+                          <select
+                            value={manualForm.cor}
+                            onChange={(e) => setManualForm(prev => ({ ...prev, cor: e.target.value }))}
+                            className="w-full bg-white border border-forest/15 rounded-xl px-3 py-2.5 focus:outline-none focus:border-[#C5A059] text-xs font-medium"
+                          >
+                            <optgroup label="DROPS Safran (100% Algodão Egípcio · 50g/160m · Agulha 3mm)">
+                              {safranYarns.map((item: any) => (
+                                <option key={`s_saf_${item.id}`} value={item.name}>
+                                  {item.name} ({item.quantity} {item.unit || 'novelos'})
+                                </option>
                               ))}
                             </optgroup>
-                          )}
-                        </select>
+                            <optgroup label="DROPS Paris (100% Algodão Reciclado · 50g/75m · Agulha 5mm)">
+                              {parisYarns.map((item: any) => (
+                                <option key={`s_par_${item.id}`} value={item.name}>
+                                  {item.name} ({item.quantity} {item.unit || 'novelos'})
+                                </option>
+                              ))}
+                            </optgroup>
+                            {otherProductColors.length > 0 && (
+                              <optgroup label="Outras Cores / Variações">
+                                {otherProductColors.map(c => (
+                                  <option key={`s_oth_${c}`} value={c}>{c}</option>
+                                ))}
+                              </optgroup>
+                            )}
+                          </select>
+                          <div className="flex items-center gap-1.5 px-0.5">
+                            <div className="flex items-center gap-1.5 bg-white px-2.5 py-1 rounded-lg border border-forest/10 shadow-2xs">
+                              <YarnSwatch name={manualForm.cor} size="w-4 h-4 rounded-sm" />
+                              <span className="text-[10px] font-semibold text-forest">{manualForm.cor || 'Cor Selecionada'}</span>
+                            </div>
+                          </div>
+                        </div>
                       ) : (
                         <input
                           type="text"
@@ -1910,6 +1985,14 @@ export default function AdminDashboardModal({ onClose, shopCategories = [] }: Ad
                           <div className="flex items-center justify-between gap-1.5 pt-2 mt-2 border-t border-forest/10 text-xs w-full min-w-0">
                             <span className="text-[10px] font-bold uppercase tracking-wider text-forest/50 shrink-0">Qtd:</span>
                             <div className="flex items-center gap-1 min-w-0 shrink-0">
+                              <button
+                                type="button"
+                                onClick={() => setManualForm(prev => ({
+                                  ...prev,
+                                  accessories: { ...prev.accessories, etiquetaQty: Math.max(1, (prev.accessories?.etiquetaQty || 1) - 1) }
+                                }))}
+                                className="w-6 h-6 rounded-md bg-forest/5 hover:bg-forest/10 flex items-center justify-center font-bold text-forest cursor-pointer touch-manipulation text-xs select-none"
+                              >-</button>
                               <input
                                 type="number"
                                 min="1"
@@ -1919,9 +2002,17 @@ export default function AdminDashboardModal({ onClose, shopCategories = [] }: Ad
                                   ...prev,
                                   accessories: { ...prev.accessories, etiquetaQty: Math.max(1, parseInt(e.target.value) || 1) }
                                 }))}
-                                className="w-14 sm:w-16 bg-white border border-forest/20 rounded-lg px-1.5 py-0.5 text-center font-bold text-forest text-xs focus:outline-none focus:border-[#C5A059] min-w-0"
+                                className="w-12 bg-white border border-forest/20 rounded-lg px-1 py-0.5 text-center font-bold text-forest text-xs focus:outline-none focus:border-[#C5A059] min-w-0"
                               />
-                              <span className="text-[10px] text-forest/60 shrink-0">unid.</span>
+                              <button
+                                type="button"
+                                onClick={() => setManualForm(prev => ({
+                                  ...prev,
+                                  accessories: { ...prev.accessories, etiquetaQty: (prev.accessories?.etiquetaQty || 1) + 1 }
+                                }))}
+                                className="w-6 h-6 rounded-md bg-forest/5 hover:bg-forest/10 flex items-center justify-center font-bold text-forest cursor-pointer touch-manipulation text-xs select-none"
+                              >+</button>
+                              <span className="text-[10px] text-forest/60 shrink-0">un.</span>
                             </div>
                           </div>
                         )}
@@ -1945,6 +2036,14 @@ export default function AdminDashboardModal({ onClose, shopCategories = [] }: Ad
                           <div className="flex items-center justify-between gap-1.5 pt-2 mt-2 border-t border-forest/10 text-xs w-full min-w-0">
                             <span className="text-[10px] font-bold uppercase tracking-wider text-forest/50 shrink-0">Qtd:</span>
                             <div className="flex items-center gap-1 min-w-0 shrink-0">
+                              <button
+                                type="button"
+                                onClick={() => setManualForm(prev => ({
+                                  ...prev,
+                                  accessories: { ...prev.accessories, caixaQty: Math.max(1, (prev.accessories?.caixaQty || 1) - 1) }
+                                }))}
+                                className="w-6 h-6 rounded-md bg-forest/5 hover:bg-forest/10 flex items-center justify-center font-bold text-forest cursor-pointer touch-manipulation text-xs select-none"
+                              >-</button>
                               <input
                                 type="number"
                                 min="1"
@@ -1954,9 +2053,17 @@ export default function AdminDashboardModal({ onClose, shopCategories = [] }: Ad
                                   ...prev,
                                   accessories: { ...prev.accessories, caixaQty: Math.max(1, parseInt(e.target.value) || 1) }
                                 }))}
-                                className="w-14 sm:w-16 bg-white border border-forest/20 rounded-lg px-1.5 py-0.5 text-center font-bold text-forest text-xs focus:outline-none focus:border-[#C5A059] min-w-0"
+                                className="w-12 bg-white border border-forest/20 rounded-lg px-1 py-0.5 text-center font-bold text-forest text-xs focus:outline-none focus:border-[#C5A059] min-w-0"
                               />
-                              <span className="text-[10px] text-forest/60 shrink-0">unid.</span>
+                              <button
+                                type="button"
+                                onClick={() => setManualForm(prev => ({
+                                  ...prev,
+                                  accessories: { ...prev.accessories, caixaQty: (prev.accessories?.caixaQty || 1) + 1 }
+                                }))}
+                                className="w-6 h-6 rounded-md bg-forest/5 hover:bg-forest/10 flex items-center justify-center font-bold text-forest cursor-pointer touch-manipulation text-xs select-none"
+                              >+</button>
+                              <span className="text-[10px] text-forest/60 shrink-0">un.</span>
                             </div>
                           </div>
                         )}
@@ -1980,6 +2087,14 @@ export default function AdminDashboardModal({ onClose, shopCategories = [] }: Ad
                           <div className="flex items-center justify-between gap-1.5 pt-2 mt-2 border-t border-forest/10 text-xs w-full min-w-0">
                             <span className="text-[10px] font-bold uppercase tracking-wider text-forest/50 shrink-0">Qtd:</span>
                             <div className="flex items-center gap-1 min-w-0 shrink-0">
+                              <button
+                                type="button"
+                                onClick={() => setManualForm(prev => ({
+                                  ...prev,
+                                  accessories: { ...prev.accessories, sacoEnvelopeQty: Math.max(1, (prev.accessories?.sacoEnvelopeQty || 1) - 1) }
+                                }))}
+                                className="w-6 h-6 rounded-md bg-forest/5 hover:bg-forest/10 flex items-center justify-center font-bold text-forest cursor-pointer touch-manipulation text-xs select-none"
+                              >-</button>
                               <input
                                 type="number"
                                 min="1"
@@ -1989,9 +2104,17 @@ export default function AdminDashboardModal({ onClose, shopCategories = [] }: Ad
                                   ...prev,
                                   accessories: { ...prev.accessories, sacoEnvelopeQty: Math.max(1, parseInt(e.target.value) || 1) }
                                 }))}
-                                className="w-14 sm:w-16 bg-white border border-forest/20 rounded-lg px-1.5 py-0.5 text-center font-bold text-forest text-xs focus:outline-none focus:border-[#C5A059] min-w-0"
+                                className="w-12 bg-white border border-forest/20 rounded-lg px-1 py-0.5 text-center font-bold text-forest text-xs focus:outline-none focus:border-[#C5A059] min-w-0"
                               />
-                              <span className="text-[10px] text-forest/60 shrink-0">unid.</span>
+                              <button
+                                type="button"
+                                onClick={() => setManualForm(prev => ({
+                                  ...prev,
+                                  accessories: { ...prev.accessories, sacoEnvelopeQty: (prev.accessories?.sacoEnvelopeQty || 1) + 1 }
+                                }))}
+                                className="w-6 h-6 rounded-md bg-forest/5 hover:bg-forest/10 flex items-center justify-center font-bold text-forest cursor-pointer touch-manipulation text-xs select-none"
+                              >+</button>
+                              <span className="text-[10px] text-forest/60 shrink-0">un.</span>
                             </div>
                           </div>
                         )}
@@ -2015,6 +2138,14 @@ export default function AdminDashboardModal({ onClose, shopCategories = [] }: Ad
                           <div className="flex items-center justify-between gap-1.5 pt-2 mt-2 border-t border-forest/10 text-xs w-full min-w-0">
                             <span className="text-[10px] font-bold uppercase tracking-wider text-forest/50 shrink-0">Qtd:</span>
                             <div className="flex items-center gap-1 min-w-0 shrink-0">
+                              <button
+                                type="button"
+                                onClick={() => setManualForm(prev => ({
+                                  ...prev,
+                                  accessories: { ...prev.accessories, fechoQty: Math.max(1, (prev.accessories?.fechoQty || 1) - 1) }
+                                }))}
+                                className="w-6 h-6 rounded-md bg-forest/5 hover:bg-forest/10 flex items-center justify-center font-bold text-forest cursor-pointer touch-manipulation text-xs select-none"
+                              >-</button>
                               <input
                                 type="number"
                                 min="1"
@@ -2024,9 +2155,17 @@ export default function AdminDashboardModal({ onClose, shopCategories = [] }: Ad
                                   ...prev,
                                   accessories: { ...prev.accessories, fechoQty: Math.max(1, parseInt(e.target.value) || 1) }
                                 }))}
-                                className="w-14 sm:w-16 bg-white border border-forest/20 rounded-lg px-1.5 py-0.5 text-center font-bold text-forest text-xs focus:outline-none focus:border-[#C5A059] min-w-0"
+                                className="w-12 bg-white border border-forest/20 rounded-lg px-1 py-0.5 text-center font-bold text-forest text-xs focus:outline-none focus:border-[#C5A059] min-w-0"
                               />
-                              <span className="text-[10px] text-forest/60 shrink-0">unid.</span>
+                              <button
+                                type="button"
+                                onClick={() => setManualForm(prev => ({
+                                  ...prev,
+                                  accessories: { ...prev.accessories, fechoQty: (prev.accessories?.fechoQty || 1) + 1 }
+                                }))}
+                                className="w-6 h-6 rounded-md bg-forest/5 hover:bg-forest/10 flex items-center justify-center font-bold text-forest cursor-pointer touch-manipulation text-xs select-none"
+                              >+</button>
+                              <span className="text-[10px] text-forest/60 shrink-0">un.</span>
                             </div>
                           </div>
                         )}
@@ -2050,18 +2189,38 @@ export default function AdminDashboardModal({ onClose, shopCategories = [] }: Ad
                           <div className="flex items-center justify-between gap-1.5 pt-2 mt-2 border-t border-forest/10 text-xs w-full min-w-0">
                             <span className="text-[10px] font-bold uppercase tracking-wider text-forest/50 shrink-0">Consumo:</span>
                             <div className="flex items-center gap-1 min-w-0 shrink-0">
+                              <button
+                                type="button"
+                                onClick={() => setManualForm(prev => ({
+                                  ...prev,
+                                  accessories: { ...prev.accessories, forroMeters: Math.max(0.001, Math.round(((prev.accessories?.forroMeters || 0.25) - 0.05) * 100) / 100) }
+                                }))}
+                                className="w-6 h-6 rounded-md bg-forest/5 hover:bg-forest/10 flex items-center justify-center font-bold text-forest cursor-pointer touch-manipulation text-xs select-none"
+                              >-</button>
                               <input
                                 type="number"
-                                min="0.01"
-                                step="0.05"
+                                min="0.0001"
+                                step="any"
                                 value={manualForm.accessories?.forroMeters ?? 0.25}
-                                onChange={(e) => setManualForm(prev => ({
-                                  ...prev,
-                                  accessories: { ...prev.accessories, forroMeters: Math.max(0.01, parseFloat(e.target.value) || 0.25) }
-                                }))}
-                                className="w-14 sm:w-16 bg-white border border-forest/20 rounded-lg px-1.5 py-0.5 text-center font-bold text-forest text-xs focus:outline-none focus:border-[#C5A059] min-w-0"
+                                onChange={(e) => {
+                                  const valStr = e.target.value.replace(',', '.');
+                                  const parsed = parseFloat(valStr);
+                                  setManualForm(prev => ({
+                                    ...prev,
+                                    accessories: { ...prev.accessories, forroMeters: isNaN(parsed) ? 0 : parsed }
+                                  }));
+                                }}
+                                className="w-14 bg-white border border-forest/20 rounded-lg px-1 py-0.5 text-center font-bold text-forest text-xs focus:outline-none focus:border-[#C5A059] min-w-0"
                               />
-                              <span className="text-[10px] text-forest/60 shrink-0">metros</span>
+                              <button
+                                type="button"
+                                onClick={() => setManualForm(prev => ({
+                                  ...prev,
+                                  accessories: { ...prev.accessories, forroMeters: Math.round(((prev.accessories?.forroMeters || 0.25) + 0.05) * 100) / 100 }
+                                }))}
+                                className="w-6 h-6 rounded-md bg-forest/5 hover:bg-forest/10 flex items-center justify-center font-bold text-forest cursor-pointer touch-manipulation text-xs select-none"
+                              >+</button>
+                              <span className="text-[10px] text-forest/60 shrink-0">m²</span>
                             </div>
                           </div>
                         )}
@@ -2268,6 +2427,16 @@ export default function AdminDashboardModal({ onClose, shopCategories = [] }: Ad
 
                             {/* Order Management Actions */}
                             <div className="flex items-center gap-1.5 ml-2 pl-2 border-l border-forest/10">
+                              <button
+                                type="button"
+                                onClick={() => setEditingOrderModal(JSON.parse(JSON.stringify(order)))}
+                                disabled={isUpdating}
+                                title="Editar Detalhes / Registo da Venda"
+                                className="px-2.5 py-1 text-[#8C6D2D] hover:text-[#5E481C] bg-[#FCF8F2] hover:bg-[#F7EFE3] rounded-[6px] transition-all cursor-pointer border border-[#C5A059]/30 flex items-center gap-1 text-[10px] font-medium tracking-wide shadow-2xs"
+                              >
+                                <Edit className="w-3 h-3 text-[#C5A059] shrink-0" />
+                                <span>Editar</span>
+                              </button>
                               {order.status !== 'failed' && (
                                 <button
                                   type="button"
@@ -2683,7 +2852,7 @@ export default function AdminDashboardModal({ onClose, shopCategories = [] }: Ad
                         id: `p-${Date.now()}`,
                         name: 'Nova Peça em Crochet',
                         price: '25€',
-                        img: 'https://i.ibb.co/L8N8b9p/african-flower-pouch.jpg',
+                        img: '/products/african-flower-pouch/1.webp',
                         description: 'Peça feita à mão com amor e afeto.',
                         material: 'Fio 100% Algodão',
                         care: 'Lavar à mão com água fria',
@@ -5288,6 +5457,381 @@ export default function AdminDashboardModal({ onClose, shopCategories = [] }: Ad
         </>
       )}
     </AnimatePresence>
+
+    {/* EDIT ORDER MODAL DIALOG */}
+    {editingOrderModal && (
+      <div className="fixed inset-0 z-[1200] bg-black/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-6 overflow-y-auto">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.95, y: 10 }}
+          animate={{ opacity: 1, scale: 1, y: 0 }}
+          exit={{ opacity: 0, scale: 0.95, y: 10 }}
+          className="bg-[#FAF8F5] border border-[#C5A059]/40 rounded-[24px] shadow-2xl max-w-2xl w-full max-h-[90vh] flex flex-col overflow-hidden text-forest"
+        >
+          {/* Header */}
+          <div className="p-4 sm:p-5 border-b border-[#C5A059]/20 bg-[#FCFBF9] flex items-center justify-between shrink-0">
+            <div className="flex items-center gap-2.5">
+              <div className="p-2 bg-[#243119] text-[#C5A059] rounded-xl">
+                <Edit className="w-4 h-4" />
+              </div>
+              <div>
+                <h3 className="font-serif text-base sm:text-lg font-bold text-[#243119] leading-tight">Editar Venda / Encomenda</h3>
+                <p className="text-[10px] font-sans text-forest/60">
+                  Nº: <span className="font-mono font-bold text-[#C5A059]">{editingOrderModal.orderId}</span>
+                </p>
+              </div>
+            </div>
+            <button
+              type="button"
+              onClick={() => setEditingOrderModal(null)}
+              className="p-1.5 hover:bg-forest/10 rounded-full transition-colors cursor-pointer"
+            >
+              <X className="w-5 h-5 text-forest/70" />
+            </button>
+          </div>
+
+          {/* Form Body */}
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              handleSaveEditOrder(editingOrderModal);
+            }}
+            className="p-4 sm:p-6 space-y-4 overflow-y-auto flex-1 text-xs"
+          >
+            {/* Row 1: Product & Price */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div className="space-y-1">
+                <label className="font-bold uppercase tracking-wider text-[10px] text-forest/60">Produto</label>
+                <input
+                  type="text"
+                  value={editingOrderModal.productName || ''}
+                  onChange={(e) => setEditingOrderModal((prev: any) => ({ ...prev, productName: e.target.value }))}
+                  className="w-full bg-white border border-forest/15 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-[#C5A059]"
+                  required
+                />
+              </div>
+              <div className="space-y-1">
+                <label className="font-bold uppercase tracking-wider text-[10px] text-forest/60">Valor (€)</label>
+                <input
+                  type="text"
+                  value={editingOrderModal.price || ''}
+                  onChange={(e) => setEditingOrderModal((prev: any) => ({ ...prev, price: e.target.value }))}
+                  className="w-full bg-white border border-forest/15 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-[#C5A059]"
+                  required
+                />
+              </div>
+            </div>
+
+            {/* Row 2: Selections (Cor / Combinação) */}
+            <div className="space-y-1">
+              <label className="font-bold uppercase tracking-wider text-[10px] text-forest/60">Cor Selecionada</label>
+              <input
+                type="text"
+                value={editingOrderModal.selections?.cor || ''}
+                onChange={(e) => setEditingOrderModal((prev: any) => ({
+                  ...prev,
+                  selections: { ...(prev.selections || {}), cor: e.target.value }
+                }))}
+                className="w-full bg-white border border-forest/15 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-[#C5A059]"
+              />
+            </div>
+
+            {/* Row 3: Customer Info */}
+            <div className="bg-white/90 border border-forest/10 rounded-2xl p-3.5 space-y-3">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-forest/60 flex items-center gap-1.5 font-sans">
+                <User className="w-3.5 h-3.5 text-[#C5A059]" />
+                Dados do Cliente
+              </span>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="font-bold uppercase tracking-wider text-[9px] text-forest/50">Nome</label>
+                  <input
+                    type="text"
+                    value={editingOrderModal.customer?.nome || ''}
+                    onChange={(e) => setEditingOrderModal((prev: any) => ({
+                      ...prev,
+                      customer: { ...(prev.customer || {}), nome: e.target.value }
+                    }))}
+                    className="w-full bg-white border border-forest/15 rounded-lg px-2.5 py-1.5 text-xs focus:outline-none focus:border-[#C5A059]"
+                  />
+                </div>
+                <div>
+                  <label className="font-bold uppercase tracking-wider text-[9px] text-forest/50">E-mail</label>
+                  <input
+                    type="email"
+                    value={editingOrderModal.customer?.email || ''}
+                    onChange={(e) => setEditingOrderModal((prev: any) => ({
+                      ...prev,
+                      customer: { ...(prev.customer || {}), email: e.target.value }
+                    }))}
+                    className="w-full bg-white border border-forest/15 rounded-lg px-2.5 py-1.5 text-xs focus:outline-none focus:border-[#C5A059]"
+                  />
+                </div>
+                <div>
+                  <label className="font-bold uppercase tracking-wider text-[9px] text-forest/50">Telefone</label>
+                  <input
+                    type="text"
+                    value={editingOrderModal.customer?.telefone || ''}
+                    onChange={(e) => setEditingOrderModal((prev: any) => ({
+                      ...prev,
+                      customer: { ...(prev.customer || {}), telefone: e.target.value }
+                    }))}
+                    className="w-full bg-white border border-forest/15 rounded-lg px-2.5 py-1.5 text-xs focus:outline-none focus:border-[#C5A059]"
+                  />
+                </div>
+                <div>
+                  <label className="font-bold uppercase tracking-wider text-[9px] text-forest/50">NIF</label>
+                  <input
+                    type="text"
+                    value={editingOrderModal.customer?.nif || ''}
+                    onChange={(e) => setEditingOrderModal((prev: any) => ({
+                      ...prev,
+                      customer: { ...(prev.customer || {}), nif: e.target.value }
+                    }))}
+                    className="w-full bg-white border border-forest/15 rounded-lg px-2.5 py-1.5 text-xs focus:outline-none focus:border-[#C5A059]"
+                  />
+                </div>
+                <div className="sm:col-span-2">
+                  <label className="font-bold uppercase tracking-wider text-[9px] text-forest/50">Morada de Envio</label>
+                  <input
+                    type="text"
+                    value={editingOrderModal.customer?.morada || ''}
+                    onChange={(e) => setEditingOrderModal((prev: any) => ({
+                      ...prev,
+                      customer: { ...(prev.customer || {}), morada: e.target.value }
+                    }))}
+                    className="w-full bg-white border border-forest/15 rounded-lg px-2.5 py-1.5 text-xs focus:outline-none focus:border-[#C5A059]"
+                  />
+                </div>
+                <div>
+                  <label className="font-bold uppercase tracking-wider text-[9px] text-forest/50">Código Postal</label>
+                  <input
+                    type="text"
+                    value={editingOrderModal.customer?.codigoPostal || ''}
+                    onChange={(e) => setEditingOrderModal((prev: any) => ({
+                      ...prev,
+                      customer: { ...(prev.customer || {}), codigoPostal: formatPostalCodePT(e.target.value) }
+                    }))}
+                    className="w-full bg-white border border-forest/15 rounded-lg px-2.5 py-1.5 text-xs focus:outline-none focus:border-[#C5A059]"
+                  />
+                </div>
+                <div>
+                  <label className="font-bold uppercase tracking-wider text-[9px] text-forest/50">Cidade</label>
+                  <input
+                    type="text"
+                    value={editingOrderModal.customer?.cidade || ''}
+                    onChange={(e) => setEditingOrderModal((prev: any) => ({
+                      ...prev,
+                      customer: { ...(prev.customer || {}), cidade: e.target.value }
+                    }))}
+                    className="w-full bg-white border border-forest/15 rounded-lg px-2.5 py-1.5 text-xs focus:outline-none focus:border-[#C5A059]"
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Row 4: Status, Priority & Payment Method */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <div className="space-y-1">
+                <label className="font-bold uppercase tracking-wider text-[10px] text-forest/60">Estado da Encomenda</label>
+                <select
+                  value={editingOrderModal.status || 'paid'}
+                  onChange={(e) => setEditingOrderModal((prev: any) => ({ ...prev, status: e.target.value }))}
+                  className="w-full bg-white border border-forest/15 rounded-xl px-2.5 py-2 text-xs focus:outline-none focus:border-[#C5A059]"
+                >
+                  <option value="paid">No Atelier (Paga)</option>
+                  <option value="pending_payment">Aguardar Liquidação</option>
+                  <option value="shipped">A Caminho (Expedida)</option>
+                  <option value="delivered">Entregue ao Cliente</option>
+                  <option value="failed">Cancelada / Rejeitada</option>
+                </select>
+              </div>
+
+              <div className="space-y-1">
+                <label className="font-bold uppercase tracking-wider text-[10px] text-forest/60">Prioridade</label>
+                <select
+                  value={editingOrderModal.priority || 'NORMAL'}
+                  onChange={(e) => setEditingOrderModal((prev: any) => ({ ...prev, priority: e.target.value }))}
+                  className="w-full bg-white border border-forest/15 rounded-xl px-2.5 py-2 text-xs focus:outline-none focus:border-[#C5A059]"
+                >
+                  <option value="NORMAL">NORMAL</option>
+                  <option value="ALTA (Atelier Urgente)">URGENTE (Atelier)</option>
+                </select>
+              </div>
+
+              <div className="space-y-1">
+                <label className="font-bold uppercase tracking-wider text-[10px] text-forest/60">Método de Pagamento</label>
+                <input
+                  type="text"
+                  value={editingOrderModal.paymentMethod || 'card'}
+                  onChange={(e) => setEditingOrderModal((prev: any) => ({ ...prev, paymentMethod: e.target.value }))}
+                  className="w-full bg-white border border-forest/15 rounded-xl px-2.5 py-2 text-xs focus:outline-none focus:border-[#C5A059]"
+                />
+              </div>
+            </div>
+
+            {/* Row 5: Accessories & Checklist */}
+            <div className="bg-white/90 border border-[#C5A059]/25 rounded-2xl p-3.5 space-y-2 text-left">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-forest/60 flex items-center gap-1.5 font-sans">
+                <Layers className="w-3.5 h-3.5 text-[#C5A059]" />
+                Acessórios & Consumos
+              </span>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs pt-1">
+                {/* Forro Algodão */}
+                <div className="p-2 rounded-xl border border-forest/10 bg-[#FCFBF9] flex items-center justify-between">
+                  <label className="flex items-center gap-1.5 cursor-pointer font-medium text-forest">
+                    <input
+                      type="checkbox"
+                      checked={editingOrderModal.accessories?.forro ?? false}
+                      onChange={(e) => setEditingOrderModal((prev: any) => ({
+                        ...prev,
+                        accessories: { ...(prev.accessories || {}), forro: e.target.checked }
+                      }))}
+                      className="rounded text-[#C5A059] focus:ring-[#C5A059] w-3.5 h-3.5"
+                    />
+                    <span className="text-xs">Forro Algodão</span>
+                  </label>
+                  {editingOrderModal.accessories?.forro && (
+                    <div className="flex items-center gap-1">
+                      <button
+                        type="button"
+                        onClick={() => setEditingOrderModal((prev: any) => ({
+                          ...prev,
+                          accessories: {
+                            ...(prev.accessories || {}),
+                            forroMeters: Math.max(0.001, Math.round((((prev.accessories?.forroMeters) || 0.25) - 0.05) * 100) / 100)
+                          }
+                        }))}
+                        className="w-5 h-5 rounded bg-forest/5 hover:bg-forest/10 flex items-center justify-center font-bold text-forest text-xs cursor-pointer"
+                      >-</button>
+                      <input
+                        type="number"
+                        min="0.0001"
+                        step="any"
+                        value={editingOrderModal.accessories?.forroMeters ?? 0.25}
+                        onChange={(e) => {
+                          const parsed = parseFloat(e.target.value.replace(',', '.'));
+                          setEditingOrderModal((prev: any) => ({
+                            ...prev,
+                            accessories: { ...(prev.accessories || {}), forroMeters: isNaN(parsed) ? 0 : parsed }
+                          }));
+                        }}
+                        className="w-14 bg-white border border-forest/20 rounded px-1 py-0.5 text-center font-bold text-forest text-xs focus:outline-none"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setEditingOrderModal((prev: any) => ({
+                          ...prev,
+                          accessories: {
+                            ...(prev.accessories || {}),
+                            forroMeters: Math.round((((prev.accessories?.forroMeters) || 0.25) + 0.05) * 100) / 100
+                          }
+                        }))}
+                        className="w-5 h-5 rounded bg-forest/5 hover:bg-forest/10 flex items-center justify-center font-bold text-forest text-xs cursor-pointer"
+                      >+</button>
+                      <span className="text-[10px] text-forest/60">m²</span>
+                    </div>
+                  )}
+                </div>
+
+                {/* Fecho Correr */}
+                <div className="p-2 rounded-xl border border-forest/10 bg-[#FCFBF9] flex items-center justify-between">
+                  <label className="flex items-center gap-1.5 cursor-pointer font-medium text-forest">
+                    <input
+                      type="checkbox"
+                      checked={editingOrderModal.accessories?.fecho ?? false}
+                      onChange={(e) => setEditingOrderModal((prev: any) => ({
+                        ...prev,
+                        accessories: { ...(prev.accessories || {}), fecho: e.target.checked }
+                      }))}
+                      className="rounded text-[#C5A059] focus:ring-[#C5A059] w-3.5 h-3.5"
+                    />
+                    <span className="text-xs">Fecho Correr</span>
+                  </label>
+                  {editingOrderModal.accessories?.fecho && (
+                    <div className="flex items-center gap-1">
+                      <button
+                        type="button"
+                        onClick={() => setEditingOrderModal((prev: any) => ({
+                          ...prev,
+                          accessories: {
+                            ...(prev.accessories || {}),
+                            fechoQty: Math.max(1, ((prev.accessories?.fechoQty) || 1) - 1)
+                          }
+                        }))}
+                        className="w-5 h-5 rounded bg-forest/5 hover:bg-forest/10 flex items-center justify-center font-bold text-forest text-xs cursor-pointer"
+                      >-</button>
+                      <input
+                        type="number"
+                        min="1"
+                        step="1"
+                        value={editingOrderModal.accessories?.fechoQty ?? 1}
+                        onChange={(e) => setEditingOrderModal((prev: any) => ({
+                          ...prev,
+                          accessories: { ...(prev.accessories || {}), fechoQty: parseInt(e.target.value) || 1 }
+                        }))}
+                        className="w-10 bg-white border border-forest/20 rounded px-1 py-0.5 text-center font-bold text-forest text-xs focus:outline-none"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setEditingOrderModal((prev: any) => ({
+                          ...prev,
+                          accessories: {
+                            ...(prev.accessories || {}),
+                            fechoQty: ((prev.accessories?.fechoQty) || 1) + 1
+                          }
+                        }))}
+                        className="w-5 h-5 rounded bg-forest/5 hover:bg-forest/10 flex items-center justify-center font-bold text-forest text-xs cursor-pointer"
+                      >+</button>
+                      <span className="text-[10px] text-forest/60">un.</span>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {/* Row 6: Notes */}
+            <div className="space-y-1">
+              <label className="font-bold uppercase tracking-wider text-[10px] text-forest/60">Notas do Atelier / Observações</label>
+              <textarea
+                rows={2}
+                value={editingOrderModal.notes || ''}
+                onChange={(e) => setEditingOrderModal((prev: any) => ({ ...prev, notes: e.target.value }))}
+                placeholder="Instruções de confeção, prazos combinados..."
+                className="w-full bg-white border border-forest/15 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-[#C5A059]"
+              />
+            </div>
+
+            {/* Action Buttons */}
+            <div className="flex items-center justify-end gap-2.5 pt-3 border-t border-forest/10 shrink-0">
+              <button
+                type="button"
+                onClick={() => setEditingOrderModal(null)}
+                className="px-4 py-2 bg-cream hover:bg-cream/70 text-forest rounded-xl font-medium cursor-pointer"
+              >
+                Cancelar
+              </button>
+              <button
+                type="submit"
+                disabled={actionLoading[editingOrderModal.orderId]}
+                className="px-5 py-2 bg-[#243119] hover:bg-[#1a2412] text-cream rounded-xl font-medium flex items-center gap-2 cursor-pointer shadow-md"
+              >
+                {actionLoading[editingOrderModal.orderId] ? (
+                  <>
+                    <span className="animate-spin rounded-full h-3 w-3 border border-cream border-t-transparent" />
+                    A Guardar...
+                  </>
+                ) : (
+                  <>
+                    <Save className="w-3.5 h-3.5 text-[#C5A059]" />
+                    Guardar Alterações
+                  </>
+                )}
+              </button>
+            </div>
+          </form>
+        </motion.div>
+      </div>
+    )}
 
     {/* EMAIL PREVIEW MODAL OVERLAY */}
     <AnimatePresence>
