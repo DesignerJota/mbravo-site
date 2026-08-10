@@ -398,14 +398,15 @@ export function getSwatchStyle(colorNameOrRef: string, yarnLineId?: string) {
   const match = findYarnColor(colorNameOrRef, yarnLineId);
   if (match) {
     const imgUrl = match.imageUrl || match.swatchUrl;
+    // Garante que o caminho começa sempre com '/' para o servidor de produção encontrar a imagem
+    const validUrl = imgUrl.startsWith('/') ? imgUrl : `/${imgUrl}`;
     return {
       backgroundColor: match.colorHex,
-      backgroundImage: `url(${imgUrl})`,
+      backgroundImage: `url(${validUrl})`,
       backgroundSize: 'cover',
       backgroundPosition: 'center'
     };
   }
-  // Fallback
   return {
     backgroundColor: '#D8C3A5'
   };
