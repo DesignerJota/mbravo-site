@@ -1,6 +1,7 @@
 // /src/translations.ts
 
 import { useState, useEffect } from 'react';
+import { findYarnColor } from './data/yarns';
 
 export function useLanguage() {
   const [lang, setLang] = useState<'pt' | 'en'>(() => {
@@ -640,6 +641,10 @@ export function formatColorName(colorStr: string): string {
   if (!colorStr) return '';
   let cleaned = colorStr.trim();
 
+  // Remove technical references like "Ref. 57" or "Ref 57"
+  cleaned = cleaned.replace(/Ref\.\s*\d+/gi, '');
+  cleaned = cleaned.replace(/Ref\s*\d+/gi, '');
+
   // If there's a yarn brand/supplier prefix before a dash (e.g. "DROPS SAFIR - Natural"), extract color name
   if (cleaned.includes(' - ')) {
     const parts = cleaned.split(' - ');
@@ -650,8 +655,8 @@ export function formatColorName(colorStr: string): string {
   }
 
   // Remove remaining supplier/brand prefixes if any
-  cleaned = cleaned.replace(/^(DROPS\s+[A-Za-z0-9\s]+?)\s*[-–—]?\s*/i, '');
-  cleaned = cleaned.replace(/^(DROPS\s+(Safran|Paris|Loves\s+You\s*\d*)?|Safran|Paris)\s*[-–—]?\s*/i, '');
+  cleaned = cleaned.replace(/^(DROPS|Senshoku)\s+[A-Za-z0-9\s]+?\s*[-–—]?\s*/i, '');
+  cleaned = cleaned.replace(/^(DROPS\s+(Safran|Paris|Muskat|Loves\s+You\s*\d*)?|Safran|Paris|Muskat)\s*[-–—]?\s*/i, '');
 
   // Remove leading numbers or code patterns (e.g., "16 - ", "01 - ", "16 ")
   cleaned = cleaned.replace(/^(\d+)\s*[-–—]?\s*/, '');
@@ -675,7 +680,6 @@ export function getColorSwatchBg(rawColorName: string): string {
 
   const formatted = formatColorName(rawColorName);
   const name = formatted.toLowerCase().trim();
-  const rawLower = rawClean.toLowerCase();
 
   // 2. Handle bicolor gradient combinations
   if (name.includes('&')) {
@@ -685,7 +689,14 @@ export function getColorSwatchBg(rawColorName: string): string {
     return `linear-gradient(45deg, ${bg1} 50%, ${bg2} 50%)`;
   }
 
-  // 3. High-precision M★BRAVO Luxury Palette & DROPS Safran/Paris Yarn Mapping
+  // 3. Lookup yarn database for real texture swatches
+  const matchedYarn = findYarnColor(rawColorName);
+  if (matchedYarn && (matchedYarn.swatchUrl || matchedYarn.imageUrl)) {
+    const imgUrl = matchedYarn.imageUrl || matchedYarn.swatchUrl;
+    return `url("${imgUrl}") center/cover no-repeat ${matchedYarn.colorHex || '#D8C3A5'}`;
+  }
+
+  const rawLower = rawClean.toLowerCase();
   // Pure White (#FFFFFF)
   if (name === 'branco' || name.endsWith('branco') || name.includes('white') || rawLower.includes('safran 11') || rawLower.includes('paris 16') || rawLower.includes('17 - branco')) {
     return '#FFFFFF';
@@ -1154,19 +1165,19 @@ export const translatedFeaturedProducts = {
       id: 'v2c',
       title: 'Signature Granny Poncho',
       desc: 'Crochet autoral premium e intemporal',
-      img: 'https://images.unsplash.com/photo-1434389677669-e08b4cac3105?auto=format&fit=crop&q=80&w=800'
+      img: '/products/signature-granny-poncho/1.webp'
     },
     {
       id: 'alma_cardigan',
       title: 'Alma Cardigan',
       desc: 'Clássico design em granny squares',
-      img: 'https://images.unsplash.com/photo-1523381210434-271e8be1f52b?auto=format&fit=crop&q=80&w=800'
+      img: '/products/alma-cardigan/1.webp'
     },
     {
       id: 'b1',
       title: 'African Flower Pouch',
       desc: 'Mala artesanal com forro e fecho premium',
-      img: 'https://images.unsplash.com/photo-1583847268964-b28dc8f51f92?auto=format&fit=crop&q=80&w=800'
+      img: '/products/african-flower-pouch/1.webp'
     }
   ],
   en: [
@@ -1174,19 +1185,19 @@ export const translatedFeaturedProducts = {
       id: 'v2c',
       title: 'Signature Granny Poncho',
       desc: 'Premium and timeless authorial crochet',
-      img: 'https://images.unsplash.com/photo-1434389677669-e08b4cac3105?auto=format&fit=crop&q=80&w=800'
+      img: '/products/signature-granny-poncho/1.webp'
     },
     {
       id: 'alma_cardigan',
       title: 'Alma Cardigan',
       desc: 'Classic design in granny squares',
-      img: 'https://images.unsplash.com/photo-1523381210434-271e8be1f52b?auto=format&fit=crop&q=80&w=800'
+      img: '/products/alma-cardigan/1.webp'
     },
     {
       id: 'b1',
       title: 'African Flower Pouch',
       desc: 'Artisanal bag with premium lining and zipper',
-      img: 'https://images.unsplash.com/photo-1583847268964-b28dc8f51f92?auto=format&fit=crop&q=80&w=800'
+      img: '/products/african-flower-pouch/1.webp'
     }
   ]
 };
