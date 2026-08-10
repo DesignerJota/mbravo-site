@@ -17,6 +17,43 @@ interface TextureSwatchPickerProps {
   showYarnBadge?: boolean;
 }
 
+// Module-level shared stock map cache and subscriber listener set for universal auto-sync
+let globalFetchedStockMap: Record<string, boolean> | null = null;
+const stockListeners = new Set<(map: Record<string, boolean>) => void>();
+
+async function fetchGlobalInventoryStock() {
+  try {
+    const API_BASE_URL = import.meta.env.VITE_API_URL || '';
+    const res = await fetch(`${API_BASE_URL}/api/inventory`);
+    if (!res.ok) return;
+    const data = await res.json();
+    if (!data.success || !Array.isArray(data.inventory)) return;
+
+    const map: Record<string, boolean> = {};
+    data.inventory.forEach((item: any) => {
+      const isAvailable = Number(item.quantity ?? 0) > 0;
+      if (item.id) {
+        map[item.id] = isAvailable;
+        map[item.id.toLowerCase()] = isAvailable;
+      }
+      if (item.name) {
+        map[item.name] = isAvailable;
+        map[item.name.toLowerCase()] = isAvailable;
+        const clean = getCleanColorName(item.name).toLowerCase();
+        map[clean] = isAvailable;
+      }
+      if (item.refCode) {
+        map[item.refCode] = isAvailable;
+        map[item.refCode.toLowerCase()] = isAvailable;
+      }
+    });
+    globalFetchedStockMap = map;
+    stockListeners.forEach(listener => listener(map));
+  } catch (err) {
+    console.warn("[TEXTURE SWATCH] Failed auto-fetching Railway inventory:", err);
+  }
+}
+
 export const TextureSwatchPicker: React.FC<TextureSwatchPickerProps> = ({
   label,
   selectedColor,
@@ -30,6 +67,38 @@ export const TextureSwatchPicker: React.FC<TextureSwatchPickerProps> = ({
 }) => {
   const [hoveredSwatch, setHoveredSwatch] = useState<YarnColor | null>(null);
   const [hoverPos, setHoverPos] = useState<{ x: number; y: number }>({ x: 50, y: 50 });
+  const [internalStockMap, setInternalStockMap] = useState<Record<string, boolean>>(
+    globalFetchedStockMap || {}
+  );
+
+  // Auto-fetch Railway inventory on mount and subscribe to stock updates universally
+  React.useEffect(() => {
+    const handleUpdate = (map: Record<string, boolean>) => {
+      setInternalStockMap(map);
+    };
+    stockListeners.add(handleUpdate);
+
+    if (!globalFetchedStockMap) {
+      fetchGlobalInventoryStock();
+    } else {
+      setInternalStockMap(globalFetchedStockMap);
+    }
+
+    const handleCustomEvent = () => {
+      fetchGlobalInventoryStock();
+    };
+    window.addEventListener('inventory-updated', handleCustomEvent);
+
+    return () => {
+      stockListeners.delete(handleUpdate);
+      window.removeEventListener('inventory-updated', handleCustomEvent);
+    };
+  }, []);
+
+  // Combine prop yarnStockMap with auto-fetched internalStockMap
+  const effectiveStockMap = React.useMemo(() => {
+    return { ...internalStockMap, ...yarnStockMap };
+  }, [internalStockMap, yarnStockMap]);
 
   // Get active yarn line metadata
   const currentYarnLine = YARN_LINES.find(l => l.id === yarnLineId) || YARN_LINES[0];
@@ -40,10 +109,10 @@ export const TextureSwatchPicker: React.FC<TextureSwatchPickerProps> = ({
     
     const clean = getCleanColorName(swatchName).toLowerCase();
     
-    // Check yarnStockMap
-    if (yarnStockMap[clean] === false || yarnStockMap[swatchName] === false || yarnStockMap[swatchName.toLowerCase()] === false) return true;
+    // Check effectiveStockMap
+    if (effectiveStockMap[clean] === false || effectiveStockMap[swatchName] === false || effectiveStockMap[swatchName.toLowerCase()] === false) return true;
     if (swatchItem) {
-      if (yarnStockMap[swatchItem.id] === false || yarnStockMap[swatchItem.name.toLowerCase()] === false) return true;
+      if (effectiveStockMap[swatchItem.id] === false || effectiveStockMap[swatchItem.id.toLowerCase()] === false || effectiveStockMap[swatchItem.name.toLowerCase()] === false) return true;
     }
     
     // Check outOfStockColors list
@@ -51,7 +120,7 @@ export const TextureSwatchPicker: React.FC<TextureSwatchPickerProps> = ({
       const cleanOOS = getCleanColorName(oos).toLowerCase();
       return cleanOOS === clean || oos.toLowerCase() === swatchName.toLowerCase();
     });
-  }, [outOfStockColors, yarnStockMap]);
+  }, [outOfStockColors, effectiveStockMap]);
 
   // Filter & strictly deduplicate swatches by yarnLineId or options provided
   const swatchList: YarnColor[] = React.useMemo(() => {
