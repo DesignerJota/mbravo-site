@@ -11,6 +11,7 @@ import { DigitalBusinessCard } from './components/DigitalBusinessCard';
 import { SHIPPING_ZONES } from './types';
 import { AtelierCartDrawer } from './components/AtelierCartDrawer';
 import { CartCheckoutModal } from './components/CartCheckoutModal';
+import { TextureSwatchPicker } from './components/TextureSwatchPicker';
 import { 
   useLanguage, 
   translateProduct, 
@@ -403,8 +404,7 @@ export let SHOP_CATEGORIES = [
           '/products/coraline-coasters/1.webp',
           '/products/coraline-coasters/2.webp',
           '/products/coraline-coasters/3.webp',
-          '/products/coraline-coasters/4.webp',
-          '/products/coraline-coasters/5.webp'
+          '/products/coraline-coasters/4.webp'
         ],
         description: "Bases em crochet inspiradas no design Coraline, feitas à mão com todo o carinho para trazer um toque aconchegante, elegante e especial ao teu espaço.",
         material: "- Material: 100% algodão",
@@ -509,8 +509,7 @@ Com fecho ajustável em cordão e um acabamento delicado handmade, é perfeito p
         images: [
           '/products/granny-square-sling-bag/1.webp',
           '/products/granny-square-sling-bag/2.webp',
-          '/products/granny-square-sling-bag/3.webp',
-          '/products/granny-square-sling-bag/4.webp'
+          '/products/granny-square-sling-bag/3.webp'
         ],
         description: "Mala em crochet com padrão Granny Square floral, cuidadosamente feita à mão e forrada no interior para maior estrutura e durabilidade. Com alça ajustável e fecho de correr, pode ser usada à cintura, a tiracolo ou ao ombro, adaptando-se facilmente ao teu estilo e às tuas necessidades do dia a dia.\nDimensões aproximadas: 26 cm (largura) × 11 cm (altura)",
         material: "- Material: 100% algodão de alta qualidade\n- Detalhe: Forro interno macio para maior segurança e estrutura",
@@ -547,11 +546,12 @@ Compacta e prática, fecha com um botão de madeira com estrela, um detalhe espe
         id: 'v1', 
         name: 'Marea Bikini Set', 
         price: calculateProductRange('Marea Bikini Set'), 
-        img: '/products/marea-bikini-set/frente.webp',
+        img: '/products/marea-bikini-set/1.webp',
         images: [
-          '/products/marea-bikini-set/frente.webp',
           '/products/marea-bikini-set/1.webp',
-          '/products/marea-bikini-set/2.webp'
+          '/products/marea-bikini-set/2.webp',
+          '/products/marea-bikini-set/3.webp',
+          '/products/marea-bikini-set/4.webp'
         ],
         description: "Biquíni em crochet feito à mão, pensado para os dias de verão e momentos à beira-mar. O Marea Bikini combina um design de riscas delicadas com um ajuste confortável, criando um look handmade, minimalista e cozy. Disponível em várias combinações de cores.",
         material: "- Material: 100% algodão",
@@ -663,9 +663,7 @@ Disponível em várias combinações de cores, foi criado para acompanhar os dia
         img: '/products/classic-bandana/1.webp',
         images: [
           '/products/classic-bandana/1.webp',
-          '/products/classic-bandana/2.webp',
-          '/products/classic-bandana/3.webp',
-          '/products/classic-bandana/4.webp'
+          '/products/classic-bandana/2.webp'
         ],
         description: `Bandana em crochet feita à mão, com um design clássico em granny stitch.
 Leve, versátil e ajustável através de fitas, foi criada para complementar qualquer look com um toque artesanal e intemporal.
@@ -714,21 +712,21 @@ const PRODUCTS = [
     id: 1, 
     title: 'Aura Crystalline', 
     desc: 'Um volume arquitetónico que desafia a gravidade, marcado pela assinatura linear de Carolina. Cada ponto é uma coordenada num mapa de luxo sensorial.',
-    img: 'https://images.unsplash.com/photo-1614633833026-07205c9d640f?auto=format&fit=crop&q=80&w=800', 
+    img: '/categories/category-malas.webp', 
     price: '€285' 
   },
   { 
     id: 2, 
     title: 'Nebula Silk', 
     desc: 'A fluidez da malha encontra o design de impacto. Uma peça que carrega o DNA autoral da marca em texturas que parecem esculpidas pela luz.',
-    img: 'https://images.unsplash.com/photo-1584992236310-6edddc08acff?auto=format&fit=crop&q=80&w=800', 
+    img: '/categories/category-vestuario.webp', 
     price: '€310' 
   },
   { 
     id: 3, 
     title: 'Vector Nomad', 
     desc: 'O equilíbrio perfeito entre o saber-fazer manual e o utilitarismo futurista. Uma declaração de exclusividade gravada em cada entrelaçar de fio.',
-    img: 'https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?auto=format&fit=crop&q=80&w=800', 
+    img: '/categories/category-acessorios.webp', 
     price: '€245' 
   },
 ];
@@ -3395,6 +3393,15 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({ product: rawProduct,
                             alt={`${product.name} - Imagem ${activeImgIndex + 1}`} 
                             loading="lazy"
                             decoding="async"
+                            onError={(e) => {
+                                (e.currentTarget as HTMLImageElement).src = product.id.startsWith('b') || product.name.includes('Pouch')
+                                    ? '/categories/category-malas.webp'
+                                    : product.id.startsWith('h')
+                                    ? '/categories/category-casa.webp'
+                                    : product.id.startsWith('a')
+                                    ? '/categories/category-acessorios.webp'
+                                    : '/categories/category-vestuario.webp';
+                            }}
                             style={{ imageRendering: 'crisp-edges', filter: 'none', opacity: 1 }}
                             custom={direction}
                             variants={slideVariants}
@@ -3501,6 +3508,9 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({ product: rawProduct,
                                         alt="" 
                                         loading="lazy"
                                         decoding="async"
+                                        onError={(e) => {
+                                            (e.currentTarget as HTMLImageElement).src = '/categories/category-malas.webp';
+                                        }}
                                         style={{ imageRendering: 'crisp-edges', filter: 'none', opacity: 1 }}
                                         className="w-full h-full object-cover antialiased filter-none opacity-100" 
                                     />
@@ -4501,141 +4511,59 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({ product: rawProduct,
                         <div className="space-y-3.5 sm:space-y-5">
                             {/* Container Comum para Seletores (Cores, Tamanho, Quantidade) com recuo explícito */}
                             <div id="selection-selectors-group" className="space-y-3 sm:space-y-4 text-left w-full">
-                                {/* Cores: Conditional rendering based on colorType */}
+                                {/* Cores: Texture Swatch Picker Integration */}
                                 {colorType === 'single' && (
-                                    <div className="space-y-1.5">
-                                        <div className="flex justify-between items-center">
-                                            <h5 className="text-[8.5px] sm:text-[9px] uppercase tracking-[0.2em] font-semibold text-forest/50 flex items-center gap-1.5">
-                                                <span className="text-[#C5A059] text-[10px]">●</span> {t('product.color')}
-                                            </h5>
-                                            <span className="text-[9.5px] font-medium text-forest/70 uppercase tracking-wider">
-                                                {translateColor(selections.cor, lang)}
-                                            </span>
-                                        </div>
-                                        <div className="flex flex-wrap gap-1.5 sm:gap-2">
-                                            {availableColorOptions.map(rawCol => {
-                                                const formattedName = formatColorName(rawCol);
-                                                const isActive = formatColorName(selections.cor) === formattedName || selections.cor === rawCol;
-                                                const swatchBg = getColorSwatchBg(rawCol);
-                                                return (
-                                                    <button 
-                                                        key={rawCol}
-                                                        type="button"
-                                                        onClick={() => setSelections(prev => ({ ...prev, cor: rawCol, corPrincipal: rawCol }))}
-                                                        className={`w-5 h-5 sm:w-6 sm:h-6 rounded-full border transition-all p-0.5 cursor-pointer relative ${
-                                                            isActive 
-                                                                ? 'ring-1 ring-offset-1 ring-forest border-white scale-105' 
-                                                                : 'border-forest/15 hover:scale-105 hover:border-[#C5A059]'
-                                                        }`}
-                                                        title={formattedName}
-                                                    >
-                                                        <div 
-                                                            className="w-full h-full rounded-full border border-black/10" 
-                                                            style={{ background: swatchBg }}
-                                                        />
-                                                    </button>
-                                                );
-                                            })}
-                                        </div>
-                                    </div>
+                                    <TextureSwatchPicker
+                                        label={t('product.color')}
+                                        selectedColor={selections.cor}
+                                        availableOptions={availableColorOptions}
+                                        yarnLineId={isSafran ? 'drops-safran' : 'drops-paris'}
+                                        outOfStockColors={(product as any).outOfStockColors || (product as any).coresEsgotadas || []}
+                                        lang={lang}
+                                        onChange={(newColor) => setSelections(prev => ({ ...prev, cor: newColor, corPrincipal: newColor }))}
+                                    />
                                 )}
 
                                 {colorType === 'bicolor' && (
-                                    <div className="space-y-3">
-                                        {/* Row 1: Primary Color */}
-                                        <div className="space-y-1.5">
-                                            <div className="flex justify-between items-center">
-                                                <h5 className="text-[8.5px] sm:text-[9px] uppercase tracking-[0.2em] font-semibold text-forest/50 flex items-center gap-1.5">
-                                                    <span className="text-[#C5A059] text-[10px]">●</span> {lang === 'pt' ? 'Cor Principal' : 'Main Color'}
-                                                </h5>
-                                                <span className="text-[9.5px] font-medium text-forest/70 uppercase tracking-wider">
-                                                    {translateColor(selections.corPrincipal || availableColorOptions[0], lang)}
-                                                </span>
-                                            </div>
-                                            <div className="flex flex-wrap gap-1.5 sm:gap-2">
-                                                {availableColorOptions.map(rawCol => {
-                                                    const formattedName = formatColorName(rawCol);
-                                                    const activePrim = selections.corPrincipal || availableColorOptions[0];
-                                                    const isActive = formatColorName(activePrim) === formattedName || activePrim === rawCol;
-                                                    const swatchBg = getColorSwatchBg(rawCol);
-                                                    return (
-                                                        <button 
-                                                            key={`prim-${rawCol}`}
-                                                            type="button"
-                                                            onClick={() => {
-                                                                const newPrim = rawCol;
-                                                                const currentDet = selections.corDetalhe || availableColorOptions[1] || availableColorOptions[0];
-                                                                const combined = `${formatColorName(newPrim)} & ${formatColorName(currentDet)}`;
-                                                                setSelections(prev => ({
-                                                                    ...prev,
-                                                                    corPrincipal: newPrim,
-                                                                    cor: combined
-                                                                }));
-                                                            }}
-                                                            className={`w-5 h-5 sm:w-6 sm:h-6 rounded-full border transition-all p-0.5 cursor-pointer relative ${
-                                                                isActive 
-                                                                    ? 'ring-1 ring-offset-1 ring-forest border-white scale-105' 
-                                                                    : 'border-forest/15 hover:scale-105 hover:border-[#C5A059]'
-                                                            }`}
-                                                            title={formattedName}
-                                                        >
-                                                            <div 
-                                                                className="w-full h-full rounded-full border border-black/10" 
-                                                                style={{ background: swatchBg }}
-                                                            />
-                                                        </button>
-                                                    );
-                                                })}
-                                            </div>
-                                        </div>
+                                    <div className="space-y-4">
+                                        {/* Primary Color Zone */}
+                                        <TextureSwatchPicker
+                                            label={lang === 'pt' ? 'Cor Principal (Zona Base)' : 'Main Color (Base Zone)'}
+                                            selectedColor={selections.corPrincipal || availableColorOptions[0]}
+                                            availableOptions={availableColorOptions}
+                                            yarnLineId={isSafran ? 'drops-safran' : 'drops-paris'}
+                                            outOfStockColors={(product as any).outOfStockColors || (product as any).coresEsgotadas || []}
+                                            lang={lang}
+                                            onChange={(newPrim) => {
+                                                const currentDet = selections.corDetalhe || availableColorOptions[1] || availableColorOptions[0];
+                                                const combined = `${formatColorName(newPrim)} & ${formatColorName(currentDet)}`;
+                                                setSelections(prev => ({
+                                                    ...prev,
+                                                    corPrincipal: newPrim,
+                                                    cor: combined
+                                                }));
+                                            }}
+                                        />
 
-                                        {/* Row 2: Detail / Cord Color */}
-                                        <div className="space-y-1.5">
-                                            <div className="flex justify-between items-center">
-                                                <h5 className="text-[8.5px] sm:text-[9px] uppercase tracking-[0.2em] font-semibold text-forest/50 flex items-center gap-1.5">
-                                                    <span className="text-[#C5A059] text-[10px]">●</span> {(product as any).secondColorLabel || (product as any).detailLabel || (product as any).corDetalheLabel || ((product.name.toLowerCase().includes('mini pouch') || product.name.toLowerCase().includes('mini pouches') || (product as any).hasCordao) ? (lang === 'pt' ? 'Cor do Cordão' : 'Drawstring Color') : (lang === 'pt' ? 'Cor do Detalhe' : 'Detail Color'))}
-                                                </h5>
-                                                <span className="text-[9.5px] font-medium text-forest/70 uppercase tracking-wider">
-                                                    {translateColor(selections.corDetalhe || availableColorOptions[1] || availableColorOptions[0], lang)}
-                                                </span>
-                                            </div>
-                                            <div className="flex flex-wrap gap-1.5 sm:gap-2">
-                                                {availableColorOptions.map(rawCol => {
-                                                    const formattedName = formatColorName(rawCol);
-                                                    const activeDet = selections.corDetalhe || availableColorOptions[1] || availableColorOptions[0];
-                                                    const isActive = formatColorName(activeDet) === formattedName || activeDet === rawCol;
-                                                    const swatchBg = getColorSwatchBg(rawCol);
-                                                    return (
-                                                        <button 
-                                                            key={`det-${rawCol}`}
-                                                            type="button"
-                                                            onClick={() => {
-                                                                const newDet = rawCol;
-                                                                const currentPrim = selections.corPrincipal || availableColorOptions[0];
-                                                                const combined = `${formatColorName(currentPrim)} & ${formatColorName(newDet)}`;
-                                                                setSelections(prev => ({
-                                                                    ...prev,
-                                                                    corDetalhe: newDet,
-                                                                    corFio: newDet,
-                                                                    cor: combined
-                                                                }));
-                                                            }}
-                                                            className={`w-5 h-5 sm:w-6 sm:h-6 rounded-full border transition-all p-0.5 cursor-pointer relative ${
-                                                                isActive 
-                                                                    ? 'ring-1 ring-offset-1 ring-forest border-white scale-105' 
-                                                                    : 'border-forest/15 hover:scale-105 hover:border-[#C5A059]'
-                                                            }`}
-                                                            title={formattedName}
-                                                        >
-                                                            <div 
-                                                                className="w-full h-full rounded-full border border-black/10" 
-                                                                style={{ background: swatchBg }}
-                                                            />
-                                                        </button>
-                                                    );
-                                                })}
-                                            </div>
-                                        </div>
+                                        {/* Detail / Cord Color Zone */}
+                                        <TextureSwatchPicker
+                                            label={(product as any).secondColorLabel || (product as any).detailLabel || (product as any).corDetalheLabel || ((product.name.toLowerCase().includes('mini pouch') || product.name.toLowerCase().includes('mini pouches') || (product as any).hasCordao) ? (lang === 'pt' ? 'Cor do Cordão' : 'Drawstring Color') : (lang === 'pt' ? 'Cor do Detalhe' : 'Detail Color'))}
+                                            selectedColor={selections.corDetalhe || availableColorOptions[1] || availableColorOptions[0]}
+                                            availableOptions={availableColorOptions}
+                                            yarnLineId={isSafran ? 'drops-safran' : 'drops-paris'}
+                                            outOfStockColors={(product as any).outOfStockColors || (product as any).coresEsgotadas || []}
+                                            lang={lang}
+                                            onChange={(newDet) => {
+                                                const currentPrim = selections.corPrincipal || availableColorOptions[0];
+                                                const combined = `${formatColorName(currentPrim)} & ${formatColorName(newDet)}`;
+                                                setSelections(prev => ({
+                                                    ...prev,
+                                                    corDetalhe: newDet,
+                                                    corFio: newDet,
+                                                    cor: combined
+                                                }));
+                                            }}
+                                        />
                                     </div>
                                 )}
 
@@ -4788,7 +4716,13 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({ product: rawProduct,
                                         {colorType !== 'fixed' && (
                                             <div className="flex justify-between items-center border-b border-forest/5 pb-1">
                                                 <span className="text-forest/40 text-[9px] tracking-[0.2em]">{t('product.color')}</span>
-                                                <span className="text-forest font-semibold">{translateColor(selections.cor, lang)}</span>
+                                                <div className="flex items-center gap-1.5">
+                                                    <span 
+                                                        className="w-3.5 h-3.5 rounded-full border border-forest/20 shadow-2xs shrink-0 bg-cover bg-center inline-block"
+                                                        style={{ background: getColorSwatchBg(selections.cor || selections.corPrincipal) }}
+                                                    />
+                                                    <span className="text-forest font-semibold">{translateColor(selections.cor, lang)}</span>
+                                                </div>
                                             </div>
                                         )}
                                         {hasSize && (
@@ -4829,7 +4763,13 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({ product: rawProduct,
                                         {colorType !== 'fixed' && (
                                             <div className="flex justify-between items-center border-b border-white/5 pb-1">
                                                 <span className="text-white/40 text-[9px] tracking-[0.2em]">{t('product.color')}</span>
-                                                <span className="text-[#FCFBF9] font-semibold">{translateColor(selections.cor, lang)}</span>
+                                                <div className="flex items-center gap-1.5">
+                                                    <span 
+                                                        className="w-3.5 h-3.5 rounded-full border border-white/25 shadow-2xs shrink-0 bg-cover bg-center inline-block"
+                                                        style={{ background: getColorSwatchBg(selections.cor || selections.corPrincipal) }}
+                                                    />
+                                                    <span className="text-[#FCFBF9] font-semibold">{translateColor(selections.cor, lang)}</span>
+                                                </div>
                                             </div>
                                         )}
                                         {hasSize && (
@@ -5097,6 +5037,14 @@ const CollectionSection = () => {
                                 loading={i < 2 ? "eager" : "lazy"}
                                 fetchPriority={i < 2 ? "high" : "auto"}
                                 decoding="async"
+                                onError={(e) => {
+                                    const img = e.currentTarget as HTMLImageElement;
+                                    const catId = (cat.id || '').toLowerCase();
+                                    if (catId.includes('home') || catId.includes('casa')) img.src = '/categories/category-casa.webp';
+                                    else if (catId.includes('bag') || catId.includes('mala')) img.src = '/categories/category-malas.webp';
+                                    else if (catId.includes('vestuario') || catId.includes('clothing')) img.src = '/categories/category-vestuario.webp';
+                                    else img.src = '/categories/category-acessorios.webp';
+                                }}
                                 style={{ 
                                     imageRendering: 'crisp-edges',
                                     WebkitBackfaceVisibility: 'hidden',
@@ -5396,7 +5344,7 @@ const InstagramSection = () => {
     const [posts, setPosts] = useState<any[]>([
         {
             id: '1',
-            img: 'https://i.ibb.co/mCmVm2rL/mockup-coosters-luxury-1.png',
+            img: '/products/daisy-coasters/1.webp',
             alt: 'Daisy Coasters M★BRAVO',
             productName: 'Daisy Coasters Set',
             likes: '68',
@@ -5406,7 +5354,7 @@ const InstagramSection = () => {
         },
         {
             id: '2',
-            img: 'https://i.ibb.co/NnCJyRTF/African-Flower-Pouch-10-1.png',
+            img: '/products/african-flower-pouch/1.webp',
             alt: 'African Flower Pouch M★BRAVO',
             productName: 'African Flower Pouch',
             likes: '84',
@@ -5416,7 +5364,7 @@ const InstagramSection = () => {
         },
         {
             id: '3',
-            img: 'https://i.ibb.co/zWNCP5Nx/Stella-Cushion-7-1.png',
+            img: '/products/stella-cushion/1.webp',
             alt: 'Stella Cushion M★BRAVO',
             productName: 'Stella Cushion',
             likes: '92',
@@ -5426,7 +5374,7 @@ const InstagramSection = () => {
         },
         {
             id: '4',
-            img: 'https://i.ibb.co/wNdC8NNG/Granny-square-sling-bag-20.png',
+            img: '/products/granny-square-sling-bag/1.webp',
             alt: 'Granny Square Sling Bag M★BRAVO',
             productName: 'Granny Square Sling Bag',
             likes: '79',
@@ -5436,7 +5384,7 @@ const InstagramSection = () => {
         },
         {
             id: '5',
-            img: 'https://i.ibb.co/kVZvr34t/Sunflower-coasters-5.png',
+            img: '/products/sunflower-coasters/1.webp',
             alt: 'Sunflower Coasters M★BRAVO',
             productName: 'Sunflower Coasters Set',
             likes: '56',
@@ -5446,7 +5394,7 @@ const InstagramSection = () => {
         },
         {
             id: '6',
-            img: 'https://i.ibb.co/VY1dx3nt/Mini-shell-Pouch.png',
+            img: '/products/mini-shell-pouch/1.webp',
             alt: 'Mini Shell Pouch M★BRAVO',
             productName: 'Mini Shell Pouch',
             likes: '71',
@@ -6897,133 +6845,57 @@ const ProductDetailPage = ({ pathname }: { pathname: string }) => {
                                     </div>
                                 )}
 
-                                {/* Color Swatch Customizer */}
+                                {/* Color Swatch Customizer Integration */}
                                 {colorType === 'single' && (
-                                    <div className="space-y-2">
-                                        <div className="flex justify-between items-center text-[10px] uppercase tracking-wider text-forest/55">
-                                            <span>{lang === 'pt' ? 'Cor' : 'Color'}</span>
-                                            <span className="font-bold text-[#A68244] bg-[#FDF9F3] px-3 py-0.5 rounded-full border border-[#C5A059]/10">{translateColor(selections.cor, lang)}</span>
-                                        </div>
-                                        <div className="flex flex-wrap gap-2.5">
-                                            {availableColorOptions.map((rawCol) => {
-                                                const formattedName = formatColorName(rawCol);
-                                                const isActive = formatColorName(selections.cor) === formattedName || selections.cor === rawCol;
-                                                const swatchBg = getColorSwatchBg(rawCol);
-                                                return (
-                                                    <button
-                                                        key={rawCol}
-                                                        type="button"
-                                                        onClick={() => setSelections(prev => ({ ...prev, cor: rawCol, corPrincipal: rawCol }))}
-                                                        className={`relative w-8 h-8 rounded-full border transition-all cursor-pointer p-0.5 shadow-sm ${
-                                                            isActive 
-                                                                ? 'ring-2 ring-offset-2 ring-[#C5A059] scale-110 shadow-md shadow-[#C5A059]/20 border-white' 
-                                                                : 'border-forest/15 hover:scale-105 hover:border-[#C5A059]'
-                                                        }`}
-                                                        title={formattedName}
-                                                    >
-                                                        <div 
-                                                            className="w-full h-full rounded-full border border-black/10 shadow-inner" 
-                                                            style={{ background: swatchBg }}
-                                                        />
-                                                    </button>
-                                                );
-                                            })}
-                                        </div>
-                                    </div>
+                                    <TextureSwatchPicker
+                                        label={t('product.color')}
+                                        selectedColor={selections.cor}
+                                        availableOptions={availableColorOptions}
+                                        yarnLineId={isSafran ? 'drops-safran' : 'drops-paris'}
+                                        outOfStockColors={(productTranslated as any).outOfStockColors || (productTranslated as any).coresEsgotadas || []}
+                                        lang={lang}
+                                        onChange={(newColor) => setSelections(prev => ({ ...prev, cor: newColor, corPrincipal: newColor }))}
+                                    />
                                 )}
 
                                 {colorType === 'bicolor' && (
                                     <div className="space-y-4">
-                                        {/* Row 1: Primary Color */}
-                                        <div className="space-y-2">
-                                            <div className="flex justify-between items-center text-[10px] uppercase tracking-wider text-forest/55">
-                                                <span>{lang === 'pt' ? 'Cor Principal' : 'Main Color'}</span>
-                                                <span className="font-bold text-[#A68244] bg-[#FDF9F3] px-3 py-0.5 rounded-full border border-[#C5A059]/10">
-                                                    {translateColor(selections.corPrincipal || availableColorOptions[0], lang)}
-                                                </span>
-                                            </div>
-                                            <div className="flex flex-wrap gap-2.5">
-                                                {availableColorOptions.map((rawCol) => {
-                                                    const formattedName = formatColorName(rawCol);
-                                                    const activePrim = selections.corPrincipal || availableColorOptions[0];
-                                                    const isActive = formatColorName(activePrim) === formattedName || activePrim === rawCol;
-                                                    const swatchBg = getColorSwatchBg(rawCol);
-                                                    return (
-                                                        <button
-                                                            key={`prim-${rawCol}`}
-                                                            type="button"
-                                                            onClick={() => {
-                                                                const newPrim = rawCol;
-                                                                const currentDet = selections.corDetalhe || availableColorOptions[1] || availableColorOptions[0];
-                                                                const combined = `${formatColorName(newPrim)} & ${formatColorName(currentDet)}`;
-                                                                setSelections(prev => ({
-                                                                    ...prev,
-                                                                    corPrincipal: newPrim,
-                                                                    cor: combined
-                                                                }));
-                                                            }}
-                                                            className={`relative w-8 h-8 rounded-full border transition-all cursor-pointer p-0.5 shadow-sm ${
-                                                                isActive 
-                                                                    ? 'ring-2 ring-offset-2 ring-[#C5A059] scale-110 shadow-md shadow-[#C5A059]/20 border-white' 
-                                                                    : 'border-forest/15 hover:scale-105 hover:border-[#C5A059]'
-                                                            }`}
-                                                            title={formattedName}
-                                                        >
-                                                            <div 
-                                                                className="w-full h-full rounded-full border border-black/10 shadow-inner" 
-                                                                style={{ background: swatchBg }}
-                                                            />
-                                                        </button>
-                                                    );
-                                                })}
-                                            </div>
-                                        </div>
+                                        <TextureSwatchPicker
+                                            label={lang === 'pt' ? 'Cor Principal (Zona Base)' : 'Main Color (Base Zone)'}
+                                            selectedColor={selections.corPrincipal || availableColorOptions[0]}
+                                            availableOptions={availableColorOptions}
+                                            yarnLineId={isSafran ? 'drops-safran' : 'drops-paris'}
+                                            outOfStockColors={(productTranslated as any).outOfStockColors || (productTranslated as any).coresEsgotadas || []}
+                                            lang={lang}
+                                            onChange={(newPrim) => {
+                                                const currentDet = selections.corDetalhe || availableColorOptions[1] || availableColorOptions[0];
+                                                const combined = `${formatColorName(newPrim)} & ${formatColorName(currentDet)}`;
+                                                setSelections(prev => ({
+                                                    ...prev,
+                                                    corPrincipal: newPrim,
+                                                    cor: combined
+                                                }));
+                                            }}
+                                        />
 
-                                        {/* Row 2: Detail / Cord Color */}
-                                        <div className="space-y-2">
-                                            <div className="flex justify-between items-center text-[10px] uppercase tracking-wider text-forest/55">
-                                                <span>{(productTranslated as any).secondColorLabel || (productTranslated as any).detailLabel || (productTranslated as any).corDetalheLabel || ((productTranslated.name.toLowerCase().includes('mini pouch') || productTranslated.name.toLowerCase().includes('mini pouches') || (productTranslated as any).hasCordao) ? (lang === 'pt' ? 'Cor do Cordão' : 'Drawstring Color') : (lang === 'pt' ? 'Cor do Detalhe' : 'Detail Color'))}</span>
-                                                <span className="font-bold text-[#A68244] bg-[#FDF9F3] px-3 py-0.5 rounded-full border border-[#C5A059]/10">
-                                                    {translateColor(selections.corDetalhe || availableColorOptions[1] || availableColorOptions[0], lang)}
-                                                </span>
-                                            </div>
-                                            <div className="flex flex-wrap gap-2.5">
-                                                {availableColorOptions.map((rawCol) => {
-                                                    const formattedName = formatColorName(rawCol);
-                                                    const activeDet = selections.corDetalhe || availableColorOptions[1] || availableColorOptions[0];
-                                                    const isActive = formatColorName(activeDet) === formattedName || activeDet === rawCol;
-                                                    const swatchBg = getColorSwatchBg(rawCol);
-                                                    return (
-                                                        <button
-                                                            key={`det-${rawCol}`}
-                                                            type="button"
-                                                            onClick={() => {
-                                                                const newDet = rawCol;
-                                                                const currentPrim = selections.corPrincipal || availableColorOptions[0];
-                                                                const combined = `${formatColorName(currentPrim)} & ${formatColorName(newDet)}`;
-                                                                setSelections(prev => ({
-                                                                    ...prev,
-                                                                    corDetalhe: newDet,
-                                                                    corFio: newDet,
-                                                                    cor: combined
-                                                                }));
-                                                            }}
-                                                            className={`relative w-8 h-8 rounded-full border transition-all cursor-pointer p-0.5 shadow-sm ${
-                                                                isActive 
-                                                                    ? 'ring-2 ring-offset-2 ring-[#C5A059] scale-110 shadow-md shadow-[#C5A059]/20 border-white' 
-                                                                    : 'border-forest/15 hover:scale-105 hover:border-[#C5A059]'
-                                                            }`}
-                                                            title={formattedName}
-                                                        >
-                                                            <div 
-                                                                className="w-full h-full rounded-full border border-black/10 shadow-inner" 
-                                                                style={{ background: swatchBg }}
-                                                            />
-                                                        </button>
-                                                    );
-                                                })}
-                                            </div>
-                                        </div>
+                                        <TextureSwatchPicker
+                                            label={(productTranslated as any).secondColorLabel || (productTranslated as any).detailLabel || (productTranslated as any).corDetalheLabel || ((productTranslated.name.toLowerCase().includes('mini pouch') || productTranslated.name.toLowerCase().includes('mini pouches') || (productTranslated as any).hasCordao) ? (lang === 'pt' ? 'Cor do Cordão' : 'Drawstring Color') : (lang === 'pt' ? 'Cor do Detalhe' : 'Detail Color'))}
+                                            selectedColor={selections.corDetalhe || availableColorOptions[1] || availableColorOptions[0]}
+                                            availableOptions={availableColorOptions}
+                                            yarnLineId={isSafran ? 'drops-safran' : 'drops-paris'}
+                                            outOfStockColors={(productTranslated as any).outOfStockColors || (productTranslated as any).coresEsgotadas || []}
+                                            lang={lang}
+                                            onChange={(newDet) => {
+                                                const currentPrim = selections.corPrincipal || availableColorOptions[0];
+                                                const combined = `${formatColorName(currentPrim)} & ${formatColorName(newDet)}`;
+                                                setSelections(prev => ({
+                                                    ...prev,
+                                                    corDetalhe: newDet,
+                                                    corFio: newDet,
+                                                    cor: combined
+                                                }));
+                                            }}
+                                        />
                                     </div>
                                 )}
 
