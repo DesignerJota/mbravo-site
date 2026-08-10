@@ -4616,6 +4616,7 @@ export default function AdminDashboardModal({ onClose, shopCategories = [] }: Ad
                         if (res.ok && data.success) {
                           alert("Inventário físico de matérias-primas guardado com sucesso!");
                           setInventory(data.inventory || []);
+                          window.dispatchEvent(new CustomEvent('inventory-updated'));
                         } else {
                           alert(data.error || "Erro ao guardar inventário.");
                         }
