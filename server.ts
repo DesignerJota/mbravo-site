@@ -1904,7 +1904,7 @@ app.get("/api/admin/orders/:orderId/email-preview", verifyAdmin, (req, res) => {
 
 // Endpoint to update an order
 app.post("/api/admin/orders/update", verifyAdmin, (req, res) => {
-  const { orderId, status, trackingCode, priority, selections } = req.body;
+  const { orderId, status, trackingCode, priority, selections, productName, price, customer, paymentMethod, notes, items, accessories } = req.body;
   
   // Reload current orders from disk to stay perfectly synchronized
   const currentOrders = loadOrders();
@@ -1931,8 +1931,29 @@ app.post("/api/admin/orders/update", verifyAdmin, (req, res) => {
   if (priority) {
     order.priority = priority;
   }
+  if (productName) {
+    order.productName = productName;
+  }
+  if (price !== undefined) {
+    order.price = price;
+  }
+  if (customer) {
+    order.customer = { ...(order.customer || {}), ...customer };
+  }
+  if (paymentMethod) {
+    order.paymentMethod = paymentMethod;
+  }
+  if (notes !== undefined) {
+    order.notes = notes;
+  }
+  if (items) {
+    order.items = items;
+  }
+  if (accessories) {
+    order.accessories = accessories;
+  }
   if (selections) {
-    order.selections = { ...order.selections, ...selections };
+    order.selections = { ...(order.selections || {}), ...selections };
   }
 
   // If status is updated to shipped, generate the shipped email!
