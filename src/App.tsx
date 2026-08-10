@@ -23,6 +23,7 @@ import {
   translateQuantity,
   translateBackendError
 } from './translations';
+import { getCleanColorName } from './data/yarns';
 
 // API Base URL config for Railway production backend vs local development
 const API_BASE_URL = import.meta.env.VITE_API_URL || '';
@@ -2757,7 +2758,56 @@ interface ProductCardProps {
     onNextProduct?: () => void;
 }
 
+// Module-level cache and subscriber for raw materials inventory stock map
+let globalYarnStockMap: Record<string, boolean> = {};
+
+export function useYarnStockMap() {
+  const [stockMap, setStockMap] = useState<Record<string, boolean>>(globalYarnStockMap);
+
+  useEffect(() => {
+    let isMounted = true;
+    const fetchInventoryStock = async () => {
+      try {
+        const res = await fetch(`${API_BASE_URL}/api/inventory`);
+        if (!res.ok) return;
+        const data = await res.json();
+        if (!isMounted || !data.success || !Array.isArray(data.inventory)) return;
+
+        const map: Record<string, boolean> = {};
+        data.inventory.forEach((item: any) => {
+          const isAvailable = Number(item.quantity ?? 0) > 0;
+          if (item.id) map[item.id] = isAvailable;
+          if (item.name) {
+            map[item.name] = isAvailable;
+            map[item.name.toLowerCase()] = isAvailable;
+            const clean = getCleanColorName(item.name).toLowerCase();
+            map[clean] = isAvailable;
+          }
+        });
+        globalYarnStockMap = map;
+        setStockMap(map);
+      } catch (err) {
+        console.warn("[INVENTORY SYNC] Failed to fetch inventory stock map:", err);
+      }
+    };
+
+    fetchInventoryStock();
+
+    const handleInventoryUpdate = () => {
+      fetchInventoryStock();
+    };
+    window.addEventListener('inventory-updated', handleInventoryUpdate);
+    return () => {
+      isMounted = false;
+      window.removeEventListener('inventory-updated', handleInventoryUpdate);
+    };
+  }, []);
+
+  return stockMap;
+}
+
 const ProductCardComponent: React.FC<ProductCardProps> = ({ product: rawProduct, i, isFocused, isSubdued, onFocus, onPrevProduct, onNextProduct }) => {
+    const yarnStockMap = useYarnStockMap();
     const { lang, t } = useLanguage();
     const { addToCart, setIsCheckoutOpen, selectedShippingZone, setSelectedShippingZone } = useCart();
     const product = translateProduct(rawProduct, lang);
@@ -4519,6 +4569,7 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({ product: rawProduct,
                                         availableOptions={availableColorOptions}
                                         yarnLineId={isSafran ? 'drops-safran' : 'drops-paris'}
                                         outOfStockColors={(product as any).outOfStockColors || (product as any).coresEsgotadas || []}
+                                        yarnStockMap={yarnStockMap}
                                         lang={lang}
                                         onChange={(newColor) => setSelections(prev => ({ ...prev, cor: newColor, corPrincipal: newColor }))}
                                     />
@@ -4533,6 +4584,7 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({ product: rawProduct,
                                             availableOptions={availableColorOptions}
                                             yarnLineId={isSafran ? 'drops-safran' : 'drops-paris'}
                                             outOfStockColors={(product as any).outOfStockColors || (product as any).coresEsgotadas || []}
+                                            yarnStockMap={yarnStockMap}
                                             lang={lang}
                                             onChange={(newPrim) => {
                                                 const currentDet = selections.corDetalhe || availableColorOptions[1] || availableColorOptions[0];
@@ -4552,6 +4604,7 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({ product: rawProduct,
                                             availableOptions={availableColorOptions}
                                             yarnLineId={isSafran ? 'drops-safran' : 'drops-paris'}
                                             outOfStockColors={(product as any).outOfStockColors || (product as any).coresEsgotadas || []}
+                                            yarnStockMap={yarnStockMap}
                                             lang={lang}
                                             onChange={(newDet) => {
                                                 const currentPrim = selections.corPrincipal || availableColorOptions[0];
@@ -4915,6 +4968,7 @@ const CarouselItem: React.FC<{ children: React.ReactNode }> = ({ children }) => 
 };
 
 const CollectionSection = () => {
+    const yarnStockMap = useYarnStockMap();
     const containerRef = useRef(null);
     const { lang, t } = useLanguage();
     const [isMobileOrTablet, setIsMobileOrTablet] = useState(false);
@@ -6209,6 +6263,7 @@ const CategoryPage = ({ pathname }: { pathname: string }) => {
 
 // --- Product Detail Page Component ---
 const ProductDetailPage = ({ pathname }: { pathname: string }) => {
+    const yarnStockMap = useYarnStockMap();
     const { lang, t } = useLanguage();
     const productPath = pathname.split('/produtos/')[1]?.split('#')[0];
     const match = findProductBySlugOrId(productPath);
@@ -6853,6 +6908,7 @@ const ProductDetailPage = ({ pathname }: { pathname: string }) => {
                                         availableOptions={availableColorOptions}
                                         yarnLineId={isSafran ? 'drops-safran' : 'drops-paris'}
                                         outOfStockColors={(productTranslated as any).outOfStockColors || (productTranslated as any).coresEsgotadas || []}
+                                        yarnStockMap={yarnStockMap}
                                         lang={lang}
                                         onChange={(newColor) => setSelections(prev => ({ ...prev, cor: newColor, corPrincipal: newColor }))}
                                     />
@@ -6866,6 +6922,7 @@ const ProductDetailPage = ({ pathname }: { pathname: string }) => {
                                             availableOptions={availableColorOptions}
                                             yarnLineId={isSafran ? 'drops-safran' : 'drops-paris'}
                                             outOfStockColors={(productTranslated as any).outOfStockColors || (productTranslated as any).coresEsgotadas || []}
+                                            yarnStockMap={yarnStockMap}
                                             lang={lang}
                                             onChange={(newPrim) => {
                                                 const currentDet = selections.corDetalhe || availableColorOptions[1] || availableColorOptions[0];
@@ -6884,6 +6941,7 @@ const ProductDetailPage = ({ pathname }: { pathname: string }) => {
                                             availableOptions={availableColorOptions}
                                             yarnLineId={isSafran ? 'drops-safran' : 'drops-paris'}
                                             outOfStockColors={(productTranslated as any).outOfStockColors || (productTranslated as any).coresEsgotadas || []}
+                                            yarnStockMap={yarnStockMap}
                                             lang={lang}
                                             onChange={(newDet) => {
                                                 const currentPrim = selections.corPrincipal || availableColorOptions[0];
@@ -7975,6 +8033,47 @@ function AppContent() {
     return () => {
       isMounted = false;
       window.removeEventListener('catalog-updated', handleCatalogUpdate);
+    };
+  }, []);
+
+  // Global inventory stock map sync for yarn raw materials
+  const [yarnStockMap, setYarnStockMap] = useState<Record<string, boolean>>({});
+
+  useEffect(() => {
+    let isMounted = true;
+    const fetchInventoryStock = async () => {
+      try {
+        const res = await fetch(`${API_BASE_URL}/api/inventory`);
+        if (!res.ok) return;
+        const data = await res.json();
+        if (!isMounted || !data.success || !Array.isArray(data.inventory)) return;
+
+        const stockMap: Record<string, boolean> = {};
+        data.inventory.forEach((item: any) => {
+          const isAvailable = Number(item.quantity ?? 0) > 0;
+          if (item.id) stockMap[item.id] = isAvailable;
+          if (item.name) {
+            stockMap[item.name] = isAvailable;
+            stockMap[item.name.toLowerCase()] = isAvailable;
+            const clean = getCleanColorName(item.name).toLowerCase();
+            stockMap[clean] = isAvailable;
+          }
+        });
+        setYarnStockMap(stockMap);
+      } catch (err) {
+        console.warn("[INVENTORY SYNC] Failed to fetch inventory stock map:", err);
+      }
+    };
+
+    fetchInventoryStock();
+
+    const handleInventoryUpdate = () => {
+      fetchInventoryStock();
+    };
+    window.addEventListener('inventory-updated', handleInventoryUpdate);
+    return () => {
+      isMounted = false;
+      window.removeEventListener('inventory-updated', handleInventoryUpdate);
     };
   }, []);
 
