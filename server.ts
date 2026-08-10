@@ -1773,6 +1773,11 @@ app.post("/api/admin/catalog/save", verifyAdmin, (req, res) => {
   res.json({ success: true, categories });
 });
 
+app.get("/api/inventory", (req, res) => {
+  const list = loadInventory();
+  res.json({ success: true, inventory: list });
+});
+
 app.get("/api/admin/inventory", verifyAdmin, (req, res) => {
   const list = loadInventory();
   res.json({ success: true, inventory: list });
