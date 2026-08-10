@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
+import { TextureSwatchPicker } from './TextureSwatchPicker';
+import { getColorSwatchBg } from '../translations';
 import { 
   X, 
   Sparkles, 
@@ -410,16 +412,22 @@ const PieceVisualizerSVG: React.FC<{
       </svg>
 
       {/* Floating Canvas Tag Bar */}
-      <div className="absolute bottom-2.5 left-3 right-3 flex items-center justify-between text-[10px] font-mono bg-black/70 backdrop-blur-md px-3 py-1.5 rounded-xl border border-white/10 text-cream">
+      <div className="absolute bottom-2.5 left-3 right-3 flex items-center justify-between text-[10px] font-mono bg-black/75 backdrop-blur-md px-3 py-1.5 rounded-xl border border-white/10 text-cream">
         <div className="flex items-center gap-1.5 min-w-0">
-          <span className="w-2.5 h-2.5 rounded-full border shrink-0" style={{ backgroundColor: pColor }} />
+          <span
+            className="w-3 h-3 rounded-full border border-white/30 shrink-0 bg-cover bg-center"
+            style={{ background: getColorSwatchBg(primaryYarn.shortName || primaryYarn.name) }}
+          />
           <span className="text-[#D4C3A3] font-sans font-medium truncate">
             {isBicolor ? `Corpo: ${primaryYarn.shortName}` : primaryYarn.shortName}
           </span>
         </div>
         {isBicolor && (
           <div className="flex items-center gap-1.5 min-w-0 shrink-0">
-            <span className="w-2.5 h-2.5 rounded-full border shrink-0" style={{ backgroundColor: sColor }} />
+            <span
+              className="w-3 h-3 rounded-full border border-white/30 shrink-0 bg-cover bg-center"
+              style={{ background: getColorSwatchBg(secondaryYarn.shortName || secondaryYarn.name) }}
+            />
             <span className="text-[#C5A059] font-sans font-medium truncate">
               Destaque: {secondaryYarn.shortName}
             </span>
@@ -611,14 +619,24 @@ Gostaria de agendar a minha sessão privada de design com a Carolina.`;
                     </span>
                   </div>
 
-                  {/* Visualizer Canvas Component */}
-                  <PieceVisualizerSVG 
-                    pieceId={selectedPiece.id}
-                    primaryYarn={primaryYarn}
-                    secondaryYarn={secondaryYarn}
-                    isBicolor={isBicolor}
-                    hardware={selectedHardware}
-                  />
+                  {/* Visualizer Canvas Component with Smooth 200ms Cross-Fade */}
+                  <AnimatePresence mode="wait">
+                    <motion.div
+                      key={`${selectedPiece.id}-${primaryYarn.id}-${secondaryYarn.id}-${isBicolor}-${selectedHardware.id}`}
+                      initial={{ opacity: 0.82, scale: 0.99 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      exit={{ opacity: 0.82, scale: 0.99 }}
+                      transition={{ duration: 0.2, ease: 'easeOut' }}
+                    >
+                      <PieceVisualizerSVG 
+                        pieceId={selectedPiece.id}
+                        primaryYarn={primaryYarn}
+                        secondaryYarn={secondaryYarn}
+                        isBicolor={isBicolor}
+                        hardware={selectedHardware}
+                      />
+                    </motion.div>
+                  </AnimatePresence>
 
                   {/* Real-time Summary Badge (Integrated Admin Pricing Formula) */}
                   <div className="bg-[#1C2A15]/80 border border-[#C5A059]/30 rounded-2xl p-3.5 space-y-2.5 backdrop-blur-md text-left">
@@ -731,43 +749,22 @@ Gostaria de agendar a minha sessão privada de design com a Carolina.`;
                     </div>
 
                     {/* Zone 1: Cor Principal */}
-                    <div className="space-y-1.5">
-                      <div className="flex items-center justify-between text-[10px] text-[#D4C3A3]">
-                        <span className="font-bold uppercase tracking-wider text-[#C5A059]">
-                          {isBicolor ? '✦ Cor Principal (Corpo / Base)' : '✦ Cor Principal da Peça'}
-                        </span>
-                        <span className="font-serif italic text-[#F5EEDC]">{primaryYarn.name}</span>
-                      </div>
-                      <div className="grid grid-cols-4 sm:grid-cols-8 gap-1.5">
-                        {YARN_PALETTES.map((yarn) => {
-                          const isSelected = primaryYarn.id === yarn.id;
-                          return (
-                            <div
-                              key={`p-${yarn.id}`}
-                              onClick={() => setPrimaryYarn(yarn)}
-                              title={`${yarn.name} — ${yarn.desc}`}
-                              className={`p-1.5 rounded-xl border text-center cursor-pointer transition-all flex flex-col items-center gap-1 ${
-                                isSelected
-                                  ? 'bg-[#1C2A15] border-[#C5A059] ring-1 ring-[#C5A059]'
-                                  : 'bg-black/20 border-white/10 hover:border-[#C5A059]/40'
-                              }`}
-                            >
-                              <div 
-                                className="w-6 h-6 rounded-full border shadow-inner transition-transform"
-                                style={{ 
-                                  backgroundColor: yarn.hex, 
-                                  borderColor: yarn.borderHex,
-                                  transform: isSelected ? 'scale(1.18)' : 'scale(1)'
-                                }}
-                              />
-                              <span className="text-[8px] font-sans text-[#F5EEDC] line-clamp-1 leading-tight font-medium">
-                                {yarn.shortName.split(' ')[1] || yarn.shortName}
-                              </span>
-                            </div>
-                          );
-                        })}
-                      </div>
-                    </div>
+                    <TextureSwatchPicker
+                      label={isBicolor ? 'Cor Principal (Corpo / Base)' : 'Cor Principal da Peça'}
+                      selectedColor={primaryYarn.shortName || primaryYarn.name}
+                      yarnLineId={selectedPiece.id.includes('cardigan') || selectedPiece.id.includes('poncho') ? 'drops-safran' : 'drops-paris'}
+                      onChange={(colorName) => {
+                        const match = YARN_PALETTES.find(p => p.name.includes(colorName) || p.shortName.includes(colorName)) || {
+                          id: `custom-${colorName}`,
+                          name: `DROPS Safran (${colorName})`,
+                          shortName: colorName,
+                          hex: '#D8C3A5',
+                          borderHex: '#C5A059',
+                          desc: 'Algodão de fibra virgem M★BRAVO.'
+                        };
+                        setPrimaryYarn(match);
+                      }}
+                    />
 
                     {/* Zone 2: Cor Secundária (If Bicolor) */}
                     {isBicolor && (
@@ -775,43 +772,24 @@ Gostaria de agendar a minha sessão privada de design com a Carolina.`;
                         initial={{ opacity: 0, height: 0 }}
                         animate={{ opacity: 1, height: 'auto' }}
                         exit={{ opacity: 0, height: 0 }}
-                        className="space-y-1.5 pt-2 border-t border-white/10"
+                        className="pt-2 border-t border-white/10"
                       >
-                        <div className="flex items-center justify-between text-[10px] text-[#D4C3A3]">
-                          <span className="font-bold uppercase tracking-wider text-[#C5A059]">
-                            ✦ Cor Secundária (Aba / Bordos / Destaque)
-                          </span>
-                          <span className="font-serif italic text-[#F5EEDC]">{secondaryYarn.name}</span>
-                        </div>
-                        <div className="grid grid-cols-4 sm:grid-cols-8 gap-1.5">
-                          {YARN_PALETTES.map((yarn) => {
-                            const isSelected = secondaryYarn.id === yarn.id;
-                            return (
-                              <div
-                                key={`s-${yarn.id}`}
-                                onClick={() => setSecondaryYarn(yarn)}
-                                title={`${yarn.name} — ${yarn.desc}`}
-                                className={`p-1.5 rounded-xl border text-center cursor-pointer transition-all flex flex-col items-center gap-1 ${
-                                  isSelected
-                                    ? 'bg-[#1C2A15] border-[#C5A059] ring-1 ring-[#C5A059]'
-                                    : 'bg-black/20 border-white/10 hover:border-[#C5A059]/40'
-                                }`}
-                              >
-                                <div 
-                                  className="w-6 h-6 rounded-full border shadow-inner transition-transform"
-                                  style={{ 
-                                    backgroundColor: yarn.hex, 
-                                    borderColor: yarn.borderHex,
-                                    transform: isSelected ? 'scale(1.18)' : 'scale(1)'
-                                  }}
-                                />
-                                <span className="text-[8px] font-sans text-[#F5EEDC] line-clamp-1 leading-tight font-medium">
-                                  {yarn.shortName.split(' ')[1] || yarn.shortName}
-                                </span>
-                              </div>
-                            );
-                          })}
-                        </div>
+                        <TextureSwatchPicker
+                          label="Cor Secundária (Aba / Bordos / Destaque)"
+                          selectedColor={secondaryYarn.shortName || secondaryYarn.name}
+                          yarnLineId={selectedPiece.id.includes('cardigan') || selectedPiece.id.includes('poncho') ? 'drops-safran' : 'drops-paris'}
+                          onChange={(colorName) => {
+                            const match = YARN_PALETTES.find(p => p.name.includes(colorName) || p.shortName.includes(colorName)) || {
+                              id: `custom-${colorName}`,
+                              name: `DROPS Safran (${colorName})`,
+                              shortName: colorName,
+                              hex: '#D8C3A5',
+                              borderHex: '#C5A059',
+                              desc: 'Algodão de fibra virgem M★BRAVO.'
+                            };
+                            setSecondaryYarn(match);
+                          }}
+                        />
                       </motion.div>
                     )}
                   </div>
