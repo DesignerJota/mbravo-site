@@ -9,7 +9,7 @@ import {
 } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import { SHIPPING_ZONES } from '../types';
-import { useLanguage, formatColorName, translateColor } from '../translations';
+import { useLanguage, formatColorName, translateColor, getColorSwatchBg } from '../translations';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || '';
 
@@ -88,6 +88,80 @@ export const AtelierCartDrawer: React.FC = () => {
   const [activeExpressWallet, setActiveExpressWallet] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState('');
   const [completedOrder, setCompletedOrder] = useState<any>(null);
+
+  // Pinterest Tag & GTM dataLayer Purchase Tracking
+  useEffect(() => {
+    if (completedOrder) {
+      const orderTotal = completedOrder.total || (totalPrice + shippingFee);
+      const lineItems = cart.map(i => ({
+        product_id: i.id,
+        product_name: i.name,
+        product_price: i.price,
+        product_quantity: i.quantity
+      }));
+
+      // Fire Pinterest Checkout Event
+      if (typeof (window as any).pintrk === 'function') {
+        (window as any).pintrk('track', 'checkout', {
+          value: orderTotal,
+          currency: 'EUR',
+          order_id: completedOrder.orderId,
+          line_items: lineItems
+        });
+      }
+
+      // Fire GTM dataLayer Purchase Event
+      if (typeof (window as any).dataLayer !== 'undefined' && Array.isArray((window as any).dataLayer)) {
+        (window as any).dataLayer.push({
+          event: 'purchase',
+          ecommerce: {
+            transaction_id: completedOrder.orderId,
+            value: orderTotal,
+            currency: 'EUR',
+            items: cart.map(i => ({
+              item_id: i.id,
+              item_name: i.name,
+              price: i.price,
+              quantity: i.quantity
+            }))
+          }
+        });
+      }
+    }
+  }, [completedOrder, cart]);
+
+  // Track Begin Checkout
+  useEffect(() => {
+    if (isOpen && step === 'checkout' && cart.length > 0) {
+      if (typeof (window as any).pintrk === 'function') {
+        (window as any).pintrk('track', 'checkout', {
+          value: totalPrice + shippingFee,
+          currency: 'EUR',
+          line_items: cart.map(i => ({
+            product_id: i.id,
+            product_name: i.name,
+            product_price: i.price,
+            product_quantity: i.quantity
+          }))
+        });
+      }
+      if (typeof (window as any).dataLayer !== 'undefined' && Array.isArray((window as any).dataLayer)) {
+        (window as any).dataLayer.push({
+          event: 'begin_checkout',
+          ecommerce: {
+            value: totalPrice + shippingFee,
+            currency: 'EUR',
+            items: cart.map(i => ({
+              item_id: i.id,
+              item_name: i.name,
+              price: i.price,
+              quantity: i.quantity
+            }))
+          }
+        });
+      }
+    }
+  }, [isOpen, step, cart]);
 
   const [checkoutForm, setCheckoutForm] = useState({
     nome: '',
@@ -694,7 +768,11 @@ export const AtelierCartDrawer: React.FC = () => {
 
                 <div className="flex flex-wrap items-center gap-1.5 mt-1">
                   {colorDisplay && (
-                    <span className="text-[10px] font-sans font-medium text-forest/70">
+                    <span className="text-[10px] font-sans font-medium text-forest/70 flex items-center gap-1">
+                      <span
+                        className="w-3.5 h-3.5 rounded-full border border-forest/20 shadow-2xs shrink-0 bg-cover bg-center inline-block"
+                        style={{ background: getColorSwatchBg(colorDisplay) }}
+                      />
                       {isPt ? 'Cor' : 'Color'}: {translateColor(colorDisplay, lang)}
                     </span>
                   )}
@@ -1628,9 +1706,18 @@ export const AtelierCartDrawer: React.FC = () => {
                                 <img src={item.img} alt="" className="w-9 h-11 object-cover rounded-md border border-forest/10 bg-[#F6F1E5] shrink-0" />
                                 <div className="min-w-0">
                                   <p className="font-serif font-medium text-forest text-xs leading-snug truncate">{item.productName}</p>
-                                  <p className="text-[10px] text-forest/60 font-sans truncate">
-                                    {item.quantity}x {colorDisplay && `• ${isPt ? 'Cor' : 'Color'}: ${translateColor(colorDisplay, lang)}`}
-                                  </p>
+                                  <div className="flex items-center gap-1.5 text-[10px] text-forest/60 font-sans truncate">
+                                    <span>{item.quantity}x</span>
+                                    {colorDisplay && (
+                                      <span className="flex items-center gap-1 truncate">
+                                        • <span
+                                          className="w-3 h-3 rounded-full border border-forest/20 shadow-2xs shrink-0 bg-cover bg-center inline-block"
+                                          style={{ background: getColorSwatchBg(colorDisplay) }}
+                                        />
+                                        {translateColor(colorDisplay, lang)}
+                                      </span>
+                                    )}
+                                  </div>
                                 </div>
                               </div>
                               <span className="font-serif font-semibold text-forest text-xs shrink-0">
