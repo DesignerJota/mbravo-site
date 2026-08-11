@@ -816,7 +816,7 @@ export const AtelierCartDrawer: React.FC = () => {
 
   return createPortal(
     <AnimatePresence>
-      <div className="fixed inset-0 z-[9990] flex items-end md:items-center md:justify-center p-0 md:p-4 lg:p-6 landscape:p-2 landscape:md:p-4 overflow-hidden">
+      <div className="fixed inset-0 z-[100] flex items-end md:items-center md:justify-center p-0 md:p-4 lg:p-6 landscape:p-2 landscape:md:p-4 overflow-hidden">
         {/* Soft Translucent Editorial Overlay */}
         <motion.div
           initial={{ opacity: 0 }}
@@ -1235,7 +1235,7 @@ export const AtelierCartDrawer: React.FC = () => {
                       {isPt ? '1. Dados de Envio & Faturação' : '1. Shipping & Billing Details'}
                     </span>
 
-                    <div className="grid grid-cols-2 gap-2.5 text-xs">
+                    <div className="grid grid-cols-2 gap-3 text-xs">
                       <div>
                         <label className="block text-[8.5px] uppercase tracking-wider font-semibold text-forest/70 mb-1">
                           {isPt ? 'Nome Completo *' : 'Full Name *'}
@@ -1245,7 +1245,7 @@ export const AtelierCartDrawer: React.FC = () => {
                           value={checkoutForm.nome}
                           onChange={(e) => setCheckoutForm({ ...checkoutForm, nome: e.target.value })}
                           placeholder={isPt ? "Nome do destinatário" : "Recipient name"}
-                          className="w-full px-3 py-2 rounded-xl border border-forest/15 bg-white focus:outline-none focus:border-[#C5A059] text-xs text-forest placeholder-forest/30 transition-all"
+                          className="w-full bg-transparent border-b border-[#343E2C]/20 py-2 text-xs text-[#343E2C] placeholder-[#343E2C]/40 focus:border-[#C5A059] focus:outline-none transition-all"
                         />
                       </div>
 
@@ -1258,10 +1258,10 @@ export const AtelierCartDrawer: React.FC = () => {
                           value={checkoutForm.email}
                           onChange={(e) => setCheckoutForm({ ...checkoutForm, email: e.target.value })}
                           placeholder={isPt ? "nome@dominio.com" : "name@domain.com"}
-                          className={`w-full px-3 py-2 rounded-xl border bg-white focus:outline-none text-xs text-forest placeholder-forest/30 transition-all ${
+                          className={`w-full bg-transparent border-b py-2 text-xs text-[#343E2C] placeholder-[#343E2C]/40 focus:outline-none transition-all ${
                             checkoutForm.email && !isValidEmail(checkoutForm.email)
                               ? 'border-red-300 focus:border-red-400'
-                              : 'border-forest/15 focus:border-[#C5A059]'
+                              : 'border-[#343E2C]/20 focus:border-[#C5A059]'
                           }`}
                         />
                         {checkoutForm.email && suggestCorrectEmail(checkoutForm.email) && (
@@ -1288,7 +1288,7 @@ export const AtelierCartDrawer: React.FC = () => {
                           value={checkoutForm.telefone}
                           onChange={(e) => setCheckoutForm({ ...checkoutForm, telefone: e.target.value.replace(/[^0-9+]/g, '') })}
                           placeholder={isPt ? "9xx xxx xxx" : "Phone number"}
-                          className="w-full px-3 py-2 rounded-xl border border-forest/15 bg-white focus:outline-none focus:border-[#C5A059] text-xs text-forest placeholder-forest/30 transition-all"
+                          className="w-full bg-transparent border-b border-[#343E2C]/20 py-2 text-xs text-[#343E2C] placeholder-[#343E2C]/40 focus:border-[#C5A059] focus:outline-none transition-all"
                         />
                       </div>
 
@@ -1302,7 +1302,7 @@ export const AtelierCartDrawer: React.FC = () => {
                           value={checkoutForm.nif}
                           onChange={(e) => setCheckoutForm({ ...checkoutForm, nif: e.target.value.replace(/\D/g, '') })}
                           placeholder={isPt ? "NIF Fatura" : "Tax ID"}
-                          className="w-full px-3 py-2 rounded-xl border border-forest/15 bg-white focus:outline-none focus:border-[#C5A059] text-xs text-forest placeholder-forest/30 transition-all"
+                          className="w-full bg-transparent border-b border-[#343E2C]/20 py-2 text-xs text-[#343E2C] placeholder-[#343E2C]/40 focus:border-[#C5A059] focus:outline-none transition-all"
                         />
                       </div>
 
@@ -1315,7 +1315,7 @@ export const AtelierCartDrawer: React.FC = () => {
                           value={checkoutForm.morada}
                           onChange={(e) => setCheckoutForm({ ...checkoutForm, morada: e.target.value })}
                           placeholder={isPt ? "Morada completa de entrega" : "Full shipping address"}
-                          className="w-full px-3 py-2 rounded-xl border border-forest/15 bg-white focus:outline-none focus:border-[#C5A059] text-xs text-forest placeholder-forest/30 transition-all"
+                          className="w-full bg-transparent border-b border-[#343E2C]/20 py-2 text-xs text-[#343E2C] placeholder-[#343E2C]/40 focus:border-[#C5A059] focus:outline-none transition-all"
                         />
                       </div>
 
@@ -1329,7 +1329,7 @@ export const AtelierCartDrawer: React.FC = () => {
                           value={checkoutForm.codigoPostal}
                           onChange={(e) => setCheckoutForm({ ...checkoutForm, codigoPostal: formatPostalCodePT(e.target.value) })}
                           placeholder="XXXX-XXX"
-                          className="w-full px-3 py-2 rounded-xl border border-forest/15 bg-white focus:outline-none focus:border-[#C5A059] text-xs text-forest placeholder-forest/30 transition-all"
+                          className="w-full bg-transparent border-b border-[#343E2C]/20 py-2 text-xs text-[#343E2C] placeholder-[#343E2C]/40 focus:border-[#C5A059] focus:outline-none transition-all"
                         />
                       </div>
 
@@ -1342,7 +1342,7 @@ export const AtelierCartDrawer: React.FC = () => {
                           value={checkoutForm.cidade}
                           onChange={(e) => setCheckoutForm({ ...checkoutForm, cidade: e.target.value })}
                           placeholder={isPt ? "Cidade" : "City"}
-                          className="w-full px-3 py-2 rounded-xl border border-forest/15 bg-white focus:outline-none focus:border-[#C5A059] text-xs text-forest placeholder-forest/30 transition-all"
+                          className="w-full bg-transparent border-b border-[#343E2C]/20 py-2 text-xs text-[#343E2C] placeholder-[#343E2C]/40 focus:border-[#C5A059] focus:outline-none transition-all"
                         />
                       </div>
                     </div>
@@ -1354,44 +1354,62 @@ export const AtelierCartDrawer: React.FC = () => {
                       {isPt ? '2. Método de Pagamento' : '2. Payment Method'}
                     </span>
 
-                    <div className="grid grid-cols-3 gap-2">
+                    <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
                       <button
                         type="button"
                         onClick={() => setPaymentMethod('mbway')}
-                        className={`py-2.5 px-2 rounded-xl border text-center transition-all cursor-pointer ${
+                        className={`h-14 sm:h-16 rounded-xl border text-center transition-all cursor-pointer flex flex-col items-center justify-center p-2 ${
                           paymentMethod === 'mbway'
-                            ? 'border-[#C5A059] bg-[#343E2C] text-[#C5A059] font-medium shadow-xs'
+                            ? 'border-[#C5A059] bg-[#343E2C] text-[#C5A059] font-medium shadow-md'
                             : 'border-forest/15 bg-white text-forest/70 hover:bg-forest/5'
                         }`}
                       >
-                        <Phone size={15} className="mx-auto mb-0.5 text-[#C5A059]" />
-                        <span className="text-[10px] block font-sans font-semibold">MB WAY</span>
+                        <img src="/icons/mbway.svg" alt="MB WAY" className={`h-6 sm:h-7 w-auto max-w-[85%] object-contain transition-all ${paymentMethod === 'mbway' ? 'brightness-0 invert' : ''}`} />
                       </button>
 
                       <button
                         type="button"
                         onClick={() => setPaymentMethod('multibanco')}
-                        className={`py-2.5 px-2 rounded-xl border text-center transition-all cursor-pointer ${
+                        className={`h-14 sm:h-16 rounded-xl border text-center transition-all cursor-pointer flex flex-col items-center justify-center p-2 ${
                           paymentMethod === 'multibanco'
-                            ? 'border-[#C5A059] bg-[#343E2C] text-[#C5A059] font-medium shadow-xs'
+                            ? 'border-[#C5A059] bg-[#343E2C] text-[#C5A059] font-medium shadow-md'
                             : 'border-forest/15 bg-white text-forest/70 hover:bg-forest/5'
                         }`}
                       >
-                        <Building size={15} className="mx-auto mb-0.5 text-[#C5A059]" />
-                        <span className="text-[10px] block font-sans font-semibold">Multibanco</span>
+                        <img src="/icons/multibanco.svg" alt="Multibanco" className={`h-6 sm:h-7 w-auto max-w-[85%] object-contain transition-all ${paymentMethod === 'multibanco' ? 'brightness-0 invert' : ''}`} />
                       </button>
 
                       <button
                         type="button"
                         onClick={() => setPaymentMethod('card')}
-                        className={`py-2.5 px-2 rounded-xl border text-center transition-all cursor-pointer ${
+                        className={`h-14 sm:h-16 rounded-xl border text-center transition-all cursor-pointer flex flex-col items-center justify-center p-2 ${
                           paymentMethod === 'card'
-                            ? 'border-[#C5A059] bg-[#343E2C] text-[#C5A059] font-medium shadow-xs'
+                            ? 'border-[#C5A059] bg-[#343E2C] text-[#C5A059] font-medium shadow-md'
                             : 'border-forest/15 bg-white text-forest/70 hover:bg-forest/5'
                         }`}
                       >
-                        <CreditCard size={15} className="mx-auto mb-0.5 text-[#C5A059]" />
-                        <span className="text-[10px] block font-sans font-semibold">Cartão</span>
+                        <div className="flex items-center gap-1.5">
+                          <img src="/icons/visa.svg" alt="VISA" className={`h-5 sm:h-6 w-auto object-contain ${paymentMethod === 'card' ? 'brightness-0 invert' : ''}`} />
+                          <img src="/icons/mastercard.svg" alt="Mastercard" className={`h-5 sm:h-6 w-auto object-contain ${paymentMethod === 'card' ? 'brightness-0 invert' : ''}`} />
+                        </div>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => setPaymentMethod('wallet')}
+                        className={`h-14 sm:h-16 rounded-xl border text-center transition-all cursor-pointer flex flex-col items-center justify-center p-2 ${
+                          paymentMethod === 'wallet'
+                            ? 'border-[#C5A059] bg-[#343E2C] text-[#C5A059] font-medium shadow-md'
+                            : 'border-forest/15 bg-white text-forest/70 hover:bg-forest/5'
+                        }`}
+                      >
+                        <div className="flex items-center gap-1">
+                          {/Mac|iPhone|iPad|iPod/i.test(navigator.userAgent) ? (
+                            <img src="/icons/applepay.svg" alt="Apple Pay" className={`h-5 sm:h-6 w-auto object-contain ${paymentMethod === 'wallet' ? 'brightness-0 invert' : ''}`} />
+                          ) : (
+                            <img src="/icons/googlepay.svg" alt="Google Pay" className={`h-5 sm:h-6 w-auto object-contain ${paymentMethod === 'wallet' ? 'brightness-0 invert' : ''}`} />
+                          )}
+                        </div>
                       </button>
                     </div>
 
@@ -1405,7 +1423,7 @@ export const AtelierCartDrawer: React.FC = () => {
                           value={checkoutForm.mbwayPhone || checkoutForm.telefone}
                           onChange={(e) => setCheckoutForm({ ...checkoutForm, mbwayPhone: e.target.value.replace(/[^0-9+]/g, '') })}
                           placeholder="9xx xxx xxx"
-                          className="w-full px-3 py-2 rounded-xl border border-forest/15 bg-white text-xs text-forest focus:outline-none focus:border-[#C5A059]"
+                          className="w-full bg-transparent border-b border-[#343E2C]/20 py-1.5 text-xs text-[#343E2C] focus:outline-none focus:border-[#C5A059]"
                         />
                         <p className="text-[9.5px] text-forest/60 font-sans">
                           {isPt ? 'Notificação enviada para a app MB WAY para autorizar.' : 'Notification sent to MB WAY app.'}
@@ -1436,7 +1454,7 @@ export const AtelierCartDrawer: React.FC = () => {
                             value={checkoutForm.cardNumber}
                             onChange={(e) => setCheckoutForm({ ...checkoutForm, cardNumber: e.target.value.replace(/\D/g, '').replace(/(.{4})/g, '$1 ').trim() })}
                             placeholder="0000 0000 0000 0000"
-                            className="w-full px-3 py-2 rounded-xl border border-forest/15 bg-white text-xs text-forest focus:outline-none focus:border-[#C5A059] font-mono"
+                            className="w-full bg-transparent border-b border-[#343E2C]/20 py-1.5 text-xs text-[#343E2C] focus:outline-none focus:border-[#C5A059] font-mono"
                           />
                         </div>
 
@@ -1455,7 +1473,7 @@ export const AtelierCartDrawer: React.FC = () => {
                                 setCheckoutForm({ ...checkoutForm, cardExpiry: formatted });
                               }}
                               placeholder="MM/AA"
-                              className="w-full px-3 py-2 rounded-xl border border-forest/15 bg-white text-xs text-forest focus:outline-none focus:border-[#C5A059] font-mono"
+                              className="w-full bg-transparent border-b border-[#343E2C]/20 py-1.5 text-xs text-[#343E2C] focus:outline-none focus:border-[#C5A059] font-mono"
                             />
                           </div>
 
@@ -1469,7 +1487,7 @@ export const AtelierCartDrawer: React.FC = () => {
                               value={checkoutForm.cardCvv}
                               onChange={(e) => setCheckoutForm({ ...checkoutForm, cardCvv: e.target.value.replace(/\D/g, '') })}
                               placeholder="123"
-                              className="w-full px-3 py-2 rounded-xl border border-forest/15 bg-white text-xs text-forest focus:outline-none focus:border-[#C5A059] font-mono"
+                              className="w-full bg-transparent border-b border-[#343E2C]/20 py-1.5 text-xs text-[#343E2C] focus:outline-none focus:border-[#C5A059] font-mono"
                             />
                           </div>
                         </div>
@@ -1955,40 +1973,40 @@ export const AtelierCartDrawer: React.FC = () => {
                         <button
                           type="button"
                           onClick={() => setPaymentMethod('mbway')}
-                          className={`py-2 px-1 rounded-xl border text-center transition-all cursor-pointer ${
+                          className={`py-2 px-1 rounded-xl border text-center transition-all cursor-pointer flex flex-col items-center justify-center ${
                             paymentMethod === 'mbway'
                               ? 'border-[#C5A059] bg-[#343E2C] text-[#C5A059] font-medium shadow-xs'
                               : 'border-forest/15 bg-white text-forest/70 hover:bg-forest/5'
                           }`}
                         >
-                          <Phone size={14} className="mx-auto mb-0.5 text-[#C5A059]" />
-                          <span className="text-[9.5px] block font-sans font-semibold">MB WAY</span>
+                          <img src="/icons/mbway.svg" alt="MB WAY" className={`h-4 w-auto object-contain transition-all ${paymentMethod === 'mbway' ? 'brightness-0 invert' : ''}`} />
                         </button>
 
                         <button
                           type="button"
                           onClick={() => setPaymentMethod('multibanco')}
-                          className={`py-2 px-1 rounded-xl border text-center transition-all cursor-pointer ${
+                          className={`py-2 px-1 rounded-xl border text-center transition-all cursor-pointer flex flex-col items-center justify-center ${
                             paymentMethod === 'multibanco'
                               ? 'border-[#C5A059] bg-[#343E2C] text-[#C5A059] font-medium shadow-xs'
                               : 'border-forest/15 bg-white text-forest/70 hover:bg-forest/5'
                           }`}
                         >
-                          <Building size={14} className="mx-auto mb-0.5 text-[#C5A059]" />
-                          <span className="text-[9.5px] block font-sans font-semibold">Multibanco</span>
+                          <img src="/icons/multibanco.svg" alt="Multibanco" className={`h-4 w-auto object-contain transition-all ${paymentMethod === 'multibanco' ? '' : 'grayscale opacity-75'}`} />
                         </button>
 
                         <button
                           type="button"
                           onClick={() => setPaymentMethod('card')}
-                          className={`py-2 px-1 rounded-xl border text-center transition-all cursor-pointer ${
+                          className={`py-2 px-1 rounded-xl border text-center transition-all cursor-pointer flex flex-col items-center justify-center ${
                             paymentMethod === 'card'
                               ? 'border-[#C5A059] bg-[#343E2C] text-[#C5A059] font-medium shadow-xs'
                               : 'border-forest/15 bg-white text-forest/70 hover:bg-forest/5'
                           }`}
                         >
-                          <CreditCard size={14} className="mx-auto mb-0.5 text-[#C5A059]" />
-                          <span className="text-[9.5px] block font-sans font-semibold">Cartão</span>
+                          <div className="flex items-center gap-1">
+                            <img src="/icons/visa.svg" alt="VISA" className={`h-3.5 w-auto object-contain ${paymentMethod === 'card' ? 'brightness-0 invert' : ''}`} />
+                            <img src="/icons/mastercard.svg" alt="Mastercard" className={`h-3.5 w-auto object-contain ${paymentMethod === 'card' ? 'brightness-0 invert' : ''}`} />
+                          </div>
                         </button>
                       </div>
 
