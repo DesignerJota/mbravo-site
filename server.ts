@@ -2702,6 +2702,17 @@ app.get("/api/testimonials", async (req, res) => {
   }
 });
 
+// Explicit endpoint for Google Reviews API
+app.get("/api/google-reviews", async (req, res) => {
+  try {
+    const list = await fetchTestimonials3Layers();
+    res.json(list);
+  } catch (err: any) {
+    console.warn("[GOOGLE REVIEWS API WARN] Safe fallback to local memory:", err.message || err);
+    res.json(activeTestimonials);
+  }
+});
+
 app.post("/api/testimonials", async (req, res) => {
   try {
     const { name, text, product, rating } = req.body;
