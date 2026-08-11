@@ -6203,9 +6203,42 @@ export function getCollectionScrollTarget(element: HTMLElement): number {
 }
 
 // --- Product Image & Navigation Helpers ---
+// Dynamically glob all image files in /public/products/ across all product folders
+const rawGlobModules = import.meta.glob('/public/products/**/*.{webp,jpg,jpeg,png,svg}', { eager: true });
+
+// Build a dynamic map slug -> array of public image URLs
+const DYNAMIC_PRODUCT_IMAGES_MAP: Record<string, string[]> = {};
+
+Object.keys(rawGlobModules).forEach((pathKey) => {
+    // pathKey looks like "/public/products/classic-coasters/1.webp"
+    const publicUrl = pathKey.replace(/^\/public/, ''); // -> "/products/classic-coasters/1.webp"
+    const parts = publicUrl.split('/');
+    // parts: ["", "products", "classic-coasters", "1.webp"]
+    if (parts.length >= 4) {
+        const slug = parts[2];
+        if (!DYNAMIC_PRODUCT_IMAGES_MAP[slug]) {
+            DYNAMIC_PRODUCT_IMAGES_MAP[slug] = [];
+        }
+        DYNAMIC_PRODUCT_IMAGES_MAP[slug].push(publicUrl);
+    }
+});
+
+// Sort each slug's image array numerically (e.g. 1.webp, 2.webp ... 10.webp)
+Object.keys(DYNAMIC_PRODUCT_IMAGES_MAP).forEach((slug) => {
+    DYNAMIC_PRODUCT_IMAGES_MAP[slug].sort((a, b) => {
+        const fileA = a.split('/').pop() || '';
+        const fileB = b.split('/').pop() || '';
+        const numA = parseInt(fileA.replace(/\D/g, '') || '0', 10);
+        const numB = parseInt(fileB.replace(/\D/g, '') || '0', 10);
+        if (numA !== numB) return numA - numB;
+        return fileA.localeCompare(fileB);
+    });
+});
+
 export function getProductAllImages(product: any): string[] {
     if (!product) return [];
-    
+
+    let slug = product.id || '';
     const explicitImages: string[] = Array.isArray(product.images) && product.images.length > 0
         ? [...product.images]
         : (product.img ? [product.img] : []);
@@ -6213,36 +6246,15 @@ export function getProductAllImages(product: any): string[] {
     const firstImg = explicitImages[0] || product.img || '';
     if (firstImg && firstImg.includes('/products/')) {
         const parts = firstImg.split('/products/')[1]?.split('/');
-        const folder = parts ? parts[0] : null;
-        if (folder) {
-            const folderCounts: Record<string, number> = {
-                'classic-coasters': 10,
-                'scarf-hip-bandana': 8,
-                'coral-bikini-top': 6,
-                'mini-pouches': 6,
-                'signature-granny-poncho': 6,
-                'dragonfly-bandana': 5,
-                'african-flower-pouch': 4,
-                'alma-cardigan': 4,
-                'coraline-coasters': 4,
-                'daisy-coasters': 4,
-                'marea-bikini-set': 4,
-                'mini-alma-cardigan': 4,
-                'mini-shell-pouch': 4,
-                'stella-cushion': 4,
-                'sunflower-coasters': 4,
-                'airpods-case': 3,
-                'dragonfly-headband': 3,
-                'granny-square-sling-bag': 3,
-                'mesh-poncho': 3,
-                'classic-bandana': 2
-            };
-            const count = folderCounts[folder] || explicitImages.length;
-            if (count > explicitImages.length) {
-                return Array.from({ length: count }, (_, i) => `/products/${folder}/${i + 1}.webp`);
-            }
+        if (parts && parts[0]) {
+            slug = parts[0];
         }
     }
+
+    if (slug && DYNAMIC_PRODUCT_IMAGES_MAP[slug] && DYNAMIC_PRODUCT_IMAGES_MAP[slug].length > 0) {
+        return DYNAMIC_PRODUCT_IMAGES_MAP[slug];
+    }
+
     return explicitImages;
 }
 
