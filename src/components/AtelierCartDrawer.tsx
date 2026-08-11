@@ -994,55 +994,50 @@ export const AtelierCartDrawer: React.FC = () => {
               {/* --- TABLET & DESKTOP 2-COLUMN PROPORTIONAL LAYOUT (md:flex md:flex-row) --- */}
               <div className="hidden md:flex md:flex-row flex-1 min-h-0 overflow-hidden divide-x divide-forest/10">
                 {/* LEFT COLUMN: Order Summary & Item List (5/12) */}
-                <div className="w-[42%] bg-[#F8F6F0] p-6 flex flex-col h-full overflow-y-auto space-y-4 shrink-0">
+                <div className="w-[42%] bg-[#F8F6F0] p-5 flex flex-col h-full overflow-y-auto space-y-3.5 shrink-0">
                   <div className="flex items-center justify-between pb-2 border-b border-forest/10">
-                    <span className="text-[9px] uppercase tracking-[0.25em] font-bold text-[#A68244] block">
+                    <span className="text-[8px] uppercase tracking-[0.3em] font-semibold text-[#A68244] block font-sans">
                       {isPt ? 'Resumo do Pedido' : 'Order Summary'}
                     </span>
-                    <span className="text-[10px] text-forest/60 font-sans">
+                    <span className="text-[9.5px] text-forest/50 font-sans">
                       {totalItemCount} {totalItemCount === 1 ? (isPt ? 'peça' : 'piece') : (isPt ? 'peças' : 'pieces')}
                     </span>
                   </div>
 
-                  {/* Deep Green Luxury Courtesy Shipping Upsell Banner */}
-                  <div className="p-3.5 rounded-2xl bg-forest border border-[#C5A059]/60 shadow-md space-y-2.5">
-                    <div className="flex items-center justify-between gap-2.5">
+                  {/* Deep Green Luxury Courtesy Shipping Upsell Banner - Subtle & Integrated */}
+                  <div className="p-3 rounded-xl bg-forest border border-[#C5A059]/40 shadow-xs space-y-2">
+                    <div className="flex items-center justify-between gap-2">
                       <div className="flex items-center gap-2 min-w-0">
-                        <div className="w-6 h-6 rounded-full bg-[#C5A059]/20 flex items-center justify-center shrink-0 border border-[#C5A059]/40">
-                          <Sparkles size={13} className="text-[#C5A059]" />
+                        <div className="w-5 h-5 rounded-full bg-[#C5A059]/20 flex items-center justify-center shrink-0 border border-[#C5A059]/30">
+                          <Sparkles size={11} className="text-[#C5A059]" />
                         </div>
                         <div className="min-w-0">
-                          <p className="text-[11px] font-serif font-light text-cream leading-tight">
+                          <p className="text-[10px] font-sans font-light text-cream/90 leading-tight">
                             {isFreeShipping ? (
                               <span className="font-medium text-[#E5C17C]">
                                 {isPt 
-                                  ? 'Parabéns! O seu Envio & Packaging Personalizado M★BRAVO é de Cortesia.' 
-                                  : 'Congratulations! Your M★BRAVO Custom Shipping & Packaging is Complimentary.'}
+                                  ? 'Envio & Packaging M★BRAVO de Cortesia.' 
+                                  : 'Complimentary M★BRAVO Custom Shipping.'}
                               </span>
                             ) : (
                               isPt ? (
-                                <>Faltam <strong className="font-bold text-[#E5C17C]">{amountNeededForFreeShipping.toFixed(2)}€</strong> para Envio & Packaging Personalizado M★BRAVO de Cortesia</>
+                                <>Faltam <strong className="font-semibold text-[#E5C17C]">{amountNeededForFreeShipping.toFixed(2)}€</strong> para Envio de Cortesia</>
                               ) : (
-                                <>Add <strong className="font-bold text-[#E5C17C]">{amountNeededForFreeShipping.toFixed(2)}€</strong> for Complimentary M★BRAVO Custom Shipping & Packaging</>
+                                <>Add <strong className="font-semibold text-[#E5C17C]">{amountNeededForFreeShipping.toFixed(2)}€</strong> for Complimentary Shipping</>
                               )
                             )}
                           </p>
-                          <p className="text-[9.5px] font-sans text-cream/70 truncate mt-0.5">
-                            {isFreeShipping 
-                              ? (isPt ? 'Entrega expressa CTT sem custos de envio.' : 'Express CTT delivery with zero shipping costs.') 
-                              : (isPt ? 'Adicione mais peças sem custos adicionais de envio.' : 'Add more items with zero extra shipping fee.')}
-                          </p>
                         </div>
                       </div>
-                      <span className="text-[10px] font-mono font-bold text-[#E5C17C] shrink-0 bg-[#C5A059]/20 px-2 py-0.5 rounded-full border border-[#C5A059]/40">
+                      <span className="text-[8.5px] font-mono tracking-widest text-[#E5C17C] shrink-0 bg-[#C5A059]/15 px-1.5 py-0.5 rounded-md border border-[#C5A059]/30">
                         {isFreeShipping ? '100%' : `${Math.min(100, Math.max(0, Math.round((subtotal / 100) * 100)))}%`}
                       </span>
                     </div>
 
                     {/* Golden Shimmer Progress Bar with Sliding M★BRAVO Star at the Tip */}
-                    <div className="relative w-full bg-[#131B0D] h-2 rounded-full p-0.5 border border-[#C5A059]/30">
+                    <div className="relative w-full bg-[#131B0D] h-1.5 rounded-full p-0.5 border border-[#C5A059]/25">
                       <div 
-                        className="animate-gold-shimmer h-full rounded-full transition-all duration-500 ease-out shadow-[0_0_8px_rgba(197,160,89,0.6)]" 
+                        className="animate-gold-shimmer h-full rounded-full transition-all duration-500 ease-out shadow-[0_0_6px_rgba(197,160,89,0.5)]" 
                         style={{ width: `${isFreeShipping ? 100 : Math.min(100, Math.max(0, Math.round((subtotal / 100) * 100)))}%` }}
                       />
                       
@@ -1051,8 +1046,8 @@ export const AtelierCartDrawer: React.FC = () => {
                         className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 z-10 transition-all duration-500 ease-out pointer-events-none"
                         style={{ left: `${isFreeShipping ? 100 : Math.min(100, Math.max(0, Math.round((subtotal / 100) * 100)))}%` }}
                       >
-                        <div className="w-4 h-4 rounded-full bg-[#FCFBF9] border border-[#C5A059] flex items-center justify-center shadow-md">
-                          <span className="text-[#C5A059] text-[8.5px] font-bold leading-none select-none drop-shadow-[0_0_4px_rgba(197,160,89,0.8)]">
+                        <div className="w-3.5 h-3.5 rounded-full bg-[#FCFBF9] border border-[#C5A059] flex items-center justify-center shadow-xs">
+                          <span className="text-[#C5A059] text-[7.5px] font-bold leading-none select-none">
                             ★
                           </span>
                         </div>
@@ -1066,10 +1061,10 @@ export const AtelierCartDrawer: React.FC = () => {
                   </div>
 
                   {/* Shipping Region Selector */}
-                  <div className="pt-3 border-t border-forest/10 flex items-center justify-between text-xs font-sans">
-                    <div className="flex items-center gap-1 text-forest/70">
-                      <MapPin size={12} className="text-[#C5A059]" />
-                      <span className="text-[9px] uppercase tracking-wider font-semibold">
+                  <div className="pt-2.5 border-t border-forest/10 flex items-center justify-between text-[11px] font-sans">
+                    <div className="flex items-center gap-1 text-forest/60">
+                      <MapPin size={11} className="text-[#C5A059]" />
+                      <span className="text-[8.5px] uppercase tracking-wider font-semibold">
                         {isPt ? 'Região' : 'Region'}
                       </span>
                     </div>
@@ -1080,7 +1075,7 @@ export const AtelierCartDrawer: React.FC = () => {
                         const zone = SHIPPING_ZONES.find((z) => z.id === e.target.value);
                         if (zone) setSelectedShippingZone(zone);
                       }}
-                      className="bg-transparent border-b border-forest/20 rounded-none text-xs font-serif font-normal text-forest px-1 py-0.5 focus:outline-none focus:border-forest cursor-pointer"
+                      className="bg-transparent border-b border-forest/20 rounded-none text-[11px] font-serif font-normal text-forest px-1 py-0.5 focus:outline-none focus:border-forest cursor-pointer"
                     >
                       {SHIPPING_ZONES.map((zone) => (
                         <option key={zone.id} value={zone.id}>
@@ -1091,69 +1086,66 @@ export const AtelierCartDrawer: React.FC = () => {
                   </div>
 
                   {/* Timelines */}
-                  <div className="space-y-1 text-[10px] text-forest/75 font-sans border-t border-forest/5 pt-2">
+                  <div className="space-y-1 text-[9.5px] text-forest/65 font-sans border-t border-forest/5 pt-2">
                     <div className="flex justify-between items-center">
-                      <span className="text-forest/60">{isPt ? 'Produção Manual:' : 'Production:'}</span>
-                      <span className="font-serif font-medium text-forest">
+                      <span className="text-forest/55">{isPt ? 'Produção Manual:' : 'Production:'}</span>
+                      <span className="font-serif font-medium text-forest/90">
                         {maxLeadTimeDays === 0
                           ? (isPt ? 'Disponível em Atelier' : 'Available in Atelier')
                           : (isPt ? `${maxLeadTimeDays} ${maxLeadTimeDays === 1 ? 'dia útil' : 'dias úteis'}` : `${maxLeadTimeDays} business days`)}
                       </span>
                     </div>
                     <div className="flex justify-between items-center">
-                      <span className="text-forest/60">{isPt ? 'Envio Expresso (CTT):' : 'Express (CTT):'}</span>
-                      <span className="font-serif font-medium text-forest">1 a 3 dias úteis</span>
+                      <span className="text-forest/55">{isPt ? 'Envio Expresso (CTT):' : 'Express (CTT):'}</span>
+                      <span className="font-serif font-medium text-forest/90">1 a 3 dias úteis</span>
                     </div>
                   </div>
 
                   {/* Financial Breakdown with Explicit (+ Portes) Discrimination */}
-                  <div className="space-y-1.5 font-sans text-xs pt-2.5 border-t border-forest/10">
-                    <div className="flex justify-between text-forest/70">
+                  <div className="space-y-1 font-sans text-[11px] pt-2 border-t border-forest/10">
+                    <div className="flex justify-between text-forest/65">
                       <span>{isPt ? 'Subtotal dos Artigos' : 'Items Subtotal'}</span>
-                      <span className="font-serif font-medium text-forest">{subtotal.toFixed(2)}€</span>
+                      <span className="font-serif font-medium text-forest/90">{subtotal.toFixed(2)}€</span>
                     </div>
-                    <div className="flex justify-between text-forest/70">
+                    <div className="flex justify-between text-forest/65">
                       <span>{isPt ? 'Portes de Envio' : 'Shipping'} ({getZoneNameFromString(selectedShippingZone, isPt)})</span>
                       <span className="font-serif font-medium">
                         {shippingFee === 0 ? (
-                          <span className="text-[#987834] font-bold text-[10px] bg-[#C5A059]/15 px-2 py-0.5 rounded-full border border-[#C5A059]/30">
+                          <span className="text-[#987834] font-semibold text-[9.5px] bg-[#C5A059]/10 px-1.5 py-0.5 rounded-full border border-[#C5A059]/25">
                             {isPt ? 'Cortesia (0.00€)' : 'Courtesy (0.00€)'}
                           </span>
                         ) : (
-                          <span className="font-bold text-forest">+ {shippingFee.toFixed(2)}€</span>
+                          <span className="font-semibold text-forest/90">+ {shippingFee.toFixed(2)}€</span>
                         )}
                       </span>
                     </div>
                     <div className="pt-2 border-t border-forest/10 flex justify-between items-baseline">
                       <div>
-                        <span className="text-xs font-serif font-bold text-forest uppercase tracking-wider block">
+                        <span className="text-[10px] font-serif font-semibold text-forest uppercase tracking-wider block">
                           {isPt ? 'Total Final' : 'Final Total'}
                         </span>
-                        <span className="text-[9px] text-forest/50 font-sans block">
+                        <span className="text-[8px] text-forest/45 font-sans block">
                           ({subtotal.toFixed(2)}€ {shippingFee === 0 ? (isPt ? '+ Portes Cortesia' : '+ Courtesy Shipping') : (isPt ? `+ ${shippingFee.toFixed(2)}€ portes` : `+ ${shippingFee.toFixed(2)}€ shipping`)})
                         </span>
                       </div>
-                      <span className="text-xl font-serif font-bold text-forest">{totalPrice.toFixed(2)}€</span>
+                      <span className="text-base font-serif font-semibold text-forest">{totalPrice.toFixed(2)}€</span>
                     </div>
                   </div>
 
                   {/* Golden Badge 2: Commercial Incentive for Fixed Shipping Rate (Multipack Upsell) */}
-                  <div className="p-3 rounded-2xl bg-[#F6F2EA] border border-[#C5A059]/35 text-forest font-sans shadow-xs space-y-1 mt-2">
-                    <div className="flex items-center gap-1.5 text-[#987834]">
-                      <Sparkles size={12} className="shrink-0 text-[#C5A059]" />
-                      <span className="text-[10px] font-bold uppercase tracking-wider">
+                  <div className="p-2.5 rounded-xl bg-[#F6F2EA]/80 border border-[#C5A059]/25 text-forest font-sans shadow-2xs space-y-0.5 mt-1.5">
+                    <div className="flex items-center gap-1 text-[#987834]">
+                      <Sparkles size={11} className="shrink-0 text-[#C5A059]" />
+                      <span className="text-[9px] font-semibold uppercase tracking-wider">
                         {isPt ? 'Nota de Envio' : 'Shipping Note'}
                       </span>
                     </div>
-                    <p className="text-[11px] font-serif text-forest leading-snug">
+                    <p className="text-[10px] font-serif text-forest/90 leading-snug">
                       {isPt ? (
-                        <>Pelo mesmo valor de portes (<strong className="font-bold text-[#A68244]">{shippingFee === 0 ? '4,50€' : `${shippingFee.toFixed(2)}€`}</strong>), pode incluir até <strong className="font-bold text-[#A68244]">3 peças</strong> na mesma encomenda!</>
+                        <>Pelo mesmo valor de portes (<strong className="font-semibold text-[#A68244]">{shippingFee === 0 ? '4,50€' : `${shippingFee.toFixed(2)}€`}</strong>), pode incluir até <strong className="font-semibold text-[#A68244]">3 peças</strong> na mesma encomenda!</>
                       ) : (
-                        <>For the same shipping fee (<strong className="font-bold text-[#A68244]">{shippingFee === 0 ? '4.50€' : `${shippingFee.toFixed(2)}€`}</strong>), you can include up to <strong className="font-bold text-[#A68244]">3 items</strong> in one shipment!</>
+                        <>For the same shipping fee (<strong className="font-semibold text-[#A68244]">{shippingFee === 0 ? '4.50€' : `${shippingFee.toFixed(2)}€`}</strong>), you can include up to <strong className="font-semibold text-[#A68244]">3 items</strong> in one shipment!</>
                       )}
-                    </p>
-                    <p className="text-[9.5px] text-forest/60">
-                      {isPt ? 'Aproveite a mesma caixa e otimize o custo de transporte.' : 'Maximize your shipment box and optimize delivery value.'}
                     </p>
                   </div>
                 </div>
@@ -1179,46 +1171,48 @@ export const AtelierCartDrawer: React.FC = () => {
                       </span>
                     </div>
 
-                    {/* Show ONLY Apple Pay on Apple ecosystem, or ONLY Google Pay on Android/Windows/Chrome */}
-                    <div>
-                      {detectedEcosystem === 'apple' ? (
-                        <button
-                          type="button"
-                          disabled={isPaying}
-                          onClick={(e) => handleExpressWalletPay(e, 'Apple Pay')}
-                          className={`w-full h-10 max-h-[40px] bg-black rounded-sm flex items-center justify-center transition-all hover:bg-black/90 cursor-pointer shadow-xs border border-black/80 px-4 ${
-                            activeExpressWallet === 'applepay' ? 'ring-2 ring-[#C5A059] scale-[0.99]' : 'active:scale-[0.98]'
-                          } ${isPaying && activeExpressWallet !== 'applepay' ? 'opacity-50 cursor-not-allowed' : ''}`}
-                          title={isPt ? 'Pagar com Apple Pay' : 'Pay with Apple Pay'}
-                        >
-                          {isPaying && activeExpressWallet === 'applepay' ? (
-                            <span className="text-[10px] uppercase tracking-wider text-white font-mono animate-pulse">
-                              {isPt ? 'A autorizar Apple Pay...' : 'Authorizing Apple Pay...'}
-                            </span>
-                          ) : (
-                            <ApplePayIcon className="h-5 w-auto text-white fill-current pointer-events-none shrink-0 overflow-visible" />
-                          )}
-                        </button>
-                      ) : (
-                        <button
-                          type="button"
-                          disabled={isPaying}
-                          onClick={(e) => handleExpressWalletPay(e, 'Google Pay')}
-                          className={`w-full h-10 max-h-[40px] bg-black rounded-sm flex items-center justify-center transition-all hover:bg-black/90 cursor-pointer shadow-xs border border-black/80 px-4 ${
-                            activeExpressWallet === 'googlepay' ? 'ring-2 ring-[#C5A059] scale-[0.99]' : 'active:scale-[0.98]'
-                          } ${isPaying && activeExpressWallet !== 'googlepay' ? 'opacity-50 cursor-not-allowed' : ''}`}
-                          title={isPt ? 'Pagar com Google Pay' : 'Pay with Google Pay'}
-                        >
-                          {isPaying && activeExpressWallet === 'googlepay' ? (
-                            <span className="text-[10px] uppercase tracking-wider text-white font-mono animate-pulse">
-                              {isPt ? 'A autorizar Google Pay...' : 'Authorizing Google Pay...'}
-                            </span>
-                          ) : (
-                            <GooglePayIcon className="h-5 w-auto pointer-events-none shrink-0" />
-                          )}
-                        </button>
-                      )}
-                    </div>
+                    {/* Dynamic Ecosystem Express Wallet Button (ONLY Apple Pay on iOS/Safari, ONLY Google Pay on Android/Chrome/Windows) */}
+                    {detectedEcosystem !== 'none' && (
+                      <div>
+                        {detectedEcosystem === 'apple' ? (
+                          <button
+                            type="button"
+                            disabled={isPaying}
+                            onClick={(e) => handleExpressWalletPay(e, 'Apple Pay')}
+                            className={`w-full h-11 bg-black rounded-xl flex items-center justify-center transition-all hover:bg-black/90 cursor-pointer shadow-xs border border-black/80 px-4 ${
+                              activeExpressWallet === 'applepay' ? 'ring-2 ring-[#C5A059] scale-[0.99]' : 'active:scale-[0.98]'
+                            } ${isPaying && activeExpressWallet !== 'applepay' ? 'opacity-50 cursor-not-allowed' : ''}`}
+                            title={isPt ? 'Pagar com Apple Pay' : 'Pay with Apple Pay'}
+                          >
+                            {isPaying && activeExpressWallet === 'applepay' ? (
+                              <span className="text-[10px] uppercase tracking-wider text-white font-mono animate-pulse">
+                                {isPt ? 'A autorizar Apple Pay...' : 'Authorizing Apple Pay...'}
+                              </span>
+                            ) : (
+                              <ApplePayIcon className="h-5 w-auto text-white fill-current pointer-events-none shrink-0 overflow-visible" />
+                            )}
+                          </button>
+                        ) : (
+                          <button
+                            type="button"
+                            disabled={isPaying}
+                            onClick={(e) => handleExpressWalletPay(e, 'Google Pay')}
+                            className={`w-full h-11 bg-black rounded-xl flex items-center justify-center transition-all hover:bg-black/90 cursor-pointer shadow-xs border border-black/80 px-4 ${
+                              activeExpressWallet === 'googlepay' ? 'ring-2 ring-[#C5A059] scale-[0.99]' : 'active:scale-[0.98]'
+                            } ${isPaying && activeExpressWallet !== 'googlepay' ? 'opacity-50 cursor-not-allowed' : ''}`}
+                            title={isPt ? 'Pagar com Google Pay' : 'Pay with Google Pay'}
+                          >
+                            {isPaying && activeExpressWallet === 'googlepay' ? (
+                              <span className="text-[10px] uppercase tracking-wider text-white font-mono animate-pulse">
+                                {isPt ? 'A autorizar Google Pay...' : 'Authorizing Google Pay...'}
+                              </span>
+                            ) : (
+                              <GooglePayIcon className="h-5 w-auto pointer-events-none shrink-0" />
+                            )}
+                          </button>
+                        )}
+                      </div>
+                    )}
 
                     <div className="relative flex py-1 items-center">
                       <div className="flex-grow border-t border-forest/15"></div>
@@ -1354,57 +1348,57 @@ export const AtelierCartDrawer: React.FC = () => {
                       {isPt ? '2. Método de Pagamento' : '2. Payment Method'}
                     </span>
 
-                    <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
+                    <div className="grid grid-cols-3 sm:grid-cols-4 gap-2.5">
                       <button
                         type="button"
                         onClick={() => setPaymentMethod('mbway')}
-                        className={`h-14 sm:h-16 rounded-xl border text-center transition-all cursor-pointer flex flex-col items-center justify-center p-2 ${
+                        className={`h-16 sm:h-20 rounded-xl border text-center transition-all cursor-pointer flex flex-col items-center justify-center p-2.5 whitespace-nowrap ${
                           paymentMethod === 'mbway'
-                            ? 'border-[#C5A059] bg-[#343E2C] text-[#C5A059] font-medium shadow-md'
+                            ? 'border-[#C5A059] bg-[#343E2C] text-[#C5A059] font-medium shadow-md ring-1 ring-[#C5A059]/50'
                             : 'border-forest/15 bg-white text-forest/70 hover:bg-forest/5'
                         }`}
                       >
-                        <img src="/icons/mbway.svg" alt="MB WAY" className={`h-6 sm:h-7 w-auto max-w-[85%] object-contain transition-all ${paymentMethod === 'mbway' ? 'brightness-0 invert' : ''}`} />
+                        <img src="/icons/mbway.svg" alt="MB WAY" className={`h-8 sm:h-9 w-auto max-w-[90%] object-contain transition-all ${paymentMethod === 'mbway' ? 'brightness-0 invert' : ''}`} />
                       </button>
 
                       <button
                         type="button"
                         onClick={() => setPaymentMethod('multibanco')}
-                        className={`h-14 sm:h-16 rounded-xl border text-center transition-all cursor-pointer flex flex-col items-center justify-center p-2 ${
+                        className={`h-16 sm:h-20 rounded-xl border text-center transition-all cursor-pointer flex flex-col items-center justify-center p-2.5 whitespace-nowrap ${
                           paymentMethod === 'multibanco'
-                            ? 'border-[#C5A059] bg-[#343E2C] text-[#C5A059] font-medium shadow-md'
+                            ? 'border-[#C5A059] bg-[#343E2C] text-[#C5A059] font-medium shadow-md ring-1 ring-[#C5A059]/50'
                             : 'border-forest/15 bg-white text-forest/70 hover:bg-forest/5'
                         }`}
                       >
-                        <img src="/icons/multibanco.svg" alt="Multibanco" className={`h-6 sm:h-7 w-auto max-w-[85%] object-contain transition-all ${paymentMethod === 'multibanco' ? 'brightness-0 invert' : ''}`} />
+                        <img src="/icons/multibanco.svg" alt="Multibanco" className={`h-8 sm:h-9 w-auto max-w-[90%] object-contain transition-all ${paymentMethod === 'multibanco' ? 'brightness-0 invert' : ''}`} />
                       </button>
 
                       <button
                         type="button"
                         onClick={() => setPaymentMethod('card')}
-                        className={`h-14 sm:h-16 rounded-xl border text-center transition-all cursor-pointer flex flex-col items-center justify-center p-2 ${
+                        className={`h-16 sm:h-20 rounded-xl border text-center transition-all cursor-pointer flex flex-col items-center justify-center p-2.5 whitespace-nowrap ${
                           paymentMethod === 'card'
-                            ? 'border-[#C5A059] bg-[#343E2C] text-[#C5A059] font-medium shadow-md'
+                            ? 'border-[#C5A059] bg-[#343E2C] text-[#C5A059] font-medium shadow-md ring-1 ring-[#C5A059]/50'
                             : 'border-forest/15 bg-white text-forest/70 hover:bg-forest/5'
                         }`}
                       >
-                        <div className="flex items-center gap-1.5">
-                          <img src="/icons/visa.svg" alt="VISA" className={`h-5 sm:h-6 w-auto object-contain ${paymentMethod === 'card' ? 'brightness-0 invert' : ''}`} />
-                          <img src="/icons/mastercard.svg" alt="Mastercard" className={`h-5 sm:h-6 w-auto object-contain ${paymentMethod === 'card' ? 'brightness-0 invert' : ''}`} />
+                        <div className="flex items-center gap-1.5 whitespace-nowrap">
+                          <img src="/icons/visa.svg" alt="VISA" className={`h-6 sm:h-7 w-auto object-contain ${paymentMethod === 'card' ? 'brightness-0 invert' : ''}`} />
+                          <img src="/icons/mastercard.svg" alt="Mastercard" className={`h-6 sm:h-7 w-auto object-contain ${paymentMethod === 'card' ? 'brightness-0 invert' : ''}`} />
                         </div>
                       </button>
 
                       <button
                         type="button"
                         onClick={() => setPaymentMethod('wallet')}
-                        className={`h-14 sm:h-16 rounded-xl border text-center transition-all cursor-pointer flex flex-col items-center justify-center p-2 ${
+                        className={`h-16 sm:h-20 rounded-xl border text-center transition-all cursor-pointer flex flex-col items-center justify-center p-2.5 whitespace-nowrap ${
                           paymentMethod === 'wallet'
-                            ? 'border-[#C5A059] bg-[#343E2C] text-[#C5A059] font-medium shadow-md'
+                            ? 'border-[#C5A059] bg-[#343E2C] text-[#C5A059] font-medium shadow-md ring-1 ring-[#C5A059]/50'
                             : 'border-forest/15 bg-white text-forest/70 hover:bg-forest/5'
                         }`}
                       >
-                        <div className="flex items-center gap-1">
-                          {/Mac|iPhone|iPad|iPod/i.test(navigator.userAgent) ? (
+                        <div className="flex items-center gap-1.5 whitespace-nowrap justify-center">
+                          {detectedEcosystem === 'apple' ? (
                             <img src="/icons/applepay.svg" alt="Apple Pay" className={`h-5 sm:h-6 w-auto object-contain ${paymentMethod === 'wallet' ? 'brightness-0 invert' : ''}`} />
                           ) : (
                             <img src="/icons/googlepay.svg" alt="Google Pay" className={`h-5 sm:h-6 w-auto object-contain ${paymentMethod === 'wallet' ? 'brightness-0 invert' : ''}`} />
@@ -1786,46 +1780,48 @@ export const AtelierCartDrawer: React.FC = () => {
                         </span>
                       </div>
 
-                      {/* Show ONLY Apple Pay on Apple ecosystem, or ONLY Google Pay on Android/Windows/Chrome */}
-                      <div>
-                        {detectedEcosystem === 'apple' ? (
-                          <button
-                            type="button"
-                            disabled={isPaying}
-                            onClick={(e) => handleExpressWalletPay(e, 'Apple Pay')}
-                            className={`w-full h-12 bg-black rounded-xl flex items-center justify-center transition-all hover:bg-black/90 cursor-pointer shadow-xs border border-black/80 px-4 py-2 ${
-                              activeExpressWallet === 'applepay' ? 'ring-2 ring-[#C5A059] scale-[0.99]' : 'active:scale-[0.98]'
-                            } ${isPaying && activeExpressWallet !== 'applepay' ? 'opacity-50 cursor-not-allowed' : ''}`}
-                            title={isPt ? 'Pagar com Apple Pay' : 'Pay with Apple Pay'}
-                          >
-                            {isPaying && activeExpressWallet === 'applepay' ? (
-                              <span className="text-[10px] uppercase tracking-wider text-white font-mono animate-pulse">
-                                {isPt ? 'A autorizar Apple Pay...' : 'Authorizing Apple Pay...'}
-                              </span>
-                            ) : (
-                              <ApplePayIcon className="h-5 w-auto text-white fill-current pointer-events-none shrink-0 overflow-visible" />
-                            )}
-                          </button>
-                        ) : (
-                          <button
-                            type="button"
-                            disabled={isPaying}
-                            onClick={(e) => handleExpressWalletPay(e, 'Google Pay')}
-                            className={`w-full h-12 bg-black rounded-xl flex items-center justify-center transition-all hover:bg-black/90 cursor-pointer shadow-xs border border-black/80 px-4 py-2 ${
-                              activeExpressWallet === 'googlepay' ? 'ring-2 ring-[#C5A059] scale-[0.99]' : 'active:scale-[0.98]'
-                            } ${isPaying && activeExpressWallet !== 'googlepay' ? 'opacity-50 cursor-not-allowed' : ''}`}
-                            title={isPt ? 'Pagar com Google Pay' : 'Pay with Google Pay'}
-                          >
-                            {isPaying && activeExpressWallet === 'googlepay' ? (
-                              <span className="text-[10px] uppercase tracking-wider text-white font-mono animate-pulse">
-                                {isPt ? 'A autorizar Google Pay...' : 'Authorizing Google Pay...'}
-                              </span>
-                            ) : (
-                              <GooglePayIcon className="h-5 w-auto pointer-events-none shrink-0" />
-                            )}
-                          </button>
-                        )}
-                      </div>
+                      {/* Dynamic Ecosystem Express Wallet Button (ONLY Apple Pay on iOS/Safari, ONLY Google Pay on Android/Chrome/Windows) */}
+                      {detectedEcosystem !== 'none' && (
+                        <div>
+                          {detectedEcosystem === 'apple' ? (
+                            <button
+                              type="button"
+                              disabled={isPaying}
+                              onClick={(e) => handleExpressWalletPay(e, 'Apple Pay')}
+                              className={`w-full h-12 bg-black rounded-xl flex items-center justify-center transition-all hover:bg-black/90 cursor-pointer shadow-xs border border-black/80 px-4 py-2 ${
+                                activeExpressWallet === 'applepay' ? 'ring-2 ring-[#C5A059] scale-[0.99]' : 'active:scale-[0.98]'
+                              } ${isPaying && activeExpressWallet !== 'applepay' ? 'opacity-50 cursor-not-allowed' : ''}`}
+                              title={isPt ? 'Pagar com Apple Pay' : 'Pay with Apple Pay'}
+                            >
+                              {isPaying && activeExpressWallet === 'applepay' ? (
+                                <span className="text-[10px] uppercase tracking-wider text-white font-mono animate-pulse">
+                                  {isPt ? 'A autorizar Apple Pay...' : 'Authorizing Apple Pay...'}
+                                </span>
+                              ) : (
+                                <ApplePayIcon className="h-5 w-auto text-white fill-current pointer-events-none shrink-0 overflow-visible" />
+                              )}
+                            </button>
+                          ) : (
+                            <button
+                              type="button"
+                              disabled={isPaying}
+                              onClick={(e) => handleExpressWalletPay(e, 'Google Pay')}
+                              className={`w-full h-12 bg-black rounded-xl flex items-center justify-center transition-all hover:bg-black/90 cursor-pointer shadow-xs border border-black/80 px-4 py-2 ${
+                                activeExpressWallet === 'googlepay' ? 'ring-2 ring-[#C5A059] scale-[0.99]' : 'active:scale-[0.98]'
+                              } ${isPaying && activeExpressWallet !== 'googlepay' ? 'opacity-50 cursor-not-allowed' : ''}`}
+                              title={isPt ? 'Pagar com Google Pay' : 'Pay with Google Pay'}
+                            >
+                              {isPaying && activeExpressWallet === 'googlepay' ? (
+                                <span className="text-[10px] uppercase tracking-wider text-white font-mono animate-pulse">
+                                  {isPt ? 'A autorizar Google Pay...' : 'Authorizing Google Pay...'}
+                                </span>
+                              ) : (
+                                <GooglePayIcon className="h-5 w-auto pointer-events-none shrink-0" />
+                              )}
+                            </button>
+                          )}
+                        </div>
+                      )}
 
                       <div className="relative flex py-1 items-center">
                         <div className="flex-grow border-t border-forest/15"></div>
@@ -1969,43 +1965,43 @@ export const AtelierCartDrawer: React.FC = () => {
                         {isPt ? '2. Método de Pagamento' : '2. Payment Method'}
                       </span>
 
-                      <div className="grid grid-cols-3 gap-1.5">
+                      <div className="grid grid-cols-3 gap-2">
                         <button
                           type="button"
                           onClick={() => setPaymentMethod('mbway')}
-                          className={`py-2 px-1 rounded-xl border text-center transition-all cursor-pointer flex flex-col items-center justify-center ${
+                          className={`h-14 sm:h-16 rounded-xl border text-center transition-all cursor-pointer flex flex-col items-center justify-center p-2 whitespace-nowrap ${
                             paymentMethod === 'mbway'
-                              ? 'border-[#C5A059] bg-[#343E2C] text-[#C5A059] font-medium shadow-xs'
+                              ? 'border-[#C5A059] bg-[#343E2C] text-[#C5A059] font-medium shadow-xs ring-1 ring-[#C5A059]/50'
                               : 'border-forest/15 bg-white text-forest/70 hover:bg-forest/5'
                           }`}
                         >
-                          <img src="/icons/mbway.svg" alt="MB WAY" className={`h-4 w-auto object-contain transition-all ${paymentMethod === 'mbway' ? 'brightness-0 invert' : ''}`} />
+                          <img src="/icons/mbway.svg" alt="MB WAY" className={`h-7 sm:h-8 w-auto max-w-[90%] object-contain transition-all ${paymentMethod === 'mbway' ? 'brightness-0 invert' : ''}`} />
                         </button>
 
                         <button
                           type="button"
                           onClick={() => setPaymentMethod('multibanco')}
-                          className={`py-2 px-1 rounded-xl border text-center transition-all cursor-pointer flex flex-col items-center justify-center ${
+                          className={`h-14 sm:h-16 rounded-xl border text-center transition-all cursor-pointer flex flex-col items-center justify-center p-2 whitespace-nowrap ${
                             paymentMethod === 'multibanco'
-                              ? 'border-[#C5A059] bg-[#343E2C] text-[#C5A059] font-medium shadow-xs'
+                              ? 'border-[#C5A059] bg-[#343E2C] text-[#C5A059] font-medium shadow-xs ring-1 ring-[#C5A059]/50'
                               : 'border-forest/15 bg-white text-forest/70 hover:bg-forest/5'
                           }`}
                         >
-                          <img src="/icons/multibanco.svg" alt="Multibanco" className={`h-4 w-auto object-contain transition-all ${paymentMethod === 'multibanco' ? '' : 'grayscale opacity-75'}`} />
+                          <img src="/icons/multibanco.svg" alt="Multibanco" className={`h-7 sm:h-8 w-auto max-w-[90%] object-contain transition-all ${paymentMethod === 'multibanco' ? 'brightness-0 invert' : 'grayscale opacity-75'}`} />
                         </button>
 
                         <button
                           type="button"
                           onClick={() => setPaymentMethod('card')}
-                          className={`py-2 px-1 rounded-xl border text-center transition-all cursor-pointer flex flex-col items-center justify-center ${
+                          className={`h-14 sm:h-16 rounded-xl border text-center transition-all cursor-pointer flex flex-col items-center justify-center p-2 whitespace-nowrap ${
                             paymentMethod === 'card'
-                              ? 'border-[#C5A059] bg-[#343E2C] text-[#C5A059] font-medium shadow-xs'
+                              ? 'border-[#C5A059] bg-[#343E2C] text-[#C5A059] font-medium shadow-xs ring-1 ring-[#C5A059]/50'
                               : 'border-forest/15 bg-white text-forest/70 hover:bg-forest/5'
                           }`}
                         >
-                          <div className="flex items-center gap-1">
-                            <img src="/icons/visa.svg" alt="VISA" className={`h-3.5 w-auto object-contain ${paymentMethod === 'card' ? 'brightness-0 invert' : ''}`} />
-                            <img src="/icons/mastercard.svg" alt="Mastercard" className={`h-3.5 w-auto object-contain ${paymentMethod === 'card' ? 'brightness-0 invert' : ''}`} />
+                          <div className="flex items-center gap-1.5 whitespace-nowrap">
+                            <img src="/icons/visa.svg" alt="VISA" className={`h-5 sm:h-6 w-auto object-contain ${paymentMethod === 'card' ? 'brightness-0 invert' : ''}`} />
+                            <img src="/icons/mastercard.svg" alt="Mastercard" className={`h-5 sm:h-6 w-auto object-contain ${paymentMethod === 'card' ? 'brightness-0 invert' : ''}`} />
                           </div>
                         </button>
                       </div>
