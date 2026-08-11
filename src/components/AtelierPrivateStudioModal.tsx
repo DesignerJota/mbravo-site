@@ -841,7 +841,7 @@ Gostaria de agendar a minha sessão privada de design com a Carolina.`;
                         placeholder="Ex: Maria Santos"
                         value={clientName}
                         onChange={(e) => setClientName(e.target.value)}
-                        className="w-full bg-white/5 border border-white/15 rounded-xl px-3 py-2 text-xs text-[#F5EEDC] placeholder-[#D4C3A3]/40 focus:outline-none focus:border-[#C5A059]"
+                        className="w-full bg-transparent border-b border-[#C5A059]/30 py-2 text-xs text-[#F5EEDC] placeholder-[#D4C3A3]/40 focus:outline-none focus:border-[#C5A059] transition-all"
                       />
                     </div>
                     <div className="sm:col-span-2">
@@ -853,7 +853,7 @@ Gostaria de agendar a minha sessão privada de design com a Carolina.`;
                         placeholder="Ex: Para evento em Outubro, tons terrosos..."
                         value={customNotes}
                         onChange={(e) => setCustomNotes(e.target.value)}
-                        className="w-full bg-white/5 border border-white/15 rounded-xl px-3 py-2 text-xs text-[#F5EEDC] placeholder-[#D4C3A3]/40 focus:outline-none focus:border-[#C5A059]"
+                        className="w-full bg-transparent border-b border-[#C5A059]/30 py-2 text-xs text-[#F5EEDC] placeholder-[#D4C3A3]/40 focus:outline-none focus:border-[#C5A059] transition-all"
                       />
                     </div>
                   </div>
