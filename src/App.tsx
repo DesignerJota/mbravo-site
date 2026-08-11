@@ -421,7 +421,12 @@ export let SHOP_CATEGORIES = [
           '/products/classic-coasters/2.webp',
           '/products/classic-coasters/3.webp',
           '/products/classic-coasters/4.webp',
-          '/products/classic-coasters/5.webp'
+          '/products/classic-coasters/5.webp',
+          '/products/classic-coasters/6.webp',
+          '/products/classic-coasters/7.webp',
+          '/products/classic-coasters/8.webp',
+          '/products/classic-coasters/9.webp',
+          '/products/classic-coasters/10.webp'
         ],
         description: "Bases em crochet com um design floral clássico e delicado, pensadas para trazer um toque cozy e elegante ao teu espaço. Disponíveis em várias cores, mantendo sempre as pétalas brancas para um acabamento suave e delicado.",
         material: "- Material: 100% algodão",
@@ -475,7 +480,9 @@ export let SHOP_CATEGORIES = [
           '/products/mini-pouches/1.webp',
           '/products/mini-pouches/2.webp',
           '/products/mini-pouches/3.webp',
-          '/products/mini-pouches/4.webp'
+          '/products/mini-pouches/4.webp',
+          '/products/mini-pouches/5.webp',
+          '/products/mini-pouches/6.webp'
         ],
         description: `Mini pouch em crochet feito à mão, criado com um design simples e intemporal para guardar pequenos essenciais do dia a dia.
 Com fecho ajustável em cordão e um acabamento delicado handmade, é perfeito para moedas, cartões, joias, lip products ou pequenos tesouros do dia a dia.`,
@@ -567,7 +574,9 @@ Compacta e prática, fecha com um botão de madeira com estrela, um detalhe espe
           '/products/coral-bikini-top/1.webp',
           '/products/coral-bikini-top/2.webp',
           '/products/coral-bikini-top/3.webp',
-          '/products/coral-bikini-top/4.webp'
+          '/products/coral-bikini-top/4.webp',
+          '/products/coral-bikini-top/5.webp',
+          '/products/coral-bikini-top/6.webp'
         ],
         description: `Bikini top em crochet feito à mão, com um design triangular clássico e detalhes delicados.
 Ajustável no pescoço e nas costas para um ajuste confortável e personalizado.
@@ -579,7 +588,8 @@ Disponível em várias combinações de cores, foi criado para acompanhar os dia
         id: 'v2b', name: 'Mesh Poncho', price: calculateProductRange('Mesh Poncho'), img: '/products/mesh-poncho/1.webp',
         images: [
           '/products/mesh-poncho/1.webp',
-          '/products/mesh-poncho/2.webp'
+          '/products/mesh-poncho/2.webp',
+          '/products/mesh-poncho/3.webp'
         ],
         description: "Poncho em crochet leve e delicado, feito à mão com um design de malha aberta para um look effortless and cozy. Perfeito para sobrepor a tops, vestidos ou biquínis, criando um toque elegante e descontraído ao outfit. Disponível em várias cores.",
         material: "- Material: 100% algodão",
@@ -595,7 +605,8 @@ Disponível em várias combinações de cores, foi criado para acompanhar os dia
           '/products/signature-granny-poncho/2.webp',
           '/products/signature-granny-poncho/3.webp',
           '/products/signature-granny-poncho/4.webp',
-          '/products/signature-granny-poncho/5.webp'
+          '/products/signature-granny-poncho/5.webp',
+          '/products/signature-granny-poncho/6.webp'
         ],
         description: "Poncho em crochet feito à mão, criado com um clássico padrão granny stitch e combinação de duas cores para um look cozy e intemporal. Com um ajuste confortável e textura aconchegante, é perfeito para sobrepor a diferentes looks e acrescentar um toque handmade e effortless ao visual.",
         details: "• Ideal para layering em diferentes looks\n• Disponível em várias combinações de cores",
@@ -626,7 +637,8 @@ Disponível em várias combinações de cores, foi criado para acompanhar os dia
         images: [
           '/products/mini-alma-cardigan/1.webp',
           '/products/mini-alma-cardigan/2.webp',
-          '/products/mini-alma-cardigan/3.webp'
+          '/products/mini-alma-cardigan/3.webp',
+          '/products/mini-alma-cardigan/4.webp'
         ],
         sizes: ['2 anos', '4 anos', '6 anos'],
         description: "Versão mini do Alma Cardigan, feita à mão em crochet com granny squares clássicos e um design cozy e intemporal. Pensado para os mais pequenos, combina conforto, delicadeza e um toque handmade especial. Disponível em várias combinações de cores and materiais.",
@@ -651,7 +663,8 @@ Disponível em várias combinações de cores, foi criado para acompanhar os dia
           '/products/dragonfly-bandana/1.webp',
           '/products/dragonfly-bandana/2.webp',
           '/products/dragonfly-bandana/3.webp',
-          '/products/dragonfly-bandana/4.webp'
+          '/products/dragonfly-bandana/4.webp',
+          '/products/dragonfly-bandana/5.webp'
         ],
         description: "Bandana em crochet com delicado padrão de libelinhas, feita à mão para dar um toque cozy e especial ao teu look. Leve, confortável e versátil, perfeita para usar no dia a dia. Disponível em várias cores e em duas opções de material.",
         material: "- Opção 1: 100% algodão (opção leve)\n- Opção 2: 50% algodão, 50% lã (opção mais cozy)",
@@ -695,7 +708,11 @@ Disponível em várias cores.`,
           '/products/scarf-hip-bandana/1.webp',
           '/products/scarf-hip-bandana/2.webp',
           '/products/scarf-hip-bandana/3.webp',
-          '/products/scarf-hip-bandana/4.webp'
+          '/products/scarf-hip-bandana/4.webp',
+          '/products/scarf-hip-bandana/5.webp',
+          '/products/scarf-hip-bandana/6.webp',
+          '/products/scarf-hip-bandana/7.webp',
+          '/products/scarf-hip-bandana/8.webp'
         ],
         description: `Peça em crochet leve e versátil, cuidadosamente feita à mão.
 Pode ser usada como hip scarf ou bandana, adicionando um toque boho e handmade a qualquer look.
@@ -1150,12 +1167,13 @@ const Navbar = ({ currentPage, setCurrentPage, pathname, isAppLoading = false }:
 
     // Adaptive dynamic background with glassmorphism contrast on scroll
     const navBg = isScrolled 
-      ? 'bg-[#FAF8F5]/65 backdrop-blur-xl backdrop-saturate-150 shadow-xs border-b border-forest/10 py-3.5' 
+      ? 'bg-[#FAF8F5]/75 backdrop-blur-md backdrop-saturate-150 shadow-xs border-b border-forest/10 py-3.5' 
       : 'bg-transparent py-6 md:py-8';
     const textColor = isScrolled ? 'text-forest' : (isDarkBg ? 'text-cream' : 'text-forest');
 
   return (
-    <nav className={`fixed top-0 left-0 w-full z-40 transition-all duration-300 ${isAppLoading ? 'opacity-0 pointer-events-none' : 'opacity-100 pointer-events-auto'} ${navBg}`}>
+    <>
+      <nav className={`fixed top-0 left-0 w-full z-40 transition-all duration-300 ${isAppLoading ? 'opacity-0 pointer-events-none' : 'opacity-100 pointer-events-auto'} ${navBg}`}>
       <div className="max-w-7xl mx-auto px-6 flex justify-between items-center">
         {/* Logo with entry animation and Smart Invert */}
         <motion.a 
@@ -1170,7 +1188,7 @@ const Navbar = ({ currentPage, setCurrentPage, pathname, isAppLoading = false }:
             className="relative"
             aria-label="M★BRAVO"
         >
-          <Logo light={isDarkBg} className="h-10 md:h-12" />
+          <Logo light={isScrolled ? false : isDarkBg} className="h-10 md:h-12 transition-all duration-300" />
         </motion.a>
 
         {/* Desktop Nav */}
@@ -1190,7 +1208,7 @@ const Navbar = ({ currentPage, setCurrentPage, pathname, isAppLoading = false }:
                 className={`text-[10px] uppercase tracking-[0.4em] font-bold transition-all duration-200 relative group ${textColor} ${
                   isHighlight 
                     ? `px-6 py-2 border rounded-full transition-all duration-200 ${
-                        isDarkBg 
+                        isDarkBg && !isScrolled
                           ? 'border-cream/30 hover:bg-cream hover:text-forest' 
                           : 'border-forest/30 hover:bg-forest hover:text-cream'
                        }` 
@@ -1199,7 +1217,7 @@ const Navbar = ({ currentPage, setCurrentPage, pathname, isAppLoading = false }:
               >
                 {displayName}
                 {!isHighlight && (
-                  <div className={`absolute -bottom-1 left-0 w-0 h-[1px] ${isDarkBg ? 'bg-cream' : 'bg-forest'} group-hover:w-full transition-all duration-200 opacity-40`} />
+                  <div className={`absolute -bottom-1 left-0 w-0 h-[1px] ${isScrolled ? 'bg-forest' : (isDarkBg ? 'bg-cream' : 'bg-forest')} group-hover:w-full transition-all duration-200 opacity-40`} />
                 )}
               </motion.a>
             );
@@ -1210,7 +1228,7 @@ const Navbar = ({ currentPage, setCurrentPage, pathname, isAppLoading = false }:
             initial={{ opacity: 0, y: -10 }}
             animate={isAppLoading ? { opacity: 0, y: -10 } : { opacity: 1, y: 0 }}
             transition={{ delay: 0.2 + (NAV_LINKS_LIST.length * 0.08), duration: 0.6 }}
-            className={`flex items-center text-[10px] uppercase tracking-[0.2em] font-medium transition-all duration-200 pl-4 lg:pl-6 border-l ${isDarkBg ? 'border-cream/20' : 'border-forest/20'} ${textColor}`}
+            className={`flex items-center text-[10px] uppercase tracking-[0.2em] font-medium transition-all duration-200 pl-4 lg:pl-6 border-l ${isScrolled ? 'border-forest/20' : (isDarkBg ? 'border-cream/20' : 'border-forest/20')} ${textColor}`}
           >
             <button 
               onClick={() => handleLanguageChange('PT')} 
@@ -1218,7 +1236,7 @@ const Navbar = ({ currentPage, setCurrentPage, pathname, isAppLoading = false }:
             >
               PT
             </button>
-            <span className={`mx-2 lg:mx-3 ${isDarkBg ? 'text-cream/20' : 'text-forest/20'}`}>|</span>
+            <span className={`mx-2 lg:mx-3 ${isScrolled ? 'text-forest/20' : (isDarkBg ? 'text-cream/20' : 'text-forest/20')}`}>|</span>
             <button 
               onClick={() => handleLanguageChange('EN')} 
               className={`transition-all duration-200 cursor-pointer hover:text-[#C5A059] ${lang === 'EN' ? 'font-bold opacity-100' : 'opacity-40 hover:opacity-80'}`}
@@ -1230,7 +1248,7 @@ const Navbar = ({ currentPage, setCurrentPage, pathname, isAppLoading = false }:
             <button
               onClick={() => setIsCartOpen(true)}
               className={`relative p-2 ml-4 rounded-full transition-all cursor-pointer hover:scale-110 flex items-center justify-center ${
-                isDarkBg ? 'text-cream hover:text-[#C5A059]' : 'text-forest hover:text-[#C5A059]'
+                isScrolled ? 'text-forest hover:text-[#C5A059]' : (isDarkBg ? 'text-cream hover:text-[#C5A059]' : 'text-forest hover:text-[#C5A059]')
               }`}
               title="Saco de Compras / Shopping Bag"
             >
@@ -1249,7 +1267,7 @@ const Navbar = ({ currentPage, setCurrentPage, pathname, isAppLoading = false }:
           <button
             onClick={() => setIsCartOpen(true)}
             className={`relative p-2 rounded-full transition-all cursor-pointer flex items-center justify-center ${
-              isDarkBg ? 'text-cream' : 'text-forest'
+              isScrolled ? 'text-forest' : (isDarkBg ? 'text-cream' : 'text-forest')
             }`}
             title="Saco de Compras"
           >
@@ -1275,97 +1293,99 @@ const Navbar = ({ currentPage, setCurrentPage, pathname, isAppLoading = false }:
           )}
         </div>
       </div>
+    </nav>
 
-      {/* Mobile Menu Overlay - Refined with Forest theme */}
-      <AnimatePresence>
-        {mobileMenuOpen && (
+    {/* Mobile Navigation Slide-Over Drawer Panel (Outside <nav> to avoid stacking context clipping) */}
+    <AnimatePresence>
+      {mobileMenuOpen && (
+        <div className="fixed inset-0 z-[99999] flex justify-end pointer-events-auto w-full h-full h-[100dvh] overflow-hidden">
+          {/* Dark Overlay Backdrop with Blur */}
           <motion.div
-            initial={{ opacity: 0, backdropFilter: "blur(0px)" }}
-            animate={{ opacity: 1, backdropFilter: "blur(20px)" }}
-            exit={{ opacity: 0, backdropFilter: "blur(0px)" }}
-            className="fixed inset-0 z-[100] bg-forest flex flex-col items-center justify-center p-6 sm:p-8 space-y-6 overflow-y-auto w-full h-full pointer-events-auto"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.3 }}
+            onClick={() => setMobileMenuOpen(false)}
+            className="fixed inset-0 w-full h-full bg-black/70 backdrop-blur-md cursor-pointer z-0"
+          />
+
+          {/* Slide-Over Panel Right-to-Left */}
+          <motion.div
+            initial={{ x: '100%' }}
+            animate={{ x: 0 }}
+            exit={{ x: '100%' }}
+            transition={{ type: 'spring', damping: 28, stiffness: 280 }}
+            className="relative z-10 w-[85%] max-w-md h-full h-[100dvh] max-h-[100dvh] bg-[#121A0D] text-cream flex flex-col justify-between p-6 sm:p-8 shadow-2xl border-l border-[#C5A059]/30 overflow-y-auto"
           >
-             <button 
-                className="absolute top-8 right-8 text-cream hover:text-brand-green-light transition-all duration-300 p-3 bg-white/5 hover:bg-white/10 rounded-full border border-white/10 flex items-center justify-center cursor-pointer shadow-lg"
+            {/* Header with Brand Logo & Prominent Close Button X */}
+            <div className="flex justify-between items-center border-b border-[#C5A059]/20 pb-4 pt-1 shrink-0">
+              <Logo light className="h-8 sm:h-9" />
+              <button 
+                className="w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 text-cream transition-all duration-300 border border-white/20 flex items-center justify-center cursor-pointer shadow-md active:scale-95 shrink-0"
                 onClick={() => setMobileMenuOpen(false)}
                 aria-label="Fechar Menu"
-             >
-                <X size={28} />
-             </button>
-             
-             {/* Centered navigation links with balanced vertical gap */}
-             <div className="flex flex-col items-center justify-center space-y-4 sm:space-y-5">
-               {NAV_LINKS_LIST.map((link, i) => {
+              >
+                <X size={22} />
+              </button>
+            </div>
+
+            {/* Navigation Links */}
+            <div className="flex flex-col space-y-6 py-8">
+              {NAV_LINKS_LIST.map((link, i) => {
                 const displayName = t(link.key);
                 return (
                   <motion.a
                     key={link.name}
                     href={link.href}
                     onClick={(e) => handleLinkClick(e, link.href)}
-                    initial={{ opacity: 0, y: 15 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -10 }}
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ opacity: 1, x: 0 }}
                     transition={{ 
-                      duration: 0.6,
-                      delay: i * 0.08,
+                      duration: 0.4,
+                      delay: 0.1 + i * 0.06,
                       ease: [0.16, 1, 0.3, 1]
                     }}
-                    className="text-2xl sm:text-3xl md:text-4xl font-serif text-cream hover:text-brand-green-light hover:italic transition-all duration-500 tracking-wide text-center"
+                    className="text-xl sm:text-2xl font-serif text-cream hover:text-[#C5A059] transition-all duration-300 tracking-wide text-left flex items-center gap-3 group"
                   >
-                    {displayName}
+                    <span className="text-[#C5A059] text-xs opacity-0 group-hover:opacity-100 transition-opacity">✦</span>
+                    <span>{displayName}</span>
                   </motion.a>
                 );
-               })}
-             </div>
+              })}
+            </div>
 
-             {/* Mobile Language Selector with proportional sizing and elegant stagger */}
-             <motion.div 
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ 
-                  duration: 0.6,
-                  delay: NAV_LINKS_LIST.length * 0.08 + 0.1,
-                  ease: [0.16, 1, 0.3, 1]
-                }}
-                className="flex items-center text-xs uppercase tracking-[0.25em] font-medium text-cream"
-             >
+            {/* Footer Language & Social Controls */}
+            <div className="border-t border-[#C5A059]/20 pt-6 space-y-6 shrink-0">
+              <div className="flex items-center text-xs uppercase tracking-[0.25em] font-medium text-cream">
                 <button 
                   onClick={() => handleLanguageChange('PT')} 
-                  className={`transition-all duration-500 cursor-pointer ${lang === 'PT' ? 'font-bold text-cream' : 'text-cream/40 hover:text-cream/80'}`}
+                  className={`transition-all duration-300 cursor-pointer ${lang === 'PT' ? 'font-bold text-[#C5A059]' : 'text-cream/40 hover:text-cream/80'}`}
                 >
                   PT
                 </button>
                 <span className="mx-3 text-cream/20">|</span>
                 <button 
                   onClick={() => handleLanguageChange('EN')} 
-                  className={`transition-all duration-500 cursor-pointer ${lang === 'EN' ? 'font-bold text-cream' : 'text-cream/40 hover:text-cream/80'}`}
+                  className={`transition-all duration-300 cursor-pointer ${lang === 'EN' ? 'font-bold text-[#C5A059]' : 'text-cream/40 hover:text-cream/80'}`}
                 >
                   EN
                 </button>
-             </motion.div>
+              </div>
 
-             {/* Delicate footer icons matching the refined proportions */}
-             <motion.div 
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ 
-                  duration: 0.6,
-                  delay: NAV_LINKS_LIST.length * 0.08 + 0.2,
-                  ease: [0.16, 1, 0.3, 1]
-                }}
-                className="flex gap-8"
-             >
-                 <a href="https://instagram.com/mbravobycarolina/" target="_blank" rel="noopener noreferrer" className="p-2">
-                     <Instagram className="text-cream/40 hover:text-cream transition-colors duration-300" size={20} />
-                 </a>
-                 <a href={MAILTO_LINK} className="p-2">
-                     <Mail className="text-cream/40 hover:text-cream transition-colors duration-300" size={20} />
-                 </a>
-             </motion.div>
+              <div className="flex gap-6 items-center">
+                <a href="https://instagram.com/mbravobycarolina/" target="_blank" rel="noopener noreferrer" className="p-2 bg-white/5 rounded-full hover:bg-white/10 transition-colors">
+                  <Instagram className="text-cream/60 hover:text-[#C5A059] transition-colors duration-300" size={18} />
+                </a>
+                <a href={MAILTO_LINK} className="p-2 bg-white/5 rounded-full hover:bg-white/10 transition-colors">
+                  <Mail className="text-cream/60 hover:text-[#C5A059] transition-colors duration-300" size={18} />
+                </a>
+              </div>
+            </div>
           </motion.div>
-        )}
-      </AnimatePresence>
-    </nav>
+        </div>
+      )}
+    </AnimatePresence>
+  </>
   );
 };
 
@@ -2022,7 +2042,7 @@ const Hero = () => {
                 {/* Editorial Organic Glass Tag CTA Anchor ('VER A COLEÇÃO') */}
                 <motion.div
                     style={{ y: ctaY, scale: ctaScale, opacity: ctaOpacity }}
-                    className="absolute bottom-12 sm:bottom-20 md:bottom-24 landscape:bottom-4 sm:landscape:bottom-8 md:landscape:bottom-12 left-1/2 -translate-x-1/2 z-[50] pointer-events-auto w-auto max-w-[90vw]"
+                    className="absolute bottom-20 sm:bottom-24 md:bottom-28 landscape:bottom-6 left-1/2 -translate-x-1/2 z-[50] pointer-events-auto w-auto max-w-[90vw] pb-[env(safe-area-inset-bottom)]"
                 >
                     <motion.button
                         initial={{ opacity: 0, y: 14, scale: 0.96 }}
@@ -3217,11 +3237,13 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({ product: rawProduct,
     }, [isCheckingOut, paymentMethod, totalPrice, lang]);
     const isLiveMode = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY?.startsWith('pk_live') || false;
 
-    const productImages = product.images || [product.img];
+    const productImages = getProductAllImages(product);
 
     useEffect(() => {
-        setActiveImgIndex(0);
-        setDirection(0);
+        if (isFocused) {
+            setActiveImgIndex(0);
+            setDirection(0);
+        }
     }, [product.id, isFocused]);
 
     // Logic for Material & Care
@@ -3414,7 +3436,7 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({ product: rawProduct,
         <div data-lenis-prevent className="w-full h-auto lg:h-[88vh] lg:max-w-6xl bg-[#FCFBF9] rounded-none md:rounded-[2rem] lg:rounded-[2.5rem] flex flex-col lg:flex-row shadow-2xl relative overflow-visible lg:overflow-hidden text-forest select-none landscape:max-h-[92vh] modal-landscape-container">
             {/* a) Área de Visualização */}
             <div 
-                className="w-full lg:w-[62%] sticky top-0 lg:relative z-20 h-[26vh] xs:h-[28vh] sm:h-[32vh] md:h-[36vh] max-h-[250px] landscape:max-h-[160px] lg:max-h-none lg:h-full shrink-0 border-b lg:border-b-0 lg:border-r border-forest/10 p-1 sm:p-2 lg:p-4 flex flex-col items-center justify-center overflow-hidden bg-[#F5F2ED] transition-colors duration-500 shadow-sm lg:shadow-none"
+                className="w-full lg:w-[62%] sticky top-0 lg:relative z-20 h-[40vh] sm:h-[44vh] max-h-[48vh] landscape:max-h-[220px] lg:max-h-none lg:h-full shrink-0 border-b lg:border-b-0 lg:border-r border-forest/10 p-1 sm:p-2 lg:p-4 flex flex-col items-center justify-center overflow-hidden bg-[#F5F2ED] transition-colors duration-500 shadow-sm lg:shadow-none"
                 style={{ touchAction: 'pan-y' }}
             >
                 {/* Floating label in top-left corner */}
@@ -3538,7 +3560,7 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({ product: rawProduct,
                         </div>
                         
                         {/* Interactive Luxury Thumbnails Strip in Viewer */}
-                        <div className="absolute bottom-16 left-1/2 -translate-x-1/2 z-35 hidden lg:flex gap-2 p-1.5 bg-[#FCFBF9]/90 backdrop-blur-xl rounded-xl border border-forest/10 max-w-[85%] overflow-x-auto no-scrollbar shadow-sm">
+                        <div className="absolute bottom-14 sm:bottom-16 left-1/2 -translate-x-1/2 z-35 flex gap-1.5 sm:gap-2 p-1 sm:p-1.5 bg-[#FCFBF9]/90 backdrop-blur-xl rounded-xl border border-forest/10 max-w-[92%] overflow-x-auto no-scrollbar shadow-xs">
                             {productImages.map((imgUrl, idx) => (
                                 <button
                                     key={idx}
@@ -3549,9 +3571,9 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({ product: rawProduct,
                                             setActiveImgIndex(idx);
                                         }
                                     }}
-                                    className={`relative w-10 h-10 rounded-lg overflow-hidden border transition-all shrink-0 ${
+                                    className={`relative w-8 h-8 sm:w-10 sm:h-10 rounded-lg overflow-hidden border transition-all shrink-0 cursor-pointer ${
                                         idx === activeImgIndex 
-                                            ? 'border-forest scale-95 shadow-md' 
+                                            ? 'border-forest scale-95 shadow-xs ring-1 ring-forest/30' 
                                             : 'border-transparent opacity-60 hover:opacity-100'
                                     }`}
                                     aria-label={lang === 'pt' ? `Ver miniatura ${idx + 1}` : `View thumbnail ${idx + 1}`}
@@ -4115,8 +4137,11 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({ product: rawProduct,
                                                     }`}
                                                 >
                                                     <div className="flex items-center gap-1">
-                                                        <img src="/icons/applepay.svg" alt="Apple Pay" className={`h-3.5 w-auto object-contain ${paymentMethod === 'wallet' ? 'brightness-0 invert' : ''}`} />
-                                                        <img src="/icons/googlepay.svg" alt="Google Pay" className={`h-3.5 w-auto object-contain ${paymentMethod === 'wallet' ? 'brightness-0 invert' : ''}`} />
+                                                        {/iphone|ipad|ipod|macintosh/i.test(navigator.userAgent) ? (
+                                                            <img src="/icons/applepay.svg" alt="Apple Pay" className={`h-3.5 w-auto object-contain ${paymentMethod === 'wallet' ? 'brightness-0 invert' : ''}`} />
+                                                        ) : (
+                                                            <img src="/icons/googlepay.svg" alt="Google Pay" className={`h-3.5 w-auto object-contain ${paymentMethod === 'wallet' ? 'brightness-0 invert' : ''}`} />
+                                                        )}
                                                     </div>
                                                 </button>
                                             )}
@@ -4580,7 +4605,13 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({ product: rawProduct,
                                         outOfStockColors={(product as any).outOfStockColors || (product as any).coresEsgotadas || []}
                                         yarnStockMap={yarnStockMap}
                                         lang={lang}
-                                        onChange={(newColor) => setSelections(prev => ({ ...prev, cor: newColor, corPrincipal: newColor }))}
+                                        onChange={(newColor) => {
+                                            setSelections(prev => ({ ...prev, cor: newColor, corPrincipal: newColor }));
+                                            const idx = availableColorOptions.indexOf(newColor);
+                                            if (idx >= 0 && productImages.length > 0) {
+                                                setActiveImgIndex(idx % productImages.length);
+                                            }
+                                        }}
                                     />
                                 )}
 
@@ -4603,6 +4634,10 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({ product: rawProduct,
                                                     corPrincipal: newPrim,
                                                     cor: combined
                                                 }));
+                                                const idx = availableColorOptions.indexOf(newPrim);
+                                                if (idx >= 0 && productImages.length > 0) {
+                                                    setActiveImgIndex(idx % productImages.length);
+                                                }
                                             }}
                                         />
 
@@ -4854,7 +4889,7 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({ product: rawProduct,
                                 )}
                             </div>
                             
-                            <div className="space-y-2">
+                            <div className="space-y-2.5 w-full">
                                 {/* Primary CTA: Add to Cart */}
                                 <motion.button 
                                     onClick={() => {
@@ -4873,9 +4908,9 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({ product: rawProduct,
                                     }}
                                     whileHover={{ scale: 1.01 }}
                                     whileTap={{ scale: 0.99 }}
-                                    className="w-full rounded-sm py-2 px-4 max-h-[40px] h-10 text-center font-medium bg-[#C5A059] text-[#343E2C] hover:bg-[#d5b069] active:scale-95 text-[11px] uppercase tracking-[0.2em] cursor-pointer shadow-xs border border-[#C5A059]/10 flex items-center justify-center gap-2 transition-all duration-200 font-sans"
+                                    className="w-full rounded-xl py-3 h-11 text-center font-semibold bg-[#C5A059] text-[#343E2C] hover:bg-[#d5b069] active:scale-95 text-[11px] uppercase tracking-[0.2em] cursor-pointer shadow-md border border-[#C5A059]/30 flex items-center justify-center gap-2 transition-all duration-200 font-sans whitespace-nowrap"
                                 >
-                                    <ShoppingBag size={13} />
+                                    <ShoppingBag size={14} />
                                     <span>{lang === 'pt' ? 'Adicionar ao Carrinho' : 'Add to Cart'}</span>
                                 </motion.button>
                                 
@@ -4898,7 +4933,7 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({ product: rawProduct,
                                     }}
                                     whileHover={{ scale: 1.01 }}
                                     whileTap={{ scale: 0.99 }}
-                                    className="w-full rounded-sm py-1.5 px-4 max-h-[38px] h-9 text-center font-medium bg-transparent text-[#FCFBF9] hover:bg-white/10 active:scale-95 text-[10px] uppercase tracking-[0.2em] cursor-pointer border border-white/20 flex items-center justify-center transition-all duration-200 font-sans"
+                                    className="w-full rounded-xl py-3 h-10 text-center font-semibold bg-[#243119] text-[#FCFBF9] hover:bg-[#2e3e20] active:scale-95 text-[10px] uppercase tracking-[0.2em] cursor-pointer border border-[#C5A059]/40 flex items-center justify-center transition-all duration-200 font-sans shadow-sm whitespace-nowrap"
                                 >
                                     {lang === 'pt' ? 'Comprar Agora' : 'Buy Now'}
                                 </motion.button>
@@ -4909,7 +4944,7 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({ product: rawProduct,
                                     rel="noopener noreferrer"
                                     whileHover={{ scale: 1.01 }}
                                     whileTap={{ scale: 0.99 }}
-                                    className="w-full rounded-sm py-1 px-3 max-h-[34px] h-8 text-center font-medium bg-transparent text-white/60 hover:text-white hover:bg-white/5 active:scale-95 text-[9px] uppercase tracking-[0.18em] cursor-pointer border border-white/10 flex items-center justify-center transition-all duration-200 font-sans"
+                                    className="w-full rounded-lg py-1.5 px-3 max-h-[34px] h-8 text-center font-medium bg-transparent text-white/60 hover:text-white hover:bg-white/5 active:scale-95 text-[9px] uppercase tracking-[0.18em] cursor-pointer border border-white/10 flex items-center justify-center transition-all duration-200 font-sans"
                                 >
                                     {t('product.customize_design')}
                                 </motion.a>
@@ -4922,36 +4957,61 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({ product: rawProduct,
             {/* Ultra-Fine Minimalist Mobile/Tablet Sticky Checkout Footer Bar */}
             {!isCheckingOut && (
                 <div 
-                    className="lg:hidden sticky bottom-0 left-0 right-0 z-[60] bg-[#FCFBF9]/95 backdrop-blur-md border-t border-forest/10 px-4 py-2 flex items-center justify-between gap-3 shadow-[0_-4px_20px_rgba(0,0,0,0.04)] w-full shrink-0"
-                    style={{ paddingBottom: 'max(0.5rem, env(safe-area-inset-bottom))' }}
+                    className="lg:hidden sticky bottom-0 left-0 right-0 z-[60] bg-[#FCFBF9]/95 backdrop-blur-md border-t border-forest/10 px-3 py-2.5 flex items-center justify-between gap-2 shadow-[0_-4px_20px_rgba(0,0,0,0.06)] w-full shrink-0"
+                    style={{ paddingBottom: 'max(0.6rem, env(safe-area-inset-bottom))' }}
                 >
-                    <div className="flex flex-col text-left shrink-0">
+                    <div className="flex flex-col text-left shrink-0 pr-1">
                         <span className="text-[7.5px] uppercase tracking-[0.2em] text-[#A68244] font-semibold font-sans">{t('product.total_amount')}</span>
-                        <span className="text-base font-serif text-forest font-semibold tracking-tight leading-none">{currentPrice}</span>
+                        <span className="text-sm sm:text-base font-serif text-forest font-bold tracking-tight leading-none">{currentPrice}</span>
                     </div>
 
-                    <motion.button 
-                        onClick={() => {
-                            addToCart({
-                                productId: product.id || product.name,
-                                productName: product.name,
-                                categoryName: product.category,
-                                img: (product.images && product.images[0]) || product.img || '',
-                                unitPrice: calculatedPriceNum,
-                                quantity: 1,
-                                leadTimeDays: (product as any).tempoProducao ? parseInt((product as any).tempoProducao) || 3 : 3,
-                                selections,
-                                hasSize,
-                                hasQuantity
-                            });
-                        }}
-                        whileHover={{ scale: 1.01 }}
-                        whileTap={{ scale: 0.99 }}
-                        className="rounded-sm h-9 max-h-[38px] px-5 bg-[#C5A059] text-[#343E2C] hover:bg-[#d5b069] text-[10px] uppercase tracking-[0.2em] font-medium cursor-pointer shadow-xs border border-[#C5A059]/20 flex items-center justify-center gap-1.5 font-sans"
-                    >
-                        <ShoppingBag size={12} />
-                        <span>{lang === 'pt' ? 'Adicionar' : 'Add'}</span>
-                    </motion.button>
+                    <div className="flex items-center gap-2 flex-grow max-w-[70%]">
+                        <motion.button 
+                            onClick={() => {
+                                addToCart({
+                                    productId: product.id || product.name,
+                                    productName: product.name,
+                                    categoryName: product.category,
+                                    img: (product.images && product.images[0]) || product.img || '',
+                                    unitPrice: calculatedPriceNum,
+                                    quantity: 1,
+                                    leadTimeDays: (product as any).tempoProducao ? parseInt((product as any).tempoProducao) || 3 : 3,
+                                    selections,
+                                    hasSize,
+                                    hasQuantity
+                                });
+                            }}
+                            whileHover={{ scale: 1.01 }}
+                            whileTap={{ scale: 0.99 }}
+                            className="flex-1 rounded-lg h-10 px-2 bg-[#C5A059] text-[#343E2C] hover:bg-[#d5b069] text-[9.5px] sm:text-[10px] uppercase tracking-[0.15em] font-bold cursor-pointer shadow-xs border border-[#C5A059]/30 flex items-center justify-center gap-1 font-sans whitespace-nowrap"
+                        >
+                            <ShoppingBag size={12} />
+                            <span>{lang === 'pt' ? 'Adicionar' : 'Add'}</span>
+                        </motion.button>
+
+                        <motion.button 
+                            onClick={() => {
+                                addToCart({
+                                    productId: product.id || product.name,
+                                    productName: product.name,
+                                    categoryName: product.category,
+                                    img: (product.images && product.images[0]) || product.img || '',
+                                    unitPrice: calculatedPriceNum,
+                                    quantity: 1,
+                                    leadTimeDays: (product as any).tempoProducao ? parseInt((product as any).tempoProducao) || 3 : 3,
+                                    selections,
+                                    hasSize,
+                                    hasQuantity
+                                });
+                                setIsCheckoutOpen(true);
+                            }}
+                            whileHover={{ scale: 1.01 }}
+                            whileTap={{ scale: 0.99 }}
+                            className="flex-1 rounded-lg h-10 px-2 bg-[#243119] text-[#FCFBF9] hover:bg-[#2e3e20] text-[9.5px] sm:text-[10px] uppercase tracking-[0.15em] font-bold cursor-pointer shadow-xs border border-[#C5A059]/40 flex items-center justify-center font-sans whitespace-nowrap"
+                        >
+                            <span>{lang === 'pt' ? 'Comprar' : 'Buy Now'}</span>
+                        </motion.button>
+                    </div>
                 </div>
             )}
         </div>
@@ -5847,15 +5907,14 @@ const TestimonialsSection = () => {
 
     // Fetch live Google Places reviews and user submissions from back-end
     useEffect(() => {
-        fetch(`${API_BASE_URL}/api/testimonials`)
+        fetch(`${API_BASE_URL}/api/google-reviews`)
             .then(res => {
-                if (!res.ok) {
-                    throw new Error(`Server responded with status ${res.status}`);
-                }
-                return res.json();
+                if (!res.ok) return fetch(`${API_BASE_URL}/api/testimonials`);
+                return res;
             })
+            .then(res => res.json())
             .then(data => {
-                if (Array.isArray(data)) {
+                if (Array.isArray(data) && data.length > 0) {
                     setReviews(data);
                 }
             })
@@ -6143,7 +6202,50 @@ export function getCollectionScrollTarget(element: HTMLElement): number {
     return sectionTop + 320 - navbarHeight;
 }
 
-// --- Navigation Helpers ---
+// --- Product Image & Navigation Helpers ---
+export function getProductAllImages(product: any): string[] {
+    if (!product) return [];
+    
+    const explicitImages: string[] = Array.isArray(product.images) && product.images.length > 0
+        ? [...product.images]
+        : (product.img ? [product.img] : []);
+
+    const firstImg = explicitImages[0] || product.img || '';
+    if (firstImg && firstImg.includes('/products/')) {
+        const parts = firstImg.split('/products/')[1]?.split('/');
+        const folder = parts ? parts[0] : null;
+        if (folder) {
+            const folderCounts: Record<string, number> = {
+                'classic-coasters': 10,
+                'scarf-hip-bandana': 8,
+                'coral-bikini-top': 6,
+                'mini-pouches': 6,
+                'signature-granny-poncho': 6,
+                'dragonfly-bandana': 5,
+                'african-flower-pouch': 4,
+                'alma-cardigan': 4,
+                'coraline-coasters': 4,
+                'daisy-coasters': 4,
+                'marea-bikini-set': 4,
+                'mini-alma-cardigan': 4,
+                'mini-shell-pouch': 4,
+                'stella-cushion': 4,
+                'sunflower-coasters': 4,
+                'airpods-case': 3,
+                'dragonfly-headband': 3,
+                'granny-square-sling-bag': 3,
+                'mesh-poncho': 3,
+                'classic-bandana': 2
+            };
+            const count = folderCounts[folder] || explicitImages.length;
+            if (count > explicitImages.length) {
+                return Array.from({ length: count }, (_, i) => `/products/${folder}/${i + 1}.webp`);
+            }
+        }
+    }
+    return explicitImages;
+}
+
 export function navigateTo(path: string) {
     window.history.pushState(null, '', path);
     const event = new CustomEvent('mbravo-navigate', { detail: path });
@@ -6292,7 +6394,7 @@ const ProductDetailPage = ({ pathname }: { pathname: string }) => {
     const { addToCart, selectedShippingZone, setSelectedShippingZone } = useCart();
     const translatedCategory = translateCategory(category, lang);
     const productTranslated = translateProduct(product, lang);
-    const productImages = productTranslated.images || [productTranslated.img];
+    const productImages = getProductAllImages(productTranslated);
 
     const [activeImgIndex, setActiveImgIndex] = useState(0);
     const currentImg = productImages[activeImgIndex];
@@ -6389,6 +6491,10 @@ const ProductDetailPage = ({ pathname }: { pathname: string }) => {
             }));
         }
     }, [productTranslated.id, availableColorOptions.join(',')]);
+
+    useEffect(() => {
+        setActiveImgIndex(0);
+    }, [productTranslated.id]);
 
     const [isCheckingOut, setIsCheckingOut] = useState(false);
     const [paymentMethod, setPaymentMethod] = useState<'mbway' | 'multibanco' | 'card' | 'wallet'>('mbway');
@@ -6823,22 +6929,26 @@ const ProductDetailPage = ({ pathname }: { pathname: string }) => {
 
                     {/* Proportional Thumbnail Swatches Strip */}
                     {productImages.length > 1 && (
-                        <div className="flex gap-2.5 overflow-x-auto no-scrollbar py-1">
+                        <div className="flex gap-2 sm:gap-2.5 overflow-x-auto no-scrollbar py-2 px-1 border-t border-forest/5">
                             {productImages.map((imgUrl, idx) => (
                                 <button
                                     key={idx}
                                     onClick={() => setActiveImgIndex(idx)}
-                                    className={`relative w-20 h-24 rounded-lg overflow-hidden border transition-all shrink-0 ${
+                                    className={`relative w-16 h-20 sm:w-20 sm:h-24 rounded-xl overflow-hidden border-2 transition-all shrink-0 cursor-pointer shadow-xs ${
                                         idx === activeImgIndex 
-                                            ? 'border-forest ring-1 ring-forest/20' 
-                                            : 'border-transparent opacity-60 hover:opacity-100'
+                                            ? 'border-forest ring-2 ring-forest/20 scale-100 opacity-100 shadow-md' 
+                                            : 'border-forest/10 opacity-60 hover:opacity-100 hover:border-forest/40 hover:scale-[1.03]'
                                     }`}
+                                    aria-label={lang === 'pt' ? `Ver foto ${idx + 1}` : `View photo ${idx + 1}`}
                                 >
                                     <img 
                                         src={imgUrl} 
-                                        alt="" 
+                                        alt={`${productTranslated.name} - ${idx + 1}`} 
                                         loading="lazy"
                                         decoding="async"
+                                        onError={(e) => {
+                                            (e.currentTarget as HTMLImageElement).src = '/categories/category-acessorios.webp';
+                                        }}
                                         className="w-full h-full object-cover" 
                                     />
                                 </button>
@@ -6919,7 +7029,13 @@ const ProductDetailPage = ({ pathname }: { pathname: string }) => {
                                         outOfStockColors={(productTranslated as any).outOfStockColors || (productTranslated as any).coresEsgotadas || []}
                                         yarnStockMap={yarnStockMap}
                                         lang={lang}
-                                        onChange={(newColor) => setSelections(prev => ({ ...prev, cor: newColor, corPrincipal: newColor }))}
+                                        onChange={(newColor) => {
+                                            setSelections(prev => ({ ...prev, cor: newColor, corPrincipal: newColor }));
+                                            const idx = availableColorOptions.indexOf(newColor);
+                                            if (idx >= 0 && productImages.length > 0) {
+                                                setActiveImgIndex(idx % productImages.length);
+                                            }
+                                        }}
                                     />
                                 )}
 
@@ -6941,6 +7057,10 @@ const ProductDetailPage = ({ pathname }: { pathname: string }) => {
                                                     corPrincipal: newPrim,
                                                     cor: combined
                                                 }));
+                                                const idx = availableColorOptions.indexOf(newPrim);
+                                                if (idx >= 0 && productImages.length > 0) {
+                                                    setActiveImgIndex(idx % productImages.length);
+                                                }
                                             }}
                                         />
 
@@ -7443,8 +7563,8 @@ const ProductDetailPage = ({ pathname }: { pathname: string }) => {
                                                                 : 'bg-white/80 text-forest/65 border-forest/10 hover:bg-forest/5'
                                                         }`}
                                                     >
-                                                        <div className="flex items-center gap-1">
-                                                            {/Mac|iPhone|iPad|iPod/i.test(navigator.userAgent) ? (
+                                                        <div className="flex items-center gap-1.5 justify-center">
+                                                            {/iphone|ipad|ipod|macintosh/i.test(navigator.userAgent) ? (
                                                                 <img src="/icons/applepay.svg" alt="Apple Pay" className={`h-5 sm:h-6 w-auto object-contain ${paymentMethod === 'wallet' ? 'brightness-0 invert' : ''}`} />
                                                             ) : (
                                                                 <img src="/icons/googlepay.svg" alt="Google Pay" className={`h-5 sm:h-6 w-auto object-contain ${paymentMethod === 'wallet' ? 'brightness-0 invert' : ''}`} />
