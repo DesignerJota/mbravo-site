@@ -67,6 +67,7 @@ export const TextureSwatchPicker: React.FC<TextureSwatchPickerProps> = ({
 }) => {
   const [hoveredSwatch, setHoveredSwatch] = useState<YarnColor | null>(null);
   const [hoverPos, setHoverPos] = useState<{ x: number; y: number }>({ x: 50, y: 50 });
+  const [isExpanded, setIsExpanded] = useState<boolean>(false);
   const [internalStockMap, setInternalStockMap] = useState<Record<string, boolean>>(
     globalFetchedStockMap || {}
   );
@@ -216,17 +217,33 @@ export const TextureSwatchPicker: React.FC<TextureSwatchPickerProps> = ({
           </h5>
         </div>
         
-        <div className="flex items-center gap-1.5 bg-forest/5 px-2.5 py-0.5 rounded-full border border-forest/10">
-          <span className={`text-[10px] sm:text-[11px] font-medium tracking-wide ${
-            (activeHoverSwatch ? isHoveredOOS : isSelectedOOS) ? 'text-red-700 font-semibold' : 'text-forest'
-          }`}>
-            {activeHoverSwatch ? activeHoverSwatch.name : (cleanSelectedName || swatchList[0]?.name)}
-            {(activeHoverSwatch ? isHoveredOOS : isSelectedOOS) && (
-              <span className="ml-1 text-red-600 font-bold text-[9px]">
-                — {lang === 'pt' ? 'Indisponível' : 'Out of Stock'}
+        <div className="flex items-center gap-2">
+          {swatchList.length > 10 && (
+            <button
+              type="button"
+              onClick={() => setIsExpanded(!isExpanded)}
+              className="text-[10px] tracking-[0.2em] font-light uppercase underline-offset-4 hover:underline text-[#C5A059] hover:text-forest transition-colors cursor-pointer bg-transparent p-0 border-0 flex items-center gap-1"
+            >
+              <span>
+                {isExpanded
+                  ? (lang === 'pt' ? 'Recolher' : 'Collapse')
+                  : (lang === 'pt' ? `Ver todas (${swatchList.length})` : `Show all (${swatchList.length})`)}
               </span>
-            )}
-          </span>
+            </button>
+          )}
+
+          <div className="flex items-center gap-1.5 bg-forest/5 px-2.5 py-0.5 rounded-full border border-forest/10">
+            <span className={`text-[10px] sm:text-[11px] font-medium tracking-wide ${
+              (activeHoverSwatch ? isHoveredOOS : isSelectedOOS) ? 'text-red-700 font-semibold' : 'text-forest'
+            }`}>
+              {activeHoverSwatch ? activeHoverSwatch.name : (cleanSelectedName || swatchList[0]?.name)}
+              {(activeHoverSwatch ? isHoveredOOS : isSelectedOOS) && (
+                <span className="ml-1 text-red-600 font-bold text-[9px]">
+                  — {lang === 'pt' ? 'Indisponível' : 'Out of Stock'}
+                </span>
+              )}
+            </span>
+          </div>
         </div>
       </div>
 
@@ -240,9 +257,13 @@ export const TextureSwatchPicker: React.FC<TextureSwatchPickerProps> = ({
         </div>
       )}
 
-      {/* Swatch Selection Grid */}
-      <div className="grid grid-cols-5 sm:grid-cols-6 md:grid-cols-8 gap-2 relative">
-        {swatchList.map((swatch) => {
+      {/* Swatch Selection Grid / Collapsible Horizontal Container */}
+      <div className={`relative transition-all duration-300 ${
+        !isExpanded && swatchList.length > 10
+          ? 'flex flex-wrap gap-2 sm:gap-2.5 items-center'
+          : 'flex flex-wrap gap-2 sm:gap-2.5 items-center max-h-[220px] overflow-y-auto pr-1'
+      }`}>
+        {swatchList.slice(0, !isExpanded && swatchList.length > 10 ? 10 : swatchList.length).map((swatch) => {
           // Comparação normalizada para evitar falsas seleções múltiplas
           const isSelected = cleanSelectedName.trim().toLowerCase() === swatch.name.trim().toLowerCase();
           const isOOS = isColorOutOfStock(swatch.name, swatch);
@@ -251,7 +272,7 @@ export const TextureSwatchPicker: React.FC<TextureSwatchPickerProps> = ({
           return (
             <motion.div
               key={swatch.id}
-              whileHover={!isOOS ? { scale: 1.08 } : { scale: 1.02 }}
+              whileHover={!isOOS ? { scale: 1.1 } : { scale: 1.02 }}
               whileTap={!isOOS ? { scale: 0.95 } : undefined}
               onMouseEnter={() => setHoveredSwatch(swatch)}
               onMouseLeave={() => setHoveredSwatch(null)}
@@ -260,23 +281,25 @@ export const TextureSwatchPicker: React.FC<TextureSwatchPickerProps> = ({
                   onChange(swatch.name);
                 }
               }}
-              className={`relative aspect-square rounded-xl overflow-hidden border transition-all duration-300 shadow-sm ${
+              className={`relative rounded-full overflow-hidden transition-all duration-200 shrink-0 ${
+                'w-6 h-6 sm:w-7 sm:h-7'
+              } ${
                 isOOS
-                  ? 'cursor-not-allowed border-red-300/40 opacity-45 grayscale-[20%]'
-                  : 'cursor-pointer group opacity-90 hover:opacity-100'
+                  ? 'cursor-not-allowed border border-red-300/40 opacity-40 grayscale'
+                  : 'cursor-pointer group opacity-90 hover:opacity-100 border border-forest/15 hover:border-[#C5A059]'
               } ${
                 isSelected && !isOOS
-                  ? 'ring-2 ring-[#C5A059] border-white shadow-md scale-105 z-10'
+                  ? 'ring-1 ring-[#C5A059] ring-offset-2 ring-offset-[#FAF8F5] z-10 border-[#C5A059]'
                   : ''
               } ${
                 isSelected && isOOS
-                  ? 'ring-2 ring-red-400 border-white'
-                  : 'border-forest/15 hover:border-[#C5A059]'
+                  ? 'ring-1 ring-red-400 ring-offset-2'
+                  : ''
               }`}
             >
-              {/* Texture Swatch Image Container with Warm Linen Skeleton & HEX Fallback */}
+              {/* Texture Swatch Image Container */}
               <div 
-                className="w-full h-full relative overflow-hidden bg-[#FAF8F5]"
+                className="w-full h-full relative overflow-hidden rounded-full bg-[#FAF8F5]"
                 style={{ backgroundColor: swatch.colorHex || '#D8C3A5' }}
               >
                 {rawImgUrl && (
@@ -285,7 +308,7 @@ export const TextureSwatchPicker: React.FC<TextureSwatchPickerProps> = ({
                     alt={swatch.name}
                     loading="eager"
                     decoding="async"
-                    className={`w-full h-full object-cover transition-transform duration-500 ${
+                    className={`w-full h-full object-cover transition-transform duration-300 ${
                       !isOOS ? 'group-hover:scale-125' : ''
                     }`}
                     onError={(e) => {
@@ -295,17 +318,10 @@ export const TextureSwatchPicker: React.FC<TextureSwatchPickerProps> = ({
                 )}
               </div>
 
-              {/* Tactile Overlay Pattern */}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-black/10 pointer-events-none" />
-
-              {/* OUT OF STOCK Visual Indicator: Red Overlay with X Icon & Indisponível Banner */}
+              {/* OUT OF STOCK Visual Indicator */}
               {isOOS && (
-                <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none z-10">
-                  <div className="absolute inset-0 bg-black/55 backdrop-blur-[0.5px]" />
-                  <div className="z-10 bg-red-950/90 text-red-100 text-[6.5px] sm:text-[7.5px] font-bold px-1 py-0.5 rounded uppercase tracking-tighter border border-red-500/40 flex items-center gap-0.5 shadow-md">
-                    <X size={9} strokeWidth={2.5} className="text-red-400 shrink-0" />
-                    <span>{lang === 'pt' ? 'Indisponível' : 'Out of Stock'}</span>
-                  </div>
+                <div className="absolute inset-0 rounded-full flex items-center justify-center bg-black/60 backdrop-blur-[0.5px] pointer-events-none z-10">
+                  <X size={10} strokeWidth={2.5} className="text-red-300" />
                 </div>
               )}
 
@@ -314,19 +330,10 @@ export const TextureSwatchPicker: React.FC<TextureSwatchPickerProps> = ({
                 <motion.div
                   initial={{ scale: 0 }}
                   animate={{ scale: 1 }}
-                  className="absolute inset-0 bg-[#343E2C]/30 backdrop-blur-[1px] flex items-center justify-center text-white"
+                  className="absolute inset-0 rounded-full bg-[#343E2C]/30 backdrop-blur-[0.5px] flex items-center justify-center text-white"
                 >
-                  <div className="w-4 h-4 rounded-full bg-[#C5A059] text-forest flex items-center justify-center shadow-md">
-                    <Check size={10} strokeWidth={3} />
-                  </div>
+                  <Check size={10} strokeWidth={3} className="text-[#C5A059]" />
                 </motion.div>
-              )}
-
-              {/* Hover Zoom Indicator */}
-              {!isOOS && (
-                <div className="absolute top-1 right-1 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
-                  <ZoomIn size={10} className="text-white drop-shadow-md" />
-                </div>
               )}
             </motion.div>
           );
