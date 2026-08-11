@@ -1039,9 +1039,10 @@ const Navbar = ({ currentPage, setCurrentPage, pathname, isAppLoading = false }:
 
     const handleLinkClick = (e: React.MouseEvent, href: string) => {
         setMobileMenuOpen(false);
+        setIsCartOpen(false);
         // Start lenis immediately to allow scroll to work and clear overflow lock
         (window as any).lenis?.start();
-        document.body.style.overflow = '';
+        document.body.style.overflow = 'unset';
 
         const activePath = pathname;
         const isHomePage = activePath === '/' || activePath === '/home' || activePath.startsWith('/#');
@@ -1147,12 +1148,14 @@ const Navbar = ({ currentPage, setCurrentPage, pathname, isAppLoading = false }:
         };
     }, [currentPage, pathname]);
 
-    // Totally transparent with contrast-based dynamic text color as requested
-    const navBg = 'bg-transparent';
-    const textColor = isDarkBg ? 'text-cream' : 'text-forest';
+    // Adaptive dynamic background with glassmorphism contrast on scroll
+    const navBg = isScrolled 
+      ? 'bg-[#FAF8F5]/65 backdrop-blur-xl backdrop-saturate-150 shadow-xs border-b border-forest/10 py-3.5' 
+      : 'bg-transparent py-6 md:py-8';
+    const textColor = isScrolled ? 'text-forest' : (isDarkBg ? 'text-cream' : 'text-forest');
 
   return (
-    <nav className={`fixed top-0 left-0 w-full z-[100] transition-opacity duration-500 ${isAppLoading ? 'opacity-0 pointer-events-none' : 'opacity-100 pointer-events-auto'} ${isScrolled ? 'py-4' : 'py-8'} ${navBg}`}>
+    <nav className={`fixed top-0 left-0 w-full z-40 transition-all duration-300 ${isAppLoading ? 'opacity-0 pointer-events-none' : 'opacity-100 pointer-events-auto'} ${navBg}`}>
       <div className="max-w-7xl mx-auto px-6 flex justify-between items-center">
         {/* Logo with entry animation and Smart Invert */}
         <motion.a 
@@ -1280,7 +1283,7 @@ const Navbar = ({ currentPage, setCurrentPage, pathname, isAppLoading = false }:
             initial={{ opacity: 0, backdropFilter: "blur(0px)" }}
             animate={{ opacity: 1, backdropFilter: "blur(20px)" }}
             exit={{ opacity: 0, backdropFilter: "blur(0px)" }}
-            className="fixed inset-0 z-[999] bg-forest flex flex-col items-center justify-center p-6 sm:p-8 space-y-6 sm:space-y-10 overflow-y-auto max-h-screen my-auto"
+            className="fixed inset-0 z-[100] bg-forest flex flex-col items-center justify-center p-6 sm:p-8 space-y-6 overflow-y-auto w-full h-full pointer-events-auto"
           >
              <button 
                 className="absolute top-8 right-8 text-cream hover:text-brand-green-light transition-all duration-300 p-3 bg-white/5 hover:bg-white/10 rounded-full border border-white/10 flex items-center justify-center cursor-pointer shadow-lg"
@@ -3598,11 +3601,11 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({ product: rawProduct,
                                 </span>
                                 <button 
                                     onClick={handleToggle}
-                                    className="p-1.5 rounded-full bg-forest/5 text-forest hover:bg-forest hover:text-cream transition-all border border-forest/10 shadow-sm cursor-pointer ml-1"
+                                    className="w-11 h-11 flex items-center justify-center rounded-full bg-forest/5 text-forest hover:bg-forest hover:text-cream transition-all border border-forest/10 shadow-sm cursor-pointer ml-1 active:scale-95"
                                     title="Fechar"
                                     aria-label={lang === 'pt' ? 'Fechar' : 'Close'}
                                 >
-                                    <X size={12} />
+                                    <X size={18} />
                                 </button>
                             </div>
                         </div>
@@ -4066,7 +4069,7 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({ product: rawProduct,
                                                         : 'bg-white text-forest/65 border-forest/10 hover:bg-forest/5'
                                                 }`}
                                             >
-                                                <span className="text-[10px] font-extrabold tracking-wider uppercase font-sans">MB WAY</span>
+                                                <img src="/icons/mbway.svg" alt="MB WAY" className={`h-4.5 w-auto object-contain transition-all ${paymentMethod === 'mbway' ? 'brightness-0 invert' : ''}`} />
                                             </button>
                                             
                                             {/* Multibanco */}
@@ -4081,7 +4084,7 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({ product: rawProduct,
                                                         : 'bg-white text-forest/65 border-forest/10 hover:bg-forest/5'
                                                 }`}
                                             >
-                                                <span className="text-[10px] font-extrabold tracking-wider uppercase font-sans">MB</span>
+                                                <img src="/icons/multibanco.svg" alt="Multibanco" className={`h-4.5 w-auto object-contain transition-all ${paymentMethod === 'multibanco' ? '' : 'grayscale opacity-75'}`} />
                                             </button>
 
                                             {/* Cartão de Crédito */}
@@ -4094,7 +4097,10 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({ product: rawProduct,
                                                         : 'bg-white text-forest/65 border-forest/10 hover:bg-forest/5'
                                                 }`}
                                             >
-                                                <span className="text-[10px] font-extrabold tracking-wider uppercase font-sans">{lang === 'pt' ? 'CARTÃO' : 'CARD'}</span>
+                                                <div className="flex items-center gap-1">
+                                                    <img src="/icons/visa.svg" alt="VISA" className={`h-3.5 w-auto object-contain ${paymentMethod === 'card' ? 'brightness-0 invert' : ''}`} />
+                                                    <img src="/icons/mastercard.svg" alt="Mastercard" className={`h-3.5 w-auto object-contain ${paymentMethod === 'card' ? 'brightness-0 invert' : ''}`} />
+                                                </div>
                                             </button>
 
                                             {/* Carteiras Digitais (Apple Pay / Google Pay) */}
@@ -4108,7 +4114,10 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({ product: rawProduct,
                                                             : 'bg-white text-forest/65 border-forest/10 hover:bg-forest/5'
                                                     }`}
                                                 >
-                                                    <span className="text-[10px] font-extrabold tracking-wider uppercase font-sans">PAY</span>
+                                                    <div className="flex items-center gap-1">
+                                                        <img src="/icons/applepay.svg" alt="Apple Pay" className={`h-3.5 w-auto object-contain ${paymentMethod === 'wallet' ? 'brightness-0 invert' : ''}`} />
+                                                        <img src="/icons/googlepay.svg" alt="Google Pay" className={`h-3.5 w-auto object-contain ${paymentMethod === 'wallet' ? 'brightness-0 invert' : ''}`} />
+                                                    </div>
                                                 </button>
                                             )}
                                         </div>
@@ -7281,26 +7290,26 @@ const ProductDetailPage = ({ pathname }: { pathname: string }) => {
 })()}
                                       
                                       {/* Inputs */}
-                                        <div className="space-y-2.5">
+                                        <div className="space-y-3">
                                             <input 
                                                 type="text" 
                                                 placeholder={lang === 'pt' ? "Nome Completo" : "Full Name"} 
                                                 required
                                                 value={checkoutForm.nome}
                                                 onChange={(e) => setCheckoutForm(prev => ({ ...prev, nome: e.target.value }))}
-                                                className="w-full bg-white rounded-xl px-4 py-2.5 text-xs text-forest placeholder-forest/30 border border-forest/10 focus:border-[#C5A059] focus:outline-none transition-all font-sans"
+                                                className="w-full bg-transparent border-b border-[#343E2C]/20 py-2.5 text-xs text-[#343E2C] placeholder-[#343E2C]/40 focus:border-[#C5A059] focus:outline-none transition-all font-sans"
                                             />
-                                            <div className="grid grid-cols-2 gap-2">
+                                            <div className="grid grid-cols-2 gap-3">
                                                 <input 
                                                     type="email" 
                                                     placeholder={lang === 'pt' ? "E-mail" : "Email Address"} 
                                                     required
                                                     value={checkoutForm.email}
                                                     onChange={(e) => setCheckoutForm(prev => ({ ...prev, email: e.target.value }))}
-                                                    className={`w-full bg-white rounded-xl px-4 py-2.5 text-xs text-forest placeholder-forest/30 border focus:outline-none transition-all font-sans ${
+                                                    className={`w-full bg-transparent border-b py-2.5 text-xs text-[#343E2C] placeholder-[#343E2C]/40 focus:outline-none transition-all font-sans ${
                                                         checkoutForm.email && !isValidEmail(checkoutForm.email)
                                                             ? 'border-red-300 focus:border-red-400' 
-                                                            : 'border-forest/10 focus:border-[#C5A059]'
+                                                            : 'border-[#343E2C]/20 focus:border-[#C5A059]'
                                                     }`}
                                                 />
                                                 <input 
@@ -7309,7 +7318,7 @@ const ProductDetailPage = ({ pathname }: { pathname: string }) => {
                                                     required
                                                     value={checkoutForm.telefone}
                                                     onChange={(e) => setCheckoutForm(prev => ({ ...prev, telefone: e.target.value }))}
-                                                    className="w-full bg-white rounded-xl px-4 py-2.5 text-xs text-forest placeholder-forest/30 border border-forest/10 focus:border-[#C5A059] focus:outline-none transition-all font-sans"
+                                                    className="w-full bg-transparent border-b border-[#343E2C]/20 py-2.5 text-xs text-[#343E2C] placeholder-[#343E2C]/40 focus:border-[#C5A059] focus:outline-none transition-all font-sans"
                                                 />
                                             </div>
 
@@ -7352,16 +7361,16 @@ const ProductDetailPage = ({ pathname }: { pathname: string }) => {
                                                 required
                                                 value={checkoutForm.morada}
                                                 onChange={(e) => setCheckoutForm(prev => ({ ...prev, morada: e.target.value }))}
-                                                className="w-full bg-white rounded-xl px-4 py-2.5 text-xs text-forest placeholder-forest/30 border border-forest/10 focus:border-[#C5A059] focus:outline-none transition-all font-sans"
+                                                className="w-full bg-transparent border-b border-[#343E2C]/20 py-2.5 text-xs text-[#343E2C] placeholder-[#343E2C]/40 focus:border-[#C5A059] focus:outline-none transition-all font-sans"
                                             />
-                                            <div className="grid grid-cols-2 gap-2">
+                                            <div className="grid grid-cols-2 gap-3">
                                                 <input 
                                                     type="text" 
                                                     placeholder={lang === 'pt' ? "Código Postal" : "Postal Code"} 
                                                     required
                                                     value={checkoutForm.codigoPostal}
                                                     onChange={(e) => setCheckoutForm(prev => ({ ...prev, codigoPostal: e.target.value }))}
-                                                    className="w-full bg-white rounded-xl px-4 py-2.5 text-xs text-forest placeholder-forest/30 border border-forest/10 focus:border-[#C5A059] focus:outline-none transition-all font-sans"
+                                                    className="w-full bg-transparent border-b border-[#343E2C]/20 py-2.5 text-xs text-[#343E2C] placeholder-[#343E2C]/40 focus:border-[#C5A059] focus:outline-none transition-all font-sans"
                                                 />
                                                 <input 
                                                     type="text" 
@@ -7369,7 +7378,7 @@ const ProductDetailPage = ({ pathname }: { pathname: string }) => {
                                                     required
                                                     value={checkoutForm.cidade}
                                                     onChange={(e) => setCheckoutForm(prev => ({ ...prev, cidade: e.target.value }))}
-                                                    className="w-full bg-white rounded-xl px-4 py-2.5 text-xs text-forest placeholder-forest/30 border border-forest/10 focus:border-[#C5A059] focus:outline-none transition-all font-sans"
+                                                    className="w-full bg-transparent border-b border-[#343E2C]/20 py-2.5 text-xs text-[#343E2C] placeholder-[#343E2C]/40 focus:border-[#C5A059] focus:outline-none transition-all font-sans"
                                                 />
                                             </div>
                                             <input 
@@ -7378,7 +7387,7 @@ const ProductDetailPage = ({ pathname }: { pathname: string }) => {
                                                 maxLength={9}
                                                 value={checkoutForm.nif}
                                                 onChange={(e) => setCheckoutForm(prev => ({ ...prev, nif: e.target.value.replace(/\D/g, '') }))}
-                                                className="w-full bg-white rounded-xl px-4 py-2.5 text-xs text-forest placeholder-forest/30 border border-forest/10 focus:border-[#C5A059] focus:outline-none transition-all font-sans"
+                                                className="w-full bg-transparent border-b border-[#343E2C]/20 py-2.5 text-xs text-[#343E2C] placeholder-[#343E2C]/40 focus:border-[#C5A059] focus:outline-none transition-all font-sans"
                                             />
                                         </div>
 
@@ -7387,58 +7396,67 @@ const ProductDetailPage = ({ pathname }: { pathname: string }) => {
                                             <span className="text-[9px] uppercase tracking-wider text-forest/40 font-mono block">
                                                 {lang === 'pt' ? 'MÉTODO DE PAGAMENTO' : 'PAYMENT METHOD'}
                                             </span>
-                                            <div className={`grid ${canUseWallet ? 'grid-cols-4' : 'grid-cols-3'} gap-2`}>
+                                            <div className={`grid ${canUseWallet ? 'grid-cols-4' : 'grid-cols-3'} gap-2.5`}>
                                                 <button
                                                     type="button"
                                                     onClick={() => setPaymentMethod('mbway')}
-                                                    className={`flex flex-col items-center justify-center py-2.5 rounded-xl border transition-all cursor-pointer border-solid ${
+                                                    className={`h-14 sm:h-16 flex flex-col items-center justify-center p-2 rounded-xl border transition-all cursor-pointer border-solid ${
                                                         paymentMethod === 'mbway' 
-                                                            ? 'bg-[#343E2C] text-[#C5A059] border-[#C5A059]' 
-                                                            : 'bg-white text-forest/65 border-forest/10 hover:bg-forest/5'
+                                                            ? 'bg-[#343E2C] text-[#C5A059] border-[#C5A059] shadow-md' 
+                                                            : 'bg-white/80 text-forest/65 border-forest/10 hover:bg-forest/5'
                                                     }`}
                                                 >
-                                                    <span className="text-[10px] font-extrabold tracking-wider font-sans">MB WAY</span>
+                                                    <img src="/icons/mbway.svg" alt="MB WAY" className={`h-6 sm:h-7 w-auto max-w-[85%] object-contain transition-all ${paymentMethod === 'mbway' ? 'brightness-0 invert' : ''}`} />
                                                 </button>
                                                 <button
                                                     type="button"
                                                     onClick={() => setPaymentMethod('multibanco')}
-                                                    className={`flex flex-col items-center justify-center py-2.5 rounded-xl border transition-all cursor-pointer border-solid ${
+                                                    className={`h-14 sm:h-16 flex flex-col items-center justify-center p-2 rounded-xl border transition-all cursor-pointer border-solid ${
                                                         paymentMethod === 'multibanco' 
-                                                            ? 'bg-[#343E2C] text-[#C5A059] border-[#C5A059]' 
-                                                            : 'bg-white text-forest/65 border-forest/10 hover:bg-forest/5'
+                                                            ? 'bg-[#343E2C] text-[#C5A059] border-[#C5A059] shadow-md' 
+                                                            : 'bg-white/80 text-forest/65 border-forest/10 hover:bg-forest/5'
                                                     }`}
                                                 >
-                                                    <span className="text-[10px] font-extrabold tracking-wider font-sans">MB</span>
+                                                    <img src="/icons/multibanco.svg" alt="Multibanco" className={`h-6 sm:h-7 w-auto max-w-[85%] object-contain transition-all ${paymentMethod === 'multibanco' ? 'brightness-0 invert' : ''}`} />
                                                 </button>
                                                 <button
                                                     type="button"
                                                     onClick={() => setPaymentMethod('card')}
-                                                    className={`flex flex-col items-center justify-center py-2.5 rounded-xl border transition-all cursor-pointer border-solid ${
+                                                    className={`h-14 sm:h-16 flex flex-col items-center justify-center p-2 rounded-xl border transition-all cursor-pointer border-solid ${
                                                         paymentMethod === 'card' 
-                                                            ? 'bg-[#343E2C] text-[#C5A059] border-[#C5A059]' 
-                                                            : 'bg-white text-forest/65 border-forest/10 hover:bg-forest/5'
+                                                            ? 'bg-[#343E2C] text-[#C5A059] border-[#C5A059] shadow-md' 
+                                                            : 'bg-white/80 text-forest/65 border-forest/10 hover:bg-forest/5'
                                                     }`}
                                                 >
-                                                    <span className="text-[10px] font-extrabold tracking-wider font-sans">{lang === 'pt' ? 'CARTÃO' : 'CARD'}</span>
+                                                    <div className="flex items-center gap-1.5">
+                                                        <img src="/icons/visa.svg" alt="VISA" className={`h-5 sm:h-6 w-auto object-contain ${paymentMethod === 'card' ? 'brightness-0 invert' : ''}`} />
+                                                        <img src="/icons/mastercard.svg" alt="Mastercard" className={`h-5 sm:h-6 w-auto object-contain ${paymentMethod === 'card' ? 'brightness-0 invert' : ''}`} />
+                                                    </div>
                                                 </button>
                                                 {canUseWallet && (
                                                     <button
                                                         type="button"
                                                         onClick={() => setPaymentMethod('wallet')}
-                                                        className={`flex flex-col items-center justify-center py-2.5 rounded-xl border transition-all cursor-pointer border-solid ${
+                                                        className={`h-14 sm:h-16 flex flex-col items-center justify-center p-2 rounded-xl border transition-all cursor-pointer border-solid ${
                                                             paymentMethod === 'wallet' 
-                                                                ? 'bg-[#343E2C] text-[#C5A059] border-[#C5A059]' 
-                                                                : 'bg-white text-forest/65 border-forest/10 hover:bg-forest/5'
+                                                                ? 'bg-[#343E2C] text-[#C5A059] border-[#C5A059] shadow-md' 
+                                                                : 'bg-white/80 text-forest/65 border-forest/10 hover:bg-forest/5'
                                                         }`}
                                                     >
-                                                        <span className="text-[10px] font-extrabold tracking-wider font-sans">PAY</span>
+                                                        <div className="flex items-center gap-1">
+                                                            {/Mac|iPhone|iPad|iPod/i.test(navigator.userAgent) ? (
+                                                                <img src="/icons/applepay.svg" alt="Apple Pay" className={`h-5 sm:h-6 w-auto object-contain ${paymentMethod === 'wallet' ? 'brightness-0 invert' : ''}`} />
+                                                            ) : (
+                                                                <img src="/icons/googlepay.svg" alt="Google Pay" className={`h-5 sm:h-6 w-auto object-contain ${paymentMethod === 'wallet' ? 'brightness-0 invert' : ''}`} />
+                                                            )}
+                                                        </div>
                                                     </button>
                                                 )}
                                             </div>
                                         </div>
 
                                         {/* Gateway sub panels */}
-                                        <div className="p-4 bg-white border border-forest/10 rounded-2xl min-h-[110px] flex flex-col justify-center">
+                                        <div className="p-4 bg-transparent border border-[#343E2C]/15 rounded-2xl min-h-[110px] flex flex-col justify-center">
                                             {paymentMethod === 'mbway' && (
                                                 <div className="space-y-2.5 animate-fadeIn">
                                                     <span className="text-[9px] uppercase tracking-wider text-forest/40 font-mono block">{lang === 'pt' ? 'Telemóvel Associado ao MB WAY' : 'Phone Associated with MB WAY'}</span>
@@ -7449,7 +7467,7 @@ const ProductDetailPage = ({ pathname }: { pathname: string }) => {
                                                         required
                                                         value={checkoutForm.mbwayPhone}
                                                         onChange={(e) => setCheckoutForm(prev => ({ ...prev, mbwayPhone: e.target.value.replace(/\D/g, '') }))}
-                                                        className="w-full bg-[#FCFBF9] rounded-xl px-4 py-2.5 text-xs text-forest placeholder-forest/30 border border-forest/10 focus:border-[#C5A059] focus:outline-none transition-all font-sans"
+                                                        className="w-full bg-transparent border-b border-[#343E2C]/20 py-2 text-xs text-[#343E2C] placeholder-[#343E2C]/40 focus:border-[#C5A059] focus:outline-none transition-all font-sans"
                                                     />
                                                     <p className="text-[10px] text-forest/50 font-sans leading-relaxed">
                                                         {lang === 'pt' ? (
@@ -7482,7 +7500,7 @@ const ProductDetailPage = ({ pathname }: { pathname: string }) => {
                                                         required
                                                         value={checkoutForm.cardName}
                                                         onChange={(e) => setCheckoutForm(prev => ({ ...prev, cardName: e.target.value }))}
-                                                        className="w-full bg-[#FCFBF9] rounded-xl px-4 py-2 text-xs text-forest placeholder-forest/30 border border-forest/10 focus:border-[#C5A059] focus:outline-none transition-all font-sans"
+                                                        className="w-full bg-transparent border-b border-[#343E2C]/20 py-2 text-xs text-[#343E2C] placeholder-[#343E2C]/40 focus:border-[#C5A059] focus:outline-none transition-all font-sans"
                                                     />
                                                     <input 
                                                         type="text" 
@@ -7495,9 +7513,9 @@ const ProductDetailPage = ({ pathname }: { pathname: string }) => {
                                                             const parts = clean.match(/.{1,4}/g) || [];
                                                             return { ...prev, cardNumber: parts.join(' ') };
                                                         })}
-                                                        className="w-full bg-[#FCFBF9] rounded-xl px-4 py-2 text-xs text-forest placeholder-forest/30 border border-forest/10 focus:border-[#C5A059] focus:outline-none transition-all font-sans font-mono"
+                                                        className="w-full bg-transparent border-b border-[#343E2C]/20 py-2 text-xs text-[#343E2C] placeholder-[#343E2C]/40 focus:border-[#C5A059] focus:outline-none transition-all font-sans font-mono"
                                                     />
-                                                    <div className="grid grid-cols-2 gap-2">
+                                                    <div className="grid grid-cols-2 gap-3">
                                                         <input 
                                                             type="text" 
                                                             placeholder="MM/YY" 
@@ -7512,7 +7530,7 @@ const ProductDetailPage = ({ pathname }: { pathname: string }) => {
                                                                 }
                                                                 return { ...prev, cardExpiry: formatted };
                                                             })}
-                                                            className="w-full bg-[#FCFBF9] rounded-xl px-4 py-2 text-xs text-forest placeholder-forest/30 border border-forest/10 focus:border-[#C5A059] focus:outline-none transition-all font-sans"
+                                                            className="w-full bg-transparent border-b border-[#343E2C]/20 py-2 text-xs text-[#343E2C] placeholder-[#343E2C]/40 focus:border-[#C5A059] focus:outline-none transition-all font-sans"
                                                         />
                                                         <input 
                                                             type="text" 
@@ -7521,7 +7539,7 @@ const ProductDetailPage = ({ pathname }: { pathname: string }) => {
                                                             required
                                                             value={checkoutForm.cardCvv}
                                                             onChange={(e) => setCheckoutForm(prev => ({ ...prev, cardCvv: e.target.value.replace(/\D/g, '') }))}
-                                                            className="w-full bg-[#FCFBF9] rounded-xl px-4 py-2 text-xs text-forest placeholder-forest/30 border border-forest/10 focus:border-[#C5A059] focus:outline-none transition-all font-sans font-mono"
+                                                            className="w-full bg-transparent border-b border-[#343E2C]/20 py-2 text-xs text-[#343E2C] placeholder-[#343E2C]/40 focus:border-[#C5A059] focus:outline-none transition-all font-sans font-mono"
                                                         />
                                                     </div>
                                                 </div>
@@ -7757,45 +7775,47 @@ const ProductDetailPage = ({ pathname }: { pathname: string }) => {
 
                         {/* Standalone CTAs Row (Pre-checkout) */}
                         {!isCheckingOut && (
-                            <div className="flex flex-col gap-3 pt-2">
-                                {/* Primary CTA: Add to Cart */}
-                                <button
-                                    onClick={() => {
-                                        addToCart({
-                                            productId: productTranslated.id || productTranslated.name,
-                                            productName: productTranslated.name,
-                                            categoryName: translatedCategory,
-                                            img: productImages[0] || productTranslated.img || '',
-                                            unitPrice: calculatedPriceNum,
-                                            quantity: 1,
-                                            leadTimeDays: (productTranslated as any).tempoProducao ? parseInt((productTranslated as any).tempoProducao) || 3 : 3,
-                                            selections,
-                                            hasSize,
-                                            hasQuantity
-                                        });
-                                    }}
-                                    className="w-full rounded-full py-4 px-6 text-center text-xs uppercase tracking-widest font-bold bg-[#C5A059] text-[#343E2C] hover:bg-[#d5b069] transition-all cursor-pointer border border-[#C5A059]/20 shadow-lg shadow-[#C5A059]/15 flex items-center justify-center gap-2.5 focus:outline-none font-sans"
-                                >
-                                    <ShoppingBag size={16} />
-                                    <span>{lang === 'pt' ? 'Adicionar ao Carrinho' : 'Add to Cart'}</span>
-                                </button>
+                            <div className="flex flex-col gap-3 pt-2 w-full">
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 w-full">
+                                    {/* Primary CTA: Add to Cart */}
+                                    <button
+                                        onClick={() => {
+                                            addToCart({
+                                                productId: productTranslated.id || productTranslated.name,
+                                                productName: productTranslated.name,
+                                                categoryName: translatedCategory,
+                                                img: productImages[0] || productTranslated.img || '',
+                                                unitPrice: calculatedPriceNum,
+                                                quantity: 1,
+                                                leadTimeDays: (productTranslated as any).tempoProducao ? parseInt((productTranslated as any).tempoProducao) || 3 : 3,
+                                                selections,
+                                                hasSize,
+                                                hasQuantity
+                                            });
+                                        }}
+                                        className="w-full h-12 rounded-full px-5 text-center text-[11px] uppercase tracking-[0.2em] font-bold bg-[#C5A059] text-[#343E2C] hover:bg-[#d5b069] active:scale-[0.98] transition-all cursor-pointer border border-[#C5A059]/20 shadow-md shadow-[#C5A059]/15 flex items-center justify-center gap-2 focus:outline-none font-sans"
+                                    >
+                                        <ShoppingBag size={15} />
+                                        <span>{lang === 'pt' ? 'Adicionar ao Carrinho' : 'Add to Cart'}</span>
+                                    </button>
 
-                                {/* Secondary CTA: Direct Buy Now */}
-                                <button
-                                    onClick={() => setIsCheckingOut(true)}
-                                    className="w-full rounded-full py-3.5 px-6 text-center text-xs uppercase tracking-widest font-bold bg-[#343E2C] text-[#FCFBF9] hover:bg-[#22291d] transition-all cursor-pointer border border-[#C5A059]/10 shadow-md shadow-forest/10 focus:outline-none font-sans"
-                                >
-                                    {lang === 'pt' ? 'Comprar Agora (Checkout Rápido)' : 'Buy Now (Instant Checkout)'}
-                                </button>
+                                    {/* Secondary CTA: Direct Buy Now (Ghost Style) */}
+                                    <button
+                                        onClick={() => setIsCheckingOut(true)}
+                                        className="w-full h-12 rounded-full px-5 text-center text-[11px] uppercase tracking-[0.2em] font-bold bg-transparent text-forest hover:bg-forest hover:text-cream active:scale-[0.98] transition-all cursor-pointer border border-forest/20 shadow-none focus:outline-none font-sans"
+                                    >
+                                        {lang === 'pt' ? 'Comprar Agora' : 'Buy Now'}
+                                    </button>
+                                </div>
                                 
-                                {/* WhatsApp Button */}
+                                {/* WhatsApp Button (Ghost Style) */}
                                 <a
                                     href={whatsappUrl}
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    className="w-full rounded-full py-4 px-6 text-center text-xs uppercase tracking-widest font-bold bg-white text-forest hover:bg-forest hover:text-cream transition-all border border-forest/15 shadow-sm flex items-center justify-center gap-2.5 focus:outline-none"
+                                    className="w-full h-11 rounded-full px-5 text-center text-[10px] uppercase tracking-[0.2em] font-bold bg-transparent text-forest hover:bg-forest hover:text-cream transition-all border border-forest/20 shadow-none flex items-center justify-center gap-2 focus:outline-none w-full group"
                                 >
-                                    <MessageCircle size={15} className="text-emerald-600 shrink-0" />
+                                    <MessageCircle size={15} className="text-emerald-600 group-hover:text-cream transition-colors shrink-0" />
                                     <span>{lang === 'pt' ? 'Encomendar via WhatsApp' : 'Order via WhatsApp'}</span>
                                 </a>
 
@@ -7803,7 +7823,7 @@ const ProductDetailPage = ({ pathname }: { pathname: string }) => {
                                 {(() => {
                                     const estimate = getShippingEstimate(productTranslated, lang);
                                     return (
-                                        <p className="text-[10px] text-center text-forest/55 font-sans tracking-wide italic mt-1 leading-relaxed px-4">
+                                        <p className="text-[10px] text-center text-forest/60 font-sans tracking-wide italic mt-0.5 leading-relaxed px-2 max-w-xl">
                                             {estimate.inStock 
                                                 ? (lang === 'pt' ? '✓ Peça em stock: Envio em 24h/48h úteis.' : '✓ Item in stock: Ships in 24h/48h business hours.')
                                                 : (lang === 'pt' 
@@ -7814,6 +7834,38 @@ const ProductDetailPage = ({ pathname }: { pathname: string }) => {
                                     );
                                 })()}
                             </div>
+                        )}
+
+                        {/* Mobile Floating Sticky CTA Widget (Floating Capsule) */}
+                        {!isCheckingOut && (
+                            <motion.div 
+                                initial={{ opacity: 0, y: 20, scale: 0.9 }}
+                                animate={{ opacity: 1, y: 0, scale: 1 }}
+                                className="sm:hidden fixed bottom-5 right-4 z-[85] bg-[#343E2C]/90 text-cream backdrop-blur-md border border-[#C5A059]/40 rounded-full px-4 py-2.5 shadow-2xl flex items-center gap-3 cursor-pointer active:scale-95 transition-all"
+                                onClick={() => {
+                                    addToCart({
+                                        productId: productTranslated.id || productTranslated.name,
+                                        productName: productTranslated.name,
+                                        categoryName: translatedCategory,
+                                        img: productImages[0] || productTranslated.img || '',
+                                        unitPrice: calculatedPriceNum,
+                                        quantity: 1,
+                                        leadTimeDays: (productTranslated as any).tempoProducao ? parseInt((productTranslated as any).tempoProducao) || 3 : 3,
+                                        selections,
+                                        hasSize,
+                                        hasQuantity
+                                    });
+                                }}
+                            >
+                                <div className="font-serif font-bold text-cream text-sm leading-none">
+                                    {calculatedPriceNum}€
+                                </div>
+                                <div className="w-px h-4 bg-cream/20" />
+                                <div className="flex items-center gap-1.5 text-[#C5A059]">
+                                    <ShoppingBag size={14} />
+                                    <span className="text-[10px] font-bold uppercase tracking-widest text-cream">{lang === 'pt' ? 'Adicionar' : 'Add'}</span>
+                                </div>
+                            </motion.div>
                         )}
                         
                         {/* Security Guarantees badges block */}
