@@ -6217,13 +6217,20 @@ Object.keys(rawGlobModules).forEach((pathKey) => {
     const modObj: any = rawGlobModules[pathKey];
     let resolvedUrl = typeof modObj === 'string' ? modObj : (modObj?.default || '');
     if (!resolvedUrl || typeof resolvedUrl !== 'string') {
-        resolvedUrl = pathKey.replace(/^.*?\/public/, '').replace(/^.*?\/src\/assets/, '');
+        resolvedUrl = pathKey;
+    }
+
+    // Ensure public paths are rooted for static Express/Vite serving (e.g. /public/products/... -> /products/...)
+    if (resolvedUrl.startsWith('/public/')) {
+        resolvedUrl = resolvedUrl.replace(/^\/public/, '');
+    } else if (resolvedUrl.includes('/public/products/')) {
+        resolvedUrl = '/products/' + resolvedUrl.split('/public/products/')[1];
     }
 
     // Extract slug from folder path e.g. /products/classic-coasters/1.webp
-    const match = pathKey.match(/\/products\/([^\/]+)\//);
+    const match = pathKey.match(/\/products\/([^\/]+)\//i);
     if (match && match[1]) {
-        const slug = match[1];
+        const slug = match[1].toLowerCase().trim();
         if (!DYNAMIC_PRODUCT_IMAGES_MAP[slug]) {
             DYNAMIC_PRODUCT_IMAGES_MAP[slug] = [];
         }
@@ -6248,21 +6255,35 @@ Object.keys(DYNAMIC_PRODUCT_IMAGES_MAP).forEach((slug) => {
 export function getProductAllImages(product: any): string[] {
     if (!product) return [];
 
-    let slug = product.id || '';
     const explicitImages: string[] = Array.isArray(product.images) && product.images.length > 0
         ? [...product.images]
         : (product.img ? [product.img] : []);
 
+    const candidateSlugs: string[] = [];
+
+    // 1. Extract folder from first image URL e.g. /products/classic-coasters/1.webp -> classic-coasters
     const firstImg = explicitImages[0] || product.img || '';
     if (firstImg && firstImg.includes('/products/')) {
         const parts = firstImg.split('/products/')[1]?.split('/');
         if (parts && parts[0]) {
-            slug = parts[0];
+            candidateSlugs.push(parts[0].toLowerCase().trim());
         }
     }
 
-    if (slug && DYNAMIC_PRODUCT_IMAGES_MAP[slug] && DYNAMIC_PRODUCT_IMAGES_MAP[slug].length > 0) {
-        return DYNAMIC_PRODUCT_IMAGES_MAP[slug];
+    // 2. From product ID
+    if (product.id) {
+        candidateSlugs.push(String(product.id).toLowerCase().trim());
+    }
+
+    // 3. From product name
+    if (product.name) {
+        candidateSlugs.push(slugify(product.name).toLowerCase().trim());
+    }
+
+    for (const slug of candidateSlugs) {
+        if (slug && DYNAMIC_PRODUCT_IMAGES_MAP[slug] && DYNAMIC_PRODUCT_IMAGES_MAP[slug].length > 0) {
+            return DYNAMIC_PRODUCT_IMAGES_MAP[slug];
+        }
     }
 
     return explicitImages;
