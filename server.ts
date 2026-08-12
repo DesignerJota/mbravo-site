@@ -2888,6 +2888,10 @@ app.get("/api/write-review", (req, res) => {
   return res.redirect("https://g.page/r/Cdo7JGP_Xpc3EBM/review");
 });
 
+// Strict API route fallback: prevent any unhandled /api/* request from returning HTML
+app.use("/api/*", (req, res) => {
+  return res.status(404).json({ error: `API endpoint ${req.originalUrl} not found` });
+});
 
 // Configure Vite middleware in development or serve production build
 async function startServer() {
@@ -2914,6 +2918,9 @@ async function startServer() {
     const indexPath = path.join(distPath, 'index.html');
     app.use(express.static(distPath));
     app.get('*', (req, res) => {
+      if (req.path.startsWith('/api/')) {
+        return res.status(404).json({ error: `API endpoint ${req.path} not found` });
+      }
       if (fs.existsSync(indexPath)) {
         res.sendFile(indexPath);
       } else {
