@@ -6210,6 +6210,15 @@ const rawGlobModules = import.meta.glob([
     '../public/products/**/*.{webp,jpg,jpeg,png,svg,WEBP,JPG,JPEG,PNG,SVG}'
 ], { eager: true });
 
+// Helper for natural numeric sorting of image URLs (e.g. 1.webp, 2.webp, 10.webp)
+export function sortImageUrlsNumerically(urls: string[]): string[] {
+    return [...urls].sort((a, b) => {
+        const fileA = (a.split('/').pop() || '').split('?')[0];
+        const fileB = (b.split('/').pop() || '').split('?')[0];
+        return fileA.localeCompare(fileB, undefined, { numeric: true, sensitivity: 'base' });
+    });
+}
+
 // Build a dynamic map slug -> array of public image URLs
 const DYNAMIC_PRODUCT_IMAGES_MAP: Record<string, string[]> = {};
 
@@ -6242,14 +6251,7 @@ Object.keys(rawGlobModules).forEach((pathKey) => {
 
 // Sort each slug's image array numerically (e.g. 1.webp, 2.webp ... 10.webp)
 Object.keys(DYNAMIC_PRODUCT_IMAGES_MAP).forEach((slug) => {
-    DYNAMIC_PRODUCT_IMAGES_MAP[slug].sort((a, b) => {
-        const fileA = a.split('/').pop() || '';
-        const fileB = b.split('/').pop() || '';
-        const numA = parseInt(fileA.replace(/\D/g, '') || '0', 10);
-        const numB = parseInt(fileB.replace(/\D/g, '') || '0', 10);
-        if (numA !== numB) return numA - numB;
-        return fileA.localeCompare(fileB);
-    });
+    DYNAMIC_PRODUCT_IMAGES_MAP[slug] = sortImageUrlsNumerically(DYNAMIC_PRODUCT_IMAGES_MAP[slug]);
 });
 
 export function getProductAllImages(product: any): string[] {
@@ -6282,11 +6284,11 @@ export function getProductAllImages(product: any): string[] {
 
     for (const slug of candidateSlugs) {
         if (slug && DYNAMIC_PRODUCT_IMAGES_MAP[slug] && DYNAMIC_PRODUCT_IMAGES_MAP[slug].length > 0) {
-            return DYNAMIC_PRODUCT_IMAGES_MAP[slug];
+            return sortImageUrlsNumerically(DYNAMIC_PRODUCT_IMAGES_MAP[slug]);
         }
     }
 
-    return explicitImages;
+    return sortImageUrlsNumerically(explicitImages);
 }
 
 export function navigateTo(path: string) {
