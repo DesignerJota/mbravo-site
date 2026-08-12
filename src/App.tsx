@@ -5927,8 +5927,8 @@ const TestimonialsSection = () => {
         id: 'google-invite',
         name: "M★BRAVO",
         text: lang === 'pt'
-            ? "O seu apoio significa o mundo para a M★BRAVO. Partilhe a sua experiência e deixe-nos a sua avaliação no Google!"
-            : "Your support means the world to M★BRAVO. Share your experience and leave us a review on Google!",
+            ? "O seu apoio ajuda-nos a crescer. Partilhe a sua experiência e deixe-nos a sua avaliação no Google!"
+            : "Your support helps us grow. Share your experience and leave us a review on Google!",
         product: "",
         rating: 5
     };
@@ -6203,23 +6203,33 @@ export function getCollectionScrollTarget(element: HTMLElement): number {
 }
 
 // --- Product Image & Navigation Helpers ---
-// Dynamically glob all image files in /public/products/ across all product folders
-const rawGlobModules = import.meta.glob('/public/products/**/*.{webp,jpg,jpeg,png,svg}', { eager: true });
+// Dynamically glob all image files in /public/products/ and /src/assets/products/ across all product folders
+const rawGlobModules = import.meta.glob([
+    '/public/products/**/*.{webp,jpg,jpeg,png,svg,WEBP,JPG,JPEG,PNG,SVG}',
+    '/src/assets/products/**/*.{webp,jpg,jpeg,png,svg,WEBP,JPG,JPEG,PNG,SVG}',
+    '../public/products/**/*.{webp,jpg,jpeg,png,svg,WEBP,JPG,JPEG,PNG,SVG}'
+], { eager: true });
 
 // Build a dynamic map slug -> array of public image URLs
 const DYNAMIC_PRODUCT_IMAGES_MAP: Record<string, string[]> = {};
 
 Object.keys(rawGlobModules).forEach((pathKey) => {
-    // pathKey looks like "/public/products/classic-coasters/1.webp"
-    const publicUrl = pathKey.replace(/^\/public/, ''); // -> "/products/classic-coasters/1.webp"
-    const parts = publicUrl.split('/');
-    // parts: ["", "products", "classic-coasters", "1.webp"]
-    if (parts.length >= 4) {
-        const slug = parts[2];
+    const modObj: any = rawGlobModules[pathKey];
+    let resolvedUrl = typeof modObj === 'string' ? modObj : (modObj?.default || '');
+    if (!resolvedUrl || typeof resolvedUrl !== 'string') {
+        resolvedUrl = pathKey.replace(/^.*?\/public/, '').replace(/^.*?\/src\/assets/, '');
+    }
+
+    // Extract slug from folder path e.g. /products/classic-coasters/1.webp
+    const match = pathKey.match(/\/products\/([^\/]+)\//);
+    if (match && match[1]) {
+        const slug = match[1];
         if (!DYNAMIC_PRODUCT_IMAGES_MAP[slug]) {
             DYNAMIC_PRODUCT_IMAGES_MAP[slug] = [];
         }
-        DYNAMIC_PRODUCT_IMAGES_MAP[slug].push(publicUrl);
+        if (!DYNAMIC_PRODUCT_IMAGES_MAP[slug].includes(resolvedUrl)) {
+            DYNAMIC_PRODUCT_IMAGES_MAP[slug].push(resolvedUrl);
+        }
     }
 });
 
