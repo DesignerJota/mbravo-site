@@ -2633,67 +2633,78 @@ function saveTestimonials(list: any[]) {
 
 let activeTestimonials = loadTestimonials();
 
-// 3-Layer Enterprise High-Availability Testimonials Fetcher (Google Places Legacy + New Places API v1)
+// 3-Layer Enterprise High-Availability Testimonials Fetcher (Google Places New v1 + Legacy + DB/JSON)
 async function fetchTestimonials3Layers(): Promise<any[]> {
   let googleReviews: any[] = [];
   const apiKey = process.env.GOOGLE_PLACES_API_KEY || process.env.GOOGLE_API_KEY;
   const placeId = process.env.GOOGLE_PLACE_ID;
 
+  if (!apiKey) {
+    console.warn("[TESTIMONIALS API WARN] GOOGLE_PLACES_API_KEY / GOOGLE_API_KEY is NOT set in process.env.");
+  }
+  if (!placeId) {
+    console.warn("[TESTIMONIALS API WARN] GOOGLE_PLACE_ID is NOT set in process.env.");
+  }
+
   if (apiKey && placeId) {
-    // 1. Try Legacy Places API
+    // 1. Try Places API (New) v1 first
     try {
-      console.log(`[TESTIMONIALS API] Fetching live Google Places (Legacy) reviews for Place ID: ${placeId}...`);
-      const url = `https://maps.googleapis.com/maps/api/place/details/json?place_id=${placeId}&fields=reviews,rating,user_ratings_total&key=${apiKey}&language=pt`;
-      const response = await fetch(url);
-      if (response.ok) {
-        const data: any = await response.json();
-        if (data.status === "OK" && data.result?.reviews?.length > 0) {
-          googleReviews = data.result.reviews.map((r: any) => ({
-            name: r.author_name || "Cliente Google",
-            text: r.text || "",
+      console.log(`[TESTIMONIALS API] Calling Places API (New) v1 for Place ID: ${placeId}...`);
+      const newUrl = `https://places.googleapis.com/v1/places/${placeId}`;
+      const newRes = await fetch(newUrl, {
+        headers: {
+          'X-Goog-Api-Key': apiKey,
+          'X-Goog-FieldMask': 'reviews,rating,userRatingCount,displayName',
+          'Accept-Language': 'pt-PT,pt;q=0.9'
+        }
+      });
+      if (newRes.ok) {
+        const newData: any = await newRes.json();
+        if (newData.reviews && Array.isArray(newData.reviews) && newData.reviews.length > 0) {
+          googleReviews = newData.reviews.map((r: any) => ({
+            name: r.authorAttribution?.displayName || "Cliente Google",
+            text: r.text?.text || r.originalText?.text || "",
             product: "Avaliação Verificada Google",
             rating: r.rating ? parseInt(r.rating, 10) : 5,
-            createdAt: r.time ? new Date(r.time * 1000).toISOString() : new Date().toISOString()
+            createdAt: r.publishTime || new Date().toISOString()
           })).filter((item: any) => item.text && item.text.trim().length > 0);
-          console.log(`[TESTIMONIALS API SUCCESS] Retrieved ${googleReviews.length} live Google Places (Legacy) reviews.`);
+          console.log(`[TESTIMONIALS API SUCCESS] Retrieved ${googleReviews.length} live reviews via Places API (New).`);
         } else {
-          console.warn(`[TESTIMONIALS API WARN] Legacy Places API status: ${data.status} ${data.error_message || ''}`);
+          console.log(`[TESTIMONIALS API INFO] Places API (New) returned 0 reviews in payload.`);
         }
+      } else {
+        const errBody = await newRes.text();
+        console.warn(`[TESTIMONIALS API WARN] Places API (New) HTTP ${newRes.status}: ${errBody}`);
       }
-    } catch (err: any) {
-      console.warn(`[TESTIMONIALS API WARN] Legacy Places API fetch error: ${err.message || err}`);
+    } catch (newErr: any) {
+      console.warn(`[TESTIMONIALS API WARN] Places API (New) fetch exception: ${newErr.message || newErr}`);
     }
 
-    // 2. Fallback to New Places API v1 if legacy API returned 0 reviews
+    // 2. Fallback to Legacy Places Details API if Places API (New) returned 0 reviews
     if (googleReviews.length === 0) {
       try {
-        console.log(`[TESTIMONIALS API] Trying Places API (New) v1 for Place ID: ${placeId}...`);
-        const newUrl = `https://places.googleapis.com/v1/places/${placeId}`;
-        const newRes = await fetch(newUrl, {
-          headers: {
-            'X-Goog-Api-Key': apiKey,
-            'X-Goog-FieldMask': 'reviews,rating,userRatingCount',
-            'Accept-Language': 'pt-PT,pt;q=0.9'
-          }
-        });
-        if (newRes.ok) {
-          const newData: any = await newRes.json();
-          if (newData.reviews && Array.isArray(newData.reviews) && newData.reviews.length > 0) {
-            googleReviews = newData.reviews.map((r: any) => ({
-              name: r.authorAttribution?.displayName || "Cliente Google",
-              text: r.text?.text || r.originalText?.text || "",
+        console.log(`[TESTIMONIALS API] Trying Google Places (Legacy) details API for Place ID: ${placeId}...`);
+        const url = `https://maps.googleapis.com/maps/api/place/details/json?place_id=${placeId}&fields=reviews,rating,user_ratings_total&key=${apiKey}&language=pt`;
+        const response = await fetch(url);
+        if (response.ok) {
+          const data: any = await response.json();
+          if (data.status === "OK" && data.result?.reviews?.length > 0) {
+            googleReviews = data.result.reviews.map((r: any) => ({
+              name: r.author_name || "Cliente Google",
+              text: r.text || "",
               product: "Avaliação Verificada Google",
               rating: r.rating ? parseInt(r.rating, 10) : 5,
-              createdAt: r.publishTime || new Date().toISOString()
+              createdAt: r.time ? new Date(r.time * 1000).toISOString() : new Date().toISOString()
             })).filter((item: any) => item.text && item.text.trim().length > 0);
-            console.log(`[TESTIMONIALS API SUCCESS] Retrieved ${googleReviews.length} live reviews via Places API (New).`);
+            console.log(`[TESTIMONIALS API SUCCESS] Retrieved ${googleReviews.length} live Google Places (Legacy) reviews.`);
+          } else {
+            console.warn(`[TESTIMONIALS API WARN] Legacy Places API status: ${data.status} - ${data.error_message || 'No error message provided'}`);
           }
         } else {
-          const errBody = await newRes.text();
-          console.warn(`[TESTIMONIALS API WARN] Places API (New) status ${newRes.status}: ${errBody}`);
+          console.warn(`[TESTIMONIALS API WARN] Legacy Places API HTTP status: ${response.status}`);
         }
-      } catch (newErr: any) {
-        console.warn(`[TESTIMONIALS API WARN] Places API (New) error: ${newErr.message || newErr}`);
+      } catch (err: any) {
+        console.warn(`[TESTIMONIALS API WARN] Legacy Places API fetch exception: ${err.message || err}`);
       }
     }
   }
