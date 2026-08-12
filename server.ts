@@ -2893,6 +2893,15 @@ app.use("/api/*", (req, res) => {
   return res.status(404).json({ error: `API endpoint ${req.originalUrl} not found` });
 });
 
+// Global Express Error Handling Middleware - Prevents HTML errors on API endpoints
+app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
+  console.error('[EXPRESS UNCAUGHT ERROR]', err);
+  if (req.path.startsWith('/api/') || req.originalUrl.startsWith('/api/')) {
+    return res.status(500).json({ error: err?.message || 'Internal Server Error' });
+  }
+  next(err);
+});
+
 // Configure Vite middleware in development or serve production build
 async function startServer() {
   // Boot persistent inventory check & smart upsert immediately on server start
@@ -2905,7 +2914,8 @@ async function startServer() {
 
   const isProduction = process.env.NODE_ENV === "production" || 
                        !!process.env.RAILWAY_ENVIRONMENT || 
-                       process.env.CF_PAGES === "1";
+                       process.env.CF_PAGES === "1" ||
+                       fs.existsSync(path.join(process.cwd(), 'dist', 'index.html'));
 
   if (!isProduction) {
     const vite = await createViteServer({
@@ -2915,12 +2925,31 @@ async function startServer() {
     app.use(vite.middlewares);
   } else {
     const distPath = path.join(process.cwd(), 'dist');
+    const publicPath = path.join(process.cwd(), 'public');
     const indexPath = path.join(distPath, 'index.html');
+
+    // Serve static files from dist and public directories
     app.use(express.static(distPath));
+
+    if (fs.existsSync(publicPath)) {
+      app.use(express.static(publicPath));
+      app.use('/public', express.static(publicPath));
+      app.use('/products', express.static(path.join(publicPath, 'products')));
+    }
+
+    app.use('/public', express.static(distPath));
+    app.use('/products', express.static(path.join(distPath, 'products')));
+
     app.get('*', (req, res) => {
       if (req.path.startsWith('/api/')) {
         return res.status(404).json({ error: `API endpoint ${req.path} not found` });
       }
+
+      // Safeguard: Never return index.html HTML page for missing media/image assets
+      if (/\.(webp|jpg|jpeg|png|svg|ico|css|js|woff|woff2|ttf|map)$/i.test(req.path)) {
+        return res.status(404).send('Asset not found');
+      }
+
       if (fs.existsSync(indexPath)) {
         res.sendFile(indexPath);
       } else {
@@ -2938,7 +2967,7 @@ async function startServer() {
             <body>
               <h1>MBravo API Engine</h1>
               <p>The backend API server is running successfully on Railway!</p>
-              <p>The client application is hosted on Cloudflare Pages.</p>
+              <p>The client application is served from the static build.</p>
             </body>
           </html>
         `);
