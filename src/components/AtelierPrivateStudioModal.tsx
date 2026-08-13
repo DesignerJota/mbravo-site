@@ -4,13 +4,12 @@ import {
   X, 
   Check, 
   MessageCircle, 
-  ShieldCheck, 
-  Heart, 
+  User, 
+  Mail, 
+  Phone, 
   Calendar,
-  User,
-  Mail,
-  Phone,
-  Sparkles
+  Minus,
+  Plus
 } from 'lucide-react';
 
 interface AtelierPrivateStudioModalProps {
@@ -18,67 +17,63 @@ interface AtelierPrivateStudioModalProps {
   onClose: () => void;
 }
 
-// 1. Official Catalog Pieces with Direct Photo Links
+// 1. Official Catalog Pieces without technical code noise
 const ATELIER_PRODUCTS = [
   { 
     id: 'cardigan-alma', 
     name: 'Cardigan Alma', 
     category: 'Vestuário Autoral',
     image: '/products/alma-cardigan/1.webp',
-    fallbackImage: '/vestuario.webp',
-    desc: 'Peça de vestuário de alta-costura em crochet com abotoamento frontal e punhos canelados.'
+    fallbackImage: '/vestuario.webp'
   },
   { 
-    id: 'mala-b2-sling', 
-    name: 'Mala B2 Sling', 
+    id: 'mala-sling', 
+    name: 'Mala Sling', 
     category: 'Mala em Crochet',
     image: '/products/granny-square-sling-bag/1.webp',
-    fallbackImage: '/malas.webp',
-    desc: 'Mala de ombro utilitária e elegante com pala arredondada e estrutura reforçada.'
+    fallbackImage: '/malas.webp'
   },
   { 
-    id: 'pouch-b1-mini', 
-    name: 'Pouch B1 Mini', 
+    id: 'pouch-mini', 
+    name: 'Pouch Mini', 
     category: 'Mini Mala & Acessório',
     image: '/products/mini-pouches/1.webp',
-    fallbackImage: '/acessorios.webp',
-    desc: 'Bolsa compacta para essenciais, porta-chaves ou Airpods com fecho artesanal.'
+    fallbackImage: '/acessorios.webp'
   },
   { 
-    id: 'poncho-v1', 
-    name: 'Poncho V1 / V2C', 
+    id: 'poncho-couture', 
+    name: 'Poncho Couture', 
     category: 'Acessório Nobre',
     image: '/products/signature-granny-poncho/1.webp',
-    fallbackImage: '/vestuario.webp',
-    desc: 'Capa envolvente de ombros com drapeado natural e gola estruturada.'
+    fallbackImage: '/vestuario.webp'
   },
   { 
-    id: 'decor-h2b', 
-    name: 'Almofada H2B', 
+    id: 'almofada-atelier', 
+    name: 'Almofada Atelier', 
     category: 'Decor para a Casa',
     image: '/products/stella-cushion/1.webp',
-    fallbackImage: '/casa.webp',
-    desc: 'Peça decorativa para a casa com borlas nos cantos e ponto rendado exclusivo.'
+    fallbackImage: '/casa.webp'
   },
   { 
-    id: 'coasters-mbravo', 
-    name: 'Porta-Copos Coasters', 
+    id: 'porta-copos', 
+    name: 'Porta-Copos', 
     category: 'Mesa & Decor',
     image: '/products/coraline-coasters/1.webp',
-    fallbackImage: '/casa.webp',
-    desc: 'Conjunto de base para copos em algodão penteado para momentos especiais à mesa.'
+    fallbackImage: '/casa.webp'
   }
 ];
 
-// 2. Official Raw Materials & Yarn Palettes (DROPS Safran & DROPS Paris)
+// 2. Official Raw Materials (Clean Swatches)
 const YARN_COLORS = [
-  { id: 'natural', name: 'Natural & Areia', hex: '#F5EBE0', borderHex: '#D8C3A5', yarnLine: 'DROPS Safran 18' },
-  { id: 'floresta', name: 'Verde Floresta', hex: '#416335', borderHex: '#2E4825', yarnLine: 'DROPS Safran 78' },
-  { id: 'cafe', name: 'Café M★BRAVO', hex: '#5C3A21', borderHex: '#422815', yarnLine: 'DROPS Safran 68' },
-  { id: 'rosa', name: 'Rosa do Deserto', hex: '#F4B3BA', borderHex: '#E39DA5', yarnLine: 'DROPS Safran 01' },
-  { id: 'azul', name: 'Azul Pó Marea', hex: '#B8D8EB', borderHex: '#9DC1D8', yarnLine: 'DROPS Safran 76' },
-  { id: 'baunilha', name: 'Baunilha Dourada', hex: '#F8C53A', borderHex: '#D9AA2B', yarnLine: 'DROPS Paris 35' }
+  { id: 'natural', name: 'Natural Areia', hex: '#F5EBE0' },
+  { id: 'floresta', name: 'Verde Floresta', hex: '#416335' },
+  { id: 'cafe', name: 'Café M★BRAVO', hex: '#5C3A21' },
+  { id: 'rosa', name: 'Rosa Deserto', hex: '#F4B3BA' },
+  { id: 'azul', name: 'Azul Pó Marea', hex: '#B8D8EB' },
+  { id: 'baunilha', name: 'Baunilha Dourada', hex: '#F8C53A' }
 ];
+
+const SIZES = ['Único', 'S-M', 'L-XL', 'Por Medida'];
 
 export const AtelierPrivateStudioModal: React.FC<AtelierPrivateStudioModalProps> = ({
   isOpen,
@@ -86,11 +81,16 @@ export const AtelierPrivateStudioModal: React.FC<AtelierPrivateStudioModalProps>
 }) => {
   const [selectedProduct, setSelectedProduct] = useState(ATELIER_PRODUCTS[0]);
   const [selectedColor, setSelectedColor] = useState(YARN_COLORS[0]);
+  const [showAllColors, setShowAllColors] = useState(false);
+  const [selectedSize, setSelectedSize] = useState('Por Medida');
+  const [quantity, setQuantity] = useState(1);
+  
   const [clientName, setClientName] = useState('');
   const [clientEmail, setClientEmail] = useState('');
   const [clientPhone, setClientPhone] = useState('');
   const [clientBirthday, setClientBirthday] = useState('');
   const [customNotes, setCustomNotes] = useState('');
+  
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [bookingSuccess, setBookingSuccess] = useState(false);
   const [imgError, setImgError] = useState(false);
@@ -100,19 +100,28 @@ export const AtelierPrivateStudioModal: React.FC<AtelierPrivateStudioModalProps>
   // Handle image fallback gracefully
   const currentImageUrl = imgError ? selectedProduct.fallbackImage : selectedProduct.image;
 
+  // Colors visible (4 main or all 6)
+  const visibleColors = showAllColors ? YARN_COLORS : YARN_COLORS.slice(0, 4);
+
   // Generate formatted WhatsApp Passaporte Criativo text
   const generateWhatsAppMessage = () => {
     const namePart = clientName.trim() ? `O meu nome é ${clientName.trim()}. ` : '';
-    const emailPart = clientEmail.trim() ? ` (Email: ${clientEmail.trim()})` : '';
-    const phonePart = clientPhone.trim() ? ` | Contacto: ${clientPhone.trim()}` : '';
-    const bdayPart = clientBirthday.trim() ? ` | Aniversário: ${clientBirthday.trim()}` : '';
-    const notesPart = customNotes.trim() ? ` | Notas: "${customNotes.trim()}"` : '';
+    const emailPart = clientEmail.trim() ? `\n• Email: ${clientEmail.trim()}` : '';
+    const phonePart = clientPhone.trim() ? `\n• Contacto: ${clientPhone.trim()}` : '';
+    const bdayPart = clientBirthday.trim() ? `\n• Aniversário: ${clientBirthday.trim()}` : '';
+    const notesPart = customNotes.trim() ? `\n• Visão / Notas: "${customNotes.trim()}"` : '';
 
-    return `Olá Carolina! ${namePart}Envio o meu Passaporte de Co-Criação M★BRAVO:
-✦ Peça Selecionada: ${selectedProduct.name} (${selectedProduct.category})
-✦ Tom do Algodão: ${selectedColor.name} (${selectedColor.yarnLine})${emailPart}${phonePart}${bdayPart}${notesPart}
+    return `Olá Carolina! ${namePart}Gostaria de solicitar o meu Passaporte de Co-Criação M★BRAVO:
 
-Gostaria de agendar a minha sessão privada com a Carolina Bravo.`;
+✦ PEÇA SELECIONADA:
+• Peça: ${selectedProduct.name} (${selectedProduct.category})
+• Tom: ${selectedColor.name}
+• Tamanho / Escala: ${selectedSize}
+• Quantidade: ${quantity}
+
+✦ DADOS DO CLIENTE:${emailPart}${phonePart}${bdayPart}${notesPart}
+
+Gostaria de agendar a minha sessão privada no Atelier.`;
   };
 
   const handleSubmitPassaporte = async (e: React.FormEvent) => {
@@ -128,7 +137,8 @@ Gostaria de agendar a minha sessão privada com a Carolina Bravo.`;
       productName: selectedProduct.name,
       productCategory: selectedProduct.category,
       colorName: selectedColor.name,
-      yarnLine: selectedColor.yarnLine,
+      size: selectedSize,
+      quantity,
       notes: customNotes.trim()
     };
 
@@ -138,7 +148,7 @@ Gostaria de agendar a minha sessão privada com a Carolina Bravo.`;
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(passaporteData)
-      }).catch(err => console.warn('[PASSAPORTE API] Submit notice:', err));
+      }).catch(err => console.warn('[PASSAPORTE API] Notice:', err));
 
       const existing = JSON.parse(localStorage.getItem('mbravo_creative_passports') || '[]');
       existing.unshift(passaporteData);
@@ -177,23 +187,20 @@ Gostaria de agendar a minha sessão privada com a Carolina Bravo.`;
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.95, y: 15 }}
           transition={{ type: 'spring', damping: 25, stiffness: 280 }}
-          className="relative w-full max-w-2xl bg-[#FAF7F2] border border-[#C5A059]/40 rounded-3xl p-5 sm:p-7 text-[#243119] shadow-2xl z-10 overflow-hidden my-auto max-h-[92vh] flex flex-col justify-between"
+          className="relative w-full max-w-xl bg-[#FAF7F2] border border-[#C5A059]/40 rounded-3xl p-5 sm:p-7 text-[#243119] shadow-2xl z-10 overflow-hidden my-auto max-h-[92vh] flex flex-col justify-between"
         >
-          {/* Header */}
-          <div className="flex items-start justify-between gap-4 border-b border-[#243119]/10 pb-4 shrink-0">
+          {/* Header - Clean Editorial */}
+          <div className="flex items-center justify-between border-b border-[#243119]/10 pb-4 shrink-0">
             <div>
-              <span className="text-[10px] uppercase tracking-[0.3em] font-sans font-semibold text-[#8C6D3B] block mb-0.5">
-                M★BRAVO Atelier
-              </span>
               <h2 
                 style={{ fontFamily: "'Cormorant Garamond', serif" }}
                 className="text-2xl sm:text-3xl font-serif text-[#243119] font-normal leading-tight"
               >
                 Passaporte de Co-Criação
               </h2>
-              <p className="text-xs text-[#243119]/70 font-sans mt-1 max-w-lg leading-relaxed">
-                Inicie o processo artesanal da sua peça sob medida. Preencha os detalhes para agendar a sua sessão privada com a Carolina.
-              </p>
+              <span className="text-[10px] uppercase tracking-[0.25em] font-sans font-semibold text-[#8C6D3B] block mt-0.5">
+                M★BRAVO Atelier
+              </span>
             </div>
 
             <button
@@ -206,14 +213,14 @@ Gostaria de agendar a minha sessão privada com a Carolina Bravo.`;
           </div>
 
           {/* Modal Content - Scrollable Form */}
-          <div className="overflow-y-auto my-4 pr-1 space-y-6 flex-1 custom-scrollbar">
+          <div className="overflow-y-auto my-4 pr-1 space-y-5 flex-1 custom-scrollbar">
             {bookingSuccess ? (
               <motion.div
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
                 className="py-10 text-center space-y-4"
               >
-                <div className="w-16 h-16 rounded-full bg-[#243119] text-[#C5A059] flex items-center justify-center mx-auto text-2xl shadow-sm border border-[#C5A059]">
+                <div className="w-14 h-14 rounded-full bg-[#243119] text-[#C5A059] flex items-center justify-center mx-auto text-xl shadow-sm border border-[#C5A059]">
                   ★
                 </div>
                 <h3 
@@ -222,7 +229,7 @@ Gostaria de agendar a minha sessão privada com a Carolina Bravo.`;
                 >
                   Passaporte Registado
                 </h3>
-                <p className="text-xs sm:text-sm text-[#243119]/80 max-w-md mx-auto leading-relaxed">
+                <p className="text-xs sm:text-sm text-[#243119]/80 max-w-md mx-auto leading-relaxed font-sans">
                   A abrir a conversa com o Atelier no WhatsApp... A Carolina estará à sua espera para confirmar a sua sessão privada.
                 </p>
                 <div className="pt-2">
@@ -238,16 +245,16 @@ Gostaria de agendar a minha sessão privada com a Carolina Bravo.`;
                 </div>
               </motion.div>
             ) : (
-              <form id="passaporte-form" onSubmit={handleSubmitPassaporte} className="space-y-6">
+              <form id="passaporte-form" onSubmit={handleSubmitPassaporte} className="space-y-5">
                 
-                {/* 1. SELEÇÃO DE PRODUTO & FOTO DE DESTAQUE */}
+                {/* 1. SELEÇÃO DE PEÇA & FOTO DE DESTAQUE */}
                 <div>
                   <label className="block text-[11px] uppercase tracking-[0.2em] font-sans font-semibold text-[#8C6D3B] mb-2">
                     1. Escolha a Peça do Atelier
                   </label>
 
-                  {/* Horizontal Scroll / Grid for Product Selection Pills */}
-                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 mb-4">
+                  {/* Grid for Product Selection Pills */}
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 mb-3">
                     {ATELIER_PRODUCTS.map((prod) => {
                       const isSelected = selectedProduct.id === prod.id;
                       return (
@@ -258,16 +265,16 @@ Gostaria de agendar a minha sessão privada com a Carolina Bravo.`;
                             setSelectedProduct(prod);
                             setImgError(false);
                           }}
-                          className={`p-2.5 rounded-2xl border text-left cursor-pointer transition-all ${
+                          className={`p-2 rounded-xl border text-left cursor-pointer transition-all ${
                             isSelected
                               ? 'bg-[#243119] border-[#243119] text-[#FAF8F5] shadow-xs'
                               : 'bg-white border-[#243119]/10 text-[#243119] hover:border-[#C5A059]'
                           }`}
                         >
-                          <span className={`block font-serif italic text-sm ${isSelected ? 'text-[#FAF8F5]' : 'text-[#243119]'}`}>
+                          <span className={`block font-serif italic text-xs sm:text-sm ${isSelected ? 'text-[#FAF8F5]' : 'text-[#243119]'}`}>
                             {prod.name}
                           </span>
-                          <span className={`block text-[9px] uppercase tracking-wider font-sans mt-0.5 ${isSelected ? 'text-[#C5A059]' : 'text-[#243119]/50'}`}>
+                          <span className={`block text-[8px] uppercase tracking-wider font-sans mt-0.5 ${isSelected ? 'text-[#C5A059]' : 'text-[#243119]/50'}`}>
                             {prod.category}
                           </span>
                         </button>
@@ -279,11 +286,11 @@ Gostaria de agendar a minha sessão privada com a Carolina Bravo.`;
                   <AnimatePresence mode="wait">
                     <motion.div
                       key={selectedProduct.id}
-                      initial={{ opacity: 0, y: 10 }}
+                      initial={{ opacity: 0, y: 8 }}
                       animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: -10 }}
-                      transition={{ duration: 0.3 }}
-                      className="relative w-full aspect-[16/9] sm:aspect-[2/1] rounded-2xl overflow-hidden bg-[#EFE8D8] border border-[#C5A059]/40 shadow-xs group"
+                      exit={{ opacity: 0, y: -8 }}
+                      transition={{ duration: 0.25 }}
+                      className="relative w-full aspect-[21/9] sm:aspect-[2.4/1] rounded-2xl overflow-hidden bg-[#EFE8D8] border border-[#C5A059]/30 shadow-2xs group"
                     >
                       <img 
                         src={currentImageUrl} 
@@ -291,83 +298,154 @@ Gostaria de agendar a minha sessão privada com a Carolina Bravo.`;
                         onError={() => setImgError(true)}
                         className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-700"
                       />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent pointer-events-none" />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/65 via-black/15 to-transparent pointer-events-none" />
                       
-                      <div className="absolute bottom-3 left-3 right-3 flex items-end justify-between text-white z-10">
+                      <div className="absolute bottom-2.5 left-3 right-3 flex items-end justify-between text-white z-10">
                         <div>
-                          <span className="text-[10px] uppercase tracking-[0.2em] font-sans font-semibold text-[#C5A059] block">
+                          <span className="text-[9px] uppercase tracking-[0.2em] font-sans font-semibold text-[#C5A059] block">
                             {selectedProduct.category}
                           </span>
                           <h3 
                             style={{ fontFamily: "'Cormorant Garamond', serif" }}
-                            className="text-xl sm:text-2xl font-serif text-[#FAF8F5] leading-tight"
+                            className="text-lg sm:text-xl font-serif text-[#FAF8F5] leading-tight"
                           >
                             {selectedProduct.name}
                           </h3>
                         </div>
-                        <span className="text-[10px] font-sans uppercase tracking-widest text-white/80 bg-black/40 px-2.5 py-1 rounded-full border border-white/20 backdrop-blur-xs">
-                          Peça Artesanal
+                        <span className="text-[9px] font-sans uppercase tracking-widest text-white/80 bg-black/40 px-2.5 py-0.5 rounded-full border border-white/20 backdrop-blur-xs">
+                          M★BRAVO
                         </span>
                       </div>
                     </motion.div>
                   </AnimatePresence>
                 </div>
 
-                {/* 2. OPÇÕES BÁSICAS: ALGODÃO VIRGEM */}
+                {/* 2. REORGANIZAÇÃO DO SELECTOR DE CORES (SWATCHES CIRCULARES ELEGANTES) */}
                 <div>
-                  <label className="block text-[11px] uppercase tracking-[0.2em] font-sans font-semibold text-[#8C6D3B] mb-2">
-                    2. Escolha o Tom do Algodão
-                  </label>
-                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-                    {YARN_COLORS.map((color) => {
+                  <div className="flex items-center justify-between mb-2">
+                    <label className="text-[11px] uppercase tracking-[0.2em] font-sans font-semibold text-[#8C6D3B]">
+                      2. Tom do Algodão
+                    </label>
+                    <button
+                      type="button"
+                      onClick={() => setShowAllColors(!showAllColors)}
+                      className="text-[10px] uppercase tracking-wider font-sans font-medium text-[#8C6D3B] hover:text-[#243119] underline transition-colors cursor-pointer"
+                    >
+                      {showAllColors ? 'Menos Cores' : '+ Outras Cores da Paleta'}
+                    </button>
+                  </div>
+
+                  <div className="grid grid-cols-4 sm:grid-cols-6 gap-2 bg-white/60 p-3 rounded-2xl border border-[#243119]/10">
+                    {visibleColors.map((color) => {
                       const isSelected = selectedColor.id === color.id;
                       return (
                         <button
                           key={color.id}
                           type="button"
                           onClick={() => setSelectedColor(color)}
-                          className={`p-2.5 rounded-2xl border text-left cursor-pointer transition-all flex items-center gap-2.5 ${
-                            isSelected
-                              ? 'bg-white border-[#C5A059] ring-1 ring-[#C5A059] shadow-xs'
-                              : 'bg-white/80 border-[#243119]/10 hover:border-[#C5A059]/50'
-                          }`}
+                          className="flex flex-col items-center gap-1.5 cursor-pointer group py-1"
                         >
-                          <span 
-                            className="w-5 h-5 rounded-full border border-black/15 shrink-0 shadow-2xs"
-                            style={{ backgroundColor: color.hex }}
-                          />
-                          <div className="min-w-0">
-                            <span className="block text-xs font-sans font-medium text-[#243119] truncate">
-                              {color.name}
-                            </span>
-                            <span className="block text-[9px] text-[#243119]/50 font-sans truncate">
-                              {color.yarnLine}
-                            </span>
+                          <div className={`relative w-7 h-7 sm:w-8 sm:h-8 rounded-full border transition-all flex items-center justify-center shadow-2xs ${
+                            isSelected 
+                              ? 'ring-2 ring-[#C5A059] ring-offset-2 border-black/20 scale-105' 
+                              : 'border-black/15 group-hover:scale-105'
+                          }`}
+                          style={{ backgroundColor: color.hex }}
+                          >
+                            {isSelected && (
+                              <Check size={12} className={color.hex === '#F5EBE0' || color.hex === '#F8C53A' ? 'text-black' : 'text-white'} />
+                            )}
                           </div>
-                          {isSelected && <Check size={14} className="text-[#8C6D3B] ml-auto shrink-0" />}
+                          <span className={`text-[9px] font-sans text-center leading-tight transition-colors ${
+                            isSelected ? 'font-semibold text-[#243119]' : 'text-[#243119]/60 group-hover:text-[#243119]'
+                          }`}>
+                            {color.name}
+                          </span>
                         </button>
                       );
                     })}
                   </div>
                 </div>
 
-                {/* 3. FORMULÁRIO DE CAPTAÇÃO & ANIVERSÁRIO */}
+                {/* 3. ESPECIFICAÇÕES DA PEÇA (TAMANHO & QUANTIDADE) */}
+                <div>
+                  <label className="block text-[11px] uppercase tracking-[0.2em] font-sans font-semibold text-[#8C6D3B] mb-2">
+                    3. Especificações da Peça
+                  </label>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 bg-white/60 p-3 rounded-2xl border border-[#243119]/10">
+                    {/* Escala / Tamanho */}
+                    <div>
+                      <span className="block text-[10px] uppercase tracking-wider font-sans text-[#243119]/70 mb-1.5 font-medium">
+                        Tamanho / Escala
+                      </span>
+                      <div className="flex items-center gap-1">
+                        {SIZES.map((sz) => {
+                          const isSel = selectedSize === sz;
+                          return (
+                            <button
+                              key={sz}
+                              type="button"
+                              onClick={() => setSelectedSize(sz)}
+                              className={`flex-1 py-1.5 px-1 rounded-lg text-[10px] font-sans font-medium transition-all border cursor-pointer text-center ${
+                                isSel 
+                                  ? 'bg-[#243119] text-[#FAF8F5] border-[#243119] shadow-2xs' 
+                                  : 'bg-white text-[#243119] border-[#243119]/15 hover:border-[#C5A059]'
+                              }`}
+                            >
+                              {sz}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+
+                    {/* Quantidade */}
+                    <div>
+                      <span className="block text-[10px] uppercase tracking-wider font-sans text-[#243119]/70 mb-1.5 font-medium">
+                        Quantidade
+                      </span>
+                      <div className="flex items-center justify-between bg-white border border-[#243119]/15 rounded-lg p-1 max-w-[130px]">
+                        <button
+                          type="button"
+                          onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                          className="w-6 h-6 rounded-md bg-[#FAF7F2] hover:bg-[#EFE8D8] text-[#243119] flex items-center justify-center transition-colors cursor-pointer"
+                          aria-label="Diminuir"
+                        >
+                          <Minus size={12} />
+                        </button>
+                        <span className="text-xs font-sans font-semibold text-[#243119] px-2">
+                          {quantity}
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => setQuantity(quantity + 1)}
+                          className="w-6 h-6 rounded-md bg-[#FAF7F2] hover:bg-[#EFE8D8] text-[#243119] flex items-center justify-center transition-colors cursor-pointer"
+                          aria-label="Aumentar"
+                        >
+                          <Plus size={12} />
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* 4. FORMULÁRIO DE CAPTAÇÃO & ANIVERSÁRIO */}
                 <div className="space-y-3 pt-2 border-t border-[#243119]/10">
                   <span className="block text-[11px] uppercase tracking-[0.2em] font-sans font-semibold text-[#8C6D3B]">
-                    3. Os seus Dados para Agendamento
+                    4. Dados de Agendamento
                   </span>
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     {/* Nome Completo */}
                     <div>
                       <label className="block text-[10px] uppercase tracking-wider font-sans font-medium text-[#243119]/80 mb-1 flex items-center gap-1">
-                        <User size={12} className="text-[#8C6D3B]" />
+                        <User size={11} className="text-[#8C6D3B]" />
                         <span>Nome Completo *</span>
                       </label>
                       <input
                         type="text"
                         required
-                        placeholder="Ex: Maria Santos"
+                        placeholder="Seu nome completo"
                         value={clientName}
                         onChange={(e) => setClientName(e.target.value)}
                         className="w-full bg-white border border-[#243119]/15 rounded-xl px-3 py-2 text-xs text-[#243119] placeholder-[#243119]/35 focus:outline-none focus:border-[#C5A059] transition-all"
@@ -377,13 +455,13 @@ Gostaria de agendar a minha sessão privada com a Carolina Bravo.`;
                     {/* Email */}
                     <div>
                       <label className="block text-[10px] uppercase tracking-wider font-sans font-medium text-[#243119]/80 mb-1 flex items-center gap-1">
-                        <Mail size={12} className="text-[#8C6D3B]" />
+                        <Mail size={11} className="text-[#8C6D3B]" />
                         <span>Email *</span>
                       </label>
                       <input
                         type="email"
                         required
-                        placeholder="Ex: maria@email.com"
+                        placeholder="seu.email@exemplo.com"
                         value={clientEmail}
                         onChange={(e) => setClientEmail(e.target.value)}
                         className="w-full bg-white border border-[#243119]/15 rounded-xl px-3 py-2 text-xs text-[#243119] placeholder-[#243119]/35 focus:outline-none focus:border-[#C5A059] transition-all"
@@ -393,34 +471,34 @@ Gostaria de agendar a minha sessão privada com a Carolina Bravo.`;
                     {/* Contacto / WhatsApp */}
                     <div>
                       <label className="block text-[10px] uppercase tracking-wider font-sans font-medium text-[#243119]/80 mb-1 flex items-center gap-1">
-                        <Phone size={12} className="text-[#8C6D3B]" />
+                        <Phone size={11} className="text-[#8C6D3B]" />
                         <span>Contacto / WhatsApp *</span>
                       </label>
                       <input
                         type="tel"
                         required
-                        placeholder="Ex: +351 912 345 678"
+                        placeholder="+351 --- --- ---"
                         value={clientPhone}
                         onChange={(e) => setClientPhone(e.target.value)}
                         className="w-full bg-white border border-[#243119]/15 rounded-xl px-3 py-2 text-xs text-[#243119] placeholder-[#243119]/35 focus:outline-none focus:border-[#C5A059] transition-all"
                       />
                     </div>
 
-                    {/* Data de Aniversário (Dia / Mês) */}
+                    {/* Data de Aniversário */}
                     <div>
                       <label className="block text-[10px] uppercase tracking-wider font-sans font-medium text-[#243119]/80 mb-1 flex items-center gap-1">
-                        <Calendar size={12} className="text-[#8C6D3B]" />
-                        <span>Data de Aniversário (Dia/Mês)</span>
+                        <Calendar size={11} className="text-[#8C6D3B]" />
+                        <span>Data de Aniversário</span>
                       </label>
                       <input
                         type="text"
-                        placeholder="Ex: 14/10"
+                        placeholder="DD / MM"
                         value={clientBirthday}
                         onChange={(e) => setClientBirthday(e.target.value)}
                         className="w-full bg-white border border-[#243119]/15 rounded-xl px-3 py-2 text-xs text-[#243119] placeholder-[#243119]/35 focus:outline-none focus:border-[#C5A059] transition-all"
                       />
                       <span className="block text-[9px] text-[#8C6D3B] font-sans mt-0.5 italic">
-                        Para mimos e ofertas exclusivas no seu dia especial.
+                        Para mimá-la na sua data especial.
                       </span>
                     </div>
                   </div>
@@ -428,14 +506,14 @@ Gostaria de agendar a minha sessão privada com a Carolina Bravo.`;
                   {/* Notas do seu pedido / Ocasião especial */}
                   <div>
                     <label className="block text-[10px] uppercase tracking-wider font-sans font-medium text-[#243119]/80 mb-1">
-                      Notas do seu Pedido / Ocasião Especial (Opcional)
+                      Notas do Pedido / Ocasião Especial (Opcional)
                     </label>
                     <textarea
                       rows={2}
-                      placeholder="Ex: Peça para presente de aniversário em Outubro, tom neutro..."
+                      placeholder="Detalhes do seu pedido ou visão para a peça..."
                       value={customNotes}
                       onChange={(e) => setCustomNotes(e.target.value)}
-                      className="w-full bg-white border border-[#243119]/15 rounded-xl p-3 text-xs text-[#243119] placeholder-[#243119]/35 focus:outline-none focus:border-[#C5A059] transition-all resize-none"
+                      className="w-full bg-white border border-[#243119]/15 rounded-xl p-2.5 text-xs text-[#243119] placeholder-[#243119]/35 focus:outline-none focus:border-[#C5A059] transition-all resize-none"
                     />
                   </div>
                 </div>
@@ -444,26 +522,17 @@ Gostaria de agendar a minha sessão privada com a Carolina Bravo.`;
             )}
           </div>
 
-          {/* Footer CTA */}
+          {/* Footer CTA - Centered Noble Button */}
           {!bookingSuccess && (
-            <div className="pt-3 border-t border-[#243119]/10 shrink-0 flex flex-col sm:flex-row items-center justify-between gap-3">
-              <div className="text-left hidden sm:block">
-                <span className="block text-[10px] uppercase tracking-widest text-[#8C6D3B] font-semibold">
-                  M★BRAVO — Peças Feitas Sob Medida
-                </span>
-                <span className="text-[11px] text-[#243119]/70 font-serif italic">
-                  Envio do Passaporte para o WhatsApp oficial do Atelier.
-                </span>
-              </div>
-
+            <div className="pt-3 border-t border-[#243119]/10 shrink-0 flex items-center justify-center">
               <button
                 type="submit"
                 form="passaporte-form"
                 disabled={isSubmitting}
-                className="w-full sm:w-auto py-3.5 px-6 rounded-2xl bg-[#243119] hover:bg-[#1A2412] text-[#FAF8F5] font-sans text-xs uppercase tracking-[0.2em] font-semibold shadow-xs hover:shadow-md transition-all cursor-pointer flex items-center justify-center gap-2 border border-[#243119] active:scale-[0.99]"
+                className="w-full sm:w-auto py-3.5 px-8 rounded-full bg-[#243119] hover:bg-[#1A2412] text-[#FAF8F5] font-sans text-xs uppercase tracking-[0.2em] font-semibold shadow-xs hover:shadow-md transition-all cursor-pointer flex items-center justify-center gap-2.5 border border-[#243119] active:scale-[0.99]"
               >
-                <MessageCircle size={16} className="text-[#C5A059]" />
-                <span>{isSubmitting ? 'A ABRIR O WHATSAPP...' : 'RESERVAR SESSÃO & ENVIAR PASSAPORTE'}</span>
+                <MessageCircle size={15} className="text-[#C5A059]" />
+                <span>{isSubmitting ? 'A ABRIR WHATSAPP...' : 'SOLICITAR PASSAPORTE DE CO-CRIAÇÃO'}</span>
               </button>
             </div>
           )}
