@@ -5918,10 +5918,13 @@ const TestimonialsSection = () => {
             .then(data => {
                 if (Array.isArray(data) && data.length > 0) {
                     setReviews(data);
+                } else {
+                    setReviews([]);
                 }
             })
             .catch(err => {
                 console.warn('[TESTIMONIALS FETCH ERROR]', err);
+                setReviews([]);
             });
     }, []);
 
