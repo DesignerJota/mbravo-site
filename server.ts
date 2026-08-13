@@ -2566,14 +2566,6 @@ async function syncGoogleReviews() {
     }
 
     console.log(`[GOOGLE REVIEWS SYNC] Successfully synchronized ${insertedCount} new reviews into PostgreSQL.`);
-    
-    if (insertedCount > 0) {
-      const updatedResult = await dbPool.query(
-        `SELECT name, text, product, rating, created_at AS "createdAt" FROM testimonials ORDER BY id DESC LIMIT 100`
-      );
-      activeTestimonials = updatedResult.rows;
-      saveTestimonials(activeTestimonials);
-    }
   } catch (err: any) {
     console.warn("[GOOGLE REVIEWS SYNC WARN] Non-blocking Google Reviews sync issue:", err.message || err);
   }
@@ -2581,76 +2573,24 @@ async function syncGoogleReviews() {
 
 initDatabase();
 
-// Persistent file-backed Testimonials store (used as Level 3 fallback)
-const getTestimonialsFilePath = () => {
-  const railwayPersistentDir = "/app/data";
-  try {
-    if (!fs.existsSync(railwayPersistentDir)) {
-      fs.mkdirSync(railwayPersistentDir, { recursive: true });
-    }
-    return path.join(railwayPersistentDir, "testimonials.json");
-  } catch (e) {
-    return path.join(process.cwd(), "testimonials.json");
-  }
-};
-
-const TESTIMONIALS_FILE = getTestimonialsFilePath();
-
-function loadTestimonials(): any[] {
-  if (fs.existsSync(TESTIMONIALS_FILE)) {
-    try {
-      const data = JSON.parse(fs.readFileSync(TESTIMONIALS_FILE, 'utf8'));
-      if (Array.isArray(data) && data.length > 0) {
-        console.log(`[TESTIMONIALS DATABASE READ-ONLY BOOT] Loaded ${data.length} testimonials from persistent store (${TESTIMONIALS_FILE})`);
-        return data;
-      }
-    } catch (err) {
-      console.warn("[TESTIMONIALS DATABASE WARN] Failed to load testimonials.json", err);
-    }
-  }
-
-  const localFallbackPath = path.join(process.cwd(), "testimonials.json");
-  if (fs.existsSync(localFallbackPath)) {
-    try {
-      const localData = JSON.parse(fs.readFileSync(localFallbackPath, 'utf8'));
-      if (Array.isArray(localData) && localData.length > 0) return localData;
-    } catch (err) {
-      console.warn("[TESTIMONIALS DATABASE FALLBACK WARN]", err);
-    }
-  }
-
-  // Clean state: zero mock or fictitious reviews
-  return [];
-}
-
-function saveTestimonials(list: any[]) {
-  try {
-    fs.writeFileSync(TESTIMONIALS_FILE, JSON.stringify(list, null, 2), 'utf8');
-  } catch (err) {
-    console.warn("[TESTIMONIALS DATABASE WARN] Failed to save testimonials.json", err);
-  }
-}
-
-let activeTestimonials = loadTestimonials();
-
-// 3-Layer Enterprise High-Availability Testimonials Fetcher (Google Places New v1 + Legacy + DB/JSON)
-async function fetchTestimonials3Layers(): Promise<any[]> {
+// Native Google Places Reviews Fetcher (Google Places New v1 + Legacy)
+async function fetchGoogleReviews(): Promise<any[]> {
   let googleReviews: any[] = [];
   const apiKey = (process.env.GOOGLE_PLACES_API_KEY || process.env.GOOGLE_API_KEY || '').trim();
   const rawPlaceId = (process.env.GOOGLE_PLACE_ID || '').trim();
   const placeId = rawPlaceId.replace(/^places\//, '');
 
   if (!apiKey) {
-    console.warn("[TESTIMONIALS API WARN] GOOGLE_PLACES_API_KEY / GOOGLE_API_KEY is NOT set in process.env.");
+    console.warn("[GOOGLE REVIEWS WARN] GOOGLE_PLACES_API_KEY / GOOGLE_API_KEY is NOT configured in environment.");
   }
   if (!placeId) {
-    console.warn("[TESTIMONIALS API WARN] GOOGLE_PLACE_ID is NOT set in process.env.");
+    console.warn("[GOOGLE REVIEWS WARN] GOOGLE_PLACE_ID is NOT configured in environment.");
   }
 
   if (apiKey && placeId) {
-    // 1. Try Places API (New) v1 first with X-Goog-Api-Key and X-Goog-FieldMask + key query param
+    // 1. Try Places API (New) v1 first with X-Goog-Api-Key and X-Goog-FieldMask
     try {
-      console.log(`[TESTIMONIALS API] Calling Places API (New) v1 for Place ID: ${placeId}...`);
+      console.log(`[GOOGLE REVIEWS API] Fetching Places API (New) v1 for Place ID: ${placeId}...`);
       const newUrl = `https://places.googleapis.com/v1/places/${placeId}?key=${encodeURIComponent(apiKey)}`;
       const newRes = await fetch(newUrl, {
         headers: {
@@ -2661,102 +2601,80 @@ async function fetchTestimonials3Layers(): Promise<any[]> {
       });
       if (newRes.ok) {
         const newData: any = await newRes.json();
+        console.log(`[GOOGLE REVIEWS API v1 RESPONSE STATUS] 200 OK. Reviews count: ${newData.reviews?.length || 0}`);
         if (newData.reviews && Array.isArray(newData.reviews) && newData.reviews.length > 0) {
-          googleReviews = newData.reviews.map((r: any) => ({
+          googleReviews = newData.reviews.map((r: any, idx: number) => ({
+            id: r.name || `google-v1-${idx}`,
             name: r.authorAttribution?.displayName || "Cliente Google",
             text: r.text?.text || r.originalText?.text || "",
             product: "Avaliação Verificada Google",
             rating: r.rating ? parseInt(r.rating, 10) : 5,
             createdAt: r.publishTime || new Date().toISOString()
           })).filter((item: any) => item.text && item.text.trim().length > 0);
-          console.log(`[TESTIMONIALS API SUCCESS] Retrieved ${googleReviews.length} live reviews via Places API (New).`);
+          console.log(`[GOOGLE REVIEWS API SUCCESS] Extracted ${googleReviews.length} live reviews via Places API (New).`);
         } else {
-          console.log(`[TESTIMONIALS API INFO] Places API (New) returned 0 reviews in payload.`);
+          console.log(`[GOOGLE REVIEWS API INFO] Places API (New) v1 payload contained 0 reviews.`);
         }
       } else {
         const errBody = await newRes.text();
-        console.warn(`[TESTIMONIALS API WARN] Places API (New) HTTP ${newRes.status}: ${errBody}`);
+        console.warn(`[GOOGLE REVIEWS API WARN] Places API (New) v1 HTTP ${newRes.status}: ${errBody}`);
       }
     } catch (newErr: any) {
-      console.warn(`[TESTIMONIALS API WARN] Places API (New) fetch exception: ${newErr.message || newErr}`);
+      console.warn(`[GOOGLE REVIEWS API WARN] Places API (New) v1 fetch exception: ${newErr.message || newErr}`);
     }
 
-    // 2. Fallback to Legacy Places Details API if Places API (New) returned 0 reviews
+    // 2. Fallback to Legacy Places Details API if Places API (New) v1 returned 0 reviews
     if (googleReviews.length === 0) {
       try {
-        console.log(`[TESTIMONIALS API] Trying Google Places (Legacy) details API for Place ID: ${placeId}...`);
+        console.log(`[GOOGLE REVIEWS API] Trying Google Places (Legacy) details API for Place ID: ${placeId}...`);
         const url = `https://maps.googleapis.com/maps/api/place/details/json?place_id=${placeId}&fields=reviews,rating&key=${encodeURIComponent(apiKey)}&language=pt`;
         const response = await fetch(url);
         if (response.ok) {
           const data: any = await response.json();
+          console.log(`[GOOGLE REVIEWS API Legacy RESPONSE] Status: ${data.status}`);
           if (data.status === "OK" && data.result?.reviews?.length > 0) {
-            googleReviews = data.result.reviews.map((r: any) => ({
+            googleReviews = data.result.reviews.map((r: any, idx: number) => ({
+              id: r.time ? String(r.time) : `google-legacy-${idx}`,
               name: r.author_name || "Cliente Google",
               text: r.text || "",
               product: "Avaliação Verificada Google",
               rating: r.rating ? parseInt(r.rating, 10) : 5,
               createdAt: r.time ? new Date(r.time * 1000).toISOString() : new Date().toISOString()
             })).filter((item: any) => item.text && item.text.trim().length > 0);
-            console.log(`[TESTIMONIALS API SUCCESS] Retrieved ${googleReviews.length} live Google Places (Legacy) reviews.`);
+            console.log(`[GOOGLE REVIEWS API SUCCESS] Extracted ${googleReviews.length} live Google Places (Legacy) reviews.`);
           } else {
-            console.warn(`[TESTIMONIALS API WARN] Legacy Places API status: ${data.status} - ${data.error_message || 'No error message provided'}`);
+            console.warn(`[GOOGLE REVIEWS API WARN] Legacy Places API status: ${data.status} - ${data.error_message || 'No error message provided'}`);
           }
         } else {
-          console.warn(`[TESTIMONIALS API WARN] Legacy Places API HTTP status: ${response.status}`);
+          console.warn(`[GOOGLE REVIEWS API WARN] Legacy Places API HTTP status: ${response.status}`);
         }
       } catch (err: any) {
-        console.warn(`[TESTIMONIALS API WARN] Legacy Places API fetch exception: ${err.message || err}`);
+        console.warn(`[GOOGLE REVIEWS API WARN] Legacy Places API fetch exception: ${err.message || err}`);
       }
     }
   }
 
-  let dbReviews: any[] = [];
-  if (dbPool) {
-    try {
-      const result = await dbPool.query(
-        `SELECT name, text, product, rating, created_at AS "createdAt" FROM testimonials ORDER BY id DESC LIMIT 100`
-      );
-      if (result.rows && result.rows.length > 0) {
-        dbReviews = result.rows;
-      }
-    } catch (err: any) {
-      console.warn(`[TESTIMONIALS API WARN] PostgreSQL read issue: ${err.message || err}`);
-    }
-  }
-
-  if (dbReviews.length === 0) {
-    dbReviews = loadTestimonials();
-  }
-
-  if (googleReviews.length > 0) {
-    const combined = [...googleReviews, ...dbReviews];
-    const unique = combined.filter((rev, index, self) =>
-      index === self.findIndex((t) => t.text.trim() === rev.text.trim())
-    );
-    return unique;
-  }
-
-  return dbReviews;
+  // Strictly return real Google reviews or [] if none exist
+  return googleReviews;
 }
 
-// Testimonials Endpoints with 3-Layer HA Fallback Pattern
+// Endpoints for Google Reviews & Testimonials
 app.get("/api/testimonials", async (req, res) => {
   try {
-    const list = await fetchTestimonials3Layers();
+    const list = await fetchGoogleReviews();
     res.json(list);
   } catch (err: any) {
-    console.warn("[TESTIMONIALS API WARN] Safe fallback to empty list:", err.message || err);
+    console.warn("[TESTIMONIALS API WARN] Error fetching reviews, returning empty list:", err.message || err);
     res.json([]);
   }
 });
 
-// Explicit endpoint for Google Reviews API
 app.get("/api/google-reviews", async (req, res) => {
   try {
-    const list = await fetchTestimonials3Layers();
+    const list = await fetchGoogleReviews();
     res.json(list);
   } catch (err: any) {
-    console.warn("[GOOGLE REVIEWS API WARN] Safe fallback to empty list:", err.message || err);
+    console.warn("[GOOGLE REVIEWS API WARN] Error fetching reviews, returning empty list:", err.message || err);
     res.json([]);
   }
 });
@@ -2772,26 +2690,16 @@ app.post("/api/testimonials", async (req, res) => {
 
     if (dbPool) {
       try {
-        const result = await dbPool.query(
-          `INSERT INTO testimonials (name, text, product, rating) VALUES ($1, $2, $3, $4) RETURNING name, text, product, rating, created_at AS "createdAt"`,
+        await dbPool.query(
+          `INSERT INTO testimonials (name, text, product, rating) VALUES ($1, $2, $3, $4)`,
           [name, text, cleanProduct, cleanRating]
         );
-        return res.json({ success: true, testimonial: result.rows[0] });
       } catch (dbErr: any) {
-        console.warn("[DATABASE WRITE WARN] PostgreSQL write non-blocking issue. Persisting to Volume JSON fallback:", dbErr.message || dbErr);
+        console.warn("[DATABASE WRITE WARN] PostgreSQL write non-blocking issue:", dbErr.message || dbErr);
       }
     }
 
-    const testimonial = {
-      name,
-      text,
-      product: cleanProduct,
-      rating: cleanRating,
-      createdAt: new Date().toISOString()
-    };
-    activeTestimonials.unshift(testimonial);
-    saveTestimonials(activeTestimonials);
-    res.json({ success: true, testimonial });
+    res.json({ success: true, message: "Testimonial received." });
   } catch (err: any) {
     res.status(500).json({ error: err.message });
   }
