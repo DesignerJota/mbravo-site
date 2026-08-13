@@ -395,15 +395,14 @@ END:VCARD`;
       </main>
 
       {/* Footer Authenticity */}
-      <footer className="w-full max-w-md flex flex-col items-center gap-1.5 z-20 pb-2 mt-4">
-        <div className="flex items-center gap-2 text-[10px] uppercase tracking-[0.25em] font-sans font-medium text-[#8C6D3B] bg-white/80 py-1.5 px-4 rounded-full border border-[#C5A059]/30 shadow-2xs backdrop-blur-md">
-          <ShieldCheck size={12} className="text-[#8C6D3B]" />
+      <footer className="w-full max-w-md flex flex-col items-center justify-center text-center gap-1.5 z-20 pb-2 mt-4">
+        <div className="flex items-center justify-center gap-2 text-[10px] uppercase tracking-[0.25em] font-sans font-medium text-[#8C6D3B] bg-white/80 py-1.5 px-4 rounded-full border border-[#C5A059]/30 shadow-2xs backdrop-blur-md">
+          <ShieldCheck size={12} className="text-[#8C6D3B] shrink-0" />
           <span>M★BRAVO — Handmade in Portugal</span>
         </div>
-        <p className="text-[9px] font-sans uppercase tracking-[0.25em] text-[#243119]/50 flex items-center gap-1">
+        <p className="text-[9px] font-sans uppercase tracking-[0.25em] text-[#243119]/50 flex items-center justify-center gap-1.5 w-full text-center">
           <span>Created with time</span>
-          <span>•</span>
-          <Heart size={9} className="text-[#8C6D3B] inline fill-[#8C6D3B]" />
+          <Heart size={9} className="text-[#8C6D3B] inline fill-[#8C6D3B] shrink-0" />
         </p>
       </footer>
 
