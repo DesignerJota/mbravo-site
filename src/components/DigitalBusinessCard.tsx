@@ -5,7 +5,6 @@ import {
   Instagram, 
   Share2, 
   Check, 
-  Sparkles, 
   ArrowLeft, 
   ShieldCheck, 
   Heart, 
@@ -176,7 +175,7 @@ END:VCARD`;
       </svg>
 
       {/* Top Header Bar */}
-      <header className="w-full max-w-md flex items-center justify-between z-20 pt-2 mb-3">
+      <header className="w-full max-w-md flex items-center justify-between gap-2 z-20 pt-2 mb-3">
         <button
           onClick={() => {
             if (onNavigateHome) {
@@ -185,31 +184,20 @@ END:VCARD`;
               window.location.href = '/';
             }
           }}
-          className="inline-flex items-center gap-1.5 text-[11px] sm:text-xs uppercase tracking-[0.18em] font-sans font-medium text-[#243119]/80 hover:text-[#8C6D3B] transition-colors py-2 px-3.5 rounded-full bg-white/80 hover:bg-white backdrop-blur-md border border-[#243119]/10 shadow-xs cursor-pointer"
+          className="inline-flex items-center gap-1.5 text-[11px] sm:text-xs uppercase tracking-[0.18em] font-sans font-medium text-[#243119]/80 hover:text-[#8C6D3B] transition-colors py-2 px-3.5 rounded-full bg-white/80 hover:bg-white backdrop-blur-md border border-[#243119]/10 shadow-xs cursor-pointer whitespace-nowrap shrink-0"
         >
-          <ArrowLeft size={13} className="text-[#8C6D3B]" />
+          <ArrowLeft size={13} className="text-[#8C6D3B] shrink-0" />
           <span>Voltar ao site</span>
         </button>
 
-        <div className="flex items-center gap-2">
-          <button
-            onClick={() => setShowQrModal(true)}
-            className="inline-flex items-center gap-1.5 text-[11px] sm:text-xs uppercase tracking-[0.18em] font-sans font-medium text-[#8C6D3B] hover:text-[#243119] transition-colors py-2 px-3 rounded-full bg-[#C5A059]/15 hover:bg-[#C5A059]/30 backdrop-blur-md border border-[#C5A059]/40 cursor-pointer"
-            title="QR Code"
-          >
-            <QrCode size={13} className="text-[#8C6D3B]" />
-            <span>QR Code</span>
-          </button>
-
-          <button
-            onClick={handleShareCard}
-            className="inline-flex items-center gap-1.5 text-[11px] sm:text-xs uppercase tracking-[0.18em] font-sans font-medium text-[#243119]/80 hover:text-[#8C6D3B] transition-colors py-2 px-3 rounded-full bg-white/80 hover:bg-white backdrop-blur-md border border-[#243119]/10 shadow-xs cursor-pointer"
-            title="Partilhar"
-          >
-            <Share2 size={13} className="text-[#8C6D3B]" />
-            <span>{copied ? 'Copiado!' : 'Partilhar'}</span>
-          </button>
-        </div>
+        <button
+          onClick={() => setShowQrModal(true)}
+          className="inline-flex items-center gap-1.5 text-[11px] sm:text-xs uppercase tracking-[0.18em] font-sans font-medium text-[#8C6D3B] hover:text-[#243119] transition-colors py-2 px-3.5 rounded-full bg-[#C5A059]/15 hover:bg-[#C5A059]/30 backdrop-blur-md border border-[#C5A059]/40 cursor-pointer whitespace-nowrap shrink-0"
+          title="QR Code"
+        >
+          <QrCode size={13} className="text-[#8C6D3B] shrink-0" />
+          <span>QR Code</span>
+        </button>
       </header>
 
       {/* Main Digital Pass Content */}
@@ -273,7 +261,6 @@ END:VCARD`;
             <span className="font-serif italic text-base sm:text-lg font-medium">
               {vCardAdded ? 'Contacto Adicionado!' : 'Adicionar aos Contactos'}
             </span>
-            <Sparkles size={15} className="text-[#C5A059]" />
           </button>
         </motion.div>
 
@@ -293,7 +280,6 @@ END:VCARD`;
               Personalizar Peça (Passaporte)
             </span>
           </div>
-          <Sparkles size={16} className="text-[#8C6D3B] group-hover:rotate-12 transition-transform shrink-0" />
         </motion.button>
 
         {/* 3. GRELHA DUPLA (2 COLUNAS DE BLOCOS QUADRADOS) */}
@@ -444,13 +430,16 @@ END:VCARD`;
               {/* Title */}
               <div className="mt-2 mb-4">
                 <h2 
-                  style={{ fontFamily: "'Cormorant Garamond', serif" }}
-                  className="text-2xl sm:text-3xl font-serif text-[#243119] font-normal"
+                  style={{ fontFamily: "'Cormorant Garamond', serif", letterSpacing: '0.04em' }}
+                  className="text-3xl sm:text-4xl font-serif text-[#243119] font-normal leading-none"
                 >
-                  M★BRAVO | QR Code
+                  M<span className="text-[#8C6D3B] mx-0.5">★</span>BRAVO
                 </h2>
-                <p className="text-xs text-[#243119]/70 font-sans mt-1.5 max-w-[270px] mx-auto leading-relaxed">
-                  Aponta a câmara do telemóvel para aceder diretamente a este cartão digital.
+                <p className="text-xs uppercase tracking-[0.25em] font-sans font-semibold text-[#8C6D3B] mt-1.5">
+                  Cartão Digital
+                </p>
+                <p className="text-xs text-[#243119]/75 font-sans mt-2 max-w-[270px] mx-auto leading-relaxed">
+                  Aponte a câmara do telemóvel para aceder diretamente.
                 </p>
               </div>
 
