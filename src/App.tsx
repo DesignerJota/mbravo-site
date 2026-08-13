@@ -2309,13 +2309,15 @@ const StorySection = () => {
                         <div className="absolute inset-0 ring-1 ring-inset ring-forest/10 rounded-xl xs:rounded-2xl md:rounded-[2rem] lg:rounded-[2.5rem] z-20" />
                         
                         {/* Slide Indicators */}
-                        <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-2 z-20 bg-black/10 backdrop-blur-sm px-3 py-1.5 rounded-full">
+                        <div className="absolute bottom-3 sm:bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-1.5 z-20 p-1.5 rounded-full bg-black/20 backdrop-blur-xs border border-white/10 shadow-xs">
                             {storyImages.map((_, idx) => (
                                 <button 
                                     key={idx}
                                     onClick={() => setCurrentImg(idx)}
-                                    className={`h-1 rounded-full transition-all duration-500 cursor-pointer ${
-                                        currentImg === idx ? 'w-8 bg-cream' : 'w-1.5 bg-cream/40 hover:bg-cream/70'
+                                    className={`slider-dot w-1.5 h-1.5 rounded-full transition-all duration-300 cursor-pointer ${
+                                        currentImg === idx 
+                                            ? 'bg-[#C5A059] scale-110 shadow-[0_0_6px_rgba(197,160,89,0.9)]' 
+                                            : 'bg-white/40 hover:bg-white/80'
                                     }`}
                                     aria-label={`Show slide ${idx + 1}`}
                                 />
@@ -3542,7 +3544,7 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({ product: rawProduct,
                         </div>
 
                         {/* Pagination Indicator dots at bottom of viewing box */}
-                        <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-30 flex gap-2 bg-[#FCFBF9]/80 backdrop-blur-md px-4 py-2.5 rounded-full border border-forest/10">
+                        <div className="absolute bottom-3 sm:bottom-4 left-1/2 -translate-x-1/2 z-30 flex items-center gap-1.5 p-1.5 rounded-full bg-black/20 backdrop-blur-xs border border-white/10 shadow-xs">
                             {productImages.map((_, idx) => (
                                 <button
                                     key={idx}
@@ -3553,7 +3555,11 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({ product: rawProduct,
                                             setActiveImgIndex(idx);
                                         }
                                     }}
-                                    className={`h-1.5 rounded-full transition-all duration-300 ${idx === activeImgIndex ? 'w-5 bg-forest' : 'w-1.5 bg-forest/30 hover:bg-forest'}`}
+                                    className={`slider-dot w-1.5 h-1.5 rounded-full transition-all duration-300 cursor-pointer ${
+                                        idx === activeImgIndex 
+                                            ? 'bg-[#C5A059] scale-110 shadow-[0_0_6px_rgba(197,160,89,0.9)]' 
+                                            : 'bg-white/40 hover:bg-white/80'
+                                    }`}
                                     aria-label={lang === 'pt' ? `Ir para imagem ${idx + 1}` : `Go to image ${idx + 1}`}
                                 />
                             ))}
@@ -5587,7 +5593,12 @@ const InstagramSection = () => {
                                 whileInView={{ opacity: 1, y: 0 }}
                                 viewport={{ once: true }}
                                 transition={{ duration: 1.2, delay: idx * 0.1, ease: [0.16, 1, 0.3, 1] }}
-                                className={`${post.className} group block relative bg-white p-2.5 sm:p-3 pb-3 sm:pb-3.5 border border-forest/10 rounded-sm shadow-md hover:shadow-xl transition-all duration-500 ease-out flex flex-col justify-between`}
+                                style={{ 
+                                    containerType: 'inline-size',
+                                    padding: 'clamp(6px, 3.6cqw, 12px)',
+                                    paddingBottom: 'clamp(8px, 4.8cqw, 16px)'
+                                }}
+                                className={`${post.className} @container group block relative bg-white border border-forest/10 rounded-sm shadow-md hover:shadow-xl transition-all duration-500 ease-out flex flex-col justify-between`}
                             >
                                 {/* Photo Container with Uniform Frame Proportion */}
                                 <div className="w-full overflow-hidden relative aspect-square bg-forest/5 rounded-[1px]">
@@ -5600,36 +5611,71 @@ const InstagramSection = () => {
                                         style={{ imageRendering: 'crisp-edges' }}
                                     />
                                     {/* Overlay on Hover */}
-                                    <div className="absolute inset-0 bg-forest/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col items-center justify-center gap-2 text-cream z-10 p-2 text-center">
+                                    <div className="absolute inset-0 bg-forest/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col items-center justify-center gap-1.5 text-cream z-10 p-2 text-center">
                                         {post.likes !== undefined && post.likes !== null && String(post.likes).trim() !== '' ? (
-                                            <div className="flex items-center gap-1.5 text-sm font-sans font-medium">
-                                                <Heart size={16} fill="currentColor" className="text-cream" />
+                                            <div className="flex items-center gap-1 font-sans font-medium" style={{ fontSize: 'clamp(9px, 5cqw, 13px)' }}>
+                                                <Heart size={14} fill="currentColor" className="text-cream" style={{ width: 'clamp(10px, 5cqw, 14px)', height: 'clamp(10px, 5cqw, 14px)' }} />
                                                 <span>{post.likes}</span>
                                             </div>
                                         ) : null}
-                                        <div className="flex items-center gap-1.5 text-xs font-sans font-medium opacity-90 mt-1">
-                                            <Instagram size={14} className="text-cream" />
-                                            <span className="text-[9px] uppercase tracking-wider font-semibold">{t('instagram.feed.view_profile')}</span>
+                                        <div className="flex items-center gap-1 font-sans font-medium opacity-90 mt-0.5" style={{ fontSize: 'clamp(7px, 3.8cqw, 11px)' }}>
+                                            <Instagram size={12} className="text-cream" style={{ width: 'clamp(8px, 4cqw, 13px)', height: 'clamp(8px, 4cqw, 13px)' }} />
+                                            <span className="uppercase tracking-wider font-semibold">{t('instagram.feed.view_profile')}</span>
                                         </div>
                                     </div>
                                 </div>
 
-                                {/* Fine Gold Divider Line interrupted by hollow outline star */}
-                                <div className="mt-3 relative flex items-center justify-center select-none pointer-events-none">
-                                    <div className="h-[1px] bg-[#C5A059]/35 w-full" />
-                                    <span className="absolute bg-white px-1.5 text-[#C5A059] flex items-center justify-center">
-                                        <svg className="w-2.5 h-2.5 fill-none stroke-current" viewBox="0 0 24 24" strokeWidth="1.5">
-                                            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
-                                        </svg>
-                                    </span>
+                                {/* Fine Gold Divider Line with Centered Star ($--- \star ---$) */}
+                                <div 
+                                    className="flex items-center justify-center w-full select-none pointer-events-none"
+                                    style={{
+                                        marginTop: 'clamp(4px, 2.8cqw, 9px)',
+                                        marginBottom: 'clamp(2px, 1.6cqw, 5px)',
+                                        gap: 'clamp(3px, 2cqw, 7px)',
+                                        paddingLeft: 'clamp(1px, 1cqw, 4px)',
+                                        paddingRight: 'clamp(1px, 1cqw, 4px)'
+                                    }}
+                                >
+                                    <div className="h-[1px] bg-[#C5A059]/45 flex-1" />
+                                    <svg 
+                                        className="shrink-0 text-[#C5A059] fill-[#C5A059]/20 stroke-current" 
+                                        viewBox="0 0 24 24" 
+                                        strokeWidth="1.5"
+                                        style={{
+                                            width: 'clamp(7px, 4.2cqw, 11px)',
+                                            height: 'clamp(7px, 4.2cqw, 11px)'
+                                        }}
+                                    >
+                                        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+                                    </svg>
+                                    <div className="h-[1px] bg-[#C5A059]/45 flex-1" />
                                 </div>
 
-                                {/* Refined Polaroid Bottom Captions with Distinct Typography Scale for Small vs Large Cards */}
-                                <div className="mt-2 sm:mt-2.5 text-left flex items-center justify-between select-none pointer-events-none px-1 gap-1">
-                                    <span className={`font-mono text-[#C5A059] tracking-[0.18em] uppercase font-medium shrink-0 ${isWide ? 'text-[8.5px] sm:text-[9px] lg:text-[9.5px]' : 'text-[6.5px] sm:text-[7px] lg:text-[7.5px]'}`}>
+                                {/* Standardized Polaroid Bottom Captions with Container Query Width (cqw) Responsiveness */}
+                                <div 
+                                    className="flex items-center justify-between select-none pointer-events-none w-full gap-1"
+                                    style={{
+                                        paddingTop: 'clamp(1px, 0.8cqw, 3px)',
+                                        paddingBottom: 'clamp(1px, 0.8cqw, 3px)',
+                                        paddingLeft: 'clamp(1px, 0.8cqw, 4px)',
+                                        paddingRight: 'clamp(1px, 0.8cqw, 4px)'
+                                    }}
+                                >
+                                    <span 
+                                        style={{ 
+                                            fontSize: 'clamp(6.5px, 3.6cqw, 9.5px)',
+                                            letterSpacing: '0.12em'
+                                        }}
+                                        className="font-mono text-[#C5A059] uppercase font-bold text-left shrink-0 leading-none"
+                                    >
                                         M★BRAVO
                                     </span>
-                                    <span className={`font-serif italic text-forest/80 truncate text-right font-light ${isWide ? 'text-[11px] sm:text-[11.5px] lg:text-[12px] max-w-[70%]' : 'text-[7.5px] sm:text-[8px] lg:text-[8.5px] max-w-[62%]'}`}>
+                                    <span 
+                                        style={{ 
+                                            fontSize: 'clamp(7px, 4.0cqw, 10.5px)'
+                                        }}
+                                        className="font-serif italic text-forest/90 truncate text-right font-normal leading-none max-w-[68%]"
+                                    >
                                         {post.productName || post.alt || 'M★BRAVO Piece'}
                                     </span>
                                 </div>
@@ -6099,12 +6145,16 @@ const TestimonialsSection = () => {
                                 <ChevronLeft size={12} />
                             </button>
 
-                            <div className="flex items-center gap-1.5">
+                            <div className="flex items-center gap-1.5 p-1.5 rounded-full bg-forest/5 border border-forest/10 shadow-xs">
                                 {allItems.map((_, i) => (
                                     <button
                                         key={i}
                                         onClick={() => setActiveIndex(i)}
-                                        className={`h-1 rounded-full transition-all duration-300 ${i === activeIndex ? 'w-4 bg-[#C5A059]' : 'w-1.5 bg-forest/15 hover:bg-forest/30'}`}
+                                        className={`slider-dot w-1.5 h-1.5 rounded-full transition-all duration-300 cursor-pointer ${
+                                            i === activeIndex 
+                                                ? 'bg-[#C5A059] scale-110 shadow-[0_0_6px_rgba(197,160,89,0.9)]' 
+                                                : 'bg-forest/25 hover:bg-forest/50'
+                                        }`}
                                         aria-label={`Go to testimonial ${i + 1}`}
                                     />
                                 ))}
