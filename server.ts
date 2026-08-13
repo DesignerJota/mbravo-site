@@ -2758,7 +2758,7 @@ app.get("/api/instagram", async (req, res) => {
       img: 'https://i.ibb.co/mCmVm2rL/mockup-coosters-luxury-1.png',
       alt: 'Daisy Coasters M★BRAVO',
       productName: 'Daisy Coasters Set',
-      likes: '',
+      likes: '20',
       comments: '5',
       permalink: 'https://instagram.com/mbravobycarolina/'
     },
@@ -2767,7 +2767,7 @@ app.get("/api/instagram", async (req, res) => {
       img: 'https://i.ibb.co/NnCJyRTF/African-Flower-Pouch-10-1.png',
       alt: 'African Flower Pouch M★BRAVO',
       productName: 'African Flower Pouch',
-      likes: '',
+      likes: '17',
       comments: '12',
       permalink: 'https://instagram.com/mbravobycarolina/'
     },
@@ -2776,7 +2776,7 @@ app.get("/api/instagram", async (req, res) => {
       img: 'https://i.ibb.co/zWNCP5Nx/Stella-Cushion-7-1.png',
       alt: 'Stella Cushion M★BRAVO',
       productName: 'Stella Cushion',
-      likes: '',
+      likes: '34',
       comments: '9',
       permalink: 'https://instagram.com/mbravobycarolina/'
     },
@@ -2785,7 +2785,7 @@ app.get("/api/instagram", async (req, res) => {
       img: 'https://i.ibb.co/wNdC8NNG/Granny-square-sling-bag-20.png',
       alt: 'Granny Square Sling Bag M★BRAVO',
       productName: 'Granny Square Sling Bag',
-      likes: '',
+      likes: '17',
       comments: '8',
       permalink: 'https://instagram.com/mbravobycarolina/'
     },
@@ -2794,7 +2794,7 @@ app.get("/api/instagram", async (req, res) => {
       img: 'https://i.ibb.co/kVZvr34t/Sunflower-coasters-5.png',
       alt: 'Sunflower Coasters M★BRAVO',
       productName: 'Sunflower Coasters Set',
-      likes: '',
+      likes: '14',
       comments: '4',
       permalink: 'https://instagram.com/mbravobycarolina/'
     },
@@ -2803,7 +2803,7 @@ app.get("/api/instagram", async (req, res) => {
       img: 'https://i.ibb.co/VY1dx3nt/Mini-shell-Pouch.png',
       alt: 'Mini Shell Pouch M★BRAVO',
       productName: 'Mini Shell Pouch',
-      likes: '',
+      likes: '12',
       comments: '7',
       permalink: 'https://instagram.com/mbravobycarolina/'
     }
@@ -2828,8 +2828,10 @@ app.get("/api/instagram", async (req, res) => {
           if (!cleanedName || cleanedName.length > 35) {
             cleanedName = curatedFallback[idx % curatedFallback.length].productName;
           }
-          const rawLikes = post.likeCount ?? post.like_count ?? post.likes;
-          const cleanLikes = (rawLikes !== undefined && rawLikes !== null && String(rawLikes).trim() !== '' && String(rawLikes) !== '0') ? String(rawLikes) : '';
+          const rawLikes = post.likeCount ?? post.like_count ?? post.likes ?? post.likesCount;
+          const cleanLikes = (rawLikes !== undefined && rawLikes !== null && String(rawLikes).trim() !== '' && String(rawLikes) !== '0') 
+            ? String(rawLikes) 
+            : curatedFallback[idx % curatedFallback.length].likes;
           const rawComments = post.commentsCount ?? post.comments_count ?? post.comments;
           const cleanComments = (rawComments !== undefined && rawComments !== null && String(rawComments).trim() !== '') ? String(rawComments) : '';
 
