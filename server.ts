@@ -15,6 +15,7 @@ import {
   sendMultibancoEmails, 
   sendShippedEmails, 
   sendAtelierNotificationOnly, 
+  sendPassportNotificationEmails,
   generateShippedEmailHtml, 
   generateAdminEmailHtml, 
   generateCustomerEmailHtml, 
@@ -2386,31 +2387,49 @@ app.post("/api/private-studio/passports", (req, res) => {
   try {
     const { 
       clientName, 
+      clientEmail,
+      clientPhone,
+      clientBirthday,
       pieceType, 
+      productName,
       yarnPalette, 
+      colorName,
       primaryYarn, 
       secondaryYarn, 
       isBicolor, 
       hardware, 
       estimatedHours, 
       estimatedPrice, 
-      notes 
+      notes,
+      size,
+      quantity
     } = req.body;
     
     const passportId = `MB-PASS-${Math.floor(1000 + Math.random() * 9000)}`;
+    const finalClientName = sanitizeText(clientName) || 'Cliente M★BRAVO';
+    const finalProductName = sanitizeText(productName || pieceType) || 'Peça Sob Medida';
+    const finalColorName = sanitizeText(colorName || yarnPalette) || 'Tom Personalizado';
+
     const newPassport = {
       id: passportId,
       timestamp: new Date().toISOString(),
-      clientName: sanitizeText(clientName) || 'Cliente M★BRAVO',
-      pieceType: sanitizeText(pieceType) || 'Peça Sob Medida',
-      yarnPalette: sanitizeText(yarnPalette) || 'Cru Natural',
+      clientName: finalClientName,
+      clientEmail: sanitizeText(clientEmail) || '',
+      clientPhone: sanitizeText(clientPhone) || '',
+      clientBirthday: sanitizeText(clientBirthday) || '',
+      pieceType: finalProductName,
+      productName: finalProductName,
+      yarnPalette: finalColorName,
+      colorName: finalColorName,
       primaryYarn: sanitizeText(primaryYarn) || '',
       secondaryYarn: sanitizeText(secondaryYarn) || '',
       isBicolor: Boolean(isBicolor),
       hardware: sanitizeText(hardware) || 'Acabamento Padrão',
       estimatedHours: parseInt(estimatedHours) || 20,
       estimatedPrice: sanitizeText(estimatedPrice) || 'Consultar',
-      notes: sanitizeText(notes) || ''
+      notes: sanitizeText(notes) || '',
+      size: sanitizeText(size) || 'Por Medida',
+      quantity: parseInt(quantity) || 1
     };
 
     const currentList = loadPassports();
@@ -2423,6 +2442,24 @@ app.post("/api/private-studio/passports", (req, res) => {
       passportId,
       newPassport
     );
+
+    // Dispatch notification email to Carolina and confirmation receipt to client
+    try {
+      sendPassportNotificationEmails({
+        id: passportId,
+        clientName: newPassport.clientName,
+        clientEmail: newPassport.clientEmail,
+        clientPhone: newPassport.clientPhone,
+        clientBirthday: newPassport.clientBirthday,
+        productName: newPassport.productName,
+        colorName: newPassport.colorName,
+        size: newPassport.size,
+        quantity: newPassport.quantity,
+        notes: newPassport.notes
+      });
+    } catch (emailErr) {
+      console.warn("[PASSPORTE EMAIL WARN] Error dispatching emails:", emailErr);
+    }
 
     res.json({ success: true, passport: newPassport });
   } catch (error: any) {
