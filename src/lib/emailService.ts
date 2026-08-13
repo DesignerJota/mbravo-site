@@ -985,3 +985,170 @@ export function sendShippedEmails(order: OrderData, trackingCode: string): { shi
     shippedEmailUrl: `/emails/${custFileName}`
   };
 }
+
+/**
+ * Generates and dispatches notification & confirmation emails for new Passaporte de Co-Criação requests
+ */
+export function sendPassportNotificationEmails(passportData: {
+  id?: string;
+  clientName: string;
+  clientEmail?: string;
+  clientPhone?: string;
+  clientBirthday?: string;
+  productName: string;
+  productCategory?: string;
+  colorName: string;
+  size?: string;
+  quantity?: number | string;
+  notes?: string;
+}): { customerEmailUrl?: string; adminEmailUrl?: string } {
+  const passportId = passportData.id || `MB-PASS-${Math.floor(1000 + Math.random() * 9000)}`;
+  const clientName = passportData.clientName || 'Cliente M★BRAVO';
+  const clientEmail = passportData.clientEmail;
+  const clientPhone = passportData.clientPhone || 'Não especificado';
+  const clientBirthday = passportData.clientBirthday || 'Não especificado';
+  const productName = passportData.productName || 'Peça Sob Medida';
+  const productCategory = passportData.productCategory || 'Atelier M★BRAVO';
+  const colorName = passportData.colorName || 'Cor Personalizada';
+  const size = passportData.size || 'Por Medida';
+  const quantity = passportData.quantity || 1;
+  const notes = passportData.notes || 'Sem observações adicionais.';
+
+  // 1. Admin Email HTML Template
+  const adminHtml = `<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Novo Passaporte M★BRAVO - ${passportId}</title>
+</head>
+<body style="margin:0; padding:20px; background-color:#F5F2ED; color:#243119; font-family:'Georgia', serif;">
+  <div style="max-width:600px; margin:0 auto; background:#FCFBF9; border:1px solid #C5A059; border-radius:12px; padding:30px;">
+    <div style="text-align:center; border-bottom:1px solid #243119/10; padding-bottom:15px; margin-bottom:20px;">
+      <h1 style="font-size:22px; color:#243119; margin:0; letter-spacing:0.15em;">M★BRAVO</h1>
+      <span style="font-size:10px; text-transform:uppercase; color:#8C6D3B; letter-spacing:0.2em;">Novo Passaporte de Co-Criação</span>
+    </div>
+    
+    <div style="background-color:#EFE8D8; padding:15px; border-radius:8px; margin-bottom:20px;">
+      <p style="margin:0 0 5px 0; font-size:11px; text-transform:uppercase; color:#8C6D3B; font-weight:bold;">ID Passaporte: ${passportId}</p>
+      <p style="margin:0; font-size:16px; font-weight:bold; color:#243119;">Cliente: ${clientName}</p>
+    </div>
+
+    <table width="100%" cellpadding="8" cellspacing="0" style="border-collapse:collapse; font-size:13px; margin-bottom:20px;">
+      <tr style="border-bottom:1px dashed #C5A059/40;">
+        <td style="color:#8C6D3B; font-weight:bold;">Peça Selecionada:</td>
+        <td style="text-align:right; font-weight:bold;">${productName} (${productCategory})</td>
+      </tr>
+      <tr style="border-bottom:1px dashed #C5A059/40;">
+        <td style="color:#8C6D3B; font-weight:bold;">Tom / Cor:</td>
+        <td style="text-align:right;">${colorName}</td>
+      </tr>
+      <tr style="border-bottom:1px dashed #C5A059/40;">
+        <td style="color:#8C6D3B; font-weight:bold;">Tamanho / Escala:</td>
+        <td style="text-align:right;">${size}</td>
+      </tr>
+      <tr style="border-bottom:1px dashed #C5A059/40;">
+        <td style="color:#8C6D3B; font-weight:bold;">Quantidade:</td>
+        <td style="text-align:right;">${quantity}</td>
+      </tr>
+      <tr style="border-bottom:1px dashed #C5A059/40;">
+        <td style="color:#8C6D3B; font-weight:bold;">Email do Cliente:</td>
+        <td style="text-align:right;">${clientEmail || 'Não indicado'}</td>
+      </tr>
+      <tr style="border-bottom:1px dashed #C5A059/40;">
+        <td style="color:#8C6D3B; font-weight:bold;">Telemóvel / WhatsApp:</td>
+        <td style="text-align:right;">${clientPhone}</td>
+      </tr>
+      <tr style="border-bottom:1px dashed #C5A059/40;">
+        <td style="color:#8C6D3B; font-weight:bold;">Data Aniversário:</td>
+        <td style="text-align:right;">${clientBirthday}</td>
+      </tr>
+    </table>
+
+    <div style="background:#FAF8F5; border-left:3px solid #8C6D3B; padding:12px; font-size:12px; color:#243119; font-style:italic; margin-bottom:20px;">
+      <strong>Visão / Observações do Cliente:</strong><br>
+      "${notes}"
+    </div>
+
+    <div style="text-align:center; font-size:10px; color:#8C6D3B; uppercase; letter-spacing:0.15em;">
+      M★BRAVO ATELIER &bull; SISTEMA DE GESTÃO DE PASSAPORTES
+    </div>
+  </div>
+</body>
+</html>`;
+
+  // 2. Customer Email HTML Template
+  const customerHtml = `<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Comprovativo de Passaporte - M★BRAVO</title>
+</head>
+<body style="margin:0; padding:20px; background-color:#F5F2ED; color:#243119; font-family:'Georgia', serif;">
+  <div style="max-width:600px; margin:0 auto; background:#FCFBF9; border:1px solid #C5A059; border-radius:12px; padding:30px;">
+    <div style="text-align:center; border-bottom:1px solid #243119/10; padding-bottom:15px; margin-bottom:20px;">
+      <h1 style="font-size:24px; color:#243119; margin:0; letter-spacing:0.2em;">M★BRAVO</h1>
+      <span style="font-size:10px; text-transform:uppercase; color:#8C6D3B; letter-spacing:0.25em;">Passaporte de Co-Criação</span>
+    </div>
+
+    <p style="font-size:15px; font-style:italic; text-align:center; color:#243119; margin-bottom:25px;">
+      Olá, ${clientName}.<br>O seu Passaporte de Co-Criação foi registado com sucesso!
+    </p>
+
+    <p style="font-size:13px; line-height:1.7; color:#243119/80; text-align:justify; margin-bottom:25px;">
+      Agradecemos a sua preferência. A Carolina analisará as suas especificações e entrará em contacto muito em breve para dar início ao processo de co-criação da sua peça exclusiva M★BRAVO.
+    </p>
+
+    <div style="background-color:#FAF8F5; border:1px solid #C5A059/30; border-radius:10px; padding:20px; margin-bottom:25px;">
+      <h2 style="font-size:11px; text-transform:uppercase; letter-spacing:0.2em; color:#8C6D3B; margin:0 0 15px 0;">Resumo da Co-Criação (${passportId})</h2>
+      <ul style="list-style:none; padding:0; margin:0; font-size:13px; line-height:1.8; color:#243119;">
+        <li><strong>Peça Escolhida:</strong> ${productName}</li>
+        <li><strong>Tom Selecionado:</strong> ${colorName}</li>
+        <li><strong>Tamanho / Escala:</strong> ${size}</li>
+        <li><strong>Quantidade:</strong> ${quantity}</li>
+        ${clientBirthday !== 'Não especificado' ? `<li><strong>Aniversário:</strong> ${clientBirthday}</li>` : ''}
+      </ul>
+    </div>
+
+    <div style="text-align:center; font-size:10px; text-transform:uppercase; letter-spacing:0.2em; color:#243119/50;">
+      M★BRAVO &bull; CREATED WITH TIME
+    </div>
+  </div>
+</body>
+</html>`;
+
+  const publicEmailsDir = path.join(process.cwd(), 'public', 'emails');
+  if (!fs.existsSync(publicEmailsDir)) {
+    fs.mkdirSync(publicEmailsDir, { recursive: true });
+  }
+
+  const adminFileName = `passport-admin-${passportId}.html`;
+  const custFileName = `passport-customer-${passportId}.html`;
+  fs.writeFileSync(path.join(publicEmailsDir, adminFileName), adminHtml, 'utf-8');
+  fs.writeFileSync(path.join(publicEmailsDir, custFileName), customerHtml, 'utf-8');
+
+  const notifyEmail = process.env.NOTIFICATION_EMAIL || 'handmade.mbravo@gmail.com';
+  const resendKey = process.env.RESEND_API_KEY && 
+                    process.env.RESEND_API_KEY !== "" && 
+                    !process.env.RESEND_API_KEY.includes("INSERT_") &&
+                    !process.env.RESEND_API_KEY.includes("YOUR_");
+
+  if (resendKey) {
+    // 1. Send Admin Notification Email
+    sendViaResend(process.env.RESEND_API_KEY!, notifyEmail, `✦ Novo Passaporte de Co-Criação M★BRAVO: ${clientName} - ${productName}`, adminHtml, ['encomendas@mbravobycarolina.com'])
+      .then(() => console.log(`[PASSAPORTE EMAIL SYSTEM] Admin email sent via Resend for ${passportId}`))
+      .catch(err => console.warn(`[PASSAPORTE EMAIL WARN] Resend admin fail:`, err.message));
+
+    // 2. Send Customer Confirmation Email if email provided
+    if (clientEmail && clientEmail.includes('@')) {
+      sendViaResend(process.env.RESEND_API_KEY!, clientEmail, `M★BRAVO | Comprovativo do seu Passaporte de Co-Criação - ${passportId}`, customerHtml)
+        .then(() => console.log(`[PASSAPORTE EMAIL SYSTEM] Customer confirmation email sent via Resend to ${clientEmail}`))
+        .catch(err => console.warn(`[PASSAPORTE EMAIL WARN] Resend customer fail:`, err.message));
+    }
+  }
+
+  return {
+    adminEmailUrl: `/emails/${adminFileName}`,
+    customerEmailUrl: `/emails/${custFileName}`
+  };
+}
+
