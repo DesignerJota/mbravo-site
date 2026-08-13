@@ -2588,15 +2588,16 @@ async function fetchGoogleReviews(): Promise<any[]> {
   }
 
   if (apiKey && placeId) {
-    // 1. Try Places API (New) v1 first with X-Goog-Api-Key and X-Goog-FieldMask
+    // 1. Try Places API (New) v1 with English & Multi-Language headers to catch all reviews (e.g. English, Portuguese)
     try {
       console.log(`[GOOGLE REVIEWS API] Fetching Places API (New) v1 for Place ID: ${placeId}...`);
-      const newUrl = `https://places.googleapis.com/v1/places/${placeId}?key=${encodeURIComponent(apiKey)}`;
+      const newUrl = `https://places.googleapis.com/v1/places/${placeId}?key=${encodeURIComponent(apiKey)}&languageCode=en`;
       const newRes = await fetch(newUrl, {
         headers: {
           'X-Goog-Api-Key': apiKey,
           'X-Goog-FieldMask': 'reviews,rating,userRatingCount,displayName',
-          'Accept-Language': 'pt-PT,pt;q=0.9'
+          'X-Goog-Request-Params': 'languageCode=en-US',
+          'Accept-Language': 'en-US,en;q=0.9,pt-PT;q=0.8,pt;q=0.7,*;q=0.5'
         }
       });
       if (newRes.ok) {
@@ -2606,14 +2607,14 @@ async function fetchGoogleReviews(): Promise<any[]> {
           googleReviews = newData.reviews.map((r: any, idx: number) => ({
             id: r.name || `google-v1-${idx}`,
             name: r.authorAttribution?.displayName || "Cliente Google",
-            text: r.text?.text || r.originalText?.text || "",
+            text: r.text?.text || r.originalText?.text || (typeof r.text === 'string' ? r.text : ""),
             product: "Avaliação Verificada Google",
             rating: r.rating ? parseInt(r.rating, 10) : 5,
             createdAt: r.publishTime || new Date().toISOString()
           })).filter((item: any) => item.text && item.text.trim().length > 0);
           console.log(`[GOOGLE REVIEWS API SUCCESS] Extracted ${googleReviews.length} live reviews via Places API (New).`);
         } else {
-          console.log(`[GOOGLE REVIEWS API INFO] Places API (New) v1 payload contained 0 reviews.`);
+          console.log(`[GOOGLE REVIEWS API INFO] Places API (New) v1 with languageCode=en returned 0 reviews.`);
         }
       } else {
         const errBody = await newRes.text();
@@ -2623,11 +2624,42 @@ async function fetchGoogleReviews(): Promise<any[]> {
       console.warn(`[GOOGLE REVIEWS API WARN] Places API (New) v1 fetch exception: ${newErr.message || newErr}`);
     }
 
-    // 2. Fallback to Legacy Places Details API if Places API (New) v1 returned 0 reviews
+    // 1b. If 0 reviews returned, try Places API (New) v1 without language parameter
+    if (googleReviews.length === 0) {
+      try {
+        console.log(`[GOOGLE REVIEWS API] Trying Places API (New) v1 without language restrictions...`);
+        const unconstrainedUrl = `https://places.googleapis.com/v1/places/${placeId}?key=${encodeURIComponent(apiKey)}`;
+        const unconstrainedRes = await fetch(unconstrainedUrl, {
+          headers: {
+            'X-Goog-Api-Key': apiKey,
+            'X-Goog-FieldMask': 'reviews,rating,userRatingCount,displayName',
+            'Accept-Language': '*'
+          }
+        });
+        if (unconstrainedRes.ok) {
+          const unconstrainedData: any = await unconstrainedRes.json();
+          if (unconstrainedData.reviews && Array.isArray(unconstrainedData.reviews) && unconstrainedData.reviews.length > 0) {
+            googleReviews = unconstrainedData.reviews.map((r: any, idx: number) => ({
+              id: r.name || `google-v1-unconstrained-${idx}`,
+              name: r.authorAttribution?.displayName || "Cliente Google",
+              text: r.text?.text || r.originalText?.text || (typeof r.text === 'string' ? r.text : ""),
+              product: "Avaliação Verificada Google",
+              rating: r.rating ? parseInt(r.rating, 10) : 5,
+              createdAt: r.publishTime || new Date().toISOString()
+            })).filter((item: any) => item.text && item.text.trim().length > 0);
+            console.log(`[GOOGLE REVIEWS API SUCCESS] Extracted ${googleReviews.length} live reviews via Places API (New) unconstrained.`);
+          }
+        }
+      } catch (err: any) {
+        console.warn(`[GOOGLE REVIEWS API WARN] Places API (New) unconstrained exception: ${err.message || err}`);
+      }
+    }
+
+    // 2. Fallback to Legacy Places Details API without language restriction if v1 returned 0 reviews
     if (googleReviews.length === 0) {
       try {
         console.log(`[GOOGLE REVIEWS API] Trying Google Places (Legacy) details API for Place ID: ${placeId}...`);
-        const url = `https://maps.googleapis.com/maps/api/place/details/json?place_id=${placeId}&fields=reviews,rating&key=${encodeURIComponent(apiKey)}&language=pt`;
+        const url = `https://maps.googleapis.com/maps/api/place/details/json?place_id=${placeId}&fields=reviews,rating&key=${encodeURIComponent(apiKey)}`;
         const response = await fetch(url);
         if (response.ok) {
           const data: any = await response.json();
@@ -2652,6 +2684,11 @@ async function fetchGoogleReviews(): Promise<any[]> {
         console.warn(`[GOOGLE REVIEWS API WARN] Legacy Places API fetch exception: ${err.message || err}`);
       }
     }
+  }
+
+  // Sort reviews chronologically (newest first)
+  if (googleReviews.length > 0) {
+    googleReviews.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
   }
 
   // Strictly return real Google reviews or [] if none exist
@@ -2707,8 +2744,14 @@ app.post("/api/testimonials", async (req, res) => {
 
 // Endpoint: Instagram feed via Behold API with fallback
 app.get("/api/instagram", async (req, res) => {
-  const feedId = process.env.BEHOLD_FEED_ID || process.env.VITE_BEHOLD_WIDGET_ID || "bsBrFKD7BzlZyS6ABOlJ";
+  const rawFeedId = process.env.BEHOLD_FEED_ID || process.env.VITE_BEHOLD_WIDGET_ID || "bsBrFKD7BzlZyS6ABOlJ";
   
+  // Defensive extraction: strip domain if full Behold URL was pasted into environment variable
+  const feedId = rawFeedId
+    .replace(/^https?:\/\/(www\.)?behold\.so\/(w\/)?/, '')
+    .replace(/^https?:\/\/feeds\.behold\.so\//, '')
+    .trim();
+
   const curatedFallback = [
     {
       id: "1",
@@ -2767,14 +2810,17 @@ app.get("/api/instagram", async (req, res) => {
   ];
 
   try {
+    console.log(`[INSTAGRAM BEHOLD API] Requesting Behold feed for ID: "${feedId}"...`);
     const beholdRes = await fetch(`https://feeds.behold.so/${feedId}`, {
       headers: { 'Accept': 'application/json' }
     });
     
     if (beholdRes.ok) {
       const data = await beholdRes.json();
-      const rawPosts = Array.isArray(data) ? data : (Array.isArray(data?.posts) ? data.posts : []);
+      const rawPosts = Array.isArray(data) ? data : (Array.isArray(data?.posts) ? data.posts : (Array.isArray(data?.data) ? data.data : []));
       
+      console.log(`[INSTAGRAM BEHOLD API SUCCESS] Status 200. Retreived ${rawPosts.length} raw posts from Behold.`);
+
       if (rawPosts.length > 0) {
         const formatted = rawPosts.slice(0, 6).map((post: any, idx: number) => {
           const rawCaption = post.caption || '';
@@ -2787,9 +2833,18 @@ app.get("/api/instagram", async (req, res) => {
           const rawComments = post.commentsCount ?? post.comments_count ?? post.comments;
           const cleanComments = (rawComments !== undefined && rawComments !== null && String(rawComments).trim() !== '') ? String(rawComments) : '';
 
+          const mediaUrl = post.sizes?.large?.mediaUrl || 
+                           post.sizes?.medium?.mediaUrl || 
+                           post.sizes?.small?.mediaUrl || 
+                           post.mediaUrl || 
+                           post.thumbnailUrl || 
+                           post.displayUrl || 
+                           post.children?.[0]?.mediaUrl || 
+                           curatedFallback[idx % curatedFallback.length].img;
+
           return {
             id: post.id || String(idx + 1),
-            img: post.sizes?.medium?.mediaUrl || post.mediaUrl || post.thumbnailUrl || curatedFallback[idx % curatedFallback.length].img,
+            img: mediaUrl,
             alt: `${cleanedName} M★BRAVO`,
             productName: cleanedName,
             likes: cleanLikes,
@@ -2799,10 +2854,15 @@ app.get("/api/instagram", async (req, res) => {
         });
         return res.json(formatted);
       }
+    } else {
+      const errText = await beholdRes.text();
+      console.warn(`[INSTAGRAM BEHOLD API WARN] Behold returned HTTP ${beholdRes.status} for feed ID "${feedId}": ${errText}`);
     }
+
+    console.log(`[INSTAGRAM BEHOLD API INFO] Returning curated fallback posts.`);
     return res.json(curatedFallback);
-  } catch (err) {
-    console.warn('[INSTAGRAM BEHOLD API WARN] Fallback to curated Instagram posts:', err);
+  } catch (err: any) {
+    console.warn('[INSTAGRAM BEHOLD API WARN] Exception while fetching Behold feed:', err.message || err);
     return res.json(curatedFallback);
   }
 });
