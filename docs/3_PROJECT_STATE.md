@@ -616,12 +616,13 @@ Para que o repositório no GitHub fique 100% sincronizado com a versão final de
         - **Dock Horizontal de Redes (Estilo iOS Dock):** Barra horizontal flutuante no rodapé contendo unicamente os ícones oficiais minimalistas do WhatsApp, Instagram, Pinterest e Google Maps/Avaliações, com pílula discreta de partilha.
         - **Modal QR Code Minimalista de Luxo:** Redefinido com título principal "M★BRAVO" em tipografia serifada, subtítulo "Cartão Digital" e instrução discreta "Aponte a câmara do telemóvel para aceder diretamente." com botão de cópia de link.
         - **Alinhamento do Rodapé:** Ajustado a centralização de "CREATED WITH TIME ♥" no fundo da página para que o texto e o coração fiquem perfeitamente alinhados.
-        - **Reformulação Editorial do Modal "Passaporte de Co-Criação" (`AtelierPrivateStudioModal.tsx`):** Redesenho completo do modal do Atelier para a estética "Editorial Premium/Minimalista" (#FAF7F2, tipografia limpa, sem grelhas escuras ou calculadoras densas). Apresenta:
-          * Cabeçalho: Título "Passaporte de Co-Criação" | Subtítulo "M★BRAVO Atelier".
-          * Seleção de Peça: Escolha do produto no catálogo com visualização de **1 FOTO DE DESTAQUE** em tempo real da peça selecionada.
-          * Opções Básicas de Algodão Virgem: Escolha limpa de tons do fio DROPS Safran/Paris.
-          * Formulário de Captação & Aniversário: Recolha de Nome Completo, Email, Contacto/WhatsApp, Data de Aniversário (para mimos exclusivos) e Notas da Ocasião.
-          * Botão "Reservar Sessão & Enviar Passaporte": Regista a lead no backend/storage e abre o WhatsApp com os dados estruturados do Passaporte.
+        - **Reformulação Editorial do Modal "Passaporte de Co-Criação" (`AtelierPrivateStudioModal.tsx`):** Redesenho completo para o padrão "Luxury Editorial Minimalist" (#FAF7F2, tipografia serifada nobre, sem códigos de fornecedor nem poluição visual):
+          * Cabeçalho Simplificado: Título "Passaporte de Co-Criação" | Subtítulo "M★BRAVO Atelier" (sem textos explicativos densos).
+          * Nomes de Produtos Limpos: 'Cardigan Alma', 'Mala Sling', 'Pouch Mini', 'Poncho Couture', 'Almofada Atelier', 'Porta-Copos' (removidos os códigos técnicos como V1/V2C).
+          * Swatches Circulares de Algodão: Exibição elegante em círculos com o nome do tom por baixo, 4 cores principais visíveis e botão inline "+ Outras Cores da Paleta" (sem referências a marcas de fio).
+          * Campos de Especificações da Peça: Adicionada a seleção de Tamanho / Escala ('Único', 'S-M', 'L-XL', 'Por Medida') e seletor de Quantidade numérico (- 1 +).
+          * Formulário de Captação & Aniversário Polido: Placeholders genéricos e elegantes ("Seu nome completo", "seu.email@exemplo.com", "+351 --- --- ---", "DD / MM" com nota *"Para mimá-la na sua data especial"* e "Detalhes do seu pedido ou visão para a peça...").
+          * Fecho e Botão Nobre Centrado: Removida a caixa verde à esquerda. Botão centrado com proporções nobres "SOLICITAR PASSAPORTE DE CO-CRIAÇÃO", enviando os dados formatados diretamente para o WhatsApp do Atelier (+351 912 828 182) e registando a lead no backend/localStorage.
     *   **Estabilização de Rede PostgreSQL e DNS IPv4:** Inserida a instrução `dns.setDefaultResultOrder('ipv4first')` no topo do `server.ts`, forçando a resolução IPv4 antes do IPv6 para eliminar os erros de ligação `connect ENETUNREACH` no ambiente Cloud/Railway ao comunicar com a base de dados.
 
 ### B. Roteiro Técnico de Otimização Mobile & iOS WebKit (Meta: PageSpeed >90 - FASE 1 CONCLUÍDA):
