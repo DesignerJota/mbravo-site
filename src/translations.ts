@@ -353,22 +353,7 @@ export const translations = {
     "testimonials.label_text": "O seu Comentário",
     "testimonials.label_product": "Peça Adquirida (ex: Mala Daisy)",
     "testimonials.submit_button": "Publicar Testemunho",
-    "testimonials.success_message": "Muito obrigado! O seu testemunho foi adicionado com sucesso.",
-    "testimonial.1.name": "Maria S.",
-    "testimonial.1.text": "A mala Daisy é ainda mais bonita ao vivo... O trabalho e o detalhe das flores de crochet são admiráveis, nota-se o amor em cada linha.",
-    "testimonial.1.product": "Mala Daisy",
-    "testimonial.2.name": "Carolina P.",
-    "testimonial.2.text": "Os coasters dão um toque único à mesa. São super delicados, mas nota-se logo a excelente qualidade do material.",
-    "testimonial.2.product": "Daisy Coasters",
-    "testimonial.3.name": "Emma W.",
-    "testimonial.3.text": "A mala Granny Square superou todas as minhas expectativas. É lindíssima, super robusta e cabe perfeitamente tudo o que preciso no dia a dia.",
-    "testimonial.3.product": "Mala Granny Square",
-    "testimonial.4.name": "Joana R.",
-    "testimonial.4.text": "Comprei o biquíni Marea e o caimento é impecável. A minúcia do trabalho manual e o toque do algodão orgânico são indescritíveis.",
-    "testimonial.4.product": "Marea Bikini Set",
-    "testimonial.5.name": "Teresa B.",
-    "testimonial.5.text": "O cardigan Alma é uma peça intemporal de um conforto absoluto. Recebo elogios sempre que o uso, uma verdadeira obra de arte!",
-    "testimonial.5.product": "Alma Cardigan"
+    "testimonials.success_message": "Muito obrigado! O seu testemunho foi adicionado com sucesso."
   },
   en: {
     "brand.slogan": "Every stitch holds a memory.",
@@ -582,22 +567,7 @@ export const translations = {
     "testimonials.label_text": "Your Comment",
     "testimonials.label_product": "Purchased Piece (e.g. Mala Daisy)",
     "testimonials.submit_button": "Publish Testimonial",
-    "testimonials.success_message": "Thank you very much! Your testimonial was successfully added.",
-    "testimonial.1.name": "Maria S.",
-    "testimonial.1.text": "The Daisy bag is even more beautiful in person... The craftsmanship and detail of the crochet flowers are admirable, you can feel the love in every thread.",
-    "testimonial.1.product": "Mala Daisy",
-    "testimonial.2.name": "Carolina P.",
-    "testimonial.2.text": "The coasters add a unique touch to the table. They are super delicate, but you can immediately feel the excellent quality of the material.",
-    "testimonial.2.product": "Daisy Coasters",
-    "testimonial.3.name": "Emma W.",
-    "testimonial.3.text": "The Granny Square bag exceeded all my expectations. It's gorgeous, super robust, and perfectly fits everything I need for daily life.",
-    "testimonial.3.product": "Mala Granny Square",
-    "testimonial.4.name": "Joana R.",
-    "testimonial.4.text": "I bought the Marea bikini and the fit is impeccable. The detail of the handcrafting and the soft touch of organic cotton are indescribable.",
-    "testimonial.4.product": "Marea Bikini Set",
-    "testimonial.5.name": "Teresa B.",
-    "testimonial.5.text": "The Alma cardigan is a timeless piece of absolute comfort. I get compliments every time I wear it, a true work of art!",
-    "testimonial.5.product": "Alma Cardigan"
+    "testimonials.success_message": "Thank you very much! Your testimonial was successfully added."
   }
 };
 
