@@ -2636,8 +2636,9 @@ let activeTestimonials = loadTestimonials();
 // 3-Layer Enterprise High-Availability Testimonials Fetcher (Google Places New v1 + Legacy + DB/JSON)
 async function fetchTestimonials3Layers(): Promise<any[]> {
   let googleReviews: any[] = [];
-  const apiKey = process.env.GOOGLE_PLACES_API_KEY || process.env.GOOGLE_API_KEY;
-  const placeId = process.env.GOOGLE_PLACE_ID;
+  const apiKey = (process.env.GOOGLE_PLACES_API_KEY || process.env.GOOGLE_API_KEY || '').trim();
+  const rawPlaceId = (process.env.GOOGLE_PLACE_ID || '').trim();
+  const placeId = rawPlaceId.replace(/^places\//, '');
 
   if (!apiKey) {
     console.warn("[TESTIMONIALS API WARN] GOOGLE_PLACES_API_KEY / GOOGLE_API_KEY is NOT set in process.env.");
@@ -2647,10 +2648,10 @@ async function fetchTestimonials3Layers(): Promise<any[]> {
   }
 
   if (apiKey && placeId) {
-    // 1. Try Places API (New) v1 first
+    // 1. Try Places API (New) v1 first with X-Goog-Api-Key and X-Goog-FieldMask + key query param
     try {
       console.log(`[TESTIMONIALS API] Calling Places API (New) v1 for Place ID: ${placeId}...`);
-      const newUrl = `https://places.googleapis.com/v1/places/${placeId}`;
+      const newUrl = `https://places.googleapis.com/v1/places/${placeId}?key=${encodeURIComponent(apiKey)}`;
       const newRes = await fetch(newUrl, {
         headers: {
           'X-Goog-Api-Key': apiKey,
@@ -2684,7 +2685,7 @@ async function fetchTestimonials3Layers(): Promise<any[]> {
     if (googleReviews.length === 0) {
       try {
         console.log(`[TESTIMONIALS API] Trying Google Places (Legacy) details API for Place ID: ${placeId}...`);
-        const url = `https://maps.googleapis.com/maps/api/place/details/json?place_id=${placeId}&fields=reviews,rating,user_ratings_total&key=${apiKey}&language=pt`;
+        const url = `https://maps.googleapis.com/maps/api/place/details/json?place_id=${placeId}&fields=reviews,rating&key=${encodeURIComponent(apiKey)}&language=pt`;
         const response = await fetch(url);
         if (response.ok) {
           const data: any = await response.json();
@@ -2744,8 +2745,8 @@ app.get("/api/testimonials", async (req, res) => {
     const list = await fetchTestimonials3Layers();
     res.json(list);
   } catch (err: any) {
-    console.warn("[TESTIMONIALS API WARN] Safe fallback to local memory:", err.message || err);
-    res.json(activeTestimonials);
+    console.warn("[TESTIMONIALS API WARN] Safe fallback to empty list:", err.message || err);
+    res.json([]);
   }
 });
 
@@ -2755,8 +2756,8 @@ app.get("/api/google-reviews", async (req, res) => {
     const list = await fetchTestimonials3Layers();
     res.json(list);
   } catch (err: any) {
-    console.warn("[GOOGLE REVIEWS API WARN] Safe fallback to local memory:", err.message || err);
-    res.json(activeTestimonials);
+    console.warn("[GOOGLE REVIEWS API WARN] Safe fallback to empty list:", err.message || err);
+    res.json([]);
   }
 });
 
@@ -2806,7 +2807,7 @@ app.get("/api/instagram", async (req, res) => {
       img: 'https://i.ibb.co/mCmVm2rL/mockup-coosters-luxury-1.png',
       alt: 'Daisy Coasters M★BRAVO',
       productName: 'Daisy Coasters Set',
-      likes: '68',
+      likes: '',
       comments: '5',
       permalink: 'https://instagram.com/mbravobycarolina/'
     },
@@ -2815,7 +2816,7 @@ app.get("/api/instagram", async (req, res) => {
       img: 'https://i.ibb.co/NnCJyRTF/African-Flower-Pouch-10-1.png',
       alt: 'African Flower Pouch M★BRAVO',
       productName: 'African Flower Pouch',
-      likes: '84',
+      likes: '',
       comments: '12',
       permalink: 'https://instagram.com/mbravobycarolina/'
     },
@@ -2824,7 +2825,7 @@ app.get("/api/instagram", async (req, res) => {
       img: 'https://i.ibb.co/zWNCP5Nx/Stella-Cushion-7-1.png',
       alt: 'Stella Cushion M★BRAVO',
       productName: 'Stella Cushion',
-      likes: '92',
+      likes: '',
       comments: '9',
       permalink: 'https://instagram.com/mbravobycarolina/'
     },
@@ -2833,7 +2834,7 @@ app.get("/api/instagram", async (req, res) => {
       img: 'https://i.ibb.co/wNdC8NNG/Granny-square-sling-bag-20.png',
       alt: 'Granny Square Sling Bag M★BRAVO',
       productName: 'Granny Square Sling Bag',
-      likes: '79',
+      likes: '',
       comments: '8',
       permalink: 'https://instagram.com/mbravobycarolina/'
     },
@@ -2842,7 +2843,7 @@ app.get("/api/instagram", async (req, res) => {
       img: 'https://i.ibb.co/kVZvr34t/Sunflower-coasters-5.png',
       alt: 'Sunflower Coasters M★BRAVO',
       productName: 'Sunflower Coasters Set',
-      likes: '56',
+      likes: '',
       comments: '4',
       permalink: 'https://instagram.com/mbravobycarolina/'
     },
@@ -2851,7 +2852,7 @@ app.get("/api/instagram", async (req, res) => {
       img: 'https://i.ibb.co/VY1dx3nt/Mini-shell-Pouch.png',
       alt: 'Mini Shell Pouch M★BRAVO',
       productName: 'Mini Shell Pouch',
-      likes: '71',
+      likes: '',
       comments: '7',
       permalink: 'https://instagram.com/mbravobycarolina/'
     }
@@ -2873,13 +2874,18 @@ app.get("/api/instagram", async (req, res) => {
           if (!cleanedName || cleanedName.length > 35) {
             cleanedName = curatedFallback[idx % curatedFallback.length].productName;
           }
+          const rawLikes = post.likeCount ?? post.like_count ?? post.likes;
+          const cleanLikes = (rawLikes !== undefined && rawLikes !== null && String(rawLikes).trim() !== '' && String(rawLikes) !== '0') ? String(rawLikes) : '';
+          const rawComments = post.commentsCount ?? post.comments_count ?? post.comments;
+          const cleanComments = (rawComments !== undefined && rawComments !== null && String(rawComments).trim() !== '') ? String(rawComments) : '';
+
           return {
             id: post.id || String(idx + 1),
             img: post.sizes?.medium?.mediaUrl || post.mediaUrl || post.thumbnailUrl || curatedFallback[idx % curatedFallback.length].img,
             alt: `${cleanedName} M★BRAVO`,
             productName: cleanedName,
-            likes: post.likeCount ? String(post.likeCount) : String(50 + idx * 7),
-            comments: post.commentsCount ? String(post.commentsCount) : String(3 + idx * 2),
+            likes: cleanLikes,
+            comments: cleanComments,
             permalink: post.permalink || 'https://instagram.com/mbravobycarolina/'
           };
         });
