@@ -5470,7 +5470,7 @@ const InstagramSection = () => {
             img: '/products/daisy-coasters/1.webp',
             alt: 'Daisy Coasters M★BRAVO',
             productName: 'Daisy Coasters Set',
-            likes: '',
+            likes: '20',
             comments: '5',
             permalink: 'https://instagram.com/mbravobycarolina/',
             className: gridClassNames[0]
@@ -5480,7 +5480,7 @@ const InstagramSection = () => {
             img: '/products/african-flower-pouch/1.webp',
             alt: 'African Flower Pouch M★BRAVO',
             productName: 'African Flower Pouch',
-            likes: '',
+            likes: '17',
             comments: '12',
             permalink: 'https://instagram.com/mbravobycarolina/',
             className: gridClassNames[1]
@@ -5490,7 +5490,7 @@ const InstagramSection = () => {
             img: '/products/stella-cushion/1.webp',
             alt: 'Stella Cushion M★BRAVO',
             productName: 'Stella Cushion',
-            likes: '',
+            likes: '34',
             comments: '9',
             permalink: 'https://instagram.com/mbravobycarolina/',
             className: gridClassNames[2]
@@ -5500,7 +5500,7 @@ const InstagramSection = () => {
             img: '/products/granny-square-sling-bag/1.webp',
             alt: 'Granny Square Sling Bag M★BRAVO',
             productName: 'Granny Square Sling Bag',
-            likes: '',
+            likes: '17',
             comments: '8',
             permalink: 'https://instagram.com/mbravobycarolina/',
             className: gridClassNames[3]
@@ -5510,7 +5510,7 @@ const InstagramSection = () => {
             img: '/products/sunflower-coasters/1.webp',
             alt: 'Sunflower Coasters M★BRAVO',
             productName: 'Sunflower Coasters Set',
-            likes: '',
+            likes: '14',
             comments: '4',
             permalink: 'https://instagram.com/mbravobycarolina/',
             className: gridClassNames[4]
@@ -5520,7 +5520,7 @@ const InstagramSection = () => {
             img: '/products/mini-shell-pouch/1.webp',
             alt: 'Mini Shell Pouch M★BRAVO',
             productName: 'Mini Shell Pouch',
-            likes: '',
+            likes: '12',
             comments: '7',
             permalink: 'https://instagram.com/mbravobycarolina/',
             className: gridClassNames[5]
@@ -5601,7 +5601,7 @@ const InstagramSection = () => {
                                     />
                                     {/* Overlay on Hover */}
                                     <div className="absolute inset-0 bg-forest/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col items-center justify-center gap-2 text-cream z-10 p-2 text-center">
-                                        {post.likes && String(post.likes).trim() !== '' && String(post.likes) !== '0' ? (
+                                        {post.likes !== undefined && post.likes !== null && String(post.likes).trim() !== '' ? (
                                             <div className="flex items-center gap-1.5 text-sm font-sans font-medium">
                                                 <Heart size={16} fill="currentColor" className="text-cream" />
                                                 <span>{post.likes}</span>
