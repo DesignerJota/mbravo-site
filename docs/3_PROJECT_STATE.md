@@ -615,6 +615,13 @@ Para que o repositório no GitHub fique 100% sincronizado com a versão final de
         - **Grelha Dupla & Módulo Atelier:** Bloco horizontal para "Personalizar Peça (Passaporte)" e grelha de 2 colunas em blocos quadrados para "Coleção Online" e "Catálogo de Peças", sem ícones decorativos de brilho.
         - **Dock Horizontal de Redes (Estilo iOS Dock):** Barra horizontal flutuante no rodapé contendo unicamente os ícones oficiais minimalistas do WhatsApp, Instagram, Pinterest e Google Maps/Avaliações, com pílula discreta de partilha.
         - **Modal QR Code Minimalista de Luxo:** Redefinido com título principal "M★BRAVO" em tipografia serifada, subtítulo "Cartão Digital" e instrução discreta "Aponte a câmara do telemóvel para aceder diretamente." com botão de cópia de link.
+        - **Alinhamento do Rodapé:** Ajustado a centralização de "CREATED WITH TIME ♥" no fundo da página para que o texto e o coração fiquem perfeitamente alinhados.
+        - **Reformulação Editorial do Modal "Passaporte de Co-Criação" (`AtelierPrivateStudioModal.tsx`):** Redesenho completo do modal do Atelier para a estética "Editorial Premium/Minimalista" (#FAF7F2, tipografia limpa, sem grelhas escuras ou calculadoras densas). Apresenta:
+          * Cabeçalho: Título "Passaporte de Co-Criação" | Subtítulo "M★BRAVO Atelier".
+          * Seleção de Peça: Escolha do produto no catálogo com visualização de **1 FOTO DE DESTAQUE** em tempo real da peça selecionada.
+          * Opções Básicas de Algodão Virgem: Escolha limpa de tons do fio DROPS Safran/Paris.
+          * Formulário de Captação & Aniversário: Recolha de Nome Completo, Email, Contacto/WhatsApp, Data de Aniversário (para mimos exclusivos) e Notas da Ocasião.
+          * Botão "Reservar Sessão & Enviar Passaporte": Regista a lead no backend/storage e abre o WhatsApp com os dados estruturados do Passaporte.
     *   **Estabilização de Rede PostgreSQL e DNS IPv4:** Inserida a instrução `dns.setDefaultResultOrder('ipv4first')` no topo do `server.ts`, forçando a resolução IPv4 antes do IPv6 para eliminar os erros de ligação `connect ENETUNREACH` no ambiente Cloud/Railway ao comunicar com a base de dados.
 
 ### B. Roteiro Técnico de Otimização Mobile & iOS WebKit (Meta: PageSpeed >90 - FASE 1 CONCLUÍDA):
