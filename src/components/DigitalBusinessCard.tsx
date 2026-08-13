@@ -54,12 +54,12 @@ export const DigitalBusinessCard: React.FC<DigitalBusinessCardProps> = ({ onNavi
 VERSION:3.0
 N:Bravo;Carolina;;;
 FN:Carolina | M★BRAVO
-ORG:M★BRAVO Atelier
+ORG:M★BRAVO
 TITLE:Fundadora & Designer
 TEL;TYPE=CELL,VOICE;TYPE=pref:+351912828182
 EMAIL:encomendas@mbravobycarolina.com
 URL:https://mbravobycarolina.com/card
-NOTE:M★BRAVO Atelier — Peças artesanais feitas com tempo, amor e memórias. Handmade in Portugal.
+NOTE:M★BRAVO — Peças artesanais feitas com tempo, amor e memórias. Handmade in Portugal.
 END:VCARD`;
 
     const blob = new Blob([vcardData], { type: 'text/vcard;charset=utf-8' });
@@ -114,7 +114,7 @@ END:VCARD`;
   const handleRecommend = async () => {
     const shareText = "Conhece a M★BRAVO — Peças feitas com tempo, amor e memórias: https://mbravobycarolina.com/card";
     const shareData = {
-      title: 'M★BRAVO Atelier',
+      title: 'M★BRAVO',
       text: shareText,
       url: 'https://mbravobycarolina.com/card',
     };
@@ -219,7 +219,7 @@ END:VCARD`;
               <div className="w-full h-full rounded-full overflow-hidden border border-[#FAF7F2] bg-[#EFE8D8] relative">
                 <img 
                   src="/story-1.webp" 
-                  alt="Carolina — M★BRAVO Atelier" 
+                  alt="Carolina — M★BRAVO" 
                   className="w-full h-full object-cover object-center"
                   onError={(e) => {
                     (e.target as HTMLElement).style.display = 'none';
