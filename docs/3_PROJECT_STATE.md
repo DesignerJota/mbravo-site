@@ -670,5 +670,19 @@ Para que o repositório no GitHub fique 100% sincronizado com a versão final de
     *   **3. Escala Geral & Tipografia de Alta-Costura:** Otimização dos paddings, espaçamentos e caixas de input em todo o fluxo do carrinho e checkout. Inputs com linha inferior delutada (`border-b border-[#343E2C]/20 py-2 text-xs`), botões e seletores com toque confortável e proporções refinadas.
     *   **4. Galeria Dinâmica de Imagens (.webp):** Habilitada a faixa interativa de miniaturas (thumbnails strip) em mobile, tablet e desktop no modal da página de produto (PDP) no `src/App.tsx` (`flex gap-1.5 sm:gap-2 p-1 sm:p-1.5 bg-[#FCFBF9]/90 backdrop-blur-xl rounded-xl border border-forest/10 max-w-[92%] overflow-x-auto`), permitindo navegar e alternar dinamicamente em tempo real de 2 a 8+ fotos `.webp` por produto em qualquer ecrã.
 
+*   [x] **Refinamento do Design Responsivo Sistémico de Indicadores e Polaroids (`App.tsx` & `index.css`):**
+    *   **1. Padronização Global do Carrossel (Memória Crua, PDP & Testemunhos) com Dots 6px:**
+        *   Identificada e corrigida a sobreposição CSS em `src/index.css` (`media query max-width: 640px` com `button { min-height: 44px; min-width: 44px; }`), que forçava os botões dos indicadores a expandirem para bolas gigantes em telas menores.
+        *   Criada a classe soberana `.slider-dot` em `src/index.css` com regras `min-height: 0 !important; min-width: 0 !important; width: 6px !important; height: 6px !important;`, garantindo a aplicação estrita do design circular minimalista de 6px em **Mobile, Tablet e Desktop (PC)** em todos os sliders da loja (`Memória Crua`, `Galeria PDP/QuickView` e `Testemunhos`).
+        *   Os indicadores repousam num micro-container translúcido e discreto (`p-1.5 rounded-full bg-black/20 backdrop-blur-xs border border-white/10 shadow-xs`), com o ponto ativo em dourado emissivo (`bg-[#C5A059] scale-110 shadow-[0_0_6px_rgba(197,160,89,0.9)]`), sem cobrir nem interferir com as fotografias.
+    *   **2. Coerência Sistémica e Proporção Áurea das Polaroids via Container Queries (`@container` / `cqw`):**
+        *   **Eliminação do Erro de Viewport Global (`vw`/`rem`):** Superado o erro estrutural de cálculo por viewport da janela, que inflacionava o texto em monitores PC largos para cartões pequenos de 1 coluna na grelha assimétrica de 9 colunas.
+        *   **Implementação de Container Queries Nativas (`containerType: 'inline-size'` e `cqw`):** Cada cartão Polaroid agora comanda diretamente a escala dos seus próprios elementos internos com base na sua largura física real (`cqw`):
+            *   *Paddings do Cartão:* `clamp(6px, 3.6cqw, 12px)` e inferior `clamp(8px, 4.8cqw, 16px)`.
+            *   *Linha com Estrela Dourada ($--- \star ---$):* Estrela vetorial em `clamp(7px, 4.2cqw, 11px)` e margens verticais em `clamp(4px, 2.8cqw, 9px)`.
+            *   *Texto 'M★BRAVO' (Esquerda):* `clamp(6.5px, 3.6cqw, 9.5px)` (`font-mono tracking-[0.12em] font-bold`).
+            *   *Nome do Produto (Direita):* `clamp(7px, 4.0cqw, 10.5px)` (`font-serif italic`).
+        *   **Harmonia Visual em Todas as Escalas:** Quer o cartão ocupe 2 colunas (~270px) ou 1 coluna (~130px) no PC, ou 160px no telemóvel, o respiro, a moldura e a tipografia de alta-costura preservam rigorosamente a mesma proporção áurea e elegância tátil.
+
 *   [ ] **VIP Atelier Concierge & Agendamento Privado:** Módulo de contacto direto via WhatsApp/Vídeo com Carolina para encomendar peças à medida para noivas, eventos e edições limitadas.
 *   [ ] **Soundscape Atmosférico do Atelier:** Ativação opcional no topo do site de um ambiente sonoro suave e relaxante do atelier (ritmo do tear e ambiente acústico artesanal) elevando a experiência sensorial da marca.
