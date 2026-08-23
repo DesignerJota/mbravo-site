@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { 
   X, 
@@ -10,57 +10,69 @@ import {
   Calendar,
   Minus,
   Plus,
-  Maximize2,
-  Sparkles
+  Maximize2
 } from 'lucide-react';
-import { YARN_COLORS_DATABASE, YarnColor, getCleanColorName } from '../data/yarns';
+import { YARN_COLORS_DATABASE, getCleanColorName } from '../data/yarns';
+import { useLanguage, translateColor, translateSize } from '../translations';
 
 interface AtelierPrivateStudioModalProps {
   isOpen: boolean;
   onClose: () => void;
 }
 
-// 1. Official Catalog Pieces without technical code noise
+// 1. Official Catalog Pieces with bilingual naming and categorization
 const ATELIER_PRODUCTS = [
   { 
     id: 'cardigan-alma', 
-    name: 'Cardigan Alma', 
-    category: 'Vestuário Autoral',
+    namePt: 'Cardigan Alma', 
+    nameEn: 'Alma Cardigan',
+    categoryPt: 'Vestuário Autoral',
+    categoryEn: 'Authorial Knitwear',
     image: '/products/alma-cardigan/1.webp',
     fallbackImage: '/vestuario.webp'
   },
   { 
     id: 'mala-sling', 
-    name: 'Mala Sling', 
-    category: 'Mala em Crochet',
+    namePt: 'Mala Sling', 
+    nameEn: 'Sling Bag',
+    categoryPt: 'Mala em Crochet',
+    categoryEn: 'Crochet Bag',
     image: '/products/granny-square-sling-bag/1.webp',
     fallbackImage: '/malas.webp'
   },
   { 
     id: 'pouch-mini', 
-    name: 'Pouch Mini', 
-    category: 'Mini Mala & Acessório',
+    namePt: 'Pouch Mini', 
+    nameEn: 'Mini Pouch',
+    categoryPt: 'Mini Mala & Acessório',
+    categoryEn: 'Mini Bag & Accessory',
     image: '/products/mini-pouches/1.webp',
     fallbackImage: '/acessorios.webp'
   },
   { 
     id: 'poncho-couture', 
-    name: 'Poncho Couture', 
-    category: 'Acessório Nobre',
+    namePt: 'Poncho Couture', 
+    nameEn: 'Poncho Couture',
+    categoryPt: 'Acessório Nobre',
+    categoryEn: 'Noble Accessory',
     image: '/products/signature-granny-poncho/1.webp',
     fallbackImage: '/vestuario.webp'
   },
   { 
     id: 'almofada-mbravo', 
-    name: 'Almofada M★BRAVO', 
-    category: 'Decor para a Casa',
+    namePt: 'Almofada M★BRAVO', 
+    nameEn: 'M★BRAVO Cushion',
+    categoryPt: 'Decor para a Casa',
+    categoryEn: 'Home Decor',
     image: '/products/stella-cushion/1.webp',
     fallbackImage: '/casa.webp'
   },
   { 
     id: 'porta-copos', 
-    name: 'Porta-Copos', 
-    category: 'Mesa & Decor',
+    namePt: 'Porta-Copos', 
+    nameEn: 'Coasters',
+    categoryPt: 'Mesa & Decor',
+    categoryEn: 'Table & Decor',
     image: '/products/coraline-coasters/1.webp',
     fallbackImage: '/casa.webp'
   }
@@ -82,6 +94,7 @@ export const AtelierPrivateStudioModal: React.FC<AtelierPrivateStudioModalProps>
   isOpen,
   onClose
 }) => {
+  const { lang, t } = useLanguage();
   const [selectedProduct, setSelectedProduct] = useState(ATELIER_PRODUCTS[0]);
   const [selectedColor, setSelectedColor] = useState(INITIAL_FEATURED_COLORS[0]);
   const [showAllColors, setShowAllColors] = useState(false);
@@ -128,20 +141,42 @@ export const AtelierPrivateStudioModal: React.FC<AtelierPrivateStudioModalProps>
   // Swatches displayed
   const visibleColors = showAllColors ? allOfficialColors : allOfficialColors.slice(0, 6);
 
+  const currentProductName = lang === 'en' ? selectedProduct.nameEn : selectedProduct.namePt;
+  const currentProductCategory = lang === 'en' ? selectedProduct.categoryEn : selectedProduct.categoryPt;
+  const currentColorName = translateColor(selectedColor.name, lang);
+  const currentSizeName = translateSize(selectedSize, lang);
+
   // Generate formatted WhatsApp Passaporte Criativo text
   const generateWhatsAppMessage = () => {
-    const namePart = clientName.trim() ? `O meu nome é ${clientName.trim()}. ` : '';
+    const isEn = lang === 'en';
+    const namePart = clientName.trim() 
+      ? (isEn ? `My name is ${clientName.trim()}. ` : `O meu nome é ${clientName.trim()}. `) 
+      : '';
     const emailPart = clientEmail.trim() ? `\n• Email: ${clientEmail.trim()}` : '';
-    const phonePart = clientPhone.trim() ? `\n• Contacto: ${clientPhone.trim()}` : '';
-    const bdayPart = clientBirthday.trim() ? `\n• Aniversário: ${clientBirthday.trim()}` : '';
-    const notesPart = customNotes.trim() ? `\n• Visão / Notas: "${customNotes.trim()}"` : '';
+    const phonePart = clientPhone.trim() ? `\n• ${isEn ? 'Contact' : 'Contacto'}: ${clientPhone.trim()}` : '';
+    const bdayPart = clientBirthday.trim() ? `\n• ${isEn ? 'Birthday' : 'Aniversário'}: ${clientBirthday.trim()}` : '';
+    const notesPart = customNotes.trim() ? `\n• ${isEn ? 'Vision / Notes' : 'Visão / Notas'}: "${customNotes.trim()}"` : '';
+
+    if (isEn) {
+      return `Hello Carolina! ${namePart}I would like to request my M★BRAVO Co-Creation Passport:
+
+✦ SELECTED PIECE:
+• Piece: ${currentProductName} (${currentProductCategory})
+• Shade: ${currentColorName}
+• Size / Scale: ${currentSizeName}
+• Quantity: ${quantity}
+
+✦ CLIENT DETAILS:${emailPart}${phonePart}${bdayPart}${notesPart}
+
+I would like to schedule my private session with M★BRAVO.`;
+    }
 
     return `Olá Carolina! ${namePart}Gostaria de solicitar o meu Passaporte de Co-Criação M★BRAVO:
 
 ✦ PEÇA SELECIONADA:
-• Peça: ${selectedProduct.name} (${selectedProduct.category})
-• Tom: ${selectedColor.name}
-• Tamanho / Escala: ${selectedSize}
+• Peça: ${currentProductName} (${currentProductCategory})
+• Tom: ${currentColorName}
+• Tamanho / Escala: ${currentSizeName}
 • Quantidade: ${quantity}
 
 ✦ DADOS DO CLIENTE:${emailPart}${phonePart}${bdayPart}${notesPart}
@@ -159,12 +194,13 @@ Gostaria de agendar a minha sessão privada com a M★BRAVO.`;
       clientEmail: clientEmail.trim(),
       clientPhone: clientPhone.trim(),
       clientBirthday: clientBirthday.trim(),
-      productName: selectedProduct.name,
-      productCategory: selectedProduct.category,
-      colorName: selectedColor.name,
-      size: selectedSize,
+      productName: currentProductName,
+      productCategory: currentProductCategory,
+      colorName: currentColorName,
+      size: currentSizeName,
       quantity,
-      notes: customNotes.trim()
+      notes: customNotes.trim(),
+      language: lang.toUpperCase()
     };
 
     // 1. Save in backend persistent store & send email notification
@@ -232,18 +268,18 @@ Gostaria de agendar a minha sessão privada com a M★BRAVO.`;
                   M<span className="text-[#8C6D3B] mx-0.5">★</span>BRAVO
                 </h2>
                 <span className="text-[10px] uppercase tracking-[0.2em] font-sans font-semibold text-[#8C6D3B] block border-l border-[#243119]/20 pl-2">
-                  Co-Criação
+                  {t('passport.badge')}
                 </span>
               </div>
               <p className="text-[11px] font-sans text-[#243119]/70 mt-0.5">
-                Passaporte de Co-Criação Sob Medida
+                {t('passport.subtitle')}
               </p>
             </div>
 
             <button
               onClick={onClose}
               className="w-8 h-8 rounded-full bg-white border border-[#243119]/10 text-[#243119] hover:text-[#8C6D3B] hover:bg-[#FAF6EE] flex items-center justify-center transition-colors cursor-pointer shrink-0"
-              aria-label="Fechar Modal"
+              aria-label={t('passport.close_aria')}
             >
               <X size={16} />
             </button>
@@ -268,10 +304,10 @@ Gostaria de agendar a minha sessão privada com a M★BRAVO.`;
                   style={{ fontFamily: "'Cormorant Garamond', serif" }}
                   className="text-2xl sm:text-3xl text-[#243119] font-normal"
                 >
-                  Passaporte Registado
+                  {t('passport.success_title')}
                 </h3>
                 <p className="text-xs sm:text-sm text-[#243119]/80 max-w-md mx-auto leading-relaxed font-sans">
-                  O seu Passaporte de Co-Criação foi gravado e o comprovativo enviado para o seu e-mail. A Carolina entrará em contacto para confirmar a sua sessão privada.
+                  {t('passport.success_desc')}
                 </p>
                 <div className="pt-2">
                   <button
@@ -281,7 +317,7 @@ Gostaria de agendar a minha sessão privada com a M★BRAVO.`;
                     }}
                     className="py-2.5 px-6 rounded-full bg-[#243119] text-[#FAF8F5] text-xs uppercase tracking-widest font-sans font-medium hover:bg-[#1A2412] transition-colors cursor-pointer"
                   >
-                    Concluir & Fechar
+                    {t('passport.success_btn')}
                   </button>
                 </div>
               </motion.div>
@@ -291,13 +327,15 @@ Gostaria de agendar a minha sessão privada com a M★BRAVO.`;
                 {/* 1. SELEÇÃO DE PEÇA & FOTO DE DESTAQUE */}
                 <div>
                   <label className="block text-[11px] uppercase tracking-[0.2em] font-sans font-semibold text-[#8C6D3B] mb-2">
-                    1. Escolha a Peça M★BRAVO
+                    {t('passport.step1_title')}
                   </label>
 
                   {/* Grid for Product Selection Pills */}
                   <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 mb-3">
                     {ATELIER_PRODUCTS.map((prod) => {
                       const isSelected = selectedProduct.id === prod.id;
+                      const prodName = lang === 'en' ? prod.nameEn : prod.namePt;
+                      const prodCat = lang === 'en' ? prod.categoryEn : prod.categoryPt;
                       return (
                         <button
                           key={prod.id}
@@ -313,10 +351,10 @@ Gostaria de agendar a minha sessão privada com a M★BRAVO.`;
                           }`}
                         >
                           <span className={`block font-serif italic text-xs sm:text-sm ${isSelected ? 'text-[#FAF8F5]' : 'text-[#243119]'}`}>
-                            {prod.name}
+                            {prodName}
                           </span>
                           <span className={`block text-[8px] uppercase tracking-wider font-sans mt-0.5 ${isSelected ? 'text-[#C5A059]' : 'text-[#243119]/50'}`}>
-                            {prod.category}
+                            {prodCat}
                           </span>
                         </button>
                       );
@@ -333,11 +371,11 @@ Gostaria de agendar a minha sessão privada com a M★BRAVO.`;
                       transition={{ duration: 0.25 }}
                       onClick={() => setIsLightboxOpen(true)}
                       className="relative w-full aspect-[21/9] sm:aspect-[2.4/1] rounded-2xl overflow-hidden bg-[#EFE8D8] border border-[#C5A059]/30 shadow-2xs group cursor-pointer"
-                      title="Clique para Ampliar / Zoom"
+                      title={t('passport.zoom_tooltip')}
                     >
                       <img 
                         src={currentImageUrl} 
-                        alt={selectedProduct.name}
+                        alt={currentProductName}
                         onError={() => setImgError(true)}
                         className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-700"
                       />
@@ -351,17 +389,17 @@ Gostaria de agendar a minha sessão privada com a M★BRAVO.`;
                       <div className="absolute bottom-2.5 left-3 right-3 flex items-end justify-between text-white z-10 pointer-events-none">
                         <div>
                           <span className="text-[9px] uppercase tracking-[0.2em] font-sans font-semibold text-[#C5A059] block">
-                            {selectedProduct.category}
+                            {currentProductCategory}
                           </span>
                           <h3 
                             style={{ fontFamily: "'Cormorant Garamond', serif" }}
                             className="text-lg sm:text-xl font-serif text-[#FAF8F5] leading-tight"
                           >
-                            {selectedProduct.name}
+                            {currentProductName}
                           </h3>
                         </div>
                         <span className="text-[9px] font-sans uppercase tracking-widest text-white/90 bg-black/40 px-2.5 py-0.5 rounded-full border border-white/20 backdrop-blur-xs flex items-center gap-1">
-                          <span>Ampliar</span>
+                          <span>{t('passport.enlarge')}</span>
                           <Maximize2 size={9} />
                         </span>
                       </div>
@@ -373,20 +411,23 @@ Gostaria de agendar a minha sessão privada com a M★BRAVO.`;
                 <div>
                   <div className="flex items-center justify-between mb-2">
                     <label className="text-[11px] uppercase tracking-[0.2em] font-sans font-semibold text-[#8C6D3B]">
-                      2. Tom do Algodão
+                      {t('passport.step2_title')}
                     </label>
                     <button
                       type="button"
                       onClick={() => setShowAllColors(!showAllColors)}
                       className="text-[10px] uppercase tracking-wider font-sans font-medium text-[#8C6D3B] hover:text-[#243119] underline transition-colors cursor-pointer"
                     >
-                      {showAllColors ? 'Menos Cores' : `+ Paleta Completa (${allOfficialColors.length} Tons)`}
+                      {showAllColors 
+                        ? t('passport.less_colors') 
+                        : `${t('passport.more_colors_prefix')} (${allOfficialColors.length} ${t('passport.more_colors_suffix')})`}
                     </button>
                   </div>
 
                   <div className="grid grid-cols-4 sm:grid-cols-6 gap-2.5 bg-white/60 p-3 rounded-2xl border border-[#243119]/10">
                     {visibleColors.map((color) => {
                       const isSelected = selectedColor.name === color.name;
+                      const localizedColorName = translateColor(color.name, lang);
                       return (
                         <button
                           key={color.id || color.name}
@@ -404,7 +445,7 @@ Gostaria de agendar a minha sessão privada com a M★BRAVO.`;
                             {color.swatchUrl && (
                               <img 
                                 src={color.swatchUrl} 
-                                alt={color.name}
+                                alt={localizedColorName}
                                 className="w-full h-full object-cover absolute inset-0"
                                 onError={(e) => {
                                   // Hide image on error to fallback to hex color
@@ -421,7 +462,7 @@ Gostaria de agendar a minha sessão privada com a M★BRAVO.`;
                           <span className={`text-[9px] font-sans text-center leading-tight transition-colors line-clamp-1 px-0.5 ${
                             isSelected ? 'font-semibold text-[#243119]' : 'text-[#243119]/60 group-hover:text-[#243119]'
                           }`}>
-                            {color.name}
+                            {localizedColorName}
                           </span>
                         </button>
                       );
@@ -432,17 +473,18 @@ Gostaria de agendar a minha sessão privada com a M★BRAVO.`;
                 {/* 3. ESPECIFICAÇÕES DA PEÇA (TAMANHO & QUANTIDADE) */}
                 <div>
                   <label className="block text-[11px] uppercase tracking-[0.2em] font-sans font-semibold text-[#8C6D3B] mb-2">
-                    3. Especificações da Peça
+                    {t('passport.step3_title')}
                   </label>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 bg-white/60 p-3 rounded-2xl border border-[#243119]/10">
                     {/* Escala / Tamanho */}
                     <div>
                       <span className="block text-[10px] uppercase tracking-wider font-sans text-[#243119]/70 mb-1.5 font-medium">
-                        Tamanho / Escala
+                        {t('passport.size_label')}
                       </span>
                       <div className="flex items-center gap-1">
                         {SIZES.map((sz) => {
                           const isSel = selectedSize === sz;
+                          const localizedSize = translateSize(sz, lang);
                           return (
                             <button
                               key={sz}
@@ -454,7 +496,7 @@ Gostaria de agendar a minha sessão privada com a M★BRAVO.`;
                                   : 'bg-white text-[#243119] border-[#243119]/15 hover:border-[#C5A059]'
                               }`}
                             >
-                              {sz}
+                              {localizedSize}
                             </button>
                           );
                         })}
@@ -464,14 +506,14 @@ Gostaria de agendar a minha sessão privada com a M★BRAVO.`;
                     {/* Quantidade */}
                     <div>
                       <span className="block text-[10px] uppercase tracking-wider font-sans text-[#243119]/70 mb-1.5 font-medium">
-                        Quantidade
+                        {t('passport.quantity_label')}
                       </span>
                       <div className="flex items-center justify-between bg-white border border-[#243119]/15 rounded-lg p-1 max-w-[130px]">
                         <button
                           type="button"
                           onClick={() => setQuantity(Math.max(1, quantity - 1))}
                           className="w-6 h-6 rounded-md bg-[#FAF7F2] hover:bg-[#EFE8D8] text-[#243119] flex items-center justify-center transition-colors cursor-pointer"
-                          aria-label="Diminuir"
+                          aria-label={t('passport.quantity_decrease')}
                         >
                           <Minus size={12} />
                         </button>
@@ -482,7 +524,7 @@ Gostaria de agendar a minha sessão privada com a M★BRAVO.`;
                           type="button"
                           onClick={() => setQuantity(quantity + 1)}
                           className="w-6 h-6 rounded-md bg-[#FAF7F2] hover:bg-[#EFE8D8] text-[#243119] flex items-center justify-center transition-colors cursor-pointer"
-                          aria-label="Aumentar"
+                          aria-label={t('passport.quantity_increase')}
                         >
                           <Plus size={12} />
                         </button>
@@ -494,7 +536,7 @@ Gostaria de agendar a minha sessão privada com a M★BRAVO.`;
                 {/* 4. FORMULÁRIO DE CAPTAÇÃO & ANIVERSÁRIO */}
                 <div className="space-y-3 pt-2 border-t border-[#243119]/10">
                   <span className="block text-[11px] uppercase tracking-[0.2em] font-sans font-semibold text-[#8C6D3B]">
-                    4. Dados de Agendamento
+                    {t('passport.step4_title')}
                   </span>
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -502,12 +544,12 @@ Gostaria de agendar a minha sessão privada com a M★BRAVO.`;
                     <div>
                       <label className="block text-[10px] uppercase tracking-wider font-sans font-medium text-[#243119]/80 mb-1 flex items-center gap-1">
                         <User size={11} className="text-[#8C6D3B]" />
-                        <span>Nome Completo *</span>
+                        <span>{t('passport.name_label')}</span>
                       </label>
                       <input
                         type="text"
                         required
-                        placeholder="Seu nome completo"
+                        placeholder={t('passport.name_placeholder')}
                         value={clientName}
                         onChange={(e) => setClientName(e.target.value)}
                         className="w-full bg-white border border-[#243119]/15 rounded-xl px-3 py-2 text-xs text-[#243119] placeholder-[#243119]/35 focus:outline-none focus:border-[#C5A059] transition-all"
@@ -518,12 +560,12 @@ Gostaria de agendar a minha sessão privada com a M★BRAVO.`;
                     <div>
                       <label className="block text-[10px] uppercase tracking-wider font-sans font-medium text-[#243119]/80 mb-1 flex items-center gap-1">
                         <Mail size={11} className="text-[#8C6D3B]" />
-                        <span>Email *</span>
+                        <span>{t('passport.email_label')}</span>
                       </label>
                       <input
                         type="email"
                         required
-                        placeholder="seu.email@exemplo.com"
+                        placeholder={t('passport.email_placeholder')}
                         value={clientEmail}
                         onChange={(e) => setClientEmail(e.target.value)}
                         className="w-full bg-white border border-[#243119]/15 rounded-xl px-3 py-2 text-xs text-[#243119] placeholder-[#243119]/35 focus:outline-none focus:border-[#C5A059] transition-all"
@@ -534,12 +576,12 @@ Gostaria de agendar a minha sessão privada com a M★BRAVO.`;
                     <div>
                       <label className="block text-[10px] uppercase tracking-wider font-sans font-medium text-[#243119]/80 mb-1 flex items-center gap-1">
                         <Phone size={11} className="text-[#8C6D3B]" />
-                        <span>Contacto / WhatsApp *</span>
+                        <span>{t('passport.phone_label')}</span>
                       </label>
                       <input
                         type="tel"
                         required
-                        placeholder="+351 --- --- ---"
+                        placeholder={t('passport.phone_placeholder')}
                         value={clientPhone}
                         onChange={(e) => setClientPhone(e.target.value)}
                         className="w-full bg-white border border-[#243119]/15 rounded-xl px-3 py-2 text-xs text-[#243119] placeholder-[#243119]/35 focus:outline-none focus:border-[#C5A059] transition-all"
@@ -550,17 +592,17 @@ Gostaria de agendar a minha sessão privada com a M★BRAVO.`;
                     <div>
                       <label className="block text-[10px] uppercase tracking-wider font-sans font-medium text-[#243119]/80 mb-1 flex items-center gap-1">
                         <Calendar size={11} className="text-[#8C6D3B]" />
-                        <span>Data de Aniversário</span>
+                        <span>{t('passport.birthday_label')}</span>
                       </label>
                       <input
                         type="text"
-                        placeholder="DD / MM / AAAA"
+                        placeholder={t('passport.birthday_placeholder')}
                         value={clientBirthday}
                         onChange={(e) => setClientBirthday(e.target.value)}
                         className="w-full bg-white border border-[#243119]/15 rounded-xl px-3 py-2 text-xs text-[#243119] placeholder-[#243119]/35 focus:outline-none focus:border-[#C5A059] transition-all"
                       />
                       <span className="block text-[9px] text-[#8C6D3B] font-sans mt-0.5 italic">
-                        Para mimá-la na sua data especial e métricas exclusivas.
+                        {t('passport.birthday_hint')}
                       </span>
                     </div>
                   </div>
@@ -568,11 +610,11 @@ Gostaria de agendar a minha sessão privada com a M★BRAVO.`;
                   {/* Notas do seu pedido / Ocasião especial */}
                   <div>
                     <label className="block text-[10px] uppercase tracking-wider font-sans font-medium text-[#243119]/80 mb-1">
-                      Notas do Pedido / Ocasião Especial (Opcional)
+                      {t('passport.notes_label')}
                     </label>
                     <textarea
                       rows={2}
-                      placeholder="Detalhes do seu pedido ou visão para a peça..."
+                      placeholder={t('passport.notes_placeholder')}
                       value={customNotes}
                       onChange={(e) => setCustomNotes(e.target.value)}
                       className="w-full bg-white border border-[#243119]/15 rounded-xl p-2.5 text-xs text-[#243119] placeholder-[#243119]/35 focus:outline-none focus:border-[#C5A059] transition-all resize-none"
@@ -594,7 +636,7 @@ Gostaria de agendar a minha sessão privada com a M★BRAVO.`;
                 className="w-full sm:w-auto py-3.5 px-8 rounded-full bg-[#243119] hover:bg-[#1A2412] text-[#FAF8F5] font-sans text-xs uppercase tracking-[0.2em] font-semibold shadow-xs hover:shadow-md transition-all cursor-pointer flex items-center justify-center gap-2.5 border border-[#243119] active:scale-[0.99]"
               >
                 <MessageCircle size={15} className="text-[#C5A059]" />
-                <span>{isSubmitting ? 'A ENVIAR PASSAPORTE...' : 'CONFIRMAR & ENVIAR PASSAPORTE'}</span>
+                <span>{isSubmitting ? t('passport.submitting_btn') : t('passport.submit_btn')}</span>
               </button>
             </div>
           )}
@@ -619,18 +661,18 @@ Gostaria de agendar a minha sessão privada com a M★BRAVO.`;
             <button 
               onClick={() => setIsLightboxOpen(false)} 
               className="absolute top-4 right-4 z-20 w-10 h-10 rounded-full bg-black/60 text-white flex items-center justify-center hover:bg-black/80 transition-colors cursor-pointer border border-white/20"
-              aria-label="Fechar Visualização"
+              aria-label={t('passport.lightbox_close')}
             >
               <X size={20} />
             </button>
             <img 
               src={currentImageUrl} 
-              alt={selectedProduct.name} 
+              alt={currentProductName} 
               className="max-h-[80vh] w-auto max-w-full object-contain rounded-xl mx-auto shadow-2xl" 
             />
             <div className="mt-3 text-white font-serif text-lg sm:text-xl flex items-center justify-center gap-2">
-              <span className="font-semibold">{selectedProduct.name}</span>
-              <span className="text-[#C5A059] italic text-sm">&bull; {selectedProduct.category}</span>
+              <span className="font-semibold">{currentProductName}</span>
+              <span className="text-[#C5A059] italic text-sm">&bull; {currentProductCategory}</span>
             </div>
           </motion.div>
         </div>
