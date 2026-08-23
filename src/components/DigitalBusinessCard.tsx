@@ -16,6 +16,7 @@ import {
   UserPlus
 } from 'lucide-react';
 import AtelierPrivateStudioModal from './AtelierPrivateStudioModal';
+import { useLanguage } from '../translations';
 
 // Official minimal SVG icons for iOS Dock
 const WhatsAppIcon = ({ size = 20, className = "" }: { size?: number, className?: string }) => (
@@ -41,78 +42,86 @@ interface DigitalBusinessCardProps {
 }
 
 export const DigitalBusinessCard: React.FC<DigitalBusinessCardProps> = ({ onNavigateHome }) => {
-  const [copied, setCopied] = useState(false);
+  const { lang, t } = useLanguage();
   const [recommendCopied, setRecommendCopied] = useState(false);
   const [vCardAdded, setVCardAdded] = useState(false);
   const [showQrModal, setShowQrModal] = useState(false);
   const [modalCopied, setModalCopied] = useState(false);
   const [showPrivateStudioModal, setShowPrivateStudioModal] = useState(false);
 
-  // 1. Native Mobile Contact Addition (MIME text/vcard)
+  // Language switcher handler
+  const handleLanguageChange = (newLang: 'PT' | 'EN') => {
+    localStorage.setItem('mbravo_lang', newLang);
+    window.dispatchEvent(new CustomEvent('mbravo-lang-change', { detail: newLang }));
+  };
+
+  // 1. Native Direct Mobile Contact Addition (MIME text/vcard with dynamic role/notes)
   const handleAddContact = () => {
-    const vcardData = `BEGIN:VCARD
-VERSION:3.0
-N:Bravo;Carolina;;;
-FN:Carolina | M★BRAVO
-ORG:M★BRAVO
-TITLE:Fundadora & Designer
-TEL;TYPE=CELL,VOICE;TYPE=pref:+351912828182
-EMAIL:encomendas@mbravobycarolina.com
-URL:https://mbravobycarolina.com/card
-NOTE:M★BRAVO — Peças artesanais feitas com tempo, amor e memórias. Handmade in Portugal.
-END:VCARD`;
+    const isEn = lang === 'en';
+    const vcardRole = isEn ? 'Founder & Creator' : 'Fundadora & Criadora';
+    const vcardOrg = 'M★BRAVO';
+    const vcardNote = isEn 
+      ? 'M★BRAVO — Artisanal pieces made with time, love and memories. Handmade in Portugal.' 
+      : 'M★BRAVO — Peças artesanais feitas com tempo, amor e memórias. Handmade in Portugal.';
+
+    const vcardData = [
+      'BEGIN:VCARD',
+      'VERSION:3.0',
+      'N:Bravo;Carolina;;;',
+      'FN:Carolina | M★BRAVO',
+      `ORG:${vcardOrg}`,
+      `TITLE:${vcardRole}`,
+      `ROLE:${vcardRole}`,
+      'TEL;TYPE=CELL,VOICE;TYPE=pref:+351912828182',
+      'EMAIL;TYPE=INTERNET,WORK,pref:encomendas@mbravobycarolina.com',
+      'URL;TYPE=WORK:https://mbravobycarolina.com/card',
+      'ADR;TYPE=WORK:;;Portugal;;;;',
+      `NOTE:${vcardNote}`,
+      'END:VCARD'
+    ].join('\r\n') + '\r\n';
 
     const blob = new Blob([vcardData], { type: 'text/vcard;charset=utf-8' });
     const url = URL.createObjectURL(blob);
     
-    // Check if on mobile (iOS / Android)
-    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+    // Detect OS: iOS vs Android vs Desktop
+    const userAgent = navigator.userAgent || navigator.vendor || (window as any).opera || '';
+    const isIOS = /iPad|iPhone|iPod/.test(userAgent) && !(window as any).MSStream;
+    const isAndroid = /Android/i.test(userAgent);
     
-    if (isMobile) {
-      // Direct navigation to Object URL prompts native Contact Sheet import on iOS/Android
+    if (isIOS) {
+      // Direct navigation on iOS WebKit/Safari immediately triggers the native "Add to Contacts" modal sheet
       window.location.href = url;
+    } else if (isAndroid) {
+      // On Android Chrome, trigger direct .vcf download which prompts Android to open Contacts app
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', 'Carolina_MBRAVO.vcf');
+      link.style.display = 'none';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
     } else {
+      // Desktop fallback
       const link = document.createElement('a');
       link.href = url;
       link.setAttribute('download', 'Carolina_MBRAVO.vcf');
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
-      setTimeout(() => URL.revokeObjectURL(url), 1000);
     }
+
+    setTimeout(() => URL.revokeObjectURL(url), 4000);
 
     setVCardAdded(true);
     setTimeout(() => setVCardAdded(false), 4000);
   };
 
-  // 2. Share card action
-  const handleShareCard = async () => {
-    const shareData = {
-      title: 'M★BRAVO — Cartão de Visita Digital',
-      text: 'Peças feitas com tempo, amor e memórias: https://mbravobycarolina.com/card',
-      url: 'https://mbravobycarolina.com/card',
-    };
-
-    if (navigator.share) {
-      try {
-        await navigator.share(shareData);
-      } catch (err) {
-        // Dismissed
-      }
-    } else {
-      try {
-        await navigator.clipboard.writeText(shareData.url);
-        setCopied(true);
-        setTimeout(() => setCopied(false), 3000);
-      } catch (e) {
-        // Fallback
-      }
-    }
-  };
-
-  // 3. Recommend action
+  // 2. Recommend/Share action
   const handleRecommend = async () => {
-    const shareText = "Conhece a M★BRAVO — Peças feitas com tempo, amor e memórias: https://mbravobycarolina.com/card";
+    const isEn = lang === 'en';
+    const shareText = isEn 
+      ? "Discover M★BRAVO — Pieces made with time, love and memories: https://mbravobycarolina.com/card"
+      : "Conhece a M★BRAVO — Peças feitas com tempo, amor e memórias: https://mbravobycarolina.com/card";
     const shareData = {
       title: 'M★BRAVO',
       text: shareText,
@@ -136,7 +145,7 @@ END:VCARD`;
     }
   };
 
-  // 4. Copy Modal Link
+  // 3. Copy Modal Link
   const handleCopyModalLink = async () => {
     try {
       await navigator.clipboard.writeText('https://mbravobycarolina.com/card');
@@ -146,6 +155,12 @@ END:VCARD`;
       // Fallback
     }
   };
+
+  // WhatsApp link dynamic by language
+  const whatsappText = lang === 'en'
+    ? 'Hello%20Carolina%2C%20I%20would%20like%20to%20know%20more%20about%20M%E2%98%85BRAVO%20pieces.'
+    : 'Ol%C3%A1%20Carolina%2C%20gostaria%20de%20saber%20mais%20sobre%20as%20pe%C3%A7as%20M%E2%98%85BRAVO.';
+  const whatsappUrl = `https://wa.me/351912828182?text=${whatsappText}`;
 
   return (
     <div className="min-h-screen bg-[#FAF7F2] text-[#243119] flex flex-col items-center justify-between p-4 sm:p-6 md:p-8 relative overflow-hidden font-sans select-none antialiased">
@@ -174,7 +189,7 @@ END:VCARD`;
         </defs>
       </svg>
 
-      {/* Top Header Bar */}
+      {/* Top Header Bar with Multi-language Selector */}
       <header className="w-full max-w-md flex items-center justify-between gap-2 z-20 pt-2 mb-3">
         <button
           onClick={() => {
@@ -187,8 +202,25 @@ END:VCARD`;
           className="inline-flex items-center gap-1.5 text-[11px] sm:text-xs uppercase tracking-[0.18em] font-sans font-medium text-[#243119]/80 hover:text-[#8C6D3B] transition-colors py-2 px-3.5 rounded-full bg-white/80 hover:bg-white backdrop-blur-md border border-[#243119]/10 shadow-xs cursor-pointer whitespace-nowrap shrink-0"
         >
           <ArrowLeft size={13} className="text-[#8C6D3B] shrink-0" />
-          <span>Voltar ao site</span>
+          <span>{t('card.back_site')}</span>
         </button>
+
+        {/* Multi-language Selector (PT / EN) identical to the main site */}
+        <div className="inline-flex items-center text-[10px] uppercase tracking-[0.2em] font-medium py-1.5 px-3 rounded-full bg-white/80 backdrop-blur-md border border-[#243119]/10 text-[#243119]">
+          <button 
+            onClick={() => handleLanguageChange('PT')} 
+            className={`transition-all duration-200 cursor-pointer hover:text-[#8C6D3B] ${lang === 'pt' ? 'font-bold text-[#8C6D3B] opacity-100' : 'opacity-40 hover:opacity-80'}`}
+          >
+            PT
+          </button>
+          <span className="mx-2 text-[#243119]/20">|</span>
+          <button 
+            onClick={() => handleLanguageChange('EN')} 
+            className={`transition-all duration-200 cursor-pointer hover:text-[#8C6D3B] ${lang === 'en' ? 'font-bold text-[#8C6D3B] opacity-100' : 'opacity-40 hover:opacity-80'}`}
+          >
+            EN
+          </button>
+        </div>
 
         <button
           onClick={() => setShowQrModal(true)}
@@ -196,7 +228,7 @@ END:VCARD`;
           title="QR Code"
         >
           <QrCode size={13} className="text-[#8C6D3B] shrink-0" />
-          <span>QR Code</span>
+          <span>{t('card.qr_btn')}</span>
         </button>
       </header>
 
@@ -238,10 +270,10 @@ END:VCARD`;
             style={{ fontFamily: "'Cormorant Garamond', serif", letterSpacing: '0.04em' }}
             className="text-2xl sm:text-3xl font-normal text-[#243119] leading-tight"
           >
-            Carolina <span className="text-[#8C6D3B] font-serif">|</span> M<span className="text-[#8C6D3B] mx-0.5">★</span>BRAVO
+            {t('card.name_title')} <span className="text-[#8C6D3B] font-serif">|</span> M<span className="text-[#8C6D3B] mx-0.5">★</span>BRAVO
           </h1>
           <p className="text-[11px] font-sans font-medium text-[#8C6D3B] mt-0.5 mb-2.5">
-            Fundadora & Designer
+            {t('card.role')}
           </p>
 
           {/* Welcome Note */}
@@ -249,7 +281,7 @@ END:VCARD`;
             style={{ fontFamily: "'Cormorant Garamond', serif" }}
             className="font-serif italic text-sm sm:text-base text-[#243119]/85 leading-snug max-w-[320px] mb-4"
           >
-            &ldquo;Olá! Cada peça M★BRAVO carrega tempo, intenção e alma. Leva-nos contigo.&rdquo;
+            {t('card.welcome_note')}
           </p>
 
           {/* Primary Action Button Integrated directly in Card */}
@@ -259,7 +291,7 @@ END:VCARD`;
           >
             {vCardAdded ? <Check size={17} className="text-[#C5A059]" /> : <UserPlus size={17} className="text-[#C5A059]" />}
             <span className="font-serif italic text-base sm:text-lg font-medium">
-              {vCardAdded ? 'Contacto Adicionado!' : 'Adicionar aos Contactos'}
+              {vCardAdded ? t('card.contact_saved') : t('card.save_contact')}
             </span>
           </button>
         </motion.div>
@@ -277,7 +309,7 @@ END:VCARD`;
               <Palette size={18} />
             </div>
             <span className="font-serif italic text-base sm:text-lg font-medium text-[#243119]">
-              Personalizar Peça (Passaporte)
+              {t('card.passport_btn')}
             </span>
           </div>
         </motion.button>
@@ -302,7 +334,7 @@ END:VCARD`;
               <ShoppingBag size={18} />
             </div>
             <span className="font-serif italic text-base sm:text-lg font-medium text-[#243119] leading-tight">
-              Coleção Online
+              {t('card.online_collection')}
             </span>
           </motion.button>
 
@@ -324,7 +356,7 @@ END:VCARD`;
               <Store size={18} />
             </div>
             <span className="font-serif italic text-base sm:text-lg font-medium text-[#243119] leading-tight">
-              Catálogo de Peças
+              {t('card.piece_catalog')}
             </span>
           </motion.button>
         </div>
@@ -338,7 +370,7 @@ END:VCARD`;
         >
           {/* WhatsApp */}
           <a
-            href="https://wa.me/351912828182?text=Ol%C3%A1%20Carolina%2C%20gostaria%20de%20saber%20mais%20sobre%20as%20pe%C3%A7as%20M%E2%98%85BRAVO."
+            href={whatsappUrl}
             target="_blank"
             rel="noopener noreferrer"
             title="WhatsApp"
@@ -390,7 +422,7 @@ END:VCARD`;
           className="inline-flex items-center gap-2 text-xs font-sans font-medium text-[#8C6D3B] hover:text-[#243119] transition-colors py-2 px-4 rounded-full bg-[#EFE8D8]/80 hover:bg-[#EFE8D8] border border-[#C5A059]/40 cursor-pointer shadow-2xs mt-0.5"
         >
           <Share2 size={13} className="text-[#8C6D3B]" />
-          <span>{recommendCopied ? 'Link Copiado!' : 'Partilhar Cartão'}</span>
+          <span>{recommendCopied ? t('card.link_copied') : t('card.share_card')}</span>
         </motion.button>
       </main>
 
@@ -398,10 +430,10 @@ END:VCARD`;
       <footer className="w-full max-w-md flex flex-col items-center justify-center text-center gap-1.5 z-20 pb-2 mt-4">
         <div className="flex items-center justify-center gap-2 text-[10px] uppercase tracking-[0.25em] font-sans font-medium text-[#8C6D3B] bg-white/80 py-1.5 px-4 rounded-full border border-[#C5A059]/30 shadow-2xs backdrop-blur-md">
           <ShieldCheck size={12} className="text-[#8C6D3B] shrink-0" />
-          <span>M★BRAVO — Handmade in Portugal</span>
+          <span>{t('card.made_in')}</span>
         </div>
         <p className="text-[9px] font-sans uppercase tracking-[0.25em] text-[#243119]/50 flex items-center justify-center gap-1.5 w-full text-center">
-          <span>Created with time</span>
+          <span>{t('card.created_with_time')}</span>
           <Heart size={9} className="text-[#8C6D3B] inline fill-[#8C6D3B] shrink-0" />
         </p>
       </footer>
@@ -435,10 +467,10 @@ END:VCARD`;
                   M<span className="text-[#8C6D3B] mx-0.5">★</span>BRAVO
                 </h2>
                 <p className="text-xs uppercase tracking-[0.25em] font-sans font-semibold text-[#8C6D3B] mt-1.5">
-                  Cartão Digital
+                  {t('card.modal_title')}
                 </p>
                 <p className="text-xs text-[#243119]/75 font-sans mt-2 max-w-[270px] mx-auto leading-relaxed">
-                  Aponte a câmara do telemóvel para aceder diretamente.
+                  {t('card.modal_hint')}
                 </p>
               </div>
 
@@ -457,7 +489,7 @@ END:VCARD`;
                 className="w-full py-2.5 px-4 rounded-xl bg-[#243119] hover:bg-[#1A2412] text-[#FAF8F5] text-xs font-sans font-medium flex items-center justify-center gap-2 transition-all cursor-pointer shadow-xs mt-2"
               >
                 {modalCopied ? <Check size={14} className="text-[#C5A059]" /> : <Copy size={14} className="text-[#C5A059]" />}
-                <span>{modalCopied ? 'Link Copiado!' : 'Copiar mbravobycarolina.com/card'}</span>
+                <span>{modalCopied ? t('card.link_copied') : t('card.copy_link')}</span>
               </button>
             </motion.div>
           </div>
