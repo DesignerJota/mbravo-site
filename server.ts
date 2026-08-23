@@ -296,12 +296,20 @@ app.post("/api/payment/create-intent", async (req, res) => {
       hasSize: productHasSize
     };
 
+    // Determine order locale based on checkout language and shipping address country
+    const rawLocale = (req.body.locale || checkoutForm.locale || req.body.lang || 'pt').toLowerCase().trim();
+    const country = (checkoutForm.pais || checkoutForm.country || req.body.country || 'PT').toUpperCase().trim();
+    const isInternationalCountry = country !== 'PT' && country !== 'PORTUGAL' && country !== 'PRT';
+    const isInternationalShipping = req.body.shippingZone === 'international' || req.body.shippingZone === 'islands_eu' || req.body.shippingZone === 'spain';
+    const orderLocale: 'pt' | 'en' = (rawLocale === 'en' || isInternationalCountry || isInternationalShipping) ? 'en' : 'pt';
+
     const order: any = {
       orderId,
       productName: sanitizeText(product.name),
       price: priceNum,
       selections: sanitizedSelections,
       customer: sanitizedCustomer,
+      locale: orderLocale,
       paymentMethod,
       status: "pending_payment",
       priority,
@@ -319,6 +327,7 @@ app.post("/api/payment/create-intent", async (req, res) => {
       tamanho: productHasSize ? (selections?.tamanho || '') : '',
       hasSize: productHasSize ? 'true' : 'false',
       quantidade: selections?.quantidade || '1',
+      locale: orderLocale,
       customerName: checkoutForm.nome || '',
       customerEmail: checkoutForm.email || '',
       customerPhone: checkoutForm.telefone || '',
@@ -1969,6 +1978,9 @@ app.post("/api/admin/orders/update", verifyAdmin, (req, res) => {
   if (selections) {
     order.selections = { ...(order.selections || {}), ...selections };
   }
+  if (req.body.locale) {
+    order.locale = (String(req.body.locale).toLowerCase().trim() === 'en') ? 'en' : 'pt';
+  }
 
   // If status is updated to shipped, generate the shipped email!
   if (status === 'shipped') {
@@ -2045,6 +2057,9 @@ app.post("/api/admin/orders/create", verifyAdmin, async (req, res) => {
   // Generate distinctive order ID
   const orderId = `MB-2026-${Math.floor(1000 + Math.random() * 9000)}`;
   
+  // Determine order locale for manual creation
+  const manualLocale: 'pt' | 'en' = (String(req.body.locale || req.body.emailLanguage || 'pt').toLowerCase().trim() === 'en') ? 'en' : 'pt';
+
   const newOrder: any = {
     orderId,
     productName: cleanProductName,
@@ -2066,6 +2081,7 @@ app.post("/api/admin/orders/create", verifyAdmin, async (req, res) => {
       cidade: sanitizeText(customer?.cidade),
       nif: sanitizeText(customer?.nif).replace(/\D/g, "")
     },
+    locale: manualLocale,
     paymentMethod: paymentMethod || "manual",
     status: status || "paid",
     priority: priority || "NORMAL",
