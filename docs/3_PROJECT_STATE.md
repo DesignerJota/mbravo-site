@@ -695,5 +695,21 @@ Para que o repositório no GitHub fique 100% sincronizado com a versão final de
         *   Em dispositivos móveis (iPhone/iOS e Android), o botão "Guardar Contacto" / "Save Contact" aciona diretamente a folha nativa de contactos do sistema operativo (`window.location.href = url` com `Blob` MIME `text/vcard;charset=utf-8` para iOS e download direto de `.vcf` em Android), solicitando de imediato a permissão para gravar/adicionar o contacto na agenda do telemóvel de forma automática, sem atrito de ficheiros soltos.
         *   Em navegadores desktop, disponibiliza o download imediato do ficheiro `Carolina_MBRAVO.vcf` com feedback visual de confirmação *"Contacto Guardado!"* / *"Contact Saved!"*.
 
+*   [x] **Sincronização Multi-Idioma no Modal do Passaporte de Co-criação (`AtelierPrivateStudioModal.tsx` & `translations.ts`):**
+    *   **1. Extensão do Hook de Língua (`useLanguage`):** O modal consome o estado global `'mbravo_lang'` e o evento dinâmico `'mbravo-lang-change'`, reagindo instantaneamente a qualquer alteração de idioma quer seja aberto a partir do Cartão Digital (`/card` ou `/links`) ou de qualquer outra secção.
+    *   **2. Localização Completa da Interface:** Todos os títulos de secção (*"1. Escolha a Peça M★BRAVO"* / *"1. Choose the M★BRAVO Piece"*), nomes de peças e categorias (*"Alma Cardigan / Authorial Knitwear"*, *"Sling Bag / Crochet Bag"*), swatches de cores traduzidas (*"Sand Natural"*, *"Forest Green"*, *"Marea Powder Blue"*), escalas de tamanho (*"One Size"*, *"Custom Fit"*), rótulos, placeholders e dicas do formulário passam dinamicamente para Inglês.
+    *   **3. Formatação Bilingue do Envio WhatsApp e Armazenamento:** A mensagem estruturada enviada para o WhatsApp da Carolina e os dados guardados no histórico local/API assumem a redação formal em Inglês quando em modo EN (*"Hello Carolina! My name is..."* e secções traduzidas) ou em Português quando em modo PT.
+
+*   [x] **Sistema de Disparo de E-mails Transacionais Bilingue (PT / EN) & Automação Inteligente (`emailService.ts`, `server.ts`, `AtelierCartDrawer.tsx` & `AdminDashboardModal.tsx`):**
+    *   **1. Compras Automáticas no Website (Checkout):**
+        *   O frontend (`AtelierCartDrawer.tsx`) envia ativamente o parâmetro `locale: lang` no payload de checkout para `/api/payment/create-intent`.
+        *   O backend avalia o idioma selecionado e o destino de envio: se a morada pertencer a um país estrangeiro (não-Portugal) ou o idioma do checkout for `EN`, a encomenda grava automaticamente `locale: 'en'`, assumindo o Inglês como idioma soberano para todos os e-mails associados à transação (confirmação de compra, recibo e notificação de envio com tracking CTT).
+    *   **2. Vendas Manuais no Painel Admin:**
+        *   Adicionado o seletor visual e intuitivo **"Idioma dos E-mails"** `[ Português (PT) | English (EN) ]` no formulário de inserção manual de encomendas (`showManualForm`) e no modal de edição rápida de encomendas (`editingOrderModal`).
+        *   Ao registar uma encomenda no Dashboard, os e-mails transacionais subsequentes (disparados no checkout, na notificação do atelier ou ao marcar a encomenda como expedida/shipped com código CTT) são emitidos no idioma configurado.
+    *   **3. Modelos de E-mail de Alta-Costura Localizados:**
+        *   As funções geradoras (`generateCustomerEmailHtml`, `generateShippedEmailHtml`, `generateMultibancoEmailHtml` e `generateAdminEmailHtml`) foram enriquecidas com um dicionário de alta-costura bilíngue, adaptando títulos de assunto, cabeçalhos, detalhes do produto, mensagem de produção artesanal e notas de rodapé institucionais com rigor ortográfico e elegância de marca em PT e EN.
+        *   Salvaguarda estrita da "Gold Rule" de integridade financeira: `if (order.status !== 'paid') { return ... }`.
+
 *   [ ] **VIP Atelier Concierge & Agendamento Privado:** Módulo de contacto direto via WhatsApp/Vídeo com Carolina para encomendar peças à medida para noivas, eventos e edições limitadas.
 *   [ ] **Soundscape Atmosférico do Atelier:** Ativação opcional no topo do site de um ambiente sonoro suave e relaxante do atelier (ritmo do tear e ambiente acústico artesanal) elevando a experiência sensorial da marca.
