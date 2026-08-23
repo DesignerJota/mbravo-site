@@ -684,5 +684,16 @@ Para que o repositório no GitHub fique 100% sincronizado com a versão final de
             *   *Nome do Produto (Direita):* `clamp(7px, 4.0cqw, 10.5px)` (`font-serif italic`).
         *   **Harmonia Visual em Todas as Escalas:** Quer o cartão ocupe 2 colunas (~270px) ou 1 coluna (~130px) no PC, ou 160px no telemóvel, o respiro, a moldura e a tipografia de alta-costura preservam rigorosamente a mesma proporção áurea e elegância tátil.
 
+*   [x] **Integração e Automação do vCard Bilingue & Gravação Nativa no Telemóvel (`DigitalBusinessCard.tsx` & `translations.ts`):**
+    *   **1. Suporte Multi-idioma (PT / EN):**
+        *   Integrado o seletor minimalista de idiomas (PT | EN) no cabeçalho do Cartão Digital, perfeitamente alinhado com o padrão estético e de persistência do site (`localStorage` `mbravo_lang` e evento `mbravo-lang-change`).
+        *   Toda a interface do cartão adapta-se instantaneamente em tempo real (botão "Voltar ao site" / "Back to site", "Personalizar Peça (Passaporte)" / "Customize Piece (Passport)", "Coleção Online" / "Online Collection", "Catálogo de Peças" / "Pieces Catalog", "Partilhar Cartão" / "Share Card", rodapé e modal QR Code).
+    *   **2. Cargos e Dados de Contacto Bilingues no vCard:**
+        *   O arquivo vCard (.vcf) gerado dinamicamente reflete com rigor o idioma ativo: cargo *"Fundadora & Criadora"* (PT) / *"Founder & Creator"* (EN) e notas institucionais de alta-costura traduzidas.
+        *   A hiperligação de contacto do WhatsApp ajusta o texto da mensagem predefinida automaticamente consoante a língua escolhida pelo visitante.
+    *   **3. Gravação Direta e Acionamento Nativo no Sistema Operativo (iOS / Android):**
+        *   Em dispositivos móveis (iPhone/iOS e Android), o botão "Guardar Contacto" / "Save Contact" aciona diretamente a folha nativa de contactos do sistema operativo (`window.location.href = url` com `Blob` MIME `text/vcard;charset=utf-8` para iOS e download direto de `.vcf` em Android), solicitando de imediato a permissão para gravar/adicionar o contacto na agenda do telemóvel de forma automática, sem atrito de ficheiros soltos.
+        *   Em navegadores desktop, disponibiliza o download imediato do ficheiro `Carolina_MBRAVO.vcf` com feedback visual de confirmação *"Contacto Guardado!"* / *"Contact Saved!"*.
+
 *   [ ] **VIP Atelier Concierge & Agendamento Privado:** Módulo de contacto direto via WhatsApp/Vídeo com Carolina para encomendar peças à medida para noivas, eventos e edições limitadas.
 *   [ ] **Soundscape Atmosférico do Atelier:** Ativação opcional no topo do site de um ambiente sonoro suave e relaxante do atelier (ritmo do tear e ambiente acústico artesanal) elevando a experiência sensorial da marca.
