@@ -300,6 +300,7 @@ export default function AdminDashboardModal({ onClose, shopCategories = [] }: Ad
     paymentMethod: 'card',
     status: 'paid',
     priority: 'NORMAL',
+    locale: 'pt' as 'pt' | 'en',
     accessories: {
       fecho: false,
       fechoQty: 1,
@@ -752,6 +753,7 @@ export default function AdminDashboardModal({ onClose, shopCategories = [] }: Ad
           paymentMethod: manualForm.paymentMethod,
           status: manualForm.status,
           priority: manualForm.priority,
+          locale: manualForm.locale || 'pt',
           createdAt: new Date().toISOString()
         })
       });
@@ -1307,7 +1309,11 @@ export default function AdminDashboardModal({ onClose, shopCategories = [] }: Ad
   });
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-0 md:p-4 bg-forest/80 backdrop-blur-sm select-text w-full max-w-full overflow-y-auto pointer-events-auto modal-landscape-container">
+    <div 
+      data-lenis-prevent 
+      onWheel={(e) => e.stopPropagation()} 
+      className="fixed inset-0 z-[100] flex items-center justify-center p-0 md:p-4 bg-forest/80 backdrop-blur-sm select-text w-full max-w-full overflow-y-auto pointer-events-auto modal-landscape-container"
+    >
       <motion.div 
         initial={{ scale: 0.95, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
@@ -2263,7 +2269,7 @@ export default function AdminDashboardModal({ onClose, shopCategories = [] }: Ad
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                  <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
                     {/* NIF */}
                     <div className="space-y-1">
                       <label className="font-bold uppercase tracking-wider text-[10px] text-forest/50">NIF (Opcional)</label>
@@ -2316,6 +2322,19 @@ export default function AdminDashboardModal({ onClose, shopCategories = [] }: Ad
                       >
                         <option value="NORMAL">NORMAL</option>
                         <option value="ALTA (Atelier Urgente)">URGENTE (Atelier)</option>
+                      </select>
+                    </div>
+
+                    {/* Email Language */}
+                    <div className="space-y-1">
+                      <label className="font-bold uppercase tracking-wider text-[10px] text-[#C5A059]">Idioma dos E-mails</label>
+                      <select 
+                        value={manualForm.locale || 'pt'}
+                        onChange={(e) => setManualForm(prev => ({ ...prev, locale: e.target.value as 'pt' | 'en' }))}
+                        className="w-full bg-white border border-[#C5A059]/30 rounded-xl px-3 py-2.5 focus:outline-none focus:border-[#C5A059] font-medium text-forest text-xs"
+                      >
+                        <option value="pt">Português (PT)</option>
+                        <option value="en">English (EN)</option>
                       </select>
                     </div>
                   </div>
@@ -5667,6 +5686,18 @@ export default function AdminDashboardModal({ onClose, shopCategories = [] }: Ad
                   onChange={(e) => setEditingOrderModal((prev: any) => ({ ...prev, paymentMethod: e.target.value }))}
                   className="w-full bg-white border border-forest/15 rounded-xl px-2.5 py-2 text-xs focus:outline-none focus:border-[#C5A059]"
                 />
+              </div>
+
+              <div className="space-y-1">
+                <label className="font-bold uppercase tracking-wider text-[10px] text-[#C5A059]">Idioma dos E-mails</label>
+                <select
+                  value={editingOrderModal.locale || 'pt'}
+                  onChange={(e) => setEditingOrderModal((prev: any) => ({ ...prev, locale: e.target.value as 'pt' | 'en' }))}
+                  className="w-full bg-white border border-[#C5A059]/30 rounded-xl px-2.5 py-2 text-xs focus:outline-none focus:border-[#C5A059] font-medium text-forest"
+                >
+                  <option value="pt">Português (PT)</option>
+                  <option value="en">English (EN)</option>
+                </select>
               </div>
             </div>
 
