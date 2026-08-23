@@ -331,6 +331,7 @@ export const AtelierCartDrawer: React.FC = () => {
               shippingZone: selectedShippingZone,
               amountInCents: totalInCents,
               checkoutForm: expressCustomer,
+              locale: lang,
               paymentMethod: 'wallet',
               walletType: walletTypeRef.current
             })
@@ -593,6 +594,7 @@ export const AtelierCartDrawer: React.FC = () => {
                 shippingZone: selectedShippingZone,
                 amountInCents: totalInCents,
                 checkoutForm: expressCustomer,
+                locale: lang,
                 paymentMethod: 'wallet',
                 walletType: walletTypeRef.current
               })
@@ -704,6 +706,7 @@ export const AtelierCartDrawer: React.FC = () => {
           shippingZone: selectedShippingZone,
           amountInCents: Math.round(totalPrice * 100),
           checkoutForm,
+          locale: lang,
           paymentMethod,
           mode: 'test'
         })
