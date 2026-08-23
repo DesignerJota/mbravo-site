@@ -353,7 +353,28 @@ export const translations = {
     "testimonials.label_text": "O seu Comentário",
     "testimonials.label_product": "Peça Adquirida (ex: Mala Daisy)",
     "testimonials.submit_button": "Publicar Testemunho",
-    "testimonials.success_message": "Muito obrigado! O seu testemunho foi adicionado com sucesso."
+    "testimonials.success_message": "Muito obrigado! O seu testemunho foi adicionado com sucesso.",
+
+    // Digital Business Card (Cartão de Visita Digital)
+    "card.back_site": "Voltar ao site",
+    "card.qr_btn": "QR Code",
+    "card.name_title": "Carolina",
+    "card.role": "Fundadora & Designer",
+    "card.welcome_note": "«Olá! Cada peça M★BRAVO carrega tempo, intenção e alma. Leva-nos contigo.»",
+    "card.save_contact": "Guardar Contacto",
+    "card.contact_saved": "Contacto Guardado!",
+    "card.passport_btn": "Personalizar Peça (Passaporte)",
+    "card.online_collection": "Coleção Online",
+    "card.piece_catalog": "Catálogo de Peças",
+    "card.whatsapp_text": "Ol%C3%A1%20Carolina%2C%20gostaria%20de%20saber%20mais%20sobre%20as%20pe%C3%A7as%20M%E2%98%85BRAVO.",
+    "card.share_card": "Partilhar Cartão",
+    "card.link_copied": "Link Copiado!",
+    "card.made_in": "M★BRAVO — Handmade in Portugal",
+    "card.created_with_time": "Created with time",
+    "card.modal_title": "Cartão Digital",
+    "card.modal_hint": "Aponte a câmara do telemóvel para aceder diretamente.",
+    "card.copy_link": "Copiar mbravobycarolina.com/card",
+    "card.vcard_note": "M★BRAVO — Peças artesanais feitas com tempo, amor e memórias. Handmade in Portugal."
   },
   en: {
     "brand.slogan": "Every stitch holds a memory.",
@@ -567,7 +588,28 @@ export const translations = {
     "testimonials.label_text": "Your Comment",
     "testimonials.label_product": "Purchased Piece (e.g. Mala Daisy)",
     "testimonials.submit_button": "Publish Testimonial",
-    "testimonials.success_message": "Thank you very much! Your testimonial was successfully added."
+    "testimonials.success_message": "Thank you very much! Your testimonial was successfully added.",
+
+    // Digital Business Card
+    "card.back_site": "Back to site",
+    "card.qr_btn": "QR Code",
+    "card.name_title": "Carolina",
+    "card.role": "Founder & Designer",
+    "card.welcome_note": "“Hello! Each M★BRAVO piece carries time, intention, and soul. Take us with you.”",
+    "card.save_contact": "Save Contact",
+    "card.contact_saved": "Contact Saved!",
+    "card.passport_btn": "Customize Piece (Passport)",
+    "card.online_collection": "Online Collection",
+    "card.piece_catalog": "Pieces Catalog",
+    "card.whatsapp_text": "Hello%20Carolina%2C%20I%20would%20like%20to%20know%20more%20about%20M%E2%98%85BRAVO%20pieces.",
+    "card.share_card": "Share Card",
+    "card.link_copied": "Link Copied!",
+    "card.made_in": "M★BRAVO — Handmade in Portugal",
+    "card.created_with_time": "Created with time",
+    "card.modal_title": "Digital Card",
+    "card.modal_hint": "Point your phone camera to access directly.",
+    "card.copy_link": "Copy mbravobycarolina.com/card",
+    "card.vcard_note": "M★BRAVO — Artisanal pieces made with time, love and memories. Handmade in Portugal."
   }
 };
 
