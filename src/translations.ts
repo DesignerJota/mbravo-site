@@ -374,7 +374,44 @@ export const translations = {
     "card.modal_title": "Cartão Digital",
     "card.modal_hint": "Aponte a câmara do telemóvel para aceder diretamente.",
     "card.copy_link": "Copiar mbravobycarolina.com/card",
-    "card.vcard_note": "M★BRAVO — Peças artesanais feitas com tempo, amor e memórias. Handmade in Portugal."
+    "card.vcard_note": "M★BRAVO — Peças artesanais feitas com tempo, amor e memórias. Handmade in Portugal.",
+
+    // Passaporte de Co-Criação / Private Studio Passport
+    "passport.badge": "Co-Criação",
+    "passport.subtitle": "Passaporte de Co-Criação Sob Medida",
+    "passport.close_aria": "Fechar Modal",
+    "passport.success_title": "Passaporte Registado",
+    "passport.success_desc": "O seu Passaporte de Co-Criação foi gravado e o comprovativo enviado para o seu e-mail. A Carolina entrará em contacto para confirmar a sua sessão privada.",
+    "passport.success_btn": "Concluir & Fechar",
+    "passport.step1_title": "1. Escolha a Peça M★BRAVO",
+    "passport.zoom_tooltip": "Clique para Ampliar / Zoom",
+    "passport.enlarge": "Ampliar",
+    "passport.step2_title": "2. Tom do Algodão",
+    "passport.less_colors": "Menos Cores",
+    "passport.more_colors_prefix": "+ Paleta Completa",
+    "passport.more_colors_suffix": "Tons",
+    "passport.step3_title": "3. Especificações da Peça",
+    "passport.size_label": "Tamanho / Escala",
+    "passport.size_unique": "Único",
+    "passport.size_custom": "Por Medida",
+    "passport.quantity_label": "Quantidade",
+    "passport.quantity_decrease": "Diminuir",
+    "passport.quantity_increase": "Aumentar",
+    "passport.step4_title": "4. Dados de Agendamento",
+    "passport.name_label": "Nome Completo *",
+    "passport.name_placeholder": "Seu nome completo",
+    "passport.email_label": "Email *",
+    "passport.email_placeholder": "seu.email@exemplo.com",
+    "passport.phone_label": "Contacto / WhatsApp *",
+    "passport.phone_placeholder": "+351 --- --- ---",
+    "passport.birthday_label": "Data de Aniversário",
+    "passport.birthday_placeholder": "DD / MM / AAAA",
+    "passport.birthday_hint": "Para mimá-la na sua data especial e métricas exclusivas.",
+    "passport.notes_label": "Notas do Pedido / Ocasião Especial (Opcional)",
+    "passport.notes_placeholder": "Detalhes do seu pedido ou visão para a peça...",
+    "passport.submit_btn": "CONFIRMAR & ENVIAR PASSAPORTE",
+    "passport.submitting_btn": "A ENVIAR PASSAPORTE...",
+    "passport.lightbox_close": "Fechar Visualização"
   },
   en: {
     "brand.slogan": "Every stitch holds a memory.",
@@ -609,7 +646,44 @@ export const translations = {
     "card.modal_title": "Digital Card",
     "card.modal_hint": "Point your phone camera to access directly.",
     "card.copy_link": "Copy mbravobycarolina.com/card",
-    "card.vcard_note": "M★BRAVO — Artisanal pieces made with time, love and memories. Handmade in Portugal."
+    "card.vcard_note": "M★BRAVO — Artisanal pieces made with time, love and memories. Handmade in Portugal.",
+
+    // Passaporte de Co-Criação / Private Studio Passport
+    "passport.badge": "Co-Creation",
+    "passport.subtitle": "Custom Made Co-Creation Passport",
+    "passport.close_aria": "Close Modal",
+    "passport.success_title": "Passport Registered",
+    "passport.success_desc": "Your Co-Creation Passport has been saved and confirmation sent to your email. Carolina will be in touch to confirm your private session.",
+    "passport.success_btn": "Complete & Close",
+    "passport.step1_title": "1. Choose the M★BRAVO Piece",
+    "passport.zoom_tooltip": "Click to Enlarge / Zoom",
+    "passport.enlarge": "Enlarge",
+    "passport.step2_title": "2. Cotton Shade",
+    "passport.less_colors": "Fewer Colors",
+    "passport.more_colors_prefix": "+ Full Palette",
+    "passport.more_colors_suffix": "Shades",
+    "passport.step3_title": "3. Piece Specifications",
+    "passport.size_label": "Size / Scale",
+    "passport.size_unique": "One Size",
+    "passport.size_custom": "Custom Fit",
+    "passport.quantity_label": "Quantity",
+    "passport.quantity_decrease": "Decrease",
+    "passport.quantity_increase": "Increase",
+    "passport.step4_title": "4. Booking Details",
+    "passport.name_label": "Full Name *",
+    "passport.name_placeholder": "Your full name",
+    "passport.email_label": "Email *",
+    "passport.email_placeholder": "your.email@example.com",
+    "passport.phone_label": "Contact / WhatsApp *",
+    "passport.phone_placeholder": "+351 --- --- ---",
+    "passport.birthday_label": "Birthday",
+    "passport.birthday_placeholder": "DD / MM / YYYY",
+    "passport.birthday_hint": "To treat you on your special day and tailor exclusive surprises.",
+    "passport.notes_label": "Order Notes / Special Occasion (Optional)",
+    "passport.notes_placeholder": "Details about your request or vision for the piece...",
+    "passport.submit_btn": "CONFIRM & SUBMIT PASSPORT",
+    "passport.submitting_btn": "SUBMITTING PASSPORT...",
+    "passport.lightbox_close": "Close View"
   }
 };
 
@@ -639,7 +713,19 @@ export const colorTranslations: Record<string, string> = {
   'Rosa Ternura': 'Tender Pink',
   'Castanho': 'Brown',
   'Branco': 'White',
-  // Yarn colors
+  // Yarn & Studio featured colors
+  'Natural Areia': 'Sand Natural',
+  'Verde Floresta': 'Forest Green',
+  'Café M★BRAVO': 'M★BRAVO Coffee',
+  'Rosa Deserto': 'Desert Rose',
+  'Azul Pó Marea': 'Marea Powder Blue',
+  'Baunilha Dourada': 'Golden Vanilla',
+  'Mostarda Quente': 'Warm Mustard',
+  'Verde Sálvia': 'Sage Green',
+  'Terracota Queimada': 'Burnt Terracotta',
+  'Azul Marinho': 'Navy Blue',
+  'Bordô Vintage': 'Vintage Burgundy',
+  'Cru Puro': 'Pure Raw',
   'Algodão Cru': 'Raw Cotton',
   'Cacau Escuro': 'Dark Cocoa',
   'Oliva Suave': 'Soft Olive',
@@ -841,6 +927,8 @@ export function translateSize(size: string, lang: 'pt' | 'en'): string {
   if (size === '2 anos') return '2 years';
   if (size === '4 anos') return '4 years';
   if (size === '6 anos') return '6 years';
+  if (size === 'Único') return 'One Size';
+  if (size === 'Por Medida') return 'Custom Fit';
   return size;
 }
 
